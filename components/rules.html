@@ -1,0 +1,70 @@
+<!-- COMPONENT: trading-rules -->
+<section class="content-section">
+  <h1>Daily Trading Rules</h1>
+  <p class="section-note">Maximum of 2 trades per day across all tiers. Small tier has a flat max daily loss of Rs. 1,800 at every sub-level; Medium, Large, and Pro tiers scale at 2% of capital.</p>
+
+  <div class="grid-table grid-rules">
+    <div class="cell head">Tier</div>
+    <div class="cell head num">Capital Cap (Rs.)</div>
+    <div class="cell head num">Max Loss (%)</div>
+    <div class="cell head num">Max Loss (Rs.)</div>
+
+    <!-- Small Tier: flat Rs. 1,800 max loss at every sub-level -->
+    <div class="cell label span-3">Small</div>
+    <div class="cell num cap">Rs. 25,000</div>
+    <div class="cell num">7.20%</div>
+    <div class="cell num">Rs. 1,800</div>
+
+    <div class="cell num cap">Rs. 50,000</div>
+    <div class="cell num">3.60%</div>
+    <div class="cell num">Rs. 1,800</div>
+
+    <div class="cell num cap">Rs. 75,000</div>
+    <div class="cell num">2.40%</div>
+    <div class="cell num">Rs. 1,800</div>
+
+    <!-- Medium Tier: 2% of capital -->
+    <div class="cell label span-3">Medium</div>
+    <div class="cell num cap">Rs. 1,00,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 2,000</div>
+
+    <div class="cell num cap">Rs. 2,00,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 4,000</div>
+
+    <div class="cell num cap">Rs. 5,00,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 10,000</div>
+
+    <!-- Large Tier: 2% of capital -->
+    <div class="cell label span-3">Large</div>
+    <div class="cell num cap">Rs. 5,00,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 10,000</div>
+
+    <div class="cell num cap">Rs. 7,50,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 15,000</div>
+
+    <div class="cell num cap">Rs. 10,00,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 20,000</div>
+
+    <!-- Pro Tier: 2% of capital -->
+    <div class="cell label span-3">Pro</div>
+    <div class="cell num cap">Rs. 10,00,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 20,000</div>
+
+    <div class="cell num cap">Rs. 15,00,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 30,000</div>
+
+    <div class="cell num cap">Rs. 20,00,000</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 40,000</div>
+  </div>
+  <p class="foot-note">Amounts in rupees. Maximum 2 trades allowed per day. A Trade 1 loss reaching 75% of the max daily loss blocks Trade 2; a loss reaching 100% triggers the kill switch.</p>
+</section>
+<!-- END COMPONENT: trading-rules -->

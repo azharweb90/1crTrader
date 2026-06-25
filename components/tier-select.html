@@ -1,0 +1,139 @@
+<!-- COMPONENT: tier-select -->
+<section class="content-section">
+  <h1>Set Up Your Profile</h1>
+  <p class="section-note">Choose your capital tier, enter your starting capital, and pick your trading style. You can change any of these anytime using the "Change Tier" button in the header.</p>
+
+  <!-- Step 1: Capital Tier -->
+  <div class="select-step">
+    <div class="select-step-title">1. Capital Tier</div>
+    <div class="tier-select-grid">
+      <button type="button" class="tier-select-card" data-tier="small" onclick="selectTier('small')">
+        <div class="tier-select-name">Small</div>
+        <div class="tier-select-range">Rs. 25,000 &ndash; Rs. 75,000</div>
+        <div class="tier-select-desc">Entry-level capital range</div>
+      </button>
+
+      <button type="button" class="tier-select-card" data-tier="medium" onclick="selectTier('medium')">
+        <div class="tier-select-name">Medium</div>
+        <div class="tier-select-range">Rs. 1,00,000 &ndash; Rs. 5,00,000</div>
+        <div class="tier-select-desc">Growing capital range</div>
+      </button>
+
+      <button type="button" class="tier-select-card" data-tier="large" onclick="selectTier('large')">
+        <div class="tier-select-name">Large</div>
+        <div class="tier-select-range">Rs. 5,00,000 &ndash; Rs. 10,00,000</div>
+        <div class="tier-select-desc">High capital range</div>
+      </button>
+
+      <button type="button" class="tier-select-card" data-tier="pro" onclick="selectTier('pro')">
+        <div class="tier-select-name">Pro</div>
+        <div class="tier-select-range">Rs. 10,00,000 &ndash; Rs. 20,00,000</div>
+        <div class="tier-select-desc">Professional capital range</div>
+      </button>
+    </div>
+
+    <div id="capital-amount-wrap" class="capital-amount-wrap hidden">
+      <label class="capital-amount-label" for="capital-amount-input">Enter your starting capital</label>
+      <div class="capital-amount-input-row">
+        <span class="capital-amount-prefix">Rs.</span>
+        <input
+          type="number"
+          id="capital-amount-input"
+          class="capital-amount-input"
+          min="0"
+          step="1"
+          placeholder="e.g. 150000"
+          oninput="onCapitalAmountInput()"
+        >
+      </div>
+      <p id="capital-amount-hint" class="capital-amount-hint"></p>
+      <p id="capital-amount-error" class="capital-amount-error hidden"></p>
+    </div>
+  </div>
+
+  <!-- Step 2: Trader Type -->
+  <div class="select-step">
+    <div class="select-step-title">2. Trading Style</div>
+    <div class="trader-type-grid">
+      <button type="button" class="trader-type-card" data-trader-type="option-buyer" onclick="selectTraderType('option-buyer')">
+        <div class="trader-type-name">Option Buyer</div>
+        <div class="trader-type-desc">Buys call/put options. Capital required is the option premium.</div>
+      </button>
+
+      <button type="button" class="trader-type-card" data-trader-type="option-seller" onclick="selectTraderType('option-seller')">
+        <div class="trader-type-name">Option Seller</div>
+        <div class="trader-type-desc">Writes (sells) call/put options. Requires margin, similar to futures.</div>
+      </button>
+
+      <button type="button" class="trader-type-card" data-trader-type="futures-trader" onclick="selectTraderType('futures-trader')">
+        <div class="trader-type-name">Futures Trader</div>
+        <div class="trader-type-desc">Trades futures contracts directly. Requires the highest margin.</div>
+      </button>
+
+      <button type="button" class="trader-type-card" data-trader-type="hedged-seller" onclick="selectTraderType('hedged-seller')">
+        <div class="trader-type-name">Hedged Seller</div>
+        <div class="trader-type-desc">Sells futures and buys an option for hedging to limit downside.</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 3: Instruments -->
+  <div class="select-step">
+    <div class="select-step-title">3. Instruments You Trade</div>
+    <p class="section-note" style="margin-bottom:12px;">Select one or more. You'll set lots and see the exact points stop-loss for each on the Daily Limits Tool.</p>
+
+    <button type="button" id="select-all-instruments-btn" class="select-all-btn" onclick="toggleSelectAllInstruments()">Select All</button>
+
+    <div class="instrument-grid">
+      <div class="instrument-card" data-instrument="nifty">
+        <button type="button" class="instrument-toggle" onclick="toggleInstrument('nifty')">
+          <span class="instrument-check"></span>
+          <span class="instrument-name">Nifty</span>
+          <span class="instrument-qty-label">65 qty/lot</span>
+        </button>
+      </div>
+
+      <div class="instrument-card" data-instrument="banknifty">
+        <button type="button" class="instrument-toggle" onclick="toggleInstrument('banknifty')">
+          <span class="instrument-check"></span>
+          <span class="instrument-name">Bank Nifty</span>
+          <span class="instrument-qty-label">30 qty/lot</span>
+        </button>
+      </div>
+
+      <div class="instrument-card" data-instrument="finnifty">
+        <button type="button" class="instrument-toggle" onclick="toggleInstrument('finnifty')">
+          <span class="instrument-check"></span>
+          <span class="instrument-name">FinNifty</span>
+          <span class="instrument-qty-label">60 qty/lot</span>
+        </button>
+      </div>
+
+      <div class="instrument-card" data-instrument="sensex">
+        <button type="button" class="instrument-toggle" onclick="toggleInstrument('sensex')">
+          <span class="instrument-check"></span>
+          <span class="instrument-name">Sensex</span>
+          <span class="instrument-qty-label">20 qty/lot</span>
+        </button>
+      </div>
+    </div>
+    <p id="instrument-error" class="capital-amount-error hidden"></p>
+
+    <div class="custom-stocks-wrap">
+      <label class="amount-label" for="custom-stock-input">Also Trade Stock Options? Add Your Own</label>
+      <div class="custom-stock-input-row">
+        <input type="text" id="custom-stock-input" class="journal-input" placeholder="e.g. Reliance, TCS, HDFC Bank" onkeydown="onCustomStockKeydown(event)">
+        <button type="button" class="custom-stock-add-btn" onclick="addCustomStock()">Add</button>
+      </div>
+      <div id="custom-stock-chips" class="custom-stock-chips"></div>
+      <p class="foot-note" style="margin-top:6px;">Type a stock name and press Enter or click Add. These appear alongside Nifty/Bank Nifty/etc. when picking an instrument while logging a trade.</p>
+    </div>
+  </div>
+
+  <button type="button" id="profile-continue-btn" class="profile-continue-btn" onclick="confirmProfile()" disabled>
+    Continue to Dashboard
+  </button>
+
+  <p class="foot-note">Your tier highlights matching rows and cards across the Capital Ladder, Daily Trading Rules, and Subscription Pricing tabs, and pre-selects your tier in the Daily Limits Tool. Your starting capital becomes the baseline for tracking your running balance as trades are logged. Instruments selected here appear on the Daily Limits Tool, where you'll set lots and see each one's points stop-loss.</p>
+</section>
+<!-- END COMPONENT: tier-select -->

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading System Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<div id="app-shell" class="app-shell">
+
+  <!-- Persistent left sidebar (hidden until profile setup is complete) -->
+  <nav id="sidebar" class="sidebar hidden">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-mark">PT</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-title">Prop Trading</div>
+        <div class="sidebar-brand-subtitle">Risk Blueprint</div>
+      </div>
+    </div>
+
+    <div class="sidebar-nav-group">
+      <button class="sidebar-link" data-tab="tab-dashboard" onclick="switchTab(event, 'tab-dashboard')">
+        <span class="sidebar-link-icon">⌂</span><span>Dashboard</span>
+      </button>
+      <button class="sidebar-link" data-tab="tab-calculator" onclick="switchTab(event, 'tab-calculator')">
+        <span class="sidebar-link-icon">⏱</span><span>Daily Limits Tool</span>
+      </button>
+      <button class="sidebar-link" data-tab="tab-roadmap" onclick="switchTab(event, 'tab-roadmap')">
+        <span class="sidebar-link-icon">↗</span><span>Roadmap</span>
+      </button>
+      <button class="sidebar-link" data-tab="tab-journal" onclick="switchTab(event, 'tab-journal')">
+        <span class="sidebar-link-icon">✎</span><span>Trading Journal</span>
+      </button>
+      <button class="sidebar-link" data-tab="tab-education" onclick="switchTab(event, 'tab-education')">
+        <span class="sidebar-link-icon">▶</span><span>Education</span>
+      </button>
+      <button class="sidebar-link" data-tab="tab-books" onclick="switchTab(event, 'tab-books')">
+        <span class="sidebar-link-icon">▤</span><span>Books</span>
+      </button>
+      <button class="sidebar-link" data-tab="tab-marketplace" onclick="switchTab(event, 'tab-marketplace')">
+        <span class="sidebar-link-icon">📡</span><span>Signal Marketplace</span>
+      </button>
+      <button class="sidebar-link" data-tab="tab-strategies" onclick="switchTab(event, 'tab-strategies')">
+        <span class="sidebar-link-icon">🧩</span><span>Strategies</span>
+      </button>
+    </div>
+
+    <div class="sidebar-nav-group sidebar-nav-group-bottom">
+      <button class="sidebar-link" data-tab="tab-settings" onclick="switchTab(event, 'tab-settings')">
+        <span class="sidebar-link-icon">⚙</span><span>Settings</span>
+      </button>
+      <button class="sidebar-link" data-tab="tab-subs" onclick="switchTab(event, 'tab-subs')">
+        <span class="sidebar-link-icon">★</span><span>Subscription Pricing</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main column: top bar + content -->
+  <div class="main-column">
+    <header id="top-bar" class="top-bar hidden">
+      <div class="top-bar-title">
+        <h1 id="top-bar-page-title" class="top-bar-page-title">Dashboard</h1>
+      </div>
+      <div class="top-bar-right">
+        <div id="header-balance-pill" class="header-balance-pill" style="display:none;">
+          <span class="header-balance-label">Balance</span>
+          <span id="header-balance-value" class="header-balance-value">&mdash;</span>
+        </div>
+        <span id="active-tier-badge" class="active-tier-badge" style="display:none;">
+          <span class="dot"></span>
+          <span id="active-tier-label"></span>
+        </span>
+      </div>
+    </header>
+
+    <main class="content-area">
+      <!-- Each tab-content is an empty slot; dashboard.js fetches the matching
+           components/*.html fragment into it the first time the tab is opened. -->
+      <div id="tab-select" class="tab-content active"></div>
+      <div id="tab-dashboard" class="tab-content"></div>
+      <div id="tab-calculator" class="tab-content"></div>
+      <div id="tab-roadmap" class="tab-content"></div>
+      <div id="tab-journal" class="tab-content"></div>
+      <div id="tab-education" class="tab-content"></div>
+      <div id="tab-books" class="tab-content"></div>
+      <div id="tab-marketplace" class="tab-content"></div>
+      <div id="tab-strategies" class="tab-content"></div>
+      <div id="tab-settings" class="tab-content"></div>
+      <div id="tab-subs" class="tab-content"></div>
+    </main>
+  </div>
+
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!-- COMPONENT: trading-journal -->
+<section class="content-section">
+  <h1>Trading Journal</h1>
+  <p class="section-note">Write down your strategy, reasoning, and emotions for each trade you've logged. Reviewing these regularly is one of the fastest ways to improve.</p>
+
+  <div id="journal-stats-bar" class="journal-stats-bar"></div>
+
+  <div class="journal-filter-row">
+    <div>
+      <label class="amount-label" for="journal-instrument-filter" style="margin-bottom:0;">Instrument</label>
+      <select id="journal-instrument-filter" class="select-input journal-filter-select" onchange="onJournalInstrumentFilterChange()">
+        <option value="">All instruments</option>
+      </select>
+    </div>
+    <div>
+      <label class="amount-label" for="journal-grade-filter" style="margin-bottom:0;">Grade</label>
+      <select id="journal-grade-filter" class="select-input journal-filter-select" onchange="onJournalGradeFilterChange()">
+        <option value="">All grades</option>
+        <option value="journaled">Journaled (any grade)</option>
+        <option value="not-journaled">Not journaled</option>
+      </select>
+    </div>
+    <div>
+      <label class="amount-label" for="journal-date-from" style="margin-bottom:0;">From</label>
+      <input type="date" id="journal-date-from" class="select-input journal-filter-select" onchange="onJournalDateFilterChange()">
+    </div>
+    <div>
+      <label class="amount-label" for="journal-date-to" style="margin-bottom:0;">To</label>
+      <input type="date" id="journal-date-to" class="select-input journal-filter-select" onchange="onJournalDateFilterChange()">
+    </div>
+    <button type="button" id="journal-filter-clear-btn" class="journal-filter-clear-btn" onclick="clearJournalFilters()">Clear filters</button>
+  </div>
+
+  <div id="journal-list-area"></div>
+
+  <!-- Entry form, shown when a trade is selected for journaling -->
+  <div id="journal-form-wrap" class="journal-form-wrap hidden">
+    <div class="journal-form-header">
+      <div>
+        <div class="journal-form-title">Journal Entry</div>
+        <div id="journal-form-trade-meta" class="journal-form-meta"></div>
+      </div>
+      <button type="button" class="journal-close-btn" onclick="closeJournalForm()">&times;</button>
+    </div>
+
+    <!-- 1. Trade Details -->
+    <div class="journal-section">
+      <div class="journal-section-title">1. Trade Details</div>
+      <div class="journal-field-grid">
+        <div>
+          <label class="amount-label">Instrument</label>
+          <input type="text" id="jf-instrument" class="journal-input" placeholder="e.g. Nifty, Bank Nifty">
+        </div>
+        <div>
+          <label class="amount-label">Direction</label>
+          <select id="jf-direction" class="select-input">
+            <option value="">Select</option>
+            <option value="long">Long / Buy</option>
+            <option value="short">Short / Sell</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Execution & Management -->
+    <div class="journal-section">
+      <div class="journal-section-title">2. Execution &amp; Management</div>
+      <div class="journal-field-grid">
+        <div>
+          <label class="amount-label">Entry Price</label>
+          <input type="number" id="jf-entry-price" class="journal-input" placeholder="e.g. 22150">
+        </div>
+        <div>
+          <label class="amount-label">Exit Price</label>
+          <input type="number" id="jf-exit-price" class="journal-input" placeholder="e.g. 22220">
+        </div>
+        <div>
+          <label class="amount-label">Stop Loss</label>
+          <input type="number" id="jf-stop-loss" class="journal-input" placeholder="e.g. 22100">
+        </div>
+        <div>
+          <label class="amount-label">Target</label>
+          <input type="number" id="jf-target" class="journal-input" placeholder="e.g. 22250">
+        </div>
+        <div>
+          <label class="amount-label">Risk:Reward Ratio</label>
+          <input type="text" id="jf-rr-ratio" class="journal-input" placeholder="e.g. 1:2">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Logic -->
+    <div class="journal-section">
+      <div class="journal-section-title">3. Logic</div>
+      <label class="amount-label">Setup / Entry Reason</label>
+      <textarea id="jf-setup-reason" class="journal-textarea" placeholder="Why did you take this trade? What setup or signal triggered the entry?"></textarea>
+      <label class="amount-label" style="margin-top:12px;">Market Conditions</label>
+      <textarea id="jf-market-conditions" class="journal-textarea" placeholder="What was the broader market/sector doing at the time?"></textarea>
+
+      <label class="amount-label" style="margin-top:12px;">Setup Screenshot</label>
+      <div id="jf-screenshot-dropzone" class="journal-screenshot-dropzone" tabindex="0"
+           onclick="triggerScreenshotPicker()" onpaste="onScreenshotPaste(event)">
+        <div id="jf-screenshot-empty" class="journal-screenshot-empty">
+          <div class="journal-screenshot-icon">🖼️</div>
+          <div>Click to upload, or click here and press <strong>Ctrl+V</strong> to paste a screenshot</div>
+        </div>
+        <div id="jf-screenshot-preview-wrap" class="journal-screenshot-preview-wrap hidden">
+          <img id="jf-screenshot-preview" class="journal-screenshot-preview" alt="Setup screenshot">
+          <button type="button" class="journal-screenshot-remove" onclick="removeScreenshot(event)">Remove</button>
+        </div>
+      </div>
+      <input type="file" id="jf-screenshot-input" accept="image/*" class="hidden" onchange="onScreenshotFileSelected(event)">
+      <p id="jf-screenshot-error" class="capital-amount-error hidden"></p>
+    </div>
+
+    <!-- 4. Psychology & Reflection -->
+    <div class="journal-section">
+      <div class="journal-section-title">4. Psychology &amp; Reflection</div>
+      <label class="amount-label">Emotion During The Trade</label>
+      <textarea id="jf-emotion" class="journal-textarea" placeholder="How were you feeling — confident, anxious, FOMO, calm? Be honest."></textarea>
+      <label class="amount-label" style="margin-top:12px;">Mistakes / What You'd Do Differently</label>
+      <textarea id="jf-mistakes" class="journal-textarea" placeholder="Anything you'd change next time? Rule broken? Good discipline shown?"></textarea>
+    </div>
+
+    <!-- 5. Trade Review Score -->
+    <div class="journal-section">
+      <div class="journal-section-title">5. Trade Review Score</div>
+      <p class="section-note" style="margin-bottom:10px;">Check what applied to this trade. Each item is weighted — the total maps to a letter grade, like a report card for your own discipline.</p>
+      <div id="journal-checklist-area"></div>
+      <div id="journal-grade-result" class="journal-grade-result"></div>
+    </div>
+
+    <div class="journal-form-actions">
+      <button type="button" id="journal-save-btn" class="trade-submit-btn outcome-btn journal-save-btn" onclick="saveCurrentJournalEntry()">Save Journal Entry</button>
+      <button type="button" id="journal-delete-btn" class="journal-delete-btn hidden" onclick="confirmDeleteJournalEntry()">Delete Entry</button>
+    </div>
+    <p id="journal-save-status" class="foot-note" style="margin-top:8px;"></p>
+  </div>
+</section>
+<!-- END COMPONENT: trading-journal -->

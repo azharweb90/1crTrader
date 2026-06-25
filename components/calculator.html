@@ -1,0 +1,184 @@
+<!-- COMPONENT: risk-calculator -->
+<section class="content-section">
+  <p class="section-note">This is your main screen — log today's trade outcomes here to stay inside your daily risk limits. Completed days automatically update your running balance shown in the header and roadmap.</p>
+
+  <!-- Compact capital tier + daily loss reference (merges the old standalone
+       Capital Ladder and Daily Trading Rules tabs into one table) -->
+  <div class="mini-ladder-wrap">
+    <div class="mini-ladder-title">Capital Tier &amp; Daily Loss Reference</div>
+    <div class="mini-ladder-grid mini-ladder-grid-4col">
+      <div class="mini-ladder-cell mini-ladder-head">Tier</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Range</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Max Loss %</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Max Loss Rs.</div>
+
+      <div class="mini-ladder-cell mini-ladder-label" data-tier-row="small">Small</div>
+      <div class="mini-ladder-cell num" data-tier-row="small">Rs. 25,000 &ndash; Rs. 75,000</div>
+      <div class="mini-ladder-cell num" data-tier-row="small">7.20% &ndash; 2.40%</div>
+      <div class="mini-ladder-cell num" data-tier-row="small">Rs. 1,800 flat</div>
+
+      <div class="mini-ladder-cell mini-ladder-label" data-tier-row="medium">Medium</div>
+      <div class="mini-ladder-cell num" data-tier-row="medium">Rs. 1,00,000 &ndash; Rs. 5,00,000</div>
+      <div class="mini-ladder-cell num" data-tier-row="medium">2.00%</div>
+      <div class="mini-ladder-cell num" data-tier-row="medium">Rs. 2,000 &ndash; Rs. 10,000</div>
+
+      <div class="mini-ladder-cell mini-ladder-label" data-tier-row="large">Large</div>
+      <div class="mini-ladder-cell num" data-tier-row="large">Rs. 5,00,000 &ndash; Rs. 10,00,000</div>
+      <div class="mini-ladder-cell num" data-tier-row="large">2.00%</div>
+      <div class="mini-ladder-cell num" data-tier-row="large">Rs. 10,000 &ndash; Rs. 20,000</div>
+
+      <div class="mini-ladder-cell mini-ladder-label" data-tier-row="pro">Pro</div>
+      <div class="mini-ladder-cell num" data-tier-row="pro">Rs. 10,00,000 &ndash; Rs. 20,00,000</div>
+      <div class="mini-ladder-cell num" data-tier-row="pro">2.00%</div>
+      <div class="mini-ladder-cell num" data-tier-row="pro">Rs. 20,000 &ndash; Rs. 40,000</div>
+    </div>
+    <p class="foot-note">Small tier's max loss is a flat Rs. 1,800 regardless of sub-level; its % shown is relative to capital at the low vs. high end of the range. Medium, Large, and Pro scale at a flat 2% of capital, so the Rs. figure shown is the range across their sub-levels. Maximum 2 trades per day across all tiers.</p>
+  </div>
+
+  <!-- Points stop-loss per selected instrument, derived from this tier's max
+       rupee loss and the lot size/count chosen during profile setup -->
+  <div id="instrument-sl-wrap" class="mini-ladder-wrap hidden">
+    <div class="mini-ladder-title">Points Stop-Loss By Instrument</div>
+    <div id="instrument-sl-grid" class="mini-ladder-grid instrument-sl-grid"></div>
+    <p class="foot-note">Points SL = today's max rupee loss &divide; (lot quantity &times; lots). Edit lots directly above for today's trade size; add or remove instruments via "Change Tier."</p>
+    <p id="lot-unlock-note" class="lot-unlock-note hidden"></p>
+  </div>
+
+  <div class="tool-layout">
+    <!-- Input Panel -->
+    <div class="input-panel">
+      <div class="form-group">
+        <label for="calc-tier">Operational Tier Level</label>
+        <select id="calc-tier" class="select-input" onchange="onTierChange()">
+          <option value="small-1">Small - Level 1 (Rs. 25,000 Cap)</option>
+          <option value="small-2">Small - Level 2 (Rs. 50,000 Cap)</option>
+          <option value="small-3">Small - Level 3 (Rs. 75,000 Cap)</option>
+          <option value="medium-1">Medium - Level 1 (Rs. 1,00,000 Cap)</option>
+          <option value="medium-2">Medium - Level 2 (Rs. 2,00,000 Cap)</option>
+          <option value="medium-3">Medium - Level 3 (Rs. 5,00,000 Cap)</option>
+          <option value="large-1">Large - Level 1 (Rs. 5,00,000 Cap)</option>
+          <option value="large-2">Large - Level 2 (Rs. 7,50,000 Cap)</option>
+          <option value="large-3">Large - Level 3 (Rs. 10,00,000 Cap)</option>
+          <option value="pro-1">Pro - Level 1 (Rs. 10,00,000 Cap)</option>
+          <option value="pro-2">Pro - Level 2 (Rs. 15,00,000 Cap)</option>
+          <option value="pro-3">Pro - Level 3 (Rs. 20,00,000 Cap)</option>
+        </select>
+      </div>
+
+      <!-- Trade 1 -->
+      <div class="form-group">
+        <div id="your-limit-callout" class="your-limit-callout">
+          <span class="your-limit-callout-label">Your Max Loss Today</span>
+          <span id="your-limit-value" class="your-limit-callout-value">&mdash;</span>
+        </div>
+
+        <!-- Date selector, always visible, defaulting to today. Editable
+             anytime so a missed earlier day can be backfilled before logging. -->
+        <div class="log-date-wrap">
+          <label class="amount-label" for="log-date-input">📅 Logging For Date</label>
+          <input type="date" id="log-date-input" class="log-date-input" oninput="onLogDateInput()">
+          <p id="log-date-hint" class="foot-note" style="margin:6px 0 0;"></p>
+          <p id="log-date-error" class="capital-amount-error hidden"></p>
+        </div>
+
+        <label>Today's Trade Log</label>
+
+        <div class="trade-log-container">
+          <div class="trade-log-title">Trade #1</div>
+          <label class="amount-label">Instrument</label>
+          <select id="t1-instrument" class="select-input" style="margin-bottom:10px;" onchange="onTradeInstrumentChange(1)"></select>
+          <div class="btn-group">
+            <button type="button" id="t1-profit" class="outcome-btn" onclick="setOutcome(1, 'profit')">In Profit</button>
+            <button type="button" id="t1-loss" class="outcome-btn" onclick="setOutcome(1, 'loss')">Stopped Out</button>
+          </div>
+          <div id="t1-amount-wrap" class="amount-input-wrap hidden">
+            <label class="amount-label" id="t1-amount-label">Enter loss amount (Rs.)</label>
+            <input type="number" id="t1-amount" class="amount-input" min="0" step="1" placeholder="e.g. 500" oninput="onAmountInput(1)">
+          </div>
+          <button type="button" id="t1-submit-btn" class="outcome-btn trade-submit-btn" onclick="submitTrade(1)" disabled style="margin-top:10px;">
+            Submit Trade 1
+          </button>
+          <p id="t1-submit-status" class="foot-note" style="margin-top:6px;">Log an outcome and amount to submit Trade 1.</p>
+          <button type="button" id="t1-journal-btn" class="journal-list-btn" style="width:100%; margin-top:8px;" onclick="openQuickJournalModal(1)" disabled>
+            + Add Journal Note
+          </button>
+        </div>
+
+        <!-- Trade 2: stays locked until Trade 1 is submitted as a sub-cutoff loss -->
+        <div class="trade-log-container" id="t2-container">
+          <div class="trade-log-title">Trade #2 <span class="trade-final-tag">Final Trade</span></div>
+          <label class="amount-label">Instrument</label>
+          <select id="t2-instrument" class="select-input" style="margin-bottom:10px;" onchange="onTradeInstrumentChange(2)" disabled></select>
+          <div class="btn-group">
+            <button type="button" id="t2-profit" class="outcome-btn" onclick="setOutcome(2, 'profit')" disabled>In Profit</button>
+            <button type="button" id="t2-loss" class="outcome-btn" onclick="setOutcome(2, 'loss')" disabled>Stopped Out</button>
+          </div>
+          <div id="t2-amount-wrap" class="amount-input-wrap hidden">
+            <label class="amount-label" id="t2-amount-label">Enter loss amount (Rs.)</label>
+            <input type="number" id="t2-amount" class="amount-input" min="0" step="1" placeholder="e.g. 500" oninput="onAmountInput(2)">
+          </div>
+          <button type="button" id="t2-submit-btn" class="outcome-btn trade-submit-btn" onclick="submitTrade(2)" disabled style="margin-top:10px;">
+            Submit Trade 2
+          </button>
+          <p id="t2-submit-status" class="foot-note" style="margin-top:6px;">Submit Trade 1 as a loss under the cutoff to unlock this.</p>
+          <button type="button" id="t2-journal-btn" class="journal-list-btn" style="width:100%; margin-top:8px;" onclick="openQuickJournalModal(2)" disabled>
+            + Add Journal Note
+          </button>
+        </div>
+
+        <button type="button" class="outcome-btn reset-btn" onclick="resetTracker()">Reset Daily Tracker</button>
+      </div>
+    </div>
+
+    <!-- Output Panel -->
+    <div class="output-panel">
+      <div>
+        <div class="stat-row">
+          <span class="stat-label">Maximum Allowed Loss Threshold</span>
+          <span class="stat-value" id="out-max-loss">&mdash;</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Estimated Current Daily P&amp;L</span>
+          <span class="stat-value" id="out-daily-pnl" style="color:#5f6b7a;">No Trades Run</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Max Permitted Execution Volume</span>
+          <span class="stat-value">Max 2 Trades / Day</span>
+        </div>
+      </div>
+
+      <div id="calc-alert" class="alert-banner success">
+        <div class="alert-title" id="alert-status">Parameters Normal</div>
+        <p class="alert-desc" id="alert-message">Select a tier and log Trade #1 to begin evaluating today's session.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compact log history + balance trail, visible right on this screen -->
+  <div class="calc-history-wrap">
+    <div class="mini-ladder-title">Recent Log History</div>
+    <div id="calc-history-area"></div>
+  </div>
+
+  <p class="foot-note">Evaluated metrics are generated from the Daily Trading Rules framework: profit on Trade 1 ends the day; a Trade 1 loss reaching 75% of the max daily loss blocks Trade 2; a loss reaching 100% triggers the kill switch. Each trade is submitted and recorded individually.</p>
+
+  <!-- Quick journal note modal — lightweight, opened from either trade card.
+       Saves into the SAME journal entry record used by the full Trading
+       Journal tab, so editing later there works on the same data. -->
+  <div id="quick-journal-modal-overlay" class="quick-journal-overlay hidden" onclick="onQuickJournalOverlayClick(event)">
+    <div class="quick-journal-modal">
+      <div class="journal-form-header">
+        <div class="journal-form-title">Quick Journal Note</div>
+        <button type="button" class="journal-close-btn" onclick="closeQuickJournalModal()">&times;</button>
+      </div>
+      <label class="amount-label">Strategy / Reason</label>
+      <textarea id="qj-strategy" class="journal-textarea" placeholder="Why did you take this trade?"></textarea>
+      <label class="amount-label" style="margin-top:12px;">Emotion</label>
+      <textarea id="qj-emotion" class="journal-textarea" placeholder="How were you feeling during this trade?"></textarea>
+      <p class="foot-note" style="margin-top:8px;">This is a quick note. For the full write-up (entry/exit price, screenshot, review checklist), open this trade later from the Trading Journal tab — your notes here will already be there.</p>
+      <button type="button" class="trade-submit-btn outcome-btn" style="margin-top:12px;" onclick="saveQuickJournalNote()">Save Note</button>
+      <p id="qj-save-status" class="foot-note" style="margin-top:6px;"></p>
+    </div>
+  </div>
+</section>
+<!-- END COMPONENT: risk-calculator -->

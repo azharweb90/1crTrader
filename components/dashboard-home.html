@@ -1,0 +1,44 @@
+<!-- COMPONENT: dashboard-home -->
+<section class="content-section">
+  <p class="section-note">A quick look at where things stand, and shortcuts to where you'll spend most of your time.</p>
+
+  <div id="dash-stat-grid" class="dash-stat-grid"></div>
+
+  <div class="dash-quicklinks-title">Jump back in</div>
+  <div class="dash-quicklink-grid">
+    <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-calculator')">
+      <span class="dash-quicklink-icon">⏱</span>
+      <div>
+        <div class="dash-quicklink-title">Daily Limits Tool</div>
+        <div class="dash-quicklink-desc">Log today's trades and stay inside your risk limits</div>
+      </div>
+    </button>
+    <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-roadmap')">
+      <span class="dash-quicklink-icon">↗</span>
+      <div>
+        <div class="dash-quicklink-title">Roadmap</div>
+        <div class="dash-quicklink-desc">See your tier progress and goal projections</div>
+      </div>
+    </button>
+    <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-journal')">
+      <span class="dash-quicklink-icon">✎</span>
+      <div>
+        <div class="dash-quicklink-title">Trading Journal</div>
+        <div class="dash-quicklink-desc">Write up strategy, emotion, and review past trades</div>
+      </div>
+    </button>
+    <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-settings')">
+      <span class="dash-quicklink-icon">⚙</span>
+      <div>
+        <div class="dash-quicklink-title">Settings</div>
+        <div class="dash-quicklink-desc">Change tier, capital, trading style, or instruments</div>
+      </div>
+    </button>
+  </div>
+
+  <div id="dash-recent-wrap" class="dash-recent-wrap">
+    <div class="mini-ladder-title">Recent Activity</div>
+    <div id="dash-recent-area"></div>
+  </div>
+</section>
+<!-- END COMPONENT: dashboard-home -->

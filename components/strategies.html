@@ -1,0 +1,80 @@
+<!-- COMPONENT: strategies -->
+<section class="content-section">
+  <p class="section-note">Backtested strategies shared by successful traders, each with its own setup-validity checklist you can check off live against your own trade idea. This is a working demo — strategies added here exist only in this browser session.</p>
+
+  <div class="market-banner">
+    🚧 <strong>Demo mode:</strong> strategies are not shared between users yet. This is a working model of the interaction, ready for a real backend later.
+  </div>
+
+  <div id="strategies-list-area"></div>
+
+  <!-- Strategy detail view, shown when a card is opened -->
+  <div id="strategy-detail-wrap" class="journal-form-wrap hidden">
+    <div class="journal-form-header">
+      <div>
+        <div class="journal-form-title" id="strat-detail-name"></div>
+        <div class="journal-form-meta" id="strat-detail-author"></div>
+      </div>
+      <button type="button" class="journal-close-btn" onclick="closeStrategyDetail()">&times;</button>
+    </div>
+
+    <p id="strat-detail-description" class="section-note"></p>
+
+    <div class="strategy-backtest-grid">
+      <div class="dash-stat-card">
+        <div class="dash-stat-label">Win Rate</div>
+        <div class="dash-stat-value" id="strat-detail-winrate">&mdash;</div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-label">Avg Risk:Reward</div>
+        <div class="dash-stat-value" id="strat-detail-rr">&mdash;</div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-label">Sample Size</div>
+        <div class="dash-stat-value" id="strat-detail-sample">&mdash;</div>
+      </div>
+    </div>
+
+    <div class="journal-section" style="margin-top:20px;">
+      <div class="journal-section-title">Setup Validity Checklist</div>
+      <p class="section-note" style="margin-bottom:10px;">Check off each condition against your current setup before entering. This is a self-check, not a guarantee.</p>
+      <div id="strategy-checklist-area"></div>
+      <div id="strategy-checklist-result" class="journal-grade-result"></div>
+    </div>
+  </div>
+
+  <!-- Add Strategy form -->
+  <div class="market-post-wrap">
+    <div class="select-step-title">Share a Strategy (as an admin-approved trader)</div>
+    <div class="journal-field-grid">
+      <div>
+        <label class="amount-label">Strategy Name</label>
+        <input type="text" id="st-name" class="journal-input" placeholder="e.g. Opening Range Breakout">
+      </div>
+      <div>
+        <label class="amount-label">Author</label>
+        <input type="text" id="st-author" class="journal-input" placeholder="e.g. Trader Alpha">
+      </div>
+      <div>
+        <label class="amount-label">Win Rate (%)</label>
+        <input type="number" id="st-winrate" class="journal-input" placeholder="e.g. 68">
+      </div>
+      <div>
+        <label class="amount-label">Avg Risk:Reward</label>
+        <input type="text" id="st-rr" class="journal-input" placeholder="e.g. 1:2.5">
+      </div>
+      <div>
+        <label class="amount-label">Sample Size (trades)</label>
+        <input type="number" id="st-sample" class="journal-input" placeholder="e.g. 120">
+      </div>
+    </div>
+    <label class="amount-label" style="margin-top:12px;">Description</label>
+    <textarea id="st-description" class="journal-textarea" placeholder="What is this strategy and when does it apply?"></textarea>
+    <label class="amount-label" style="margin-top:12px;">Checklist (one condition per line)</label>
+    <textarea id="st-checklist" class="journal-textarea" placeholder="e.g.&#10;Price breaks opening range high&#10;Volume above 20-day average&#10;No major news event in next hour"></textarea>
+
+    <button type="button" class="trade-submit-btn outcome-btn" style="margin-top:14px; max-width:220px;" onclick="addStrategy()">Add Strategy</button>
+    <p id="st-add-status" class="foot-note" style="margin-top:8px;"></p>
+  </div>
+</section>
+<!-- END COMPONENT: strategies -->
