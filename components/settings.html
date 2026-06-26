@@ -1,16 +1,26 @@
 <!-- COMPONENT: settings -->
 <section class="content-section">
-  <p class="section-note">Your current profile. To change any of this, use "Edit Profile" below — it reopens the same setup screen with everything pre-filled.</p>
+  <p class="section-note">Your current profile. To change any of this, use "Edit Profile" below — it reopens the same
+    setup screen with everything pre-filled.</p>
 
   <div id="settings-summary-area" class="settings-summary-grid"></div>
 
-  <button type="button" class="profile-continue-btn" style="margin-top:20px; max-width:260px;" onclick="showTierSelect()">
+  <button type="button" class="profile-continue-btn" style="margin-top:20px; max-width:260px;"
+    onclick="showTierSelect()">
     Edit Profile (Change Tier, Capital, etc.)
   </button>
 
   <div class="settings-section">
+    <div class="settings-section-title">Broker Connection</div>
+    <p class="section-note">Connect a broker to auto-sync today's trades instead of entering them manually on the Daily
+      Limits Tool. This is a prototype simulation — no real broker is contacted and no credentials are collected.</p>
+    <div id="broker-connect-area"></div>
+  </div>
+
+  <div class="settings-section">
     <div class="settings-section-title">About This Tool</div>
-    <p class="section-note">Prop Trading Risk Management Blueprint &mdash; a daily limits tracker, goal roadmap, and trading journal built around your tier's risk rules. All data lives in this browser session only; refreshing the page clears it.</p>
+    <p class="section-note">1CrTrader &mdash; a daily limits tracker, goal roadmap, and trading journal built around
+      your tier's risk rules. All data lives in this browser session only; refreshing the page clears it.</p>
   </div>
 </section>
 <!-- END COMPONENT: settings -->

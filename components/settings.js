@@ -8,44 +8,60 @@
    =========================================================== */
 
 (function () {
-
   const TIER_LABELS = {
-    small: 'Small',
-    medium: 'Medium',
-    large: 'Large',
-    pro: 'Pro',
+    small: "Small",
+    medium: "Medium",
+    large: "Large",
+    pro: "Pro",
   };
 
   const TRADER_TYPE_LABELS = {
-    'option-buyer': 'Option Buyer',
-    'option-seller': 'Option Seller',
-    'futures-trader': 'Futures Trader',
-    'hedged-seller': 'Hedged Seller',
+    "option-buyer": "Option Buyer",
+    "option-seller": "Option Seller",
+    "futures-trader": "Futures Trader",
+    "hedged-seller": "Hedged Seller",
   };
 
   function fmt(n) {
-    return Math.round(n).toLocaleString('en-IN');
+    return Math.round(n).toLocaleString("en-IN");
   }
 
+  // Broker connect/disconnect UI lives in dashboard.js (see connectMockBroker,
+  // disconnectMockBroker, renderBrokerArea) since it's shared between this
+  // tab and the Daily Limits Tool, and dashboard.js is always loaded — unlike
+  // this component, which only loads lazily when Settings is opened.
+
   function render() {
-    const container = document.getElementById('settings-summary-area');
+    const container = document.getElementById("settings-summary-area");
     if (!container) return;
 
-    const state = (typeof window.getProfileState === 'function') ? window.getProfileState() : {};
-    const instruments = (typeof window.getAllTradableInstruments === 'function') ? window.getAllTradableInstruments() : [];
+    const state =
+      typeof window.getProfileState === "function"
+        ? window.getProfileState()
+        : {};
+    const instruments =
+      typeof window.getAllTradableInstruments === "function"
+        ? window.getAllTradableInstruments()
+        : [];
 
-    const tierLabel = state.tier ? TIER_LABELS[state.tier] : '\u2014';
-    const traderLabel = (state.traderTypes && state.traderTypes.length > 0)
-      ? state.traderTypes.map(t => TRADER_TYPE_LABELS[t]).join(', ')
-      : '\u2014';
-    const startingCapital = state.startingCapital !== null && state.startingCapital !== undefined
-      ? `Rs. ${fmt(state.startingCapital)}` : '\u2014';
-    const currentBalance = state.currentBalance !== null && state.currentBalance !== undefined
-      ? `Rs. ${fmt(state.currentBalance)}` : '\u2014';
-    const joinDate = state.joinDate || '\u2014';
-    const instrumentsLabel = instruments.length > 0
-      ? instruments.map(i => i.label).join(', ')
-      : 'None selected';
+    const tierLabel = state.tier ? TIER_LABELS[state.tier] : "\u2014";
+    const traderLabel =
+      state.traderTypes && state.traderTypes.length > 0
+        ? state.traderTypes.map((t) => TRADER_TYPE_LABELS[t]).join(", ")
+        : "\u2014";
+    const startingCapital =
+      state.startingCapital !== null && state.startingCapital !== undefined
+        ? `Rs. ${fmt(state.startingCapital)}`
+        : "\u2014";
+    const currentBalance =
+      state.currentBalance !== null && state.currentBalance !== undefined
+        ? `Rs. ${fmt(state.currentBalance)}`
+        : "\u2014";
+    const joinDate = state.joinDate || "\u2014";
+    const instrumentsLabel =
+      instruments.length > 0
+        ? instruments.map((i) => i.label).join(", ")
+        : "None selected";
 
     container.innerHTML = `
       <div class="settings-stat">
@@ -73,11 +89,12 @@
         <div class="settings-stat-value settings-stat-value-small">${instrumentsLabel}</div>
       </div>
     `;
+
+    renderBrokerArea();
   }
 
   window.renderSettings = render;
 
   render();
-
 })();
 /* === END COMPONENT: settings (logic) === */
