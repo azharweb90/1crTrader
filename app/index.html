@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>1CrTrader</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232e75b6'/%3E%3Cstop offset='100%25' stop-color='%231d9e75'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='34' height='34' rx='9' fill='url(%23g)'/%3E%3Ctext x='17' y='21' font-family='Arial, Helvetica, sans-serif' font-weight='800' font-size='13' fill='%23ffffff' text-anchor='middle' letter-spacing='-0.3'%3E1Cr%3C/text%3E%3Crect x='9.5' y='24' width='15' height='2' rx='1' fill='%23ffffff' opacity='0.85'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="/app/dashboard.css">
 </head>
 <body>
 
@@ -50,9 +50,6 @@
       <button class="sidebar-link" data-tab="tab-books" onclick="switchTab(event, 'tab-books')">
         <span class="sidebar-link-icon">▤</span><span>Books</span>
       </button>
-      <button class="sidebar-link" data-tab="tab-marketplace" onclick="switchTab(event, 'tab-marketplace')">
-        <span class="sidebar-link-icon">📡</span><span>Signal Marketplace</span>
-      </button>
       <button class="sidebar-link" data-tab="tab-strategies" onclick="switchTab(event, 'tab-strategies')">
         <span class="sidebar-link-icon">🧩</span><span>Strategies</span>
       </button>
@@ -60,7 +57,7 @@
 
     <div class="sidebar-nav-group sidebar-nav-group-bottom">
       <button class="sidebar-link" data-tab="tab-settings" onclick="switchTab(event, 'tab-settings')">
-        <span class="sidebar-link-icon">⚙</span><span>Settings</span>
+        <span class="sidebar-link-icon">⚙</span><span>Account</span>
       </button>
       <button class="sidebar-link" data-tab="tab-subs" onclick="switchTab(event, 'tab-subs')">
         <span class="sidebar-link-icon">★</span><span>Subscription Pricing</span>
@@ -79,10 +76,29 @@
           <span class="header-balance-label">Balance</span>
           <span id="header-balance-value" class="header-balance-value">&mdash;</span>
         </div>
-        <span id="active-tier-badge" class="active-tier-badge" style="display:none;">
-          <span class="dot"></span>
-          <span id="active-tier-label"></span>
-        </span>
+        <div id="header-avatar-wrap" class="header-avatar-wrap" style="display:none;">
+          <button type="button"
+                  id="header-avatar-btn"
+                  class="header-avatar-btn"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  onclick="toggleAccountMenu(event)">
+            <span id="header-avatar-initials" class="header-avatar-initials"></span>
+          </button>
+          <div id="header-account-menu" class="header-account-menu hidden" role="menu">
+            <div class="header-account-menu-identity">
+              <div id="header-account-menu-name" class="header-account-menu-name"></div>
+              <div id="header-account-menu-email" class="header-account-menu-email"></div>
+            </div>
+            <div id="header-account-menu-tier" class="header-account-menu-tier"></div>
+            <button type="button" class="header-account-menu-item" onclick="switchTab(event, 'tab-settings')">
+              View Account
+            </button>
+            <button type="button" class="header-account-menu-item header-account-menu-item-danger" onclick="handleLogout()">
+              Log Out
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -96,7 +112,6 @@
       <div id="tab-journal" class="tab-content"></div>
       <div id="tab-education" class="tab-content"></div>
       <div id="tab-books" class="tab-content"></div>
-      <div id="tab-marketplace" class="tab-content"></div>
       <div id="tab-strategies" class="tab-content"></div>
       <div id="tab-settings" class="tab-content"></div>
       <div id="tab-subs" class="tab-content"></div>
@@ -105,7 +120,7 @@
 
 </div>
 
-<script src="../website/auth.js"></script>
-<script src="dashboard.js"></script>
+<script src="/website/auth.js"></script>
+<script src="/app/dashboard.js"></script>
 </body>
 </html>

@@ -506,7 +506,7 @@
   </div>
 </div>
 
-<script src="auth.js"></script>
+<script src="/website/auth.js"></script>
 <script>
   // ---------- View switching ----------
   let pendingResetEmail = null; // email currently going through forgot -> otp -> reset
@@ -551,7 +551,7 @@
     }
 
     // Registered and logged in — continue straight into profile setup.
-    window.location.href = '../app/index.html';
+    window.location.href = '/app/index.html';
   }
 
   // ---------- Login ----------
@@ -565,7 +565,7 @@
       return;
     }
 
-    window.location.href = '../app/index.html';
+    window.location.href = '/app/index.html';
   }
 
   // ---------- Forgot password ----------

@@ -21,46 +21,42 @@
   // Map of tab id -> { html, js (optional) }
   const COMPONENTS = {
     "tab-select": {
-      html: "components/tier-select.html",
+      html: "/app/components/tier-select.html",
     },
     "tab-dashboard": {
-      html: "components/dashboard-home.html",
-      js: "components/dashboard-home.js",
+      html: "/app/components/dashboard-home.html",
+      js: "/app/components/dashboard-home.js",
     },
     "tab-calculator": {
-      html: "components/calculator.html",
-      js: "components/calculator.js",
+      html: "/app/components/calculator.html",
+      js: "/app/components/calculator.js",
     },
     "tab-roadmap": {
-      html: "components/roadmap.html",
-      js: "components/roadmap.js",
+      html: "/app/components/roadmap.html",
+      js: "/app/components/roadmap.js",
     },
     "tab-journal": {
-      html: "components/journal.html",
-      js: "components/journal.js",
+      html: "/app/components/journal.html",
+      js: "/app/components/journal.js",
     },
     "tab-education": {
-      html: "components/education.html",
-      js: "components/education.js",
+      html: "/app/components/education.html",
+      js: "/app/components/education.js",
     },
     "tab-books": {
-      html: "components/books.html",
-      js: "components/books.js",
-    },
-    "tab-marketplace": {
-      html: "components/marketplace.html",
-      js: "components/marketplace.js",
+      html: "/app/components/books.html",
+      js: "/app/components/books.js",
     },
     "tab-strategies": {
-      html: "components/strategies.html",
-      js: "components/strategies.js",
+      html: "/app/components/strategies.html",
+      js: "/app/components/strategies.js",
     },
     "tab-settings": {
-      html: "components/settings.html",
-      js: "components/settings.js",
+      html: "/app/components/settings.html",
+      js: "/app/components/settings.js",
     },
     "tab-subs": {
-      html: "components/pricing.html",
+      html: "/app/components/pricing.html",
     },
   };
 
@@ -74,9 +70,8 @@
     "tab-journal": "Trading Journal",
     "tab-education": "Education",
     "tab-books": "Books",
-    "tab-marketplace": "Signal Marketplace",
     "tab-strategies": "Strategies",
-    "tab-settings": "Settings",
+    "tab-settings": "Account",
     "tab-subs": "Subscription Pricing",
   };
 
@@ -942,25 +937,85 @@
     loadComponent('tab-select');
   }
 
+  // Header identity: a small avatar (initials, like Gmail/Slack/Notion)
+  // replaces the old "Tier · Style + Style + Style..." badge, which had
+  // no natural ceiling once trading styles became a true multi-select.
+  // Tier and trading styles now live on the Account page instead, where
+  // they have room to be shown properly (chips, cards) rather than
+  // squeezed into one line of header text.
+  function getInitials(name) {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '?';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
   function refreshHeaderBadge() {
-    const badge = document.getElementById('active-tier-badge');
-    const label = document.getElementById('active-tier-label');
+    const avatarWrap = document.getElementById('header-avatar-wrap');
+    const avatarInitials = document.getElementById('header-avatar-initials');
+    const menuName = document.getElementById('header-account-menu-name');
+    const menuEmail = document.getElementById('header-account-menu-email');
+    const menuTier = document.getElementById('header-account-menu-tier');
     const balancePill = document.getElementById('header-balance-pill');
     const balanceValue = document.getElementById('header-balance-value');
 
-    if (badge && label) {
-      badge.style.display = 'inline-flex';
-      const tierText = selectedTier ? TIER_LABELS[selectedTier] + ' Tier' : '';
-      const traderText = selectedTraderTypes.size > 0
-        ? Array.from(selectedTraderTypes).map(t => TRADER_TYPE_LABELS[t]).join(' + ')
-        : '';
-      label.innerText = [tierText, traderText].filter(Boolean).join(' \u00b7 ');
+    const session = (typeof window.Auth !== 'undefined') ? window.Auth.getSession() : null;
+
+    if (avatarWrap && avatarInitials) {
+      avatarWrap.style.display = 'inline-flex';
+      avatarInitials.innerText = getInitials(session ? session.name : '');
+      if (menuName) menuName.innerText = session ? session.name : 'Trader';
+      if (menuEmail) menuEmail.innerText = session ? session.email : '';
+      if (menuTier) {
+        const tierText = selectedTier ? TIER_LABELS[selectedTier] + ' Tier' : 'Profile setup pending';
+        menuTier.innerText = tierText;
+      }
     }
 
     if (balancePill && balanceValue && currentBalance !== null) {
       balancePill.style.display = 'flex';
       balanceValue.innerText = `Rs. ${fmt(currentBalance)}`;
     }
+  }
+
+  // Toggles the avatar's account dropdown open/closed. Exposed on window
+  // since it's wired via an inline onclick in index.html. A single
+  // document-level click listener (registered once, below) closes it on
+  // any outside click so it never lingers open across tab switches etc.
+  function toggleAccountMenu(event) {
+    if (event) event.stopPropagation();
+    const btn = document.getElementById('header-avatar-btn');
+    const menu = document.getElementById('header-account-menu');
+    if (!btn || !menu) return;
+    const isHidden = menu.classList.contains('hidden');
+    if (isHidden) {
+      menu.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
+    } else {
+      menu.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  document.addEventListener('click', () => {
+    const menu = document.getElementById('header-account-menu');
+    const btn = document.getElementById('header-avatar-btn');
+    if (menu && !menu.classList.contains('hidden')) {
+      menu.classList.add('hidden');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Logout lives here (not in the lazily-loaded settings.js) because the
+  // header avatar menu — and its Log Out button — is visible from the very
+  // first page load, before Settings/Account has ever been opened once.
+  function handleLogout() {
+    if (typeof window.Auth === 'undefined') return;
+    const ok = window.confirm('Log out of 1CrTrader? You\'ll need to log back in to continue.');
+    if (!ok) return;
+    window.Auth.logout();
+    window.location.href = '/website/auth.html?view=login';
   }
 
   // ---------- Running balance + trade history ----------
@@ -1820,6 +1875,9 @@
   // Expose handlers used by inline onclick attributes in index.html / components,
   // and the state/balance hooks for components/calculator.js and roadmap.js.
   window.switchTab = switchTab;
+  window.toggleAccountMenu = toggleAccountMenu;
+  window.handleLogout = handleLogout;
+  window.getInitials = getInitials;
   window.selectTier = selectTier;
   window.selectTraderType = selectTraderType;
   window.onCapitalAmountInput = onCapitalAmountInput;
@@ -1886,7 +1944,7 @@
     if (typeof window.Auth === 'undefined') {
       console.warn('auth.js not loaded — skipping the auth gate (app will behave as if logged in).');
     } else if (!window.Auth.getSession()) {
-      window.location.href = '../website/auth.html?view=login';
+      window.location.href = '/website/auth.html?view=login';
       return;
     }
 

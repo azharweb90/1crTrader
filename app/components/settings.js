@@ -37,73 +37,127 @@
   // this component, which only loads lazily when Settings is opened.
 
   function render() {
-    const container = document.getElementById('settings-summary-area');
-    if (!container) return;
-
+    const session = (typeof window.Auth !== 'undefined') ? window.Auth.getSession() : null;
     const state = (typeof window.getProfileState === 'function') ? window.getProfileState() : {};
+    const riskSummary = (typeof window.getRiskSummary === 'function') ? window.getRiskSummary() : null;
     const instruments = (typeof window.getAllTradableInstruments === 'function') ? window.getAllTradableInstruments() : [];
 
-    const tierLabel = state.tier ? TIER_LABELS[state.tier] : '\u2014';
-    const traderLabel = (state.traderTypes && state.traderTypes.length > 0)
-      ? state.traderTypes.map(t => TRADER_TYPE_LABELS[t]).join(', ')
-      : '\u2014';
-    const startingCapital = state.startingCapital !== null && state.startingCapital !== undefined
-      ? `Rs. ${fmt(state.startingCapital)}` : '\u2014';
-    const currentBalance = state.currentBalance !== null && state.currentBalance !== undefined
-      ? `Rs. ${fmt(state.currentBalance)}` : '\u2014';
-    const joinDate = state.joinDate || '\u2014';
-    const instrumentsLabel = instruments.length > 0
-      ? instruments.map(i => i.label).join(', ')
-      : 'None selected';
+    // ---------- Profile header: avatar, name, email, phone, member since ----------
+    const avatarEl = document.getElementById('account-avatar');
+    if (avatarEl) {
+      avatarEl.innerText = (typeof window.getInitials === 'function')
+        ? window.getInitials(session ? session.name : '')
+        : '?';
+    }
+    const nameEl = document.getElementById('account-name');
+    if (nameEl) nameEl.innerText = session ? session.name : 'Trader';
 
-    container.innerHTML = `
-      <div class="settings-stat">
-        <div class="settings-stat-label">Capital Tier</div>
-        <div class="settings-stat-value">${tierLabel}</div>
-      </div>
-      <div class="settings-stat">
-        <div class="settings-stat-label">Trading Style</div>
-        <div class="settings-stat-value">${traderLabel}</div>
-      </div>
-      <div class="settings-stat">
-        <div class="settings-stat-label">Starting Capital</div>
-        <div class="settings-stat-value">${startingCapital}</div>
-      </div>
-      <div class="settings-stat">
-        <div class="settings-stat-label">Current Balance</div>
-        <div class="settings-stat-value">${currentBalance}</div>
-      </div>
-      <div class="settings-stat">
-        <div class="settings-stat-label">Member Since</div>
-        <div class="settings-stat-value">${joinDate}</div>
-      </div>
-      <div class="settings-stat settings-stat-wide">
-        <div class="settings-stat-label">Instruments You Trade</div>
-        <div class="settings-stat-value settings-stat-value-small">${instrumentsLabel}</div>
-      </div>
-    `;
+    const emailEl = document.getElementById('account-email');
+    if (emailEl) emailEl.innerText = session ? session.email : 'Not logged in';
+
+    const phoneEl = document.getElementById('account-phone');
+    if (phoneEl) phoneEl.innerText = (session && session.phone) ? session.phone : '';
+
+    const memberSinceEl = document.getElementById('account-member-since');
+    if (memberSinceEl) {
+      if (session && session.createdAt) {
+        const created = new Date(session.createdAt);
+        memberSinceEl.innerText = `Account created ${created.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}`;
+      } else {
+        memberSinceEl.innerText = '';
+      }
+    }
+
+    // ---------- Risk rules card (same data + look as the Dashboard tab's
+    // "Your Risk Rules Right Now", via the dash-risk-card styles) ----------
+    const riskGrid = document.getElementById('account-risk-grid');
+    const riskLotNote = document.getElementById('account-risk-lot-note');
+    if (riskGrid) {
+      if (!riskSummary || riskSummary.maxLossRupees === null) {
+        riskGrid.innerHTML = `<p class="section-note">Finish profile setup to see your risk rules here.</p>`;
+        if (riskLotNote) riskLotNote.innerText = '';
+      } else {
+        const maxLots = (typeof window.getMaxAllowedLots === 'function') ? window.getMaxAllowedLots() : riskSummary.maxLots;
+        riskGrid.innerHTML = `
+          <div class="dash-risk-card">
+            <div class="dash-risk-label">Capital Tier</div>
+            <div class="dash-risk-value">${riskSummary.tierLabel}</div>
+          </div>
+          <div class="dash-risk-card">
+            <div class="dash-risk-label">Max Loss Today</div>
+            <div class="dash-risk-value">Rs. ${fmt(riskSummary.maxLossRupees)}</div>
+            <div class="dash-risk-sublabel">${riskSummary.maxLossPct}% of capital</div>
+          </div>
+          <div class="dash-risk-card">
+            <div class="dash-risk-label">Lots Allowed</div>
+            <div class="dash-risk-value">${maxLots}</div>
+          </div>
+        `;
+        if (riskLotNote) {
+          riskLotNote.innerText = riskSummary.nextLotUnlock
+            ? `Reach Rs. ${fmt(riskSummary.nextLotUnlock.requiredBalance)} balance (Rs. ${fmt(riskSummary.nextLotUnlock.remaining)} more) to unlock lot ${riskSummary.nextLotUnlock.nextLotCount}.`
+            : `You're at the maximum lot allowance for your tier.`;
+        }
+      }
+    }
+
+    // ---------- Trading style, as chips (no truncation problem — chips wrap) ----------
+    const traderTypesEl = document.getElementById('account-trader-types');
+    if (traderTypesEl) {
+      const types = state.traderTypes || [];
+      traderTypesEl.innerHTML = types.length > 0
+        ? types.map(t => `<span class="account-chip">${TRADER_TYPE_LABELS[t] || t}</span>`).join('')
+        : `<p class="section-note">No trading style selected yet.</p>`;
+    }
+
+    // ---------- Capital: starting vs. current, with P&L since joining ----------
+    const capitalGrid = document.getElementById('account-capital-grid');
+    if (capitalGrid) {
+      const hasCapital = state.startingCapital !== null && state.startingCapital !== undefined
+        && state.currentBalance !== null && state.currentBalance !== undefined;
+      if (!hasCapital) {
+        capitalGrid.innerHTML = `<p class="section-note">No capital on file yet.</p>`;
+      } else {
+        const pnl = state.currentBalance - state.startingCapital;
+        const pnlSign = pnl > 0 ? '+' : (pnl < 0 ? '\u2212' : '');
+        const pnlClass = pnl > 0 ? 'account-pnl-positive' : (pnl < 0 ? 'account-pnl-negative' : '');
+        capitalGrid.innerHTML = `
+          <div class="settings-stat">
+            <div class="settings-stat-label">Starting Capital</div>
+            <div class="settings-stat-value">Rs. ${fmt(state.startingCapital)}</div>
+          </div>
+          <div class="settings-stat">
+            <div class="settings-stat-label">Current Balance</div>
+            <div class="settings-stat-value">Rs. ${fmt(state.currentBalance)}</div>
+          </div>
+          <div class="settings-stat">
+            <div class="settings-stat-label">P&amp;L Since Joining</div>
+            <div class="settings-stat-value ${pnlClass}">${pnlSign}Rs. ${fmt(Math.abs(pnl))}</div>
+          </div>
+          <div class="settings-stat">
+            <div class="settings-stat-label">Member Since</div>
+            <div class="settings-stat-value">${state.joinDate || '\u2014'}</div>
+          </div>
+        `;
+      }
+    }
+
+    // ---------- Instruments, as chips ----------
+    const instrumentsEl = document.getElementById('account-instruments');
+    if (instrumentsEl) {
+      instrumentsEl.innerHTML = instruments.length > 0
+        ? instruments.map(i => `<span class="account-chip">${i.label}</span>`).join('')
+        : `<p class="section-note">No instruments selected yet.</p>`;
+    }
 
     renderBrokerArea();
-
-    const accountEl = document.getElementById('settings-account-email');
-    if (accountEl) {
-      const session = (typeof window.Auth !== 'undefined') ? window.Auth.getSession() : null;
-      accountEl.innerText = session
-        ? `Logged in as ${session.name} (${session.email})`
-        : 'Not logged in.';
-    }
   }
 
-  function handleLogout() {
-    if (typeof window.Auth === 'undefined') return;
-    const ok = window.confirm('Log out of 1CrTrader? You\'ll need to log back in to continue.');
-    if (!ok) return;
-    window.Auth.logout();
-    window.location.href = '../website/auth.html?view=login';
-  }
+  // handleLogout lives in dashboard.js now, not here — the header avatar
+  // menu's Log Out button needs it available from the very first page
+  // load, before this component has ever been lazily loaded.
 
   window.renderSettings = render;
-  window.handleLogout = handleLogout;
 
   render();
 

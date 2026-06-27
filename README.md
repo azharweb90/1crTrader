@@ -32,7 +32,15 @@ CSS, no shared component code, no shared state beyond `Auth`.
 were abandoned drafts (a duplicate app shell and a pre-auth version of the
 landing page, respectively) and have been deleted.
 
-**Running locally:** serve the project **root** with a static server (e.g.
-VS Code Live Server) so that `../website/...` and `../app/...` relative
-paths resolve correctly — don't serve `website/` and `app/` as separate
-roots, and don't open files via `file://`.
+**Running locally:** serve the project **root** with any static server (VS
+Code Live Server, `npx serve`, `python3 -m http.server`, etc.) — all
+internal links and asset references are **root-relative** (e.g.
+`/app/dashboard.css`, `/website/auth.html`), so they resolve correctly
+regardless of trailing slashes or which static server you use. Don't open
+files via `file://`; a real HTTP origin is required either way.
+
+This also means the project deploys cleanly as-is to any static host
+(GitHub Pages, Netlify, Vercel, etc.) as long as it's served from the
+domain root. If it's ever served from a sub-path (e.g.
+`yoursite.com/1crtrader/`), the root-relative paths would need to be
+updated to include that prefix.

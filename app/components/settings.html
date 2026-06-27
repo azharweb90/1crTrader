@@ -1,12 +1,43 @@
-<!-- COMPONENT: settings -->
+<!-- COMPONENT: settings (now "Account" in the sidebar/title — internal id
+     kept as tab-settings/settings.html/settings.js to avoid touching every
+     reference across dashboard.js; only the user-facing label changed.) -->
 <section class="content-section">
-  <p class="section-note">Your current profile. To change any of this, use "Edit Profile" below — it reopens the same setup screen with everything pre-filled.</p>
 
-  <div id="settings-summary-area" class="settings-summary-grid"></div>
+  <div class="account-profile-header">
+    <div id="account-avatar" class="account-avatar"></div>
+    <div class="account-profile-identity">
+      <div id="account-name" class="account-profile-name"></div>
+      <div id="account-email" class="account-profile-email"></div>
+      <div class="account-profile-meta">
+        <span id="account-phone"></span>
+        <span id="account-member-since"></span>
+      </div>
+    </div>
+    <button type="button" class="profile-continue-btn account-edit-btn" onclick="showTierSelect()">
+      Edit Profile
+    </button>
+  </div>
 
-  <button type="button" class="profile-continue-btn" style="margin-top:20px; max-width:260px;" onclick="showTierSelect()">
-    Edit Profile (Change Tier, Capital, etc.)
-  </button>
+  <div class="account-section">
+    <div class="account-section-title">Your Risk Rules Right Now</div>
+    <div id="account-risk-grid" class="dash-risk-grid"></div>
+    <p id="account-risk-lot-note" class="foot-note" style="margin-top:10px;"></p>
+  </div>
+
+  <div class="account-section">
+    <div class="account-section-title">Trading Style</div>
+    <div id="account-trader-types" class="account-chip-row"></div>
+  </div>
+
+  <div class="account-section">
+    <div class="account-section-title">Capital</div>
+    <div id="account-capital-grid" class="settings-summary-grid"></div>
+  </div>
+
+  <div class="account-section">
+    <div class="account-section-title">Instruments You Trade</div>
+    <div id="account-instruments" class="account-chip-row"></div>
+  </div>
 
   <div class="settings-section">
     <div class="settings-section-title">Broker Connection</div>
@@ -15,14 +46,13 @@
   </div>
 
   <div class="settings-section">
-    <div class="settings-section-title">Account</div>
-    <p class="section-note" id="settings-account-email">&mdash;</p>
-    <button type="button" class="setup-manual-link" style="color:#d9381e;" onclick="handleLogout()">Log Out</button>
-  </div>
-
-  <div class="settings-section">
     <div class="settings-section-title">About This Tool</div>
     <p class="section-note">1CrTrader &mdash; a daily limits tracker, goal roadmap, and trading journal built around your tier's risk rules. All data lives in this browser session only; refreshing the page clears it.</p>
   </div>
+
+  <div class="settings-section">
+    <button type="button" class="setup-manual-link" style="color:#d9381e;" onclick="handleLogout()">Log Out</button>
+  </div>
+
 </section>
 <!-- END COMPONENT: settings -->

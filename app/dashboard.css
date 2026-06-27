@@ -13,10 +13,9 @@
      10. COMPONENT: trading-journal
      11. COMPONENT: education-books-shared (used by Education + Books tabs)
      12. COMPONENT: dashboard-home
-     13. COMPONENT: settings
-     14. COMPONENT: marketplace
-     15. COMPONENT: strategies
-     16. Responsive Overrides
+     13. COMPONENT: settings (now "Account" in the UI)
+     14. COMPONENT: strategies
+     15. Responsive Overrides
    =========================================================== */
 
 
@@ -248,7 +247,6 @@ body {
 .content-area {
   flex: 1;
   padding: 28px 32px 48px;
-  max-width: 1440px;
 }
 
 .tab-content {
@@ -626,20 +624,108 @@ body {
   display: none;
 }
 
-.active-tier-badge {
+/* Header identity: avatar button + account dropdown menu. Replaces the
+   old tier/trading-style badge, which had no natural width limit once
+   trading styles became a true multi-select — see the Account page
+   (COMPONENT: settings, now "Account") for where that detail now lives. */
+.header-avatar-wrap {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  color: #5f6b7a;
-  margin-right: 12px;
 }
 
-.active-tier-badge .dot {
-  width: 7px;
-  height: 7px;
+.header-avatar-btn {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: #1d9e75;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #2e75b6 0%, #1d9e75 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.header-avatar-initials {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.header-account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(46, 117, 182, 0.14);
+  padding: 8px;
+  z-index: 20;
+}
+
+.header-account-menu.hidden {
+  display: none;
+}
+
+.header-account-menu-identity {
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid #e5e9ed;
+  margin-bottom: 6px;
+}
+
+.header-account-menu-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f3a5f;
+}
+
+.header-account-menu-email {
+  font-size: 12px;
+  color: #5f6b7a;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.header-account-menu-tier {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #1d9e75;
+  background: #e7f6f0;
+  border-radius: 999px;
+  padding: 3px 10px;
+  display: inline-block;
+  margin: 2px 10px 8px;
+}
+
+.header-account-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #333c48;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.header-account-menu-item:hover {
+  background: #f4f6f8;
+}
+
+.header-account-menu-item-danger {
+  color: #d9381e;
+}
+
+.header-account-menu-item-danger:hover {
+  background: #fdeceb;
 }
 
 /* Prominent running-balance pill in the header — intentionally distinct
@@ -3373,8 +3459,110 @@ body {
 
 
 /* ===========================================================
-   13. COMPONENT: settings
+   13. COMPONENT: settings (now "Account" in the UI — internal class/id
+   names below keep their original "settings-" prefix where they're still
+   reused as-is, to avoid unnecessary churn; new account-specific pieces
+   use an "account-" prefix.)
    =========================================================== */
+
+.account-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e5e9ed;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.account-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2e75b6 0%, #1d9e75 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.account-profile-identity {
+  flex: 1;
+  min-width: 180px;
+}
+
+.account-profile-name {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1f3a5f;
+}
+
+.account-profile-email {
+  font-size: 13.5px;
+  color: #5f6b7a;
+  margin-top: 2px;
+}
+
+.account-profile-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #9aa5b1;
+  margin-top: 6px;
+}
+
+.account-edit-btn {
+  margin: 0;
+  max-width: none;
+  width: auto;
+  padding: 10px 18px;
+}
+
+.account-section {
+  margin-bottom: 28px;
+}
+
+.account-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f3a5f;
+  margin-bottom: 10px;
+}
+
+/* Trading styles + instruments as wrapping chips — this is what actually
+   fixes the original header-overflow problem: a multi-select with no max
+   item count needs a layout that wraps, not one that's forced onto a
+   single line (which is what the old header badge tried to do). */
+.account-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.account-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #eaf2fa;
+  color: #1f3a5f;
+  border: 1px solid #cfe1f2;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.account-pnl-positive {
+  color: #1d9e75;
+}
+
+.account-pnl-negative {
+  color: #d9381e;
+}
+
 .settings-summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -3590,9 +3778,11 @@ body {
 
 
 /* ===========================================================
-   14. COMPONENT: marketplace
+   Shared: demo-mode notice banner
+   Used by components that are working demos without a real
+   backend yet (e.g. strategies). Not tied to any one component.
    =========================================================== */
-.market-banner {
+.demo-banner {
   background: #fdf3e3;
   border: 1px solid #f3d9a4;
   border-radius: 10px;
@@ -3600,223 +3790,12 @@ body {
   font-size: 13px;
   color: #6b5217;
   margin-bottom: 20px;
-  line-height: 1.5;
 }
-
-.market-post-wrap {
-  margin-top: 28px;
-  padding: 20px;
-  background: #f8fafc;
-  border: 1px solid #e5e9ed;
-  border-radius: 14px;
-}
-
-.market-tip-card {
-  background: #ffffff;
-  border: 1px solid #e1e4e8;
-  border-radius: 12px;
-  padding: 16px 18px;
-  margin-bottom: 14px;
-}
-
-.market-tip-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.market-tip-trader {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.market-trader-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #1f3a5f;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.market-trader-name {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #1f3a5f;
-}
-
-.market-trader-tagline {
-  font-size: 11.5px;
-  color: #9aa5b1;
-}
-
-.market-tip-time {
-  font-size: 11.5px;
-  color: #9aa5b1;
-  white-space: nowrap;
-}
-
-.market-tip-body {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.market-side-tag {
-  font-size: 11.5px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 6px;
-  text-transform: uppercase;
-}
-
-.market-side-call {
-  background: #e1f5ee;
-  color: #1d9e75;
-}
-
-.market-side-put {
-  background: #fdeceb;
-  color: #d9381e;
-}
-
-.market-tip-instrument {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1b1f24;
-}
-
-.market-tip-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #f1f4f7;
-}
-
-.market-tip-stat-label {
-  display: block;
-  font-size: 10.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: #9aa5b1;
-  margin-bottom: 3px;
-}
-
-.market-tip-stat-value {
-  display: block;
-  font-size: 15px;
-  font-weight: 700;
-  color: #1b1f24;
-  font-variant-numeric: tabular-nums;
-}
-
-.market-tip-target {
-  color: #1d9e75;
-}
-
-.market-tip-sl {
-  color: #d9381e;
-}
-
-/* Date picker row */
-.market-date-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-/* Per-trader track-record stat cards */
-.market-trader-stat-card {
-  background: #ffffff;
-  border: 1px solid #e1e4e8;
-  border-radius: 12px;
-  padding: 16px 18px;
-}
-
-.market-trader-stat-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.market-trader-stat-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding-top: 12px;
-  border-top: 1px solid #f1f4f7;
-}
-
-/* Target R-ratio tag shown inline on each tip */
-.market-tip-rratio {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #5f6b7a;
-  background: #f1f4f7;
-  padding: 3px 9px;
-  border-radius: 6px;
-  margin-left: auto;
-}
-
-/* Self-reported outcome row */
-.market-outcome-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #f1f4f7;
-  flex-wrap: wrap;
-}
-
-.market-outcome-badge {
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 11px;
-  border-radius: 14px;
-}
-
-.market-outcome-pending {
-  background: #f1f4f7;
-  color: #5f6b7a;
-}
-
-.market-outcome-win {
-  background: #e1f5ee;
-  color: #1d9e75;
-}
-
-.market-outcome-loss {
-  background: #fdeceb;
-  color: #d9381e;
-}
-
-.market-outcome-select {
-  font-size: 12.5px;
-  padding: 5px 8px;
-  border: 1px solid #d8dee5;
-  border-radius: 6px;
-  font-family: inherit;
-  color: #333c48;
-}
-/* === END COMPONENT: marketplace === */
+/* === END Shared: demo-mode notice banner === */
 
 
 /* ===========================================================
-   15. COMPONENT: strategies
+   14. COMPONENT: strategies
    =========================================================== */
 .strategy-card {
   display: flex;
@@ -3883,7 +3862,7 @@ body {
 
 
 /* ===========================================================
-   16. RESPONSIVE OVERRIDES
+   15. RESPONSIVE OVERRIDES
    =========================================================== */
 @media (max-width: 700px) {
   .tool-layout {
