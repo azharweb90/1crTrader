@@ -62,6 +62,54 @@
     `;
   }
 
+  // Risk-rules-at-a-glance: pulls from window.getRiskSummary() in
+  // dashboard.js, which is computed from the SAME tierRulesMatrix the Daily
+  // Limits Tool enforces — never a separate, possibly-drifting set of
+  // numbers. Hidden entirely if no profile/tier exists yet (shouldn't
+  // normally happen since the Dashboard is only reachable after setup, but
+  // safe regardless).
+  function renderRiskRules() {
+    const wrap = document.getElementById('dash-risk-wrap');
+    const grid = document.getElementById('dash-risk-grid');
+    const lotNote = document.getElementById('dash-risk-lot-note');
+    if (!wrap || !grid) return;
+
+    const summary = (typeof window.getRiskSummary === 'function') ? window.getRiskSummary() : null;
+    if (!summary || summary.maxLossRupees === null) {
+      wrap.classList.add('hidden');
+      return;
+    }
+    wrap.classList.remove('hidden');
+
+    grid.innerHTML = `
+      <div class="dash-risk-card">
+        <div class="dash-risk-label">Capital Tier</div>
+        <div class="dash-risk-value">${summary.tierLabel}</div>
+      </div>
+      <div class="dash-risk-card">
+        <div class="dash-risk-label">Max Loss Today</div>
+        <div class="dash-risk-value">Rs. ${fmt(summary.maxLossRupees)}</div>
+        <div class="dash-risk-sublabel">${summary.maxLossPct}% of capital</div>
+      </div>
+      <div class="dash-risk-card">
+        <div class="dash-risk-label">Lots Allowed Right Now</div>
+        <div class="dash-risk-value">${summary.maxLots}</div>
+      </div>
+      <div class="dash-risk-card">
+        <div class="dash-risk-label">Max Trades / Day</div>
+        <div class="dash-risk-value">2</div>
+      </div>
+    `;
+
+    if (lotNote) {
+      if (summary.nextLotUnlock) {
+        lotNote.innerText = `Reach Rs. ${fmt(summary.nextLotUnlock.requiredBalance)} to unlock ${summary.nextLotUnlock.nextLotCount} lots (Rs. ${fmt(summary.nextLotUnlock.remaining)} to go).`;
+      } else {
+        lotNote.innerText = `${summary.maxLots} lots is the highest currently configured for your account size.`;
+      }
+    }
+  }
+
   function renderRecentActivity() {
     const container = document.getElementById('dash-recent-area');
     if (!container) return;
@@ -73,7 +121,17 @@
       return;
     }
 
-    const rows = history.slice().reverse().slice(0, 5);
+    // Sort by date (newest first), preserving submission order within a
+    // date — same fix as the Daily Limits Tool's Trade Log, since raw
+    // insertion order can diverge from date order once broker days get
+    // imported out of chronological sequence.
+    const rows = history
+      .slice()
+      .sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+        return (a.submittedAt || 0) < (b.submittedAt || 0) ? 1 : -1;
+      })
+      .slice(0, 5);
 
     let html = '<div class="calc-history-grid">';
     html += `
@@ -98,6 +156,7 @@
 
   function render() {
     renderStatCards();
+    renderRiskRules();
     renderRecentActivity();
   }
 

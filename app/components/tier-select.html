@@ -1,7 +1,48 @@
 <!-- COMPONENT: tier-select -->
 <section class="content-section">
   <h1>Set Up Your Profile</h1>
-  <p class="section-note">Choose your capital tier, enter your starting capital, and pick your trading style. You can change any of these anytime using the "Change Tier" button in the header.</p>
+  <p class="section-note">Connect your broker and we'll fetch your account balance, tier, and tradable instruments automatically. Trading style still needs your input \u2014 that's not something a broker can tell us.</p>
+
+  <!-- Broker-first setup path (default). PROTOTYPE ONLY \u2014 no real broker
+       is contacted; see startSetupBrokerConnect() in dashboard.js. -->
+  <div id="setup-broker-step" class="select-step">
+    <div class="select-step-title">1. Connect Your Broker</div>
+
+    <div id="setup-broker-connect-wrap">
+      <div id="setup-broker-picker"></div>
+      <p id="setup-broker-status" class="foot-note" style="margin-top:8px;"></p>
+      <button type="button" class="setup-manual-link" onclick="showManualProfileSetup()">Set up manually instead, without a broker</button>
+    </div>
+
+    <!-- Shown once the mock broker "connects" — replaces the connect
+         buttons above with what was "fetched": balance, derived tier,
+         and a tradable-instrument list to multi-select from. -->
+    <div id="setup-broker-fetched-wrap" class="setup-broker-fetched-wrap hidden">
+      <div class="setup-fetched-summary">
+        <div class="setup-fetched-row">
+          <span class="setup-fetched-label">Connected to</span>
+          <span id="setup-fetched-broker-name" class="setup-fetched-value">&mdash;</span>
+        </div>
+        <div class="setup-fetched-row">
+          <span class="setup-fetched-label">Fetched account balance</span>
+          <span id="setup-fetched-balance" class="setup-fetched-value">&mdash;</span>
+        </div>
+        <div class="setup-fetched-row">
+          <span class="setup-fetched-label">Tier (auto-derived from balance)</span>
+          <span id="setup-fetched-tier" class="setup-fetched-value">&mdash;</span>
+        </div>
+      </div>
+
+      <div class="select-step-title" style="margin-top:18px;">Tradable Instruments Fetched From Your Broker</div>
+      <p class="section-note" style="margin-bottom:12px;">Index instruments are selected by default. Search or browse by category to add any stock F&amp;O you also trade.</p>
+      <div id="setup-fetched-instrument-picker"></div>
+    </div>
+  </div>
+
+  <!-- Manual fallback path: hidden by default, shown only via "Set up
+       manually instead" above. Identical to the original fully-manual
+       setup screen. -->
+  <div id="setup-manual-steps" class="hidden">
 
   <!-- Step 1: Capital Tier -->
   <div class="select-step">
@@ -51,7 +92,13 @@
     </div>
   </div>
 
-  <!-- Step 2: Trader Type -->
+  </div>
+  <!-- end #setup-manual-steps wrapper for step 1; steps 2-3 below are
+       shared by BOTH paths (trading style always asked; instrument step's
+       manual checkboxes are inside #setup-manual-instrument-step further
+       down, toggled separately) -->
+
+  <!-- Step 2: Trader Type (always shown — not fetchable from a broker) -->
   <div class="select-step">
     <div class="select-step-title">2. Trading Style</div>
     <div class="trader-type-grid">
@@ -74,49 +121,40 @@
         <div class="trader-type-name">Hedged Seller</div>
         <div class="trader-type-desc">Sells futures and buys an option for hedging to limit downside.</div>
       </button>
+
+      <button type="button" class="trader-type-card" data-trader-type="equity-trader" onclick="selectTraderType('equity-trader')">
+        <div class="trader-type-name">Equity / Cash Trader</div>
+        <div class="trader-type-desc">Buys and sells stocks directly, no derivatives. Capital required is the full share value.</div>
+      </button>
+
+      <button type="button" class="trader-type-card" data-trader-type="spread-trader" onclick="selectTraderType('spread-trader')">
+        <div class="trader-type-name">Spread Trader</div>
+        <div class="trader-type-desc">Combines multiple option legs (verticals, iron condors) for defined, capped risk.</div>
+      </button>
+
+      <button type="button" class="trader-type-card" data-trader-type="scalper" onclick="selectTraderType('scalper')">
+        <div class="trader-type-name">Scalper</div>
+        <div class="trader-type-desc">Very short holding periods \u2014 seconds to minutes, aiming for small, frequent gains.</div>
+      </button>
+
+      <button type="button" class="trader-type-card" data-trader-type="swing-trader" onclick="selectTraderType('swing-trader')">
+        <div class="trader-type-name">Swing Trader</div>
+        <div class="trader-type-desc">Holds positions for days to weeks, riding a broader move rather than the same-day swing.</div>
+      </button>
     </div>
   </div>
 
-  <!-- Step 3: Instruments -->
-  <div class="select-step">
+  <!-- Step 3: Instruments (manual fallback only — the broker-first path's
+       fetched instrument grid above replaces this entirely). Both paths
+       render via renderInstrumentPicker() in dashboard.js, which reads from
+       INSTRUMENT_INFO — one source of truth, never two lists to keep in
+       sync. Search + category grouping + a "your selection" chip row, since
+       a flat checkbox grid stops working once a real broker's instrument
+       list runs into the dozens or hundreds. -->
+  <div id="setup-manual-instrument-step" class="select-step hidden">
     <div class="select-step-title">3. Instruments You Trade</div>
-    <p class="section-note" style="margin-bottom:12px;">Select one or more. You'll set lots and see the exact points stop-loss for each on the Daily Limits Tool.</p>
-
-    <button type="button" id="select-all-instruments-btn" class="select-all-btn" onclick="toggleSelectAllInstruments()">Select All</button>
-
-    <div class="instrument-grid">
-      <div class="instrument-card" data-instrument="nifty">
-        <button type="button" class="instrument-toggle" onclick="toggleInstrument('nifty')">
-          <span class="instrument-check"></span>
-          <span class="instrument-name">Nifty</span>
-          <span class="instrument-qty-label">65 qty/lot</span>
-        </button>
-      </div>
-
-      <div class="instrument-card" data-instrument="banknifty">
-        <button type="button" class="instrument-toggle" onclick="toggleInstrument('banknifty')">
-          <span class="instrument-check"></span>
-          <span class="instrument-name">Bank Nifty</span>
-          <span class="instrument-qty-label">30 qty/lot</span>
-        </button>
-      </div>
-
-      <div class="instrument-card" data-instrument="finnifty">
-        <button type="button" class="instrument-toggle" onclick="toggleInstrument('finnifty')">
-          <span class="instrument-check"></span>
-          <span class="instrument-name">FinNifty</span>
-          <span class="instrument-qty-label">60 qty/lot</span>
-        </button>
-      </div>
-
-      <div class="instrument-card" data-instrument="sensex">
-        <button type="button" class="instrument-toggle" onclick="toggleInstrument('sensex')">
-          <span class="instrument-check"></span>
-          <span class="instrument-name">Sensex</span>
-          <span class="instrument-qty-label">20 qty/lot</span>
-        </button>
-      </div>
-    </div>
+    <p class="section-note" style="margin-bottom:12px;">Search or browse by category. You'll set lots and see the exact points stop-loss for each on the Daily Limits Tool.</p>
+    <div id="manual-instrument-picker"></div>
     <p id="instrument-error" class="capital-amount-error hidden"></p>
 
     <div class="custom-stocks-wrap">

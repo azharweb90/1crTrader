@@ -78,6 +78,117 @@
     return "F-";
   }
 
+  // ---------- Rule adherence analysis (week/month) ----------
+  // Reuses the ruleStatus already stamped onto every trade record (see
+  // dashboard.js recordCompletedDay / calculator.js evaluateBrokerTradeCompliance)
+  // — no new tracking needed, just aggregating what's already there for a
+  // chosen period. Only two ruleStatus labels are ever non-compliant today:
+  // "Overtrading — 3rd+ trade that day" and "Cooldown broken — traded too
+  // soon" — everything else (kill switch, soft block, profit, etc.) is a
+  // compliant OUTCOME even though it describes why the day ended.
+  let journalAnalysisRange = 'week'; // 'week' | 'month'
+
+  function ymdLocalJournal(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function startOfWeekLocal(d) {
+    const date = new Date(d);
+    const day = date.getDay(); // 0 = Sunday
+    date.setDate(date.getDate() - day);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  function resolveJournalAnalysisRange(range) {
+    const today = new Date();
+    let from;
+    if (range === 'week') {
+      from = startOfWeekLocal(today);
+    } else {
+      from = new Date(today.getFullYear(), today.getMonth(), 1);
+    }
+    return { from, to: today };
+  }
+
+  function setJournalAnalysisRange(range) {
+    journalAnalysisRange = range;
+    renderJournalAnalysis();
+  }
+
+  function renderJournalAnalysis() {
+    const bodyEl = document.getElementById('journal-analysis-body');
+    const labelEl = document.getElementById('journal-analysis-range-label');
+    if (!bodyEl || !labelEl) return;
+
+    document.getElementById('journal-analysis-week-btn').classList.toggle('broker-range-pill-active', journalAnalysisRange === 'week');
+    document.getElementById('journal-analysis-month-btn').classList.toggle('broker-range-pill-active', journalAnalysisRange === 'month');
+
+    const { from, to } = resolveJournalAnalysisRange(journalAnalysisRange);
+    const fromStr = ymdLocalJournal(from);
+    const toStr = ymdLocalJournal(to);
+    const fmtLabel = (d) => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    labelEl.innerText = `${fmtLabel(from)} - ${fmtLabel(to)}`;
+
+    const history = getHistory().filter(t => t.date >= fromStr && t.date <= toStr);
+    const entries = (typeof window.getAllJournalEntries === 'function') ? window.getAllJournalEntries() : {};
+
+    if (history.length === 0) {
+      bodyEl.innerHTML = `<div class="roadmap-empty-state">No trades logged ${journalAnalysisRange === 'week' ? 'this week' : 'this month'} yet.</div>`;
+      return;
+    }
+
+    const compliant = history.filter(t => !t.ruleStatus || t.ruleStatus.compliant);
+    const violations = history.filter(t => t.ruleStatus && !t.ruleStatus.compliant);
+    const adherencePct = Math.round((compliant.length / history.length) * 100);
+
+    const journaledTrades = history.filter(t => entries[t.id]);
+    const journaledPct = Math.round((journaledTrades.length / history.length) * 100);
+    const gradedTrades = journaledTrades.filter(t => typeof entries[t.id].score === 'number');
+    let avgScorePct = null;
+    if (gradedTrades.length > 0) {
+      const totalPct = gradedTrades.reduce((sum, t) => sum + (entries[t.id].score / TOTAL_OBTAINABLE) * 100, 0);
+      avgScorePct = Math.round(totalPct / gradedTrades.length);
+    }
+
+    // Group violations by their specific rule label, so the trader sees
+    // WHICH habit is slipping, not just a single number.
+    const violationCounts = {};
+    violations.forEach(t => {
+      const label = t.ruleStatus.label;
+      violationCounts[label] = (violationCounts[label] || 0) + 1;
+    });
+    const violationBreakdownHtml = Object.keys(violationCounts).length > 0
+      ? Object.entries(violationCounts).map(([label, count]) => `
+          <div class="journal-violation-row">
+            <span class="rule-status-badge rule-status-violation">\u26a0 ${label}</span>
+            <span class="journal-violation-count">${count} time${count === 1 ? '' : 's'}</span>
+          </div>
+        `).join('')
+      : '<div class="journal-violation-row journal-violation-none">No rule violations this period \u2014 every trade followed the daily-loss, soft-block, and cooldown rules.</div>';
+
+    bodyEl.innerHTML = `
+      <div class="journal-analysis-stats">
+        <div class="journal-analysis-stat-card">
+          <div class="journal-analysis-stat-value ${adherencePct === 100 ? 'calc-history-win' : (violations.length > 0 ? 'calc-history-loss' : '')}">${compliant.length} / ${history.length}</div>
+          <div class="journal-analysis-stat-label">Trades within rules (${adherencePct}%)</div>
+        </div>
+        <div class="journal-analysis-stat-card">
+          <div class="journal-analysis-stat-value">${journaledTrades.length} / ${history.length}</div>
+          <div class="journal-analysis-stat-label">Trades journaled (${journaledPct}%)</div>
+        </div>
+        <div class="journal-analysis-stat-card">
+          <div class="journal-analysis-stat-value">${avgScorePct !== null ? avgScorePct + '%' : '\u2014'}</div>
+          <div class="journal-analysis-stat-label">Avg. review score</div>
+        </div>
+      </div>
+      <div class="journal-violation-breakdown">
+        <div class="journal-violation-breakdown-title">Rule violations this period</div>
+        ${violationBreakdownHtml}
+      </div>
+    `;
+  }
+
   let activeInstrumentFilter = ''; // '' = all instruments
   let activeGradeFilter = '';      // '' = all, 'journaled' = any graded entry, 'not-journaled' = no entry
   let activeDateFrom = '';         // '' = no lower bound, else 'YYYY-MM-DD'
@@ -194,7 +305,14 @@
       return;
     }
 
-    let rows = history.slice().reverse(); // most recent first
+    // Sort by date (newest first), preserving submission order within a
+    // date — same fix as the Daily Limits Tool's Trade Log, since insertion
+    // order can diverge from date order once broker days are imported out
+    // of chronological sequence.
+    let rows = history.slice().sort((a, b) => {
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      return (a.submittedAt || 0) < (b.submittedAt || 0) ? 1 : -1;
+    });
 
     if (activeInstrumentFilter) {
       rows = rows.filter(t => t.instrument === activeInstrumentFilter);
@@ -486,6 +604,7 @@
     if (deleteBtn) deleteBtn.classList.remove('hidden');
 
     renderList();
+    renderJournalAnalysis();
   }
 
   function confirmDeleteJournalEntry() {
@@ -499,6 +618,7 @@
 
     closeJournalForm();
     renderList();
+    renderJournalAnalysis();
   }
 
   // Expose handlers for inline onclick/onchange attributes
@@ -516,8 +636,11 @@
   window.onScreenshotPaste = onScreenshotPaste;
   window.removeScreenshot = removeScreenshot;
   window.renderJournalList = renderList; // dashboard.js can call this to refresh on new trades
+  window.setJournalAnalysisRange = setJournalAnalysisRange;
+  window.renderJournalAnalysis = renderJournalAnalysis; // dashboard.js can call this to refresh on new trades too
 
   renderList();
+  renderJournalAnalysis();
 
 })();
 /* === END COMPONENT: trading-journal (logic) === */

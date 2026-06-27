@@ -3,6 +3,22 @@
   <h1>Trading Journal</h1>
   <p class="section-note">Write down your strategy, reasoning, and emotions for each trade you've logged. Reviewing these regularly is one of the fastest ways to improve.</p>
 
+  <!-- Rule adherence analysis: week/month view of how often trades followed
+       the daily-loss, soft-block, and cooldown rules, plus journal
+       completion for the same period. Separate from journal-stats-bar
+       below, which is all-time rather than period-scoped. -->
+  <div class="journal-analysis-wrap">
+    <div class="journal-analysis-header">
+      <div class="mini-ladder-title" style="margin-bottom:0;">Rule Adherence Analysis</div>
+      <div class="journal-analysis-pills">
+        <button type="button" id="journal-analysis-week-btn" class="broker-range-pill" onclick="setJournalAnalysisRange('week')">This Week</button>
+        <button type="button" id="journal-analysis-month-btn" class="broker-range-pill" onclick="setJournalAnalysisRange('month')">This Month</button>
+      </div>
+    </div>
+    <div id="journal-analysis-range-label" class="broker-range-label-pill">&mdash;</div>
+    <div id="journal-analysis-body"></div>
+  </div>
+
   <div id="journal-stats-bar" class="journal-stats-bar"></div>
 
   <div class="journal-filter-row">

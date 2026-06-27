@@ -19,6 +19,7 @@
      16. Responsive Overrides
    =========================================================== */
 
+
 /* ===========================================================
    1. BASE / RESET
    =========================================================== */
@@ -27,8 +28,7 @@
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   background: #f6f8fa;
   color: #1b1f24;
   margin: 0;
@@ -55,12 +55,12 @@ h1 {
   margin: 14px 4px 0;
 }
 
+
 /* ===========================================================
    2. LAYOUT SHELL
    (sidebar, top bar, main content column, content section card)
    =========================================================== */
-html,
-body {
+html, body {
   height: 100%;
 }
 
@@ -98,6 +98,27 @@ body {
   padding: 6px 10px 22px;
   margin-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.sidebar-brand:hover {
+  opacity: 0.85;
+}
+
+.sidebar-setup-mode .sidebar-brand {
+  cursor: not-allowed;
+}
+
+.sidebar-setup-mode .sidebar-brand:hover {
+  opacity: 1;
 }
 
 .sidebar-brand-mark {
@@ -146,9 +167,7 @@ body {
   color: rgba(255, 255, 255, 0.75);
   cursor: pointer;
   font-family: inherit;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 /* During initial profile setup, the sidebar is visible (for visual
@@ -246,14 +265,8 @@ body {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .content-section {
@@ -276,6 +289,7 @@ body {
 .component-error {
   color: #b8281a;
 }
+
 
 /* ===========================================================
    3. SHARED GRID TABLE
@@ -338,6 +352,7 @@ body {
   text-align: center;
 }
 
+
 /* ===========================================================
    4. COMPONENT: tier-select
    =========================================================== */
@@ -352,6 +367,52 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 12px;
+}
+
+/* Broker-first profile setup (prototype mock) */
+.setup-manual-link {
+  display: block;
+  background: none;
+  border: none;
+  color: #2e75b6;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 14px;
+  padding: 0;
+}
+
+.setup-manual-link:hover {
+  text-decoration: underline;
+}
+
+.setup-broker-fetched-wrap.hidden {
+  display: none;
+}
+
+.setup-fetched-summary {
+  background: #f8fafc;
+  border: 1px solid #e5e9ed;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.setup-fetched-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 13.5px;
+}
+
+.setup-fetched-label {
+  color: #5f6b7a;
+}
+
+.setup-fetched-value {
+  font-weight: 700;
+  color: #1f3a5f;
 }
 
 .tier-select-grid {
@@ -625,9 +686,7 @@ body {
   z-index: 1000;
   opacity: 0;
   transform: translateY(-10px);
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
   pointer-events: none;
   max-width: 320px;
 }
@@ -760,6 +819,198 @@ body {
   display: none;
 }
 
+/* Searchable, categorized instrument picker — replaces a flat grid once
+   the instrument list grows past a handful (a real broker's tradable
+   universe can run into the hundreds). Used by both the broker-fetched
+   and manual-fallback setup paths via the same render function. */
+.instrument-picker-search {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d8dee5;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: inherit;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+}
+
+.instrument-picker-search:focus {
+  outline: none;
+  border-color: #2e75b6;
+}
+
+.instrument-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  min-height: 30px;
+}
+
+.instrument-picker-chips-empty {
+  font-size: 12.5px;
+  color: #9aa5b1;
+  align-self: center;
+}
+
+.instrument-picker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eaf1f8;
+  color: #1f3a5f;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 6px 5px 12px;
+  border-radius: 16px;
+}
+
+.instrument-picker-chip-remove {
+  background: rgba(31, 58, 95, 0.12);
+  border: none;
+  color: #1f3a5f;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instrument-picker-chip-remove:hover {
+  background: rgba(31, 58, 95, 0.24);
+}
+
+.instrument-picker-category {
+  border: 1px solid #e5e9ed;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.instrument-picker-category-header-row {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+}
+
+.instrument-picker-category-header {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.instrument-picker-chevron {
+  font-size: 9px;
+  color: #9aa5b1;
+  transition: transform 0.2s ease;
+}
+
+.instrument-picker-chevron-collapsed {
+  transform: rotate(-90deg);
+}
+
+.instrument-picker-category-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f3a5f;
+}
+
+.instrument-picker-category-count {
+  font-size: 11.5px;
+  color: #5f6b7a;
+  margin-left: auto;
+}
+
+.instrument-picker-select-all-btn {
+  background: none;
+  border: none;
+  color: #2e75b6;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.instrument-picker-select-all-btn:hover {
+  text-decoration: underline;
+}
+
+.instrument-picker-rows {
+  display: flex;
+  flex-direction: column;
+  max-height: 600px;
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+}
+
+.instrument-picker-rows-collapsed {
+  max-height: 0;
+}
+
+.instrument-picker-row {
+  width: 100%;
+  background: #ffffff;
+  border: none;
+  border-top: 1px solid #f1f4f7;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.instrument-picker-row:hover {
+  background: #fafbfc;
+}
+
+.instrument-picker-row.selected .instrument-check {
+  background: #1d9e75;
+  border-color: #1d9e75;
+}
+
+.instrument-picker-row.selected .instrument-check::after {
+  content: "\2713";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.instrument-picker-row-name {
+  font-weight: 600;
+  color: #1f3a5f;
+  font-size: 13.5px;
+  flex: 1;
+}
+
+.instrument-picker-row.selected .instrument-picker-row-name {
+  color: #1d9e75;
+}
+
+.instrument-picker-row-qty {
+  font-size: 11.5px;
+  color: #9aa5b1;
+  font-weight: 500;
+}
+
 .instrument-lots-input {
   width: 100%;
   padding: 8px 10px;
@@ -843,6 +1094,7 @@ body {
 }
 /* === END COMPONENT: tier-select === */
 
+
 /* ===========================================================
    5. COMPONENT: capital-ladder
    =========================================================== */
@@ -851,16 +1103,15 @@ body {
 }
 /* === END COMPONENT: capital-ladder === */
 
+
 /* ===========================================================
    6. COMPONENT: trading-rules
    =========================================================== */
 .grid-rules {
-  grid-template-columns: minmax(110px, 1fr) minmax(120px, 1.2fr) minmax(
-      100px,
-      0.9fr
-    ) minmax(120px, 1.2fr);
+  grid-template-columns: minmax(110px, 1fr) minmax(120px, 1.2fr) minmax(100px, 0.9fr) minmax(120px, 1.2fr);
 }
 /* === END COMPONENT: trading-rules === */
+
 
 /* ===========================================================
    7. COMPONENT: subscription-pricing
@@ -998,6 +1249,7 @@ body {
   background: #177f5e;
 }
 /* === END COMPONENT: subscription-pricing === */
+
 
 /* ===========================================================
    8. COMPONENT: risk-calculator
@@ -1345,18 +1597,10 @@ body {
   margin-bottom: 4px;
 }
 
-.alert-banner.success .alert-title {
-  color: #2e75b6;
-}
-.alert-banner.warning .alert-title {
-  color: #b5750a;
-}
-.alert-banner.danger .alert-title {
-  color: #b8281a;
-}
-.alert-banner.cooldown .alert-title {
-  color: #4a4ea3;
-}
+.alert-banner.success .alert-title { color: #2e75b6; }
+.alert-banner.warning .alert-title { color: #b5750a; }
+.alert-banner.danger  .alert-title { color: #b8281a; }
+.alert-banner.cooldown .alert-title { color: #4a4ea3; }
 
 .alert-desc {
   font-size: 13px;
@@ -1378,10 +1622,7 @@ body {
   font-size: 12.5px;
   color: #2e75b6;
   line-height: 1.5;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .lot-unlock-note.lot-cap-flash {
@@ -1438,9 +1679,7 @@ body {
 .mini-ladder-collapsible-body {
   overflow: hidden;
   max-height: 2000px;
-  transition:
-    max-height 0.25s ease,
-    opacity 0.2s ease;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
   opacity: 1;
 }
 
@@ -1462,17 +1701,11 @@ body {
 }
 
 .mini-ladder-grid-4col {
-  grid-template-columns: minmax(80px, 0.5fr) minmax(150px, 1.1fr) minmax(
-      90px,
-      0.7fr
-    ) minmax(120px, 0.9fr);
+  grid-template-columns: minmax(80px, 0.5fr) minmax(150px, 1.1fr) minmax(90px, 0.7fr) minmax(120px, 0.9fr);
 }
 
 .instrument-sl-grid {
-  grid-template-columns: minmax(100px, 1fr) minmax(70px, 0.6fr) minmax(
-      70px,
-      0.6fr
-    ) minmax(110px, 0.9fr);
+  grid-template-columns: minmax(100px, 1fr) minmax(70px, 0.6fr) minmax(70px, 0.6fr) minmax(110px, 0.9fr);
 }
 
 .mini-ladder-cell {
@@ -1595,10 +1828,7 @@ body {
 
 .calc-history-grid {
   display: grid;
-  grid-template-columns: minmax(100px, 1fr) minmax(110px, 1fr) minmax(
-      120px,
-      1fr
-    );
+  grid-template-columns: minmax(100px, 1fr) minmax(110px, 1fr) minmax(120px, 1fr);
   gap: 1px;
   background: #d8dee5;
   border: 1px solid #d8dee5;
@@ -1609,10 +1839,7 @@ body {
 }
 
 .calc-history-grid-4col {
-  grid-template-columns: minmax(90px, 0.8fr) minmax(100px, 0.8fr) minmax(
-      110px,
-      0.9fr
-    ) minmax(160px, 1.2fr);
+  grid-template-columns: minmax(90px, 0.8fr) minmax(100px, 0.8fr) minmax(110px, 0.9fr) minmax(160px, 1.2fr);
 }
 
 .calc-history-cell {
@@ -1917,15 +2144,9 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.broker-legend-green {
-  background: #1d9e75;
-}
-.broker-legend-red {
-  background: #d9381e;
-}
-.broker-legend-gray {
-  background: #d8dee5;
-}
+.broker-legend-green { background: #1d9e75; }
+.broker-legend-red { background: #d9381e; }
+.broker-legend-gray { background: #d8dee5; }
 
 .broker-legend-dot {
   display: inline-block;
@@ -1967,10 +2188,7 @@ body {
 
 .broker-scrip-grid {
   display: grid;
-  grid-template-columns: minmax(140px, 1.6fr) minmax(60px, 0.7fr) minmax(
-      70px,
-      0.8fr
-    ) minmax(70px, 0.8fr) minmax(70px, 0.8fr) minmax(90px, 1fr);
+  grid-template-columns: minmax(140px, 1.6fr) minmax(60px, 0.7fr) minmax(70px, 0.8fr) minmax(70px, 0.8fr) minmax(70px, 0.8fr) minmax(90px, 1fr);
   gap: 1px;
   background: #d8dee5;
   border: 1px solid #d8dee5;
@@ -2047,6 +2265,7 @@ body {
   display: none;
 }
 /* === END COMPONENT: risk-calculator === */
+
 
 /* ===========================================================
    9. COMPONENT: roadmap
@@ -2258,10 +2477,7 @@ body {
 
 .roadmap-history-grid {
   display: grid;
-  grid-template-columns: minmax(110px, 1fr) minmax(120px, 1fr) minmax(
-      130px,
-      1fr
-    );
+  grid-template-columns: minmax(110px, 1fr) minmax(120px, 1fr) minmax(130px, 1fr);
   gap: 1px;
   background: #d8dee5;
   border: 1px solid #d8dee5;
@@ -2402,15 +2618,13 @@ body {
 }
 /* === END COMPONENT: roadmap === */
 
+
 /* ===========================================================
    10. COMPONENT: trading-journal
    =========================================================== */
 .journal-list-grid {
   display: grid;
-  grid-template-columns: minmax(90px, 0.8fr) minmax(90px, 0.8fr) minmax(
-      120px,
-      1fr
-    ) minmax(90px, 0.7fr);
+  grid-template-columns: minmax(90px, 0.8fr) minmax(90px, 0.8fr) minmax(120px, 1fr) minmax(90px, 0.7fr);
   gap: 1px;
   background: #d8dee5;
   border: 1px solid #d8dee5;
@@ -2420,10 +2634,94 @@ body {
 }
 
 .journal-list-grid-5col {
-  grid-template-columns: minmax(85px, 0.7fr) minmax(90px, 0.7fr) minmax(
-      85px,
-      0.7fr
-    ) minmax(120px, 1fr) minmax(90px, 0.7fr);
+  grid-template-columns: minmax(85px, 0.7fr) minmax(90px, 0.7fr) minmax(85px, 0.7fr) minmax(120px, 1fr) minmax(90px, 0.7fr);
+}
+
+/* Rule adherence analysis (week/month) — separate from the all-time
+   journal-stats-bar below it. Reuses .broker-range-pill /
+   .broker-range-pill-active / .broker-range-label-pill from the Daily
+   Limits Tool's broker P&L browser for the same week/month pill pattern. */
+.journal-analysis-wrap {
+  background: #fff;
+  border: 1px solid #e5e9ed;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.journal-analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.journal-analysis-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.journal-analysis-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 14px 0 16px;
+}
+
+.journal-analysis-stat-card {
+  background: #fafbfc;
+  border: 1px solid #e5e9ed;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.journal-analysis-stat-value {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1f3a5f;
+  font-variant-numeric: tabular-nums;
+}
+
+.journal-analysis-stat-label {
+  font-size: 11px;
+  color: #5f6b7a;
+  margin-top: 4px;
+}
+
+.journal-violation-breakdown-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5f6b7a;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+}
+
+.journal-violation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f4f7;
+  font-size: 13px;
+}
+
+.journal-violation-row:last-child {
+  border-bottom: none;
+}
+
+.journal-violation-count {
+  font-weight: 700;
+  color: #a32d2d;
+  font-variant-numeric: tabular-nums;
+}
+
+.journal-violation-none {
+  color: #1d9e75;
+  font-weight: 600;
+  justify-content: flex-start;
 }
 
 .journal-stats-bar {
@@ -2739,9 +3037,7 @@ body {
   background: #ffffff;
   padding: 20px;
   cursor: pointer;
-  transition:
-    border-color 0.15s ease,
-    background 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
   outline: none;
 }
 
@@ -2804,6 +3100,7 @@ body {
   margin-left: 4px;
 }
 /* === END COMPONENT: trading-journal === */
+
 
 /* ===========================================================
    11. COMPONENT: education-books-shared
@@ -2916,6 +3213,7 @@ body {
 }
 /* === END COMPONENT: education-books-shared === */
 
+
 /* ===========================================================
    12. COMPONENT: dashboard-home
    =========================================================== */
@@ -2964,6 +3262,56 @@ body {
   letter-spacing: 0.03em;
   color: #5f6b7a;
   margin-bottom: 12px;
+}
+
+/* Risk rules at a glance — distinct navy-tinted treatment so it reads as
+   "the rules that apply to you", not just another generic stat card. */
+.dash-risk-wrap {
+  background: #f8fafc;
+  border: 1px solid #e1e4e8;
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 28px;
+}
+
+.dash-risk-wrap.hidden {
+  display: none;
+}
+
+.dash-risk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.dash-risk-card {
+  background: linear-gradient(135deg, #1f3a5f 0%, #2c4f7c 100%);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #fff;
+}
+
+.dash-risk-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 6px;
+}
+
+.dash-risk-value {
+  font-size: 19px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-risk-sublabel {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 2px;
 }
 
 .dash-quicklink-grid {
@@ -3022,6 +3370,7 @@ body {
   margin-top: 8px;
 }
 /* === END COMPONENT: dashboard-home === */
+
 
 /* ===========================================================
    13. COMPONENT: settings
@@ -3124,14 +3473,78 @@ body {
   flex-shrink: 0;
 }
 
-.broker-chip-orange {
-  background: #e2752a;
+.broker-chip-orange { background: #e2752a; }
+.broker-chip-red { background: #d9381e; }
+.broker-chip-purple { background: #6c4ec9; }
+.broker-chip-teal { background: #0d9488; }
+.broker-chip-blue { background: #2e75b6; }
+.broker-chip-maroon { background: #9d2f4a; }
+.broker-chip-navy { background: #1f3a5f; }
+
+/* "More brokers" search + list — keeps the broker picker from becoming a
+   wall of buttons as the list grows beyond the 3-4 most popular ones. */
+.broker-more-toggle {
+  display: block;
+  background: none;
+  border: none;
+  color: #2e75b6;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 12px;
+  padding: 0;
 }
-.broker-chip-red {
-  background: #d9381e;
+
+.broker-more-toggle:hover {
+  text-decoration: underline;
 }
-.broker-chip-purple {
-  background: #6c4ec9;
+
+.broker-more-wrap.hidden {
+  display: none;
+}
+
+.broker-more-wrap {
+  margin-top: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e9ed;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.broker-more-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 260px;
+  overflow-y: auto;
+  gap: 1px;
+}
+
+.broker-more-row {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e9ed;
+  border-radius: 8px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f3a5f;
+  text-align: left;
+  margin-bottom: 4px;
+}
+
+.broker-more-row:hover {
+  border-color: #2e75b6;
+}
+
+.broker-more-row:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .broker-connected-row {
@@ -3174,6 +3587,7 @@ body {
   background: #fbdedb;
 }
 /* === END COMPONENT: settings === */
+
 
 /* ===========================================================
    14. COMPONENT: marketplace
@@ -3400,6 +3814,7 @@ body {
 }
 /* === END COMPONENT: marketplace === */
 
+
 /* ===========================================================
    15. COMPONENT: strategies
    =========================================================== */
@@ -3465,6 +3880,7 @@ body {
   margin-top: 16px;
 }
 /* === END COMPONENT: strategies === */
+
 
 /* ===========================================================
    16. RESPONSIVE OVERRIDES
@@ -3560,10 +3976,7 @@ body {
   }
 
   .mini-ladder-grid-4col {
-    grid-template-columns: 70px minmax(140px, 1fr) minmax(80px, 0.6fr) minmax(
-        110px,
-        0.8fr
-      );
+    grid-template-columns: 70px minmax(140px, 1fr) minmax(80px, 0.6fr) minmax(110px, 0.8fr);
     font-size: 11.5px;
     overflow-x: auto;
   }

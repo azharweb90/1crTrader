@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1CrTrader — Sign In</title>
+<style>
+  :root {
+    --navy: #1f3a5f;
+    --navy-deep: #152a45;
+    --teal: #1d9e75;
+    --coral: #d9381e;
+    --blue: #2e75b6;
+    --ink: #1b1f24;
+    --slate: #5f6b7a;
+    --mist: #9aa5b1;
+    --line: #e1e4e8;
+    --paper: #f8fafc;
+    --white: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  h1, h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--navy);
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* ---------- Left: brand panel ---------- */
+  .brand-panel {
+    background: linear-gradient(165deg, var(--navy-deep) 0%, var(--navy) 55%, #234468 100%);
+    color: #fff;
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-panel::before {
+    content: "";
+    position: absolute;
+    top: -140px;
+    right: -160px;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(29,158,117,0.22) 0%, rgba(29,158,117,0) 70%);
+  }
+
+  .brand-mark-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 18px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--teal) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .brand-quote {
+    position: relative;
+    z-index: 2;
+    max-width: 420px;
+  }
+
+  .brand-quote h2 {
+    color: #fff;
+    font-size: 28px;
+    line-height: 1.3;
+    margin-bottom: 16px;
+  }
+
+  .brand-quote p {
+    color: rgba(255,255,255,0.7);
+    font-size: 14.5px;
+  }
+
+  .brand-stats {
+    display: flex;
+    gap: 28px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand-stats strong {
+    display: block;
+    font-family: Georgia, serif;
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .brand-stats span {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.55);
+  }
+
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; }
+    .brand-panel { display: none; }
+  }
+
+  /* ---------- Right: form panel ---------- */
+  .form-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .form-box {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .form-box-mobile-brand {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--navy);
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 860px) {
+    .form-box-mobile-brand { display: flex; }
+  }
+
+  .auth-view { display: none; }
+  .auth-view.active { display: block; }
+
+  .auth-title {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  .auth-subtitle {
+    color: var(--slate);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .field-group {
+    margin-bottom: 16px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--ink);
+  }
+
+  .field-input:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+
+  .field-error {
+    color: var(--coral);
+    font-size: 12.5px;
+    margin-top: 6px;
+  }
+
+  .field-error.hidden { display: none; }
+
+  .field-hint {
+    color: var(--mist);
+    font-size: 11.5px;
+    margin-top: 5px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: var(--navy);
+    color: #fff;
+    margin-top: 6px;
+  }
+
+  .btn-primary:hover { background: var(--navy-deep); }
+
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--slate);
+    margin-top: 10px;
+  }
+
+  .auth-switch-line {
+    text-align: center;
+    font-size: 13.5px;
+    color: var(--slate);
+    margin-top: 22px;
+  }
+
+  .auth-switch-line a {
+    color: var(--blue);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .auth-switch-line a:hover { text-decoration: underline; }
+
+  .forgot-link {
+    display: block;
+    text-align: right;
+    font-size: 12.5px;
+    color: var(--blue);
+    font-weight: 600;
+    margin-top: -8px;
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+
+  .forgot-link:hover { text-decoration: underline; }
+
+  .banner {
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .banner.error {
+    background: #fdeceb;
+    color: #a32d2d;
+    border: 1px solid #f5c9c2;
+  }
+
+  .banner.success {
+    background: #e1f5ee;
+    color: #0f6e56;
+    border: 1px solid #b9e6d4;
+  }
+
+  .banner.hidden { display: none; }
+
+  /* OTP mock display — this is the dev-mode stand-in for a real SMS/email,
+     made obviously a prototype affordance rather than disguised as one. */
+  .otp-mock-banner {
+    background: #fff7e6;
+    border: 1px solid #f0d9a8;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .otp-mock-banner-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #8a6310;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .otp-mock-code {
+    font-family: Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0.1em;
+  }
+
+  .otp-mock-note {
+    font-size: 11.5px;
+    color: #8a6310;
+    margin-top: 6px;
+  }
+
+  .otp-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .otp-digit {
+    width: 100%;
+    aspect-ratio: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-family: Georgia, serif;
+    color: var(--navy);
+  }
+
+  .otp-digit:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+
+  .resend-line {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--slate);
+    margin-top: -4px;
+    margin-bottom: 18px;
+  }
+
+  .resend-line a { color: var(--blue); font-weight: 600; cursor: pointer; }
+  .resend-line a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="brand-panel">
+    <div class="brand-mark-row">
+      <span class="brand-mark">1Cr</span> 1CrTrader
+    </div>
+    <div class="brand-quote">
+      <h2>Most traders don't lose to the market. They lose to their next trade.</h2>
+      <p>1CrTrader enforces the daily loss limits, cooldowns, and trade caps you set for yourself — on the days your discipline can't.</p>
+    </div>
+    <div class="brand-stats">
+      <div><strong>2</strong><span>max trades / day</span></div>
+      <div><strong>30 min</strong><span>forced cooldown</span></div>
+      <div><strong>₹1 Cr</strong><span>the goal</span></div>
+    </div>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-box">
+      <div class="form-box-mobile-brand"><span class="brand-mark">1Cr</span> 1CrTrader</div>
+
+      <!-- ===================== REGISTER ===================== -->
+      <div class="auth-view" id="view-register">
+        <h1 class="auth-title">Create your account</h1>
+        <p class="auth-subtitle">Free to start. You'll connect a broker or set up manually right after.</p>
+        <div id="register-error" class="banner error hidden"></div>
+
+        <div class="field-group">
+          <label class="field-label" for="reg-name">Full name</label>
+          <input type="text" id="reg-name" class="field-input" placeholder="e.g. Mohammed Azhar Uddin">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="reg-email">Email</label>
+          <input type="email" id="reg-email" class="field-input" placeholder="you@example.com">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="reg-phone">Phone (optional)</label>
+          <input type="tel" id="reg-phone" class="field-input" placeholder="+91 98765 43210">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="reg-password">Password</label>
+          <input type="password" id="reg-password" class="field-input" placeholder="At least 6 characters">
+          <p class="field-hint">Stored only in this browser for this prototype — not a real account system yet.</p>
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="handleRegister()">Create Account &amp; Continue</button>
+
+        <p class="auth-switch-line">Already have an account? <a onclick="switchAuthView('login')">Log in</a></p>
+      </div>
+
+      <!-- ===================== LOGIN ===================== -->
+      <div class="auth-view" id="view-login">
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-subtitle">Log in to pick up where you left off.</p>
+        <div id="login-error" class="banner error hidden"></div>
+
+        <div class="field-group">
+          <label class="field-label" for="login-email">Email</label>
+          <input type="email" id="login-email" class="field-input" placeholder="you@example.com">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="field-input" placeholder="Your password">
+        </div>
+        <a class="forgot-link" onclick="switchAuthView('forgot')">Forgot password?</a>
+
+        <button type="button" class="btn btn-primary" onclick="handleLogin()">Log In</button>
+
+        <p class="auth-switch-line">New here? <a onclick="switchAuthView('register')">Create an account</a></p>
+      </div>
+
+      <!-- ===================== FORGOT PASSWORD ===================== -->
+      <div class="auth-view" id="view-forgot">
+        <h1 class="auth-title">Reset your password</h1>
+        <p class="auth-subtitle">Enter the email on your account and we'll send a verification code.</p>
+        <div id="forgot-error" class="banner error hidden"></div>
+
+        <div class="field-group">
+          <label class="field-label" for="forgot-email">Email</label>
+          <input type="email" id="forgot-email" class="field-input" placeholder="you@example.com">
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="handleForgotPassword()">Send Verification Code</button>
+        <button type="button" class="btn btn-secondary" onclick="switchAuthView('login')">Back to Log In</button>
+      </div>
+
+      <!-- ===================== OTP VERIFICATION ===================== -->
+      <div class="auth-view" id="view-otp">
+        <h1 class="auth-title">Enter verification code</h1>
+        <p class="auth-subtitle" id="otp-subtitle">We've sent a 6-digit code to your email.</p>
+        <div id="otp-error" class="banner error hidden"></div>
+
+        <div class="otp-mock-banner">
+          <div class="otp-mock-banner-label">Prototype mode — no real email was sent</div>
+          <div class="otp-mock-code" id="otp-mock-code">000000</div>
+          <div class="otp-mock-note">In production this would arrive by email or SMS instead of showing here.</div>
+        </div>
+
+        <div class="otp-input-row">
+          <input type="text" maxlength="1" class="otp-digit" data-otp-index="0" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit" data-otp-index="1" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit" data-otp-index="2" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit" data-otp-index="3" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit" data-otp-index="4" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit" data-otp-index="5" inputmode="numeric">
+        </div>
+
+        <p class="resend-line">Didn't get it? <a onclick="handleResendOtp()">Send a new code</a></p>
+
+        <button type="button" class="btn btn-primary" onclick="handleVerifyOtp()">Verify Code</button>
+        <button type="button" class="btn btn-secondary" onclick="switchAuthView('forgot')">Back</button>
+      </div>
+
+      <!-- ===================== RESET PASSWORD ===================== -->
+      <div class="auth-view" id="view-reset">
+        <h1 class="auth-title">Set a new password</h1>
+        <p class="auth-subtitle">Choose a new password for your account.</p>
+        <div id="reset-error" class="banner error hidden"></div>
+
+        <div class="field-group">
+          <label class="field-label" for="reset-password">New password</label>
+          <input type="password" id="reset-password" class="field-input" placeholder="At least 6 characters">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="reset-password-confirm">Confirm new password</label>
+          <input type="password" id="reset-password-confirm" class="field-input" placeholder="Re-enter the password above">
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="handleResetPassword()">Update Password</button>
+      </div>
+
+      <!-- ===================== SUCCESS (post-reset) ===================== -->
+      <div class="auth-view" id="view-reset-success">
+        <h1 class="auth-title">Password updated</h1>
+        <p class="auth-subtitle">Your password has been changed. Log in with your new password.</p>
+        <button type="button" class="btn btn-primary" onclick="switchAuthView('login')">Back to Log In</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+  // ---------- View switching ----------
+  let pendingResetEmail = null; // email currently going through forgot -> otp -> reset
+
+  function switchAuthView(viewName) {
+    document.querySelectorAll('.auth-view').forEach(v => v.classList.remove('active'));
+    const target = document.getElementById(`view-${viewName}`);
+    if (target) target.classList.add('active');
+
+    // Reflect the active view in the URL so a refresh/bookmark lands on the
+    // same screen, and so the landing page can deep-link straight to e.g.
+    // auth.html?view=register instead of always opening on login.
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', viewName);
+    window.history.replaceState({}, '', url);
+
+    clearAllErrors();
+  }
+
+  function clearAllErrors() {
+    document.querySelectorAll('.banner.error').forEach(el => el.classList.add('hidden'));
+  }
+
+  function showError(elId, message) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.innerText = message;
+    el.classList.remove('hidden');
+  }
+
+  // ---------- Register ----------
+  function handleRegister() {
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const phone = document.getElementById('reg-phone').value;
+    const password = document.getElementById('reg-password').value;
+
+    const result = window.Auth.registerAccount({ name, email, phone, password });
+    if (!result.ok) {
+      showError('register-error', result.error);
+      return;
+    }
+
+    // Registered and logged in — continue straight into profile setup.
+    window.location.href = '../app/index.html';
+  }
+
+  // ---------- Login ----------
+  function handleLogin() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    const result = window.Auth.loginAccount({ email, password });
+    if (!result.ok) {
+      showError('login-error', result.error);
+      return;
+    }
+
+    window.location.href = '../app/index.html';
+  }
+
+  // ---------- Forgot password ----------
+  function handleForgotPassword() {
+    const email = document.getElementById('forgot-email').value;
+    const result = window.Auth.requestPasswordReset(email);
+    if (!result.ok) {
+      showError('forgot-error', result.error);
+      return;
+    }
+
+    pendingResetEmail = email.trim().toLowerCase();
+    document.getElementById('otp-mock-code').innerText = result.code;
+    document.getElementById('otp-subtitle').innerText = `We've sent a 6-digit code to ${pendingResetEmail}.`;
+    switchAuthView('otp');
+    document.querySelector('.otp-digit[data-otp-index="0"]').focus();
+  }
+
+  function handleResendOtp() {
+    if (!pendingResetEmail) return;
+    const result = window.Auth.requestPasswordReset(pendingResetEmail);
+    if (result.ok) {
+      document.getElementById('otp-mock-code').innerText = result.code;
+      document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
+      document.querySelector('.otp-digit[data-otp-index="0"]').focus();
+    }
+  }
+
+  // ---------- OTP entry: auto-advance between boxes ----------
+  document.querySelectorAll('.otp-digit').forEach((input, idx) => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/[^0-9]/g, '').slice(0, 1);
+      if (input.value && idx < 5) {
+        document.querySelector(`.otp-digit[data-otp-index="${idx + 1}"]`).focus();
+      }
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && idx > 0) {
+        document.querySelector(`.otp-digit[data-otp-index="${idx - 1}"]`).focus();
+      }
+    });
+  });
+
+  function getEnteredOtp() {
+    return Array.from(document.querySelectorAll('.otp-digit')).map(d => d.value).join('');
+  }
+
+  function handleVerifyOtp() {
+    const code = getEnteredOtp();
+    if (code.length < 6) {
+      showError('otp-error', 'Enter all 6 digits.');
+      return;
+    }
+
+    const result = window.Auth.verifyOtp(pendingResetEmail, code);
+    if (!result.ok) {
+      showError('otp-error', result.error);
+      return;
+    }
+
+    switchAuthView('reset');
+  }
+
+  // ---------- Reset password ----------
+  function handleResetPassword() {
+    const password = document.getElementById('reset-password').value;
+    const confirm = document.getElementById('reset-password-confirm').value;
+
+    if (password !== confirm) {
+      showError('reset-error', 'Passwords do not match.');
+      return;
+    }
+
+    const code = getEnteredOtp();
+    const result = window.Auth.resetPassword(pendingResetEmail, code, password);
+    if (!result.ok) {
+      showError('reset-error', result.error);
+      return;
+    }
+
+    pendingResetEmail = null;
+    switchAuthView('reset-success');
+  }
+
+  // ---------- Initial view from URL (?view=register|login|...) ----------
+  (function initFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('view');
+    const validViews = ['register', 'login', 'forgot', 'otp', 'reset', 'reset-success'];
+    switchAuthView(validViews.includes(requested) ? requested : 'login');
+  })();
+</script>
+
+</body>
+</html>
