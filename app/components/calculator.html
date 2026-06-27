@@ -3,8 +3,11 @@
   <p class="section-note">This is your main screen — log today's trade outcomes here to stay inside your daily risk
     limits. Completed days automatically update your running balance shown in the header and roadmap.</p>
 
-  <!-- Compact capital tier + daily loss reference (merges the old standalone
-       Capital Ladder and Daily Trading Rules tabs into one table).
+  <!-- Full sub-tier-level rules reference (all 12 sub-tiers across the 4
+       broad tiers — Tier | Capital | Max Lots | Max Loss Rs. | Max Loss %).
+       Rows are generated in dashboard.js from tierRulesMatrix (the single
+       source of truth) rather than hand-typed here, so this table can
+       never drift out of sync with the actual rule data again.
        Collapsible: these are static rules, not today's action items, so
        they default to collapsed after the first visit (state remembered
        in localStorage) to keep the page shorter for returning users, while
@@ -13,40 +16,17 @@
   <div class="mini-ladder-wrap">
     <button type="button" id="tier-ref-toggle" class="mini-ladder-toggle-header"
       onclick="toggleReferenceSection('tier-ref')">
-      <span class="mini-ladder-title">Capital Tier &amp; Daily Loss Reference</span>
+      <span class="mini-ladder-title">Capital Tier, Lots &amp; Daily Loss Reference</span>
       <span id="tier-ref-chevron" class="mini-ladder-chevron">&#9660;</span>
     </button>
     <div id="tier-ref-body" class="mini-ladder-collapsible-body">
-      <div class="mini-ladder-grid mini-ladder-grid-4col">
-        <div class="mini-ladder-cell mini-ladder-head">Tier</div>
-        <div class="mini-ladder-cell mini-ladder-head num">Range</div>
-        <div class="mini-ladder-cell mini-ladder-head num">Max Loss %</div>
-        <div class="mini-ladder-cell mini-ladder-head num">Max Loss Rs.</div>
-
-        <div class="mini-ladder-cell mini-ladder-label" data-tier-row="small">Small</div>
-        <div class="mini-ladder-cell num" data-tier-row="small">Rs. 25,000 &ndash; Rs. 75,000</div>
-        <div class="mini-ladder-cell num" data-tier-row="small">7.20% &ndash; 2.40%</div>
-        <div class="mini-ladder-cell num" data-tier-row="small">Rs. 1,800 flat</div>
-
-        <div class="mini-ladder-cell mini-ladder-label" data-tier-row="medium">Medium</div>
-        <div class="mini-ladder-cell num" data-tier-row="medium">Rs. 1,00,000 &ndash; Rs. 5,00,000</div>
-        <div class="mini-ladder-cell num" data-tier-row="medium">2.00%</div>
-        <div class="mini-ladder-cell num" data-tier-row="medium">Rs. 2,000 &ndash; Rs. 10,000</div>
-
-        <div class="mini-ladder-cell mini-ladder-label" data-tier-row="large">Large</div>
-        <div class="mini-ladder-cell num" data-tier-row="large">Rs. 5,00,000 &ndash; Rs. 10,00,000</div>
-        <div class="mini-ladder-cell num" data-tier-row="large">2.00%</div>
-        <div class="mini-ladder-cell num" data-tier-row="large">Rs. 10,000 &ndash; Rs. 20,000</div>
-
-        <div class="mini-ladder-cell mini-ladder-label" data-tier-row="pro">Pro</div>
-        <div class="mini-ladder-cell num" data-tier-row="pro">Rs. 10,00,000 &ndash; Rs. 20,00,000</div>
-        <div class="mini-ladder-cell num" data-tier-row="pro">2.00%</div>
-        <div class="mini-ladder-cell num" data-tier-row="pro">Rs. 20,000 &ndash; Rs. 40,000</div>
-      </div>
-      <p class="foot-note">Small tier's max loss is a flat Rs. 1,800 regardless of sub-level; its % shown is relative to
-        capital at the low vs. high end of the range. Medium, Large, and Pro scale at a flat 2% of capital, so the Rs.
-        figure shown is the range across their sub-levels. Maximum 2 trades per day across all tiers, with a mandatory
-        30-minute cooldown between them (unless Trade 1 hits the kill switch).</p>
+      <div id="tier-ref-grid" class="mini-ladder-grid mini-ladder-grid-5col"></div>
+      <p class="foot-note">Max Lots is the most lots you may use across your trades for the day — it's a ceiling, not
+        a requirement; you can always trade fewer. Max Loss does NOT multiply by lots: whether you use 1 lot or your
+        full allowance, your loss limit for the day stays the same. Lots increase either by starting with more
+        capital (you enter directly at the matching row) or by growing your balance 50% above where you started
+        (this only ever moves you up, never back down on a losing day). Maximum 2 trades per day across all tiers,
+        with a mandatory 30-minute cooldown between them (unless Trade 1 hits the kill switch).</p>
     </div>
   </div>
 

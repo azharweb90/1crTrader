@@ -107,19 +107,28 @@
   // data without depending on the Daily Limits Tool having ever been
   // visited this session. calculator.js reads this via window.tierRulesMatrix
   // instead of keeping its own separate copy.
+  //
+  // maxLots: how many lots a trader at this sub-tier may trade. This is a
+  // property of CAPITAL, not of risk — note that loss does NOT multiply by
+  // maxLots (e.g. medium-1/2/3 all sit near 4-5% loss regardless of having
+  // 4/6/8 lots available; an extra lot is about spreading/flexibility, not
+  // a bigger risk budget). See getMaxAllowedLots() below for how a trader's
+  // ENTRY sub-tier (from their base/starting capital) and subsequent +50%
+  // BALANCE GROWTH (from originalStartingCapital, compounding) combine to
+  // determine their actual current lot allowance.
   const tierRulesMatrix = {
-    "small-1":  { cap: 25000,    pct: 7.20, loss: 1800 },
-    "small-2":  { cap: 50000,    pct: 3.60, loss: 1800 },
-    "small-3":  { cap: 75000,    pct: 2.40, loss: 1800 },
-    "medium-1": { cap: 100000,   pct: 2,  loss: 2000 },
-    "medium-2": { cap: 200000,   pct: 2,  loss: 4000 },
-    "medium-3": { cap: 500000,   pct: 2,  loss: 10000 },
-    "large-1":  { cap: 500000,   pct: 2,  loss: 10000 },
-    "large-2":  { cap: 750000,   pct: 2,  loss: 15000 },
-    "large-3":  { cap: 1000000,  pct: 2,  loss: 20000 },
-    "pro-1":    { cap: 1000000,  pct: 2,  loss: 20000 },
-    "pro-2":    { cap: 1500000,  pct: 2,  loss: 30000 },
-    "pro-3":    { cap: 2000000,  pct: 2,  loss: 40000 },
+    "small-1":  { cap: 25000,    pct: 7.00, loss: 1750,  maxLots: 1 },
+    "small-2":  { cap: 50000,    pct: 6.00, loss: 3000,  maxLots: 2 },
+    "small-3":  { cap: 75000,    pct: 5.00, loss: 3750,  maxLots: 3 },
+    "medium-1": { cap: 100000,   pct: 4.00,  loss: 4000,  maxLots: 4 },
+    "medium-2": { cap: 300000,   pct: 2.00,  loss: 6000,  maxLots: 6 },
+    "medium-3": { cap: 400000,   pct: 2.00,  loss: 8000,  maxLots: 8 },
+    "large-1":  { cap: 500000,   pct: 2.00, loss: 10000, maxLots: 8 },
+    "large-2":  { cap: 700000,   pct: 2.00, loss: 14000, maxLots: 16 },
+    "large-3":  { cap: 900000,   pct: 2.00, loss: 18000, maxLots: 24 },
+    "pro-1":    { cap: 1000000,  pct: 2.00, loss: 20000, maxLots: 16 },
+    "pro-2":    { cap: 1500000,  pct: 2.00, loss: 30000, maxLots: 32 },
+    "pro-3":    { cap: 1900000,  pct: 2.00, loss: 38000, maxLots: 48 },
   };
 
   // Given a broad tier ('small'..'pro') and a rupee balance, finds which
@@ -204,6 +213,15 @@
   let originalStartingCapital = null; // rupees, set ONCE on first profile confirmation — never changes again, even
                                        // if startingCapital is later edited via Change Tier. This is the fixed
                                        // baseline the lot-unlock thresholds below are measured against.
+  let highestOfficialSubLevelNum = null; // 1/2/3 (or null until profile confirmed) — the highest official
+                                          // sub-tier EVER reached via entry-capital + growth. A ratchet, not a
+                                          // live computation: a losing day that drops currentBalance below the
+                                          // growth threshold must NOT undo a lot/loss tier already earned. See
+                                          // getOfficialSubLevelKey() below, the only place this is written to.
+  let highestOfficialSubLevelTier = null; // which broad tier highestOfficialSubLevelNum was reached under —
+                                           // if selectedTier changes (Change Tier to a different broad tier),
+                                           // the ratchet resets, since "sub-tier 3" means something different
+                                           // in Small vs. Medium and shouldn't carry across.
 
   // ---------- Mock broker connection (PROTOTYPE ONLY — no real broker API calls) ----------
   // This entire block simulates what a real Kite Connect / SmartAPI integration would feel
@@ -213,13 +231,10 @@
   let connectedBrokerName = null;  // 'Zerodha' | 'Angel One' | 'Upstox' | null
   let lastSyncedAt = null;         // timestamp (ms) of the last successful mock sync, or null
 
-  // Multiplier of originalStartingCapital needed to unlock each additional lot.
-  // Extensible: add a 3rd entry (e.g. 2.0) whenever a 3-lot tier is wanted —
-  // nothing else needs to change.
-  const LOT_UNLOCK_MULTIPLIERS = {
-    1: 1.0,   // always available from the start
-    2: 1.5,   // unlocked at +50% profit on original starting capital
-  };
+  // (Lot-unlock-by-growth multiplier logic now lives directly in
+  // getMaxAllowedLots()/getNextLotUnlockInfo() below, reading maxLots from
+  // tierRulesMatrix per sub-tier — see the comment on tierRulesMatrix above
+  // for why lot count and risk amount are no longer the same axis.)
 
   function fmt(n) {
     return Math.round(n).toLocaleString('en-IN');
@@ -1200,21 +1215,27 @@
   // than scraping the Daily Limits Tool's rendered text — this used to only
   // work if that tab had already been visited this session; now it works
   // anywhere, including the Dashboard, right after profile setup.
+  //
+  // Uses getOfficialSubLevelKey() (entry capital + formal growth unlock),
+  // NOT a raw lookup against currentBalance — max loss must always match
+  // whichever sub-tier the trader's lot count is officially at, so a bad
+  // day's balance dip can't silently change today's loss limit too.
   function getCurrentMaxLossRupees() {
-    if (!selectedTier || currentBalance === null) return null;
-    const subLevelKey = subLevelForBalance(selectedTier, currentBalance);
+    const subLevelKey = getOfficialSubLevelKey();
     if (!subLevelKey || !tierRulesMatrix[subLevelKey]) return null;
     return tierRulesMatrix[subLevelKey].loss;
   }
 
-  // Full risk-rules summary for the trader's CURRENT balance — max daily
-  // loss in rupees and %, max lots right now, and how far to the next lot
-  // unlock. Built for the Dashboard's risk-at-a-glance card, but safe to
-  // call from anywhere once a profile exists.
+  // Full risk-rules summary — max daily loss in rupees and %, max lots
+  // right now, and how far to the next lot unlock. Built for the
+  // Dashboard's risk-at-a-glance card, but safe to call from anywhere once
+  // a profile exists. loss/pct and maxLots always refer to the SAME
+  // official sub-tier (see getOfficialSubLevelKey()) — never two different
+  // ones that could disagree with each other.
   function getRiskSummary() {
     if (!selectedTier || currentBalance === null) return null;
 
-    const subLevelKey = subLevelForBalance(selectedTier, currentBalance);
+    const subLevelKey = getOfficialSubLevelKey();
     const rule = subLevelKey ? tierRulesMatrix[subLevelKey] : null;
     const maxLots = getMaxAllowedLots();
     const nextUnlock = getNextLotUnlockInfo();
@@ -1229,42 +1250,151 @@
     };
   }
 
-  // How many lots the trader is currently allowed to use, based on their
-  // CURRENT BALANCE measured against their ORIGINAL starting capital — never
-  // the (possibly re-entered) startingCapital value. A Small trader who
-  // started at Rs. 25,000 only unlocks lot 2 once balance reaches Rs. 37,500
-  // (1.5x), regardless of what their tier/capital is edited to later.
-  function getMaxAllowedLots() {
-    if (originalStartingCapital === null || currentBalance === null) return 1;
+  // How many lots the trader is currently allowed to use. Two separate
+  // things combine here (see tierRulesMatrix's maxLots comment above):
+  //
+  // 1. ENTRY sub-tier — whichever sub-tier their ORIGINAL starting capital
+  //    fell into. A trader who deposits Rs. 60,000 into Small enters
+  //    directly at small-2 (2 lots) from day one — base capital alone can
+  //    place you above sub-tier 1, no need to "grow into" a tier you
+  //    already qualified for by deposit.
+  // 2. GROWTH step-up — from that entry point, reaching +50% profit on
+  //    ORIGINAL starting capital (compounding: 1.5x, then 2.25x, ...)
+  //    advances one sub-tier at a time, capped at sub-tier 3 within the
+  //    trader's broad tier. This is the only way to move UP beyond your
+  //    entry sub-tier — depositing more cash later doesn't skip this.
+  //
+  // maxLots is a CEILING, not a mandate — a trader may always choose to
+  // trade with fewer lots than this. It also has no bearing on max loss:
+  // see getCurrentMaxLossRupees(), which reads the sub-tier's own `loss`
+  // directly and never multiplies it by lot count.
+  //
+  // getOfficialSubLevelKey() is the SINGLE source of truth for both lot
+  // count and max-loss display — both must always refer to the same
+  // sub-tier, which only ever advances via entry-capital + the formal
+  // growth rule above. It deliberately does NOT track currentBalance's
+  // "natural" sub-tier on its own (a bad day's balance dip should not
+  // silently change the trader's risk/loss numbers, only their balance) —
+  // see highestOfficialSubLevelNum: this function is a RATCHET, recomputing
+  // the live entry+growth walk on every call but never reporting a LOWER
+  // sub-tier than the highest one ever actually reached.
+  function getOfficialSubLevelKey() {
+    if (!selectedTier || originalStartingCapital === null || currentBalance === null) return null;
 
-    let maxLots = 1;
-    Object.keys(LOT_UNLOCK_MULTIPLIERS).forEach(lotCountStr => {
-      const lotCount = parseInt(lotCountStr, 10);
-      const requiredBalance = originalStartingCapital * LOT_UNLOCK_MULTIPLIERS[lotCount];
-      if (currentBalance >= requiredBalance && lotCount > maxLots) {
-        maxLots = lotCount;
+    const entryKey = subLevelForBalance(selectedTier, originalStartingCapital);
+    if (!entryKey || !tierRulesMatrix[entryKey]) return null;
+
+    let subLevelNum = parseInt(entryKey.split('-')[1], 10);
+
+    // Each further step requires the NEXT power of 1.5x on top of the
+    // ORIGINAL starting capital (1.5x for the first step up, 2.25x for the
+    // second), same compounding-from-original-capital rule used elsewhere.
+    let growthMultiplier = 1.5;
+    while (subLevelNum < 3) {
+      const nextKey = `${selectedTier}-${subLevelNum + 1}`;
+      if (!tierRulesMatrix[nextKey]) break;
+      if (currentBalance >= originalStartingCapital * growthMultiplier) {
+        subLevelNum += 1;
+        growthMultiplier *= 1.5;
+      } else {
+        break;
       }
-    });
-    return maxLots;
+    }
+
+    // Ratchet: never report (or remember) a sub-tier lower than the
+    // highest one previously reached for this profile — but only within
+    // the SAME broad tier; switching tiers via Change Tier resets it,
+    // since "sub-tier 3" doesn't carry meaning across different tiers.
+    if (highestOfficialSubLevelTier !== selectedTier) {
+      highestOfficialSubLevelNum = null;
+      highestOfficialSubLevelTier = selectedTier;
+    }
+    if (highestOfficialSubLevelNum === null || subLevelNum > highestOfficialSubLevelNum) {
+      highestOfficialSubLevelNum = subLevelNum;
+    } else if (subLevelNum < highestOfficialSubLevelNum) {
+      subLevelNum = highestOfficialSubLevelNum;
+    }
+
+    return `${selectedTier}-${subLevelNum}`;
   }
 
-  // Balance still needed to reach the NEXT lot unlock, or null if there is
-  // no further tier defined yet (extensible via LOT_UNLOCK_MULTIPLIERS).
+  function getMaxAllowedLots() {
+    const key = getOfficialSubLevelKey();
+    return (key && tierRulesMatrix[key]) ? tierRulesMatrix[key].maxLots : 1;
+  }
+
+  // Balance still needed to reach the NEXT lot unlock (the next sub-tier
+  // WITHIN the trader's tier, via the growth step-up described above), or
+  // null if already at sub-tier 3 (the highest currently configured).
   function getNextLotUnlockInfo() {
-    if (originalStartingCapital === null || currentBalance === null) return null;
+    if (!selectedTier || originalStartingCapital === null || currentBalance === null) return null;
 
-    const currentMax = getMaxAllowedLots();
-    const nextLotCount = currentMax + 1;
-    const nextMultiplier = LOT_UNLOCK_MULTIPLIERS[nextLotCount];
-    if (!nextMultiplier) return null;
+    const officialKey = getOfficialSubLevelKey();
+    if (!officialKey) return null;
+    const subLevelNum = parseInt(officialKey.split('-')[1], 10);
+    const nextKey = `${selectedTier}-${subLevelNum + 1}`;
+    if (!tierRulesMatrix[nextKey]) return null; // already at sub-tier 3
 
-    const requiredBalance = originalStartingCapital * nextMultiplier;
+    // The multiplier needed for THIS NEXT step is 1.5 raised to the power
+    // of how many growth steps it takes to get there from sub-tier 1 — i.e.
+    // if currently at sub-tier 2 (one growth step already used, or entered
+    // there directly), the next step still needs +50% more on top of
+    // ORIGINAL starting capital for each level above entry. Recompute the
+    // exact multiplier by walking from the entry point, mirroring
+    // getOfficialSubLevelKey()'s own walk, so the two can never disagree.
+    const entryKey = subLevelForBalance(selectedTier, originalStartingCapital);
+    const entrySubLevelNum = parseInt(entryKey.split('-')[1], 10);
+    let growthMultiplier = 1.5;
+    for (let n = entrySubLevelNum; n < subLevelNum; n++) {
+      growthMultiplier *= 1.5;
+    }
+
+    const requiredBalance = originalStartingCapital * growthMultiplier;
     const remaining = requiredBalance - currentBalance;
     return {
-      nextLotCount,
+      nextLotCount: tierRulesMatrix[nextKey].maxLots,
       requiredBalance,
       remaining: remaining > 0 ? remaining : 0,
     };
+  }
+
+  // Generates the Calculator tab's "Capital Tier, Lots & Daily Loss
+  // Reference" table — all 12 sub-tiers, straight from tierRulesMatrix (the
+  // single source of truth), so this table can never hand-typed-drift out
+  // of sync with the actual rule data the way the old 4-row merged version
+  // did. Each row carries data-sublevel-row="small-1" etc. for exact
+  // highlighting (see applyTierHighlight's tab-calculator branch), not just
+  // a broad-tier match — a trader at small-2 should see THAT row
+  // highlighted, not every Small row.
+  function renderTierReferenceTable() {
+    const grid = document.getElementById('tier-ref-grid');
+    if (!grid) return;
+
+    let html = `
+      <div class="mini-ladder-cell mini-ladder-head">Tier</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Capital</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Max Lots</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Max Loss Rs.</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Max Loss %</div>
+    `;
+
+    TIER_ORDER.forEach(tier => {
+      ['1', '2', '3'].forEach(subNum => {
+        const key = `${tier}-${subNum}`;
+        const rule = tierRulesMatrix[key];
+        if (!rule) return;
+        const label = `${TIER_LABELS[tier]} ${subNum}`;
+        html += `
+          <div class="mini-ladder-cell mini-ladder-label" data-sublevel-row="${key}">${label}</div>
+          <div class="mini-ladder-cell num" data-sublevel-row="${key}">Rs. ${fmt(rule.cap)}+</div>
+          <div class="mini-ladder-cell num" data-sublevel-row="${key}">${rule.maxLots}</div>
+          <div class="mini-ladder-cell num" data-sublevel-row="${key}">Rs. ${fmt(rule.loss)}</div>
+          <div class="mini-ladder-cell num" data-sublevel-row="${key}">${rule.pct.toFixed(2)}%</div>
+        `;
+      });
+    });
+
+    grid.innerHTML = html;
   }
 
   function renderInstrumentSlTable() {
@@ -1327,14 +1457,11 @@
     const noteEl = document.getElementById('lot-unlock-note');
     if (noteEl) {
       const nextUnlock = getNextLotUnlockInfo();
-      if (maxAllowedLots === 1 && nextUnlock) {
-        noteEl.innerText = `You're limited to 1 lot per trade until your balance reaches Rs. ${fmt(nextUnlock.requiredBalance)} (50% profit on your original starting capital of Rs. ${fmt(originalStartingCapital)}). Rs. ${fmt(nextUnlock.remaining)} to go.`;
+      if (nextUnlock) {
+        noteEl.innerText = `You're cleared for up to ${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'} per trade right now. Reach Rs. ${fmt(nextUnlock.requiredBalance)} balance (50% profit on your original starting capital of Rs. ${fmt(originalStartingCapital)}) to unlock ${nextUnlock.nextLotCount} lots — Rs. ${fmt(nextUnlock.remaining)} to go.`;
         noteEl.classList.remove('hidden');
-      } else if (nextUnlock) {
-        noteEl.innerText = `You're cleared for up to ${maxAllowedLots} lots per trade. Reach Rs. ${fmt(nextUnlock.requiredBalance)} to unlock lot ${nextUnlock.nextLotCount} (Rs. ${fmt(nextUnlock.remaining)} to go).`;
-        noteEl.classList.remove('hidden');
-      } else if (maxAllowedLots > 1) {
-        noteEl.innerText = `You're cleared for up to ${maxAllowedLots} lots per trade based on your account growth. That's the highest currently configured — no further lot unlock is defined yet.`;
+      } else if (maxAllowedLots >= 1) {
+        noteEl.innerText = `You're cleared for up to ${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'} per trade. That's the highest currently configured for your tier — no further lot unlock is defined yet.`;
         noteEl.classList.remove('hidden');
       } else {
         noteEl.classList.add('hidden');
@@ -1844,17 +1971,28 @@
     }
 
     if (tabId === 'tab-calculator') {
-      // Highlight the matching row in the mini ladder reference table (all 4 cells).
-      const targetTier = selectedTier;
-      container.querySelectorAll('.mini-ladder-cell[data-tier-row]').forEach(cell => {
-        const isMatch = cell.dataset.tierRow === targetTier;
+      // Auto-select the trader's OFFICIAL sub-tier (entry capital + the
+      // formal +50%-growth rule — see getOfficialSubLevelKey()), not
+      // always sub-tier 1. A Small trader who entered at small-2 (or
+      // grew into it) should see small-2's rules here by default, not
+      // be silently shown small-1's lower maxLots/loss every time they
+      // open this tab.
+      const officialKey = (typeof window.getOfficialSubLevelKey === 'function')
+        ? window.getOfficialSubLevelKey()
+        : null;
+
+      // Highlight the matching EXACT sub-tier row (not the whole broad
+      // tier) in the 12-row reference table — a trader at small-2 should
+      // see only that row highlighted, not every Small row.
+      container.querySelectorAll('.mini-ladder-cell[data-sublevel-row]').forEach(cell => {
+        const isMatch = officialKey && cell.dataset.sublevelRow === officialKey;
         cell.classList.toggle('tier-highlight', isMatch && cell.classList.contains('mini-ladder-label'));
         cell.classList.toggle('tier-highlight-row', isMatch && !cell.classList.contains('mini-ladder-label'));
       });
 
       const select = document.getElementById('calc-tier');
       if (select) {
-        select.value = TIER_FIRST_SUBLEVEL[selectedTier];
+        select.value = officialKey || TIER_FIRST_SUBLEVEL[selectedTier];
         if (typeof window.onTierChange === 'function') {
           window.onTierChange(); // this already calls renderInstrumentSlTable() internally
         }
@@ -1892,9 +2030,11 @@
   window.getAllTradableInstruments = getAllTradableInstruments;
   window.getMockBrokerTradableInstruments = getMockBrokerTradableInstruments;
   window.renderInstrumentSlTable = renderInstrumentSlTable;
+  window.renderTierReferenceTable = renderTierReferenceTable;
   window.onSlTableLotsInput = onSlTableLotsInput;
   window.getMaxAllowedLots = getMaxAllowedLots;
   window.getNextLotUnlockInfo = getNextLotUnlockInfo;
+  window.getOfficialSubLevelKey = getOfficialSubLevelKey;
   window.tierRulesMatrix = tierRulesMatrix;
   window.getRiskSummary = getRiskSummary;
   window.subLevelForBalance = subLevelForBalance;

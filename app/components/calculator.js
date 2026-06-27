@@ -23,9 +23,11 @@
 (function () {
 
   // ---------- Tier rules matrix ----------
-  // loss = max daily loss amount in rupees, pct = that loss as % of tier capital
-  // NOTE: Small tier uses a FLAT Rs. 1,800 max loss at every sub-level (not % of capital).
-  // Medium/Large/Pro scale at 2% of capital per sub-level.
+  // loss = max daily loss amount in rupees, pct = that loss as % of tier
+  // capital, maxLots = lot ceiling for that sub-tier. Each tier's own loss
+  // pattern (flat or scaling per sub-level) lives in the matrix itself —
+  // see tierRulesMatrix's definition in dashboard.js for the current
+  // numbers and the comment there for how lots/loss/growth interact.
   // tierRulesMatrix itself now lives in dashboard.js (window.tierRulesMatrix)
   // — that's always loaded, so the Dashboard and other screens can read tier
   // rules without this component ever having been opened. Kept as a local
@@ -34,8 +36,13 @@
   const tierRulesMatrix = window.tierRulesMatrix || {};
 
   const SOFT_BLOCK_RATIO = 0.75; // 75% of max daily loss blocks Trade 2 (soft block)
-  const COOLDOWN_MINUTES = 30;   // mandatory break before Trade 2 unlocks (profit or sub-cutoff loss)
-  const COOLDOWN_MS = COOLDOWN_MINUTES * 60 * 1000;
+
+  // TESTING OVERRIDE — TEMPORARY: 30 minutes shortened to 10 seconds so the
+  // cooldown flow can be clicked through quickly during testing. Revert
+  // COOLDOWN_MS to `30 * 60 * 1000` (or set COOLDOWN_MINUTES back to 30 and
+  // use that) before shipping — this is NOT the real rule.
+  const COOLDOWN_MINUTES = 30;   // mandatory break before Trade 2 unlocks (profit or sub-cutoff loss) — real rule
+  const COOLDOWN_MS = 10 * 1000; // TESTING OVERRIDE: 10 seconds instead of COOLDOWN_MINUTES * 60 * 1000
   const COOLDOWN_STORAGE_KEY = 'tradeCooldownDeadline'; // persisted so a refresh can't skip the wait
 
   // ---------- Collapsible reference tables ----------
@@ -1297,6 +1304,9 @@
   initLogDate();
   renderCalculatorHistory();
   renderCalculatorBrokerMode();
+  if (typeof window.renderTierReferenceTable === 'function') {
+    window.renderTierReferenceTable();
+  }
   applyReferenceSectionState('tier-ref');
   // NOTE: applyReferenceSectionState('instrument-ref') is intentionally NOT
   // called here. renderInstrumentSlTable() (dashboard.js) already calls it

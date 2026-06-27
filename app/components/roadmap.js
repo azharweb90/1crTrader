@@ -32,15 +32,17 @@
   };
 
   // Representative max daily loss per tier, used as the assumed size of a
-  // losing trade in the Goal Tracker's expected-value math. Small is a flat
-  // Rs. 1,800; Medium/Large/Pro use their lowest sub-level's loss as a
-  // conservative (smaller, less punishing) estimate.
-  const TIER_LOSS_ESTIMATE = {
-    small: 1800,
-    medium: 2000,
-    large: 10000,
-    pro: 20000,
-  };
+  // losing trade in the Goal Tracker's expected-value math. Reads the
+  // trader's tier's LOWEST sub-level (e.g. "small-1") from the same
+  // tierRulesMatrix dashboard.js and calculator.js use — not a separate
+  // hardcoded copy, which had drifted out of sync with the real numbers
+  // more than once. A conservative (smaller, less punishing) estimate.
+  const tierRulesMatrix = window.tierRulesMatrix || {};
+
+  function tierLossEstimate(tier) {
+    const rule = tierRulesMatrix[`${tier}-1`] || tierRulesMatrix['small-1'];
+    return rule ? rule.loss : 1750;
+  }
 
   let avgWinManualValue = null; // user-entered fallback when no trade history exists yet
   let selectedGoalAmount = null; // rupees, chosen from the Goal Tracker buttons
@@ -114,7 +116,7 @@
     const usingActual = actual.hasHistory && actual.avgWin !== null && actual.winRate !== null;
     const avgWin = usingActual ? actual.avgWin : avgWinManualValue;
     const winRate = usingActual ? actual.winRate : (avgWinManualValue !== null ? 1 : null);
-    const avgLoss = TIER_LOSS_ESTIMATE[tier] || TIER_LOSS_ESTIMATE.small;
+    const avgLoss = tierLossEstimate(tier);
 
     if (avgWin === null || avgWin <= 0 || winRate === null) {
       container.innerHTML = '<div class="roadmap-empty-state">Enter an average winning-trade amount above to see how many trades and days this goal will take.</div>';

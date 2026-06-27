@@ -1,69 +1,86 @@
 <!-- COMPONENT: trading-rules -->
+<!-- NOTE: this tab is not currently wired into dashboard.js's COMPONENTS
+     map (no sidebar link reaches it) — the live, always-accurate version
+     of this same table is the "Capital Tier, Lots & Daily Loss Reference"
+     on the Daily Limits Tool, generated dynamically from tierRulesMatrix
+     in dashboard.js. The numbers below are kept in sync by hand whenever
+     that matrix changes, since this file can't read it directly without
+     becoming a live component — if this tab is ever revived, switch it to
+     reading window.tierRulesMatrix instead of hand-typed numbers. -->
 <section class="content-section">
   <h1>Daily Trading Rules</h1>
-  <p class="section-note">Maximum of 2 trades per day across all tiers. Small tier has a flat max daily loss of Rs. 1,800 at every sub-level; Medium, Large, and Pro tiers scale at 2% of capital.</p>
+  <p class="section-note">Maximum of 2 trades per day across all tiers. Max Lots is a ceiling, not a requirement — loss does not multiply by lots.</p>
 
   <div class="grid-table grid-rules">
     <div class="cell head">Tier</div>
     <div class="cell head num">Capital Cap (Rs.)</div>
+    <div class="cell head num">Max Lots</div>
     <div class="cell head num">Max Loss (%)</div>
     <div class="cell head num">Max Loss (Rs.)</div>
 
-    <!-- Small Tier: flat Rs. 1,800 max loss at every sub-level -->
     <div class="cell label span-3">Small</div>
     <div class="cell num cap">Rs. 25,000</div>
-    <div class="cell num">7.20%</div>
-    <div class="cell num">Rs. 1,800</div>
+    <div class="cell num">1</div>
+    <div class="cell num">7.00%</div>
+    <div class="cell num">Rs. 1,750</div>
 
     <div class="cell num cap">Rs. 50,000</div>
-    <div class="cell num">3.60%</div>
-    <div class="cell num">Rs. 1,800</div>
+    <div class="cell num">2</div>
+    <div class="cell num">6.00%</div>
+    <div class="cell num">Rs. 3,000</div>
 
     <div class="cell num cap">Rs. 75,000</div>
-    <div class="cell num">2.40%</div>
-    <div class="cell num">Rs. 1,800</div>
+    <div class="cell num">3</div>
+    <div class="cell num">5.00%</div>
+    <div class="cell num">Rs. 3,750</div>
 
-    <!-- Medium Tier: 2% of capital -->
     <div class="cell label span-3">Medium</div>
     <div class="cell num cap">Rs. 1,00,000</div>
-    <div class="cell num">2.00%</div>
-    <div class="cell num">Rs. 2,000</div>
-
-    <div class="cell num cap">Rs. 2,00,000</div>
-    <div class="cell num">2.00%</div>
+    <div class="cell num">4</div>
+    <div class="cell num">4.00%</div>
     <div class="cell num">Rs. 4,000</div>
 
-    <div class="cell num cap">Rs. 5,00,000</div>
+    <div class="cell num cap">Rs. 3,00,000</div>
+    <div class="cell num">6</div>
     <div class="cell num">2.00%</div>
-    <div class="cell num">Rs. 10,000</div>
+    <div class="cell num">Rs. 6,000</div>
 
-    <!-- Large Tier: 2% of capital -->
+    <div class="cell num cap">Rs. 4,00,000</div>
+    <div class="cell num">8</div>
+    <div class="cell num">2.00%</div>
+    <div class="cell num">Rs. 8,000</div>
+
     <div class="cell label span-3">Large</div>
     <div class="cell num cap">Rs. 5,00,000</div>
+    <div class="cell num">8</div>
     <div class="cell num">2.00%</div>
     <div class="cell num">Rs. 10,000</div>
 
-    <div class="cell num cap">Rs. 7,50,000</div>
+    <div class="cell num cap">Rs. 7,00,000</div>
+    <div class="cell num">16</div>
     <div class="cell num">2.00%</div>
-    <div class="cell num">Rs. 15,000</div>
+    <div class="cell num">Rs. 14,000</div>
 
-    <div class="cell num cap">Rs. 10,00,000</div>
+    <div class="cell num cap">Rs. 9,00,000</div>
+    <div class="cell num">24</div>
     <div class="cell num">2.00%</div>
-    <div class="cell num">Rs. 20,000</div>
+    <div class="cell num">Rs. 18,000</div>
 
-    <!-- Pro Tier: 2% of capital -->
     <div class="cell label span-3">Pro</div>
     <div class="cell num cap">Rs. 10,00,000</div>
+    <div class="cell num">16</div>
     <div class="cell num">2.00%</div>
     <div class="cell num">Rs. 20,000</div>
 
     <div class="cell num cap">Rs. 15,00,000</div>
+    <div class="cell num">32</div>
     <div class="cell num">2.00%</div>
     <div class="cell num">Rs. 30,000</div>
 
-    <div class="cell num cap">Rs. 20,00,000</div>
+    <div class="cell num cap">Rs. 19,00,000</div>
+    <div class="cell num">48</div>
     <div class="cell num">2.00%</div>
-    <div class="cell num">Rs. 40,000</div>
+    <div class="cell num">Rs. 38,000</div>
   </div>
   <p class="foot-note">Amounts in rupees. Maximum 2 trades allowed per day. A Trade 1 loss reaching 75% of the max daily loss blocks Trade 2; a loss reaching 100% triggers the kill switch.</p>
 </section>
