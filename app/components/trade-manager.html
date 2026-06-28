@@ -1,0 +1,112 @@
+<!-- COMPONENT: trade-manager -->
+<section class="content-section">
+  <p class="section-note">For a trade you're currently holding. Set it up once with your entry, stop-loss, and
+    target — then check in only when you want to, and this tells you where to move your stop-loss and whether
+    you've hit your target. No live price feed; you enter the current price yourself each time you check.</p>
+
+  <!-- SETUP — stays visible on the page even after a trade starts (fields
+       disabled, not hidden, so what you entered is still right there to
+       glance at) — the active trade section below it is what shows/hides,
+       not this form. One continuous page, not two separate screens, per
+       the trader's own framing: scroll down to see the running trade,
+       don't navigate away from the form to find it.
+       Strike/instrument name (e.g. "23200 CE") replaces a Call/Put
+       dropdown entirely — direction is inferred: ends in CE -> Call, ends
+       in PE -> Put, otherwise (futures/equity, e.g. "Infosys") inferred
+       later from which side of entry the stop-loss sits on. Real price
+       levels, not abstract point counts, since that's what a trader
+       actually sees on their broker screen. R and target distance are
+       derived from these, not typed directly. -->
+  <div id="tm-setup-wrap">
+    <div class="tm-setup-grid">
+      <div class="amount-input-wrap">
+        <label class="amount-label" for="tm-instrument">Strike / Instrument</label>
+        <input type="text" id="tm-instrument" class="amount-input" placeholder="e.g. 23200 CE, Infosys"
+          autocomplete="off">
+      </div>
+      <div class="amount-input-wrap">
+        <label class="amount-label" for="tm-entry">Entry price</label>
+        <input type="number" id="tm-entry" class="amount-input" step="0.5" placeholder="e.g. 180"
+          oninput="onSetupPriceInput()" autocomplete="off">
+      </div>
+      <div class="amount-input-wrap">
+        <label class="amount-label" for="tm-sl">Stop-loss price</label>
+        <input type="number" id="tm-sl" class="amount-input" step="0.5" placeholder="e.g. 165"
+          oninput="onSetupPriceInput()" autocomplete="off">
+      </div>
+      <div class="amount-input-wrap">
+        <label class="amount-label" for="tm-target">Target price</label>
+        <input type="number" id="tm-target" class="amount-input" step="0.5" placeholder="e.g. 210"
+          autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Risk:Reward target suggestions — appears once Entry + SL are both
+         valid. Clicking a ratio fills the Target price field above with
+         the matching price level. The idea (the trader's own framing):
+         consistent R:R discipline is what makes a trader successful long
+         term, so the target should be CHOSEN from proven ratios, not
+         guessed. Extended table (1:10 through 1:100) covers swing-style
+         setups without cluttering the default view with 100 buttons. -->
+    <div id="tm-rr-suggest-wrap" class="hidden">
+      <p class="amount-label" style="margin-top:4px;">Pick a target by risk:reward — tap one to fill it in above</p>
+      <div id="tm-rr-suggest-grid" class="tm-rr-suggest-grid"></div>
+
+      <button type="button" id="tm-rr-extended-toggle" class="mini-ladder-toggle-header"
+        style="margin-top:10px;" onclick="toggleReferenceSection('tm-rr-extended')">
+        <span class="mini-ladder-title">More ratios (1:10 to 1:100)</span>
+        <span id="tm-rr-extended-chevron" class="mini-ladder-chevron">&#9660;</span>
+      </button>
+      <div id="tm-rr-extended-body" class="mini-ladder-collapsible-body">
+        <div id="tm-rr-extended-grid" class="mini-ladder-grid mini-ladder-grid-rr"></div>
+      </div>
+    </div>
+
+    <p id="tm-setup-error" class="capital-amount-error hidden"></p>
+    <button type="button" id="tm-start-btn" class="outcome-btn trade-submit-btn" onclick="startTradeManager()">
+      Start Tracking This Trade
+    </button>
+  </div>
+
+  <!-- ACTIVE TRADE — appears right below the (now-disabled) setup form
+       once it's submitted, on the SAME page. Hidden only until a trade
+       actually starts; "End this trade" clears this section AND
+       re-enables the form above, rather than being a separate reset
+       screen. -->
+  <div id="tm-active-wrap" class="hidden">
+
+    <div class="tm-active-divider"></div>
+
+    <div id="tm-rr-summary" class="tm-rr-summary"></div>
+
+    <div class="tm-active-columns">
+      <div class="tm-active-col-left">
+        <div id="tm-rr-animation-area"></div>
+
+        <div class="amount-input-wrap" style="margin-top:18px;">
+          <label class="amount-label" for="tm-current-price">Current price</label>
+          <input type="number" id="tm-current-price" class="amount-input" step="0.5" placeholder="e.g. 195"
+            oninput="onTradeManagerPricePreview()" onblur="onTradeManagerCheckIn()"
+            onkeydown="if (event.key === 'Enter') { onTradeManagerCheckIn(); event.target.blur(); }"
+            autocomplete="off">
+          <p class="foot-note" style="margin-top:6px;">Your status updates live as you type. Press Enter or click
+            away only to confirm you've hit target or your stop — that decision waits for you, the live numbers
+            don't.</p>
+        </div>
+      </div>
+      <div class="tm-active-col-right">
+        <div id="tm-result-area"></div>
+      </div>
+    </div>
+
+    <p class="foot-note" style="margin-top:14px;">Discipline means executing the plan, not watching the screen.
+      Check in when it suits you — there's no need to re-enter a price every few minutes.</p>
+
+    <button type="button" id="tm-end-btn" class="setup-manual-link" style="margin-top:10px;"
+      onclick="endTradeManager()">
+      End this trade / start a new one
+    </button>
+  </div>
+
+</section>
+<!-- END COMPONENT: trade-manager -->

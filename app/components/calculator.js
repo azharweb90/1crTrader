@@ -46,44 +46,15 @@
   const COOLDOWN_STORAGE_KEY = 'tradeCooldownDeadline'; // persisted so a refresh can't skip the wait
 
   // ---------- Collapsible reference tables ----------
-  // The tier/instrument reference tables are static rules, not today's
-  // action items — collapsed by default after a user's first visit so
-  // returning users get a shorter page, while staying one click away since
-  // they're genuinely useful to check while sizing a trade. State persists
-  // across visits via localStorage, per section, keyed by id.
-  const REFERENCE_COLLAPSE_STORAGE_PREFIX = 'refCollapsed:';
+  // isReferenceSectionCollapsed()/setReferenceSectionCollapsed()/
+  // applyReferenceSectionState()/toggleReferenceSection() now live in
+  // dashboard.js (always loaded), exposed as window.applyReferenceSectionState
+  // and window.toggleReferenceSection — moved there so Trade Manager's own
+  // collapsible R:R table works even if this component was never opened
+  // this session. This file calls those via window.* below, same as any
+  // other lazily-loaded component would.
 
-  function isReferenceSectionCollapsed(sectionId) {
-    const stored = localStorage.getItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + sectionId);
-    // No stored value yet = genuine first-ever visit: show it expanded once,
-    // then immediately record that it's been seen so every visit AFTER this
-    // one defaults to collapsed (manual toggles afterward are respected via
-    // the stored 'true'/'false' value going forward).
-    if (stored === null) {
-      setReferenceSectionCollapsed(sectionId, true);
-      return false;
-    }
-    return stored === 'true';
-  }
 
-  function setReferenceSectionCollapsed(sectionId, collapsed) {
-    localStorage.setItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + sectionId, String(collapsed));
-  }
-
-  function applyReferenceSectionState(sectionId) {
-    const body = document.getElementById(`${sectionId}-body`);
-    const chevron = document.getElementById(`${sectionId}-chevron`);
-    if (!body || !chevron) return;
-    const collapsed = isReferenceSectionCollapsed(sectionId);
-    body.classList.toggle('mini-ladder-collapsed', collapsed);
-    chevron.classList.toggle('mini-ladder-chevron-collapsed', collapsed);
-  }
-
-  function toggleReferenceSection(sectionId) {
-    const nowCollapsed = !isReferenceSectionCollapsed(sectionId);
-    setReferenceSectionCollapsed(sectionId, nowCollapsed);
-    applyReferenceSectionState(sectionId);
-  }
 
   // ---------- State ----------
   let cooldownIntervalId = null; // setInterval handle for the live countdown, or null when not running
@@ -1291,8 +1262,6 @@
   window.requestImportBrokerDay = requestImportBrokerDay;
   window.cancelImportBrokerDay = cancelImportBrokerDay;
   window.confirmImportBrokerDay = confirmImportBrokerDay;
-  window.toggleReferenceSection = toggleReferenceSection;
-  window.applyReferenceSectionState = applyReferenceSectionState;
 
   // Run once on load so the panel reflects "no trades yet" immediately.
   // resumeCooldownIfActive must run BEFORE resetTracker, since resetTracker

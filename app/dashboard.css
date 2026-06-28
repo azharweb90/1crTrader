@@ -15,7 +15,8 @@
      12. COMPONENT: dashboard-home
      13. COMPONENT: settings (now "Account" in the UI)
      14. COMPONENT: strategies
-     15. Responsive Overrides
+     15. COMPONENT: trade-manager
+     16. Responsive Overrides
    =========================================================== */
 
 
@@ -3871,7 +3872,292 @@ body {
 
 
 /* ===========================================================
-   15. RESPONSIVE OVERRIDES
+   15. COMPONENT: trade-manager
+   =========================================================== */
+.tm-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Setup fields grey out (not hide) once a trade starts — the form stays
+   on the page as a visible record of what was entered, per the trader's
+   own framing: one continuous page, not two screens to navigate between. */
+.tm-setup-grid .amount-input:disabled,
+#tm-instrument:disabled {
+  background: #f4f6f8;
+  color: #5f6b7a;
+  cursor: not-allowed;
+  border-color: #e1e4e8;
+}
+
+#tm-start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Visual separation between the (now-disabled) setup form above and the
+   active trade section below it, once a trade starts — a plain rule
+   rather than a card boundary, since both sections genuinely belong to
+   the same page/flow now. */
+.tm-active-divider {
+  border-top: 1px solid #e5e9ed;
+  margin: 24px 0 20px;
+}
+
+/* Active-trade two-column layout: chart + price input on the left, the
+   result message (target hit / stopped out / still open) on the right,
+   so the status is always visible alongside the chart rather than
+   stacked below the price input. */
+.tm-active-columns {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .tm-active-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tm-active-col-right .tm-result-card {
+  margin-top: 0;
+}
+
+/* Risk:Reward target suggestions (1:1..1:10 buttons) — appear the moment
+   Entry + SL are both valid. Clicking one fills the Target price field.
+   Confirmed with the trader: choosing a target from a proven ratio, not
+   guessing, is what makes consistent profitability possible long term. */
+.tm-rr-suggest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tm-rr-suggest-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #ffffff;
+  border: 1px solid #d8dee5;
+  border-radius: 10px;
+  padding: 8px 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.tm-rr-suggest-btn:hover {
+  border-color: #2e75b6;
+  background: #eaf2fa;
+}
+
+.tm-rr-suggest-ratio {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f3a5f;
+}
+
+.tm-rr-suggest-price {
+  font-size: 11px;
+  color: #5f6b7a;
+}
+
+/* Extended 1:10..1:100 reference table (step 10) — same mini-ladder
+   collapsible pattern used elsewhere, 3 columns: Ratio | Target Price |
+   Points. Covers the long tail of swing-style setups without cluttering
+   the default view with 100 buttons. */
+.mini-ladder-grid-rr {
+  grid-template-columns: minmax(60px, 0.6fr) minmax(100px, 1fr) minmax(80px, 0.8fr);
+}
+
+.tm-rr-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tm-rr-chip {
+  background: #f4f6f8;
+  border: 1px solid #e1e4e8;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #333c48;
+}
+
+.tm-rr-chip strong {
+  color: #1f3a5f;
+}
+
+/* Result state cards — same visual language as .profit-decision-card and
+   .cooldown-banner elsewhere in the app (centered text, big icon, soft
+   pastel background) so these read as the same family of "big moment"
+   messaging, not a new pattern bolted on. */
+.tm-result-card {
+  text-align: center;
+  border-radius: 14px;
+  padding: 22px 20px;
+  margin-top: 14px;
+}
+
+.tm-result-icon {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+
+.tm-result-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.tm-result-message {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+/* Numeric breakdown shown on closed-trade cards (points captured/lost,
+   realized R:R) — confirmed with the trader: this data feeds future
+   monthly risk-management reporting, not just in-the-moment feedback, so
+   it's kept as plain, separately-styled stats rather than buried in the
+   message prose. */
+.tm-result-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.tm-result-stat {
+  font-size: 12.5px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+.tm-result-stat strong {
+  font-weight: 700;
+}
+
+.tm-result-card.tm-result-target {
+  background: #e1f5ee;
+  border: 1px solid #b9e6d4;
+}
+
+.tm-result-card.tm-result-target .tm-result-title {
+  color: #0f6e56;
+}
+
+.tm-result-card.tm-result-target .tm-result-message {
+  color: #0f6e56;
+}
+
+/* Target-hit celebration: a brief confetti burst, plays once on render and
+   stops — restraint matters as much as the gesture itself, this isn't a
+   constant animation loop competing for attention every time the card
+   re-renders on a check-in. */
+.tm-result-card.tm-result-celebrate {
+  position: relative;
+  overflow: hidden;
+}
+
+.tm-confetti-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tm-confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: tmConfettiFall 1.1s ease-in forwards;
+}
+
+@keyframes tmConfettiFall {
+  0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(140px) rotate(220deg); }
+}
+
+/* Stopped out but with profit locked in by the trailing SL — this closes
+   the trade IN PROFIT, so it shares the same green family as a target hit
+   (confirmed with the trader: any trade that closes profitably should
+   read as a win visually, not as a muted "stopped" purple). */
+.tm-result-card.tm-result-stopped-locked {
+  background: #e1f5ee;
+  border: 1px solid #b9e6d4;
+}
+
+.tm-result-card.tm-result-stopped-locked .tm-result-title {
+  color: #0f6e56;
+}
+
+.tm-result-card.tm-result-stopped-locked .tm-result-message {
+  color: #0f6e56;
+}
+
+.tm-result-card.tm-result-stopped-neutral {
+  background: #fdeceb;
+  border: 1px solid #f6c8c2;
+}
+
+.tm-result-card.tm-result-stopped-neutral .tm-result-title {
+  color: #d9381e;
+}
+
+.tm-result-card.tm-result-stopped-neutral .tm-result-message {
+  color: #993c1d;
+}
+
+.tm-result-card.tm-result-open {
+  background: #f8fafc;
+  border: 1px solid #e5e9ed;
+}
+
+.tm-result-card.tm-result-open .tm-result-title {
+  color: #1f3a5f;
+}
+
+.tm-result-card.tm-result-open .tm-result-message {
+  color: #5f6b7a;
+}
+
+/* Light blue: trade is still open, but the trailing SL has moved into
+   profit territory — genuinely risk-free right now, distinct from the
+   neutral grey "still some risk" state above and the green "closed in
+   profit" state below. Confirmed with the trader as its own visual step,
+   not just a a lighter version of the green. */
+.tm-result-card.tm-result-open-profit {
+  background: #eaf2fa;
+  border: 1px solid #cfe1f2;
+}
+
+.tm-result-card.tm-result-open-profit .tm-result-title {
+  color: #1f4e7a;
+}
+
+.tm-result-card.tm-result-open-profit .tm-result-message {
+  color: #2e5d8f;
+}
+
+/* === END COMPONENT: trade-manager === */
+
+
+/* ===========================================================
+   16. RESPONSIVE OVERRIDES
    =========================================================== */
 @media (max-width: 700px) {
   .tool-layout {

@@ -31,6 +31,10 @@
       html: "/app/components/calculator.html",
       js: "/app/components/calculator.js",
     },
+    "tab-trade-manager": {
+      html: "/app/components/trade-manager.html",
+      js: "/app/components/trade-manager.js",
+    },
     "tab-roadmap": {
       html: "/app/components/roadmap.html",
       js: "/app/components/roadmap.js",
@@ -66,6 +70,7 @@
     "tab-select": "Set Up Your Profile",
     "tab-dashboard": "Dashboard",
     "tab-calculator": "Daily Limits Tool",
+    "tab-trade-manager": "Trade Manager",
     "tab-roadmap": "Roadmap",
     "tab-journal": "Trading Journal",
     "tab-education": "Education",
@@ -238,6 +243,93 @@
 
   function fmt(n) {
     return Math.round(n).toLocaleString('en-IN');
+  }
+
+  // Trailing stop-loss formula, worked out directly with the trader:
+  // - Below +1R in favor: hold the original SL (which sits at -1R from
+  //   entry, by definition of R).
+  // - From +1R onward: SL (in points from entry) = pointsInFavor - 1.5*R,
+  //   calculated CONTINUOUSLY (no rounding to 0.5R steps) — e.g. at
+  //   exactly +1R favor, SL = R - 1.5R = -0.5R (half the original risk);
+  //   at +1.5R favor, SL = 0 (breakeven); at +2R favor, SL = +0.5R (locked
+  //   profit); and so on indefinitely, every point gained beyond +1R
+  //   trails the SL up by the same point.
+  // Returns { slFromEntry, isHoldingOriginal, lockedProfit } where
+  // slFromEntry is in points relative to entry (negative = still risking
+  // some of the original capital, positive = guaranteed profit locked in)
+  // and lockedProfit is slFromEntry when positive, else null.
+  function computeTrailingSl(riskPoints, pointsInFavor) {
+    if (riskPoints === null || riskPoints === undefined || riskPoints <= 0) return null;
+    if (pointsInFavor === null || pointsInFavor === undefined) return null;
+
+    if (pointsInFavor < riskPoints) {
+      return {
+        isHoldingOriginal: true,
+        slFromEntry: -riskPoints,
+        lockedProfit: null,
+      };
+    }
+
+    const slFromEntry = pointsInFavor - 1.5 * riskPoints;
+    return {
+      isHoldingOriginal: false,
+      slFromEntry,
+      lockedProfit: slFromEntry > 0 ? slFromEntry : null,
+    };
+  }
+
+  // ---------- Collapsible reference tables ----------
+  // Moved here from calculator.js (now just calls these via window.*) so
+  // collapsible sections work regardless of which lazy-loaded component, if
+  // any, has been visited this session — e.g. Trade Manager's own
+  // collapsible R:R table needs this even if the Daily Limits Tool (where
+  // this logic used to live exclusively) was never opened first.
+  // The tier/instrument/R:R reference tables are static rules, not today's
+  // action items — collapsed by default after a user's first visit so
+  // returning users get a shorter page, while staying one click away since
+  // they're genuinely useful to check while sizing a trade. State persists
+  // across visits via localStorage, per section, keyed by id.
+  const REFERENCE_COLLAPSE_STORAGE_PREFIX = 'refCollapsed:';
+
+  function isReferenceSectionCollapsed(sectionId) {
+    const stored = localStorage.getItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + sectionId);
+    // No stored value yet = genuine first-ever visit: show it expanded once,
+    // then immediately record that it's been seen so every visit AFTER this
+    // one defaults to collapsed (manual toggles afterward are respected via
+    // the stored 'true'/'false' value going forward).
+    if (stored === null) {
+      setReferenceSectionCollapsed(sectionId, true);
+      return false;
+    }
+    return stored === 'true';
+  }
+
+  function setReferenceSectionCollapsed(sectionId, collapsed) {
+    localStorage.setItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + sectionId, String(collapsed));
+  }
+
+  function applyReferenceSectionState(sectionId) {
+    const body = document.getElementById(`${sectionId}-body`);
+    const chevron = document.getElementById(`${sectionId}-chevron`);
+    if (!body || !chevron) return;
+    const collapsed = isReferenceSectionCollapsed(sectionId);
+    body.classList.toggle('mini-ladder-collapsed', collapsed);
+    chevron.classList.toggle('mini-ladder-chevron-collapsed', collapsed);
+  }
+
+  function toggleReferenceSection(sectionId) {
+    // Read the ACTUAL currently-displayed state from the DOM, not by
+    // re-calling isReferenceSectionCollapsed() — that function has a
+    // first-visit side effect (writes 'true' to storage on the very first
+    // ever call, even though it returns false / "show expanded" for that
+    // call). Re-deriving state from it a second time here meant the very
+    // first toggle click right after a fresh page load was silently a
+    // no-op. The DOM's current class is the one source of truth that
+    // can't be fooled by that side effect.
+    const body = document.getElementById(`${sectionId}-body`);
+    const isCurrentlyCollapsed = body ? body.classList.contains('mini-ladder-collapsed') : false;
+    setReferenceSectionCollapsed(sectionId, !isCurrentlyCollapsed);
+    applyReferenceSectionState(sectionId);
   }
 
   function tierForBalance(balance) {
@@ -2035,6 +2127,9 @@
   window.getMaxAllowedLots = getMaxAllowedLots;
   window.getNextLotUnlockInfo = getNextLotUnlockInfo;
   window.getOfficialSubLevelKey = getOfficialSubLevelKey;
+  window.computeTrailingSl = computeTrailingSl;
+  window.toggleReferenceSection = toggleReferenceSection;
+  window.applyReferenceSectionState = applyReferenceSectionState;
   window.tierRulesMatrix = tierRulesMatrix;
   window.getRiskSummary = getRiskSummary;
   window.subLevelForBalance = subLevelForBalance;
