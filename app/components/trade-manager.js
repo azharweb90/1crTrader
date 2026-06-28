@@ -499,13 +499,23 @@
     }
   }
 
-  // Vertical risk/reward chart — green zone above entry (reward), red zone
-  // below entry (risk), decorative candlesticks for texture (NOT real
-  // price data), with SL/Entry/Target levels and 1:1/1:2/1:3 reference
-  // lines marked, plus an animated current-price marker. Modeled on the
-  // trader's own reference image. "Up" on screen always means "favorable"
-  // — points-in-favor drives vertical position, not raw price, so Call
-  // and Put trades both read the same way (green always above entry).
+  // Vertical risk/reward chart — decorative candlesticks for texture (NOT
+  // real price data), with SL/Entry/Target levels and 1:1/1:2/1:3
+  // reference lines marked, plus an animated current-price marker.
+  // Modeled on the trader's own reference image.
+  //
+  // The vertical axis is REAL PRICE, not points-in-favor — higher prices
+  // are always physically higher on screen, exactly like a normal trading
+  // chart. This matters for direction: a short trade (entry above target,
+  // SL above entry) must show its SL at the TOP of the chart in red and
+  // its target at the BOTTOM in green — the reverse of a long trade.
+  // Showing it any other way (e.g. "favorable direction always renders as
+  // up") looks backwards to anyone reading the actual price numbers next
+  // to the lines, which is exactly the bug a short-trade screenshot
+  // caught. priceFromPointsInFavor() is what converts between the
+  // points-in-favor math (used everywhere else — trailing SL, target
+  // distance, etc., all unaffected by this change) and the real price
+  // shown here.
   function renderRrAnimation(pointsInFavor) {
     const container = document.getElementById('tm-rr-animation-area');
     if (!container || riskPoints === null || targetPoints === null) return;
@@ -526,18 +536,30 @@
       : null;
     const trailingSlPoints = trailing ? trailing.slFromEntry : -riskPoints;
 
-    // Chart spans from -riskPoints (bottom) to +targetPoints (top), in
-    // points-in-favor terms, mapped onto SVG y (0 = top, H = bottom).
     const W = 600;
     const H = 320;
     const padTop = 16;
     const padBottom = 16;
     const plotH = H - padTop - padBottom;
-    const totalSpan = riskPoints + targetPoints;
 
+    // Real price bounds of the chart: the lower and higher of (SL price,
+    // target price) — for a long trade that's (SL, target) in that order;
+    // for a short trade it's (target, SL), since SL sits ABOVE entry.
+    const priceAtSl = priceFromPointsInFavor(-riskPoints);
+    const priceAtTarget = priceFromPointsInFavor(targetPoints);
+    const priceLow = Math.min(priceAtSl, priceAtTarget);
+    const priceHigh = Math.max(priceAtSl, priceAtTarget);
+    const priceSpan = priceHigh - priceLow;
+
+    function yForPrice(price) {
+      const frac = (price - priceLow) / priceSpan; // 0 at the lowest price, 1 at the highest
+      return padTop + (1 - frac) * plotH; // invert: higher price = higher on screen
+    }
+    // Points-in-favor still drives every CALCULATION (trailing SL, target
+    // distance, current price's favorable distance) — only the on-screen
+    // y-POSITION needs to go through an actual price first.
     function yFor(points) {
-      const frac = (points + riskPoints) / totalSpan; // 0 at SL, 1 at target
-      return padTop + (1 - frac) * plotH; // invert: higher points = higher on screen
+      return yForPrice(priceFromPointsInFavor(points));
     }
 
     const ySl = yFor(-riskPoints);
@@ -576,7 +598,13 @@
       const yClose = yFor(Math.max(-riskPoints, Math.min(targetPoints, c.close)));
       const yHigh = yFor(Math.max(-riskPoints, Math.min(targetPoints, c.high)));
       const yLow = yFor(Math.max(-riskPoints, Math.min(targetPoints, c.low)));
-      const bullish = c.close >= c.open;
+      // Candle color follows actual PRICE direction (green = price rose,
+      // red = price fell) — the conventional reading of any price chart.
+      // For a short trade, rising points-in-favor means FALLING price, so
+      // this is the inverse of comparing c.close/c.open directly; yClose
+      // and yOpen are already real screen y-positions (smaller y = higher
+      // price), so "price rose" is simply yClose < yOpen on screen.
+      const bullish = yClose < yOpen;
       const color = bullish ? '#5dcaa5' : '#f0997b';
       const bodyTop = Math.min(yOpen, yClose);
       const bodyH = Math.max(Math.abs(yClose - yOpen), 1.5);
@@ -611,8 +639,8 @@
     container.innerHTML = `
       <div style="position:relative;">
         <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" style="display:block; overflow:visible;">
-          <rect x="0" y="${padTop}" width="${W}" height="${yEntry - padTop}" fill="#9fe1cb" opacity="0.55"/>
-          <rect x="0" y="${yEntry}" width="${W}" height="${H - padBottom - yEntry}" fill="#f0997b" opacity="${riskZoneOpacity}"/>
+          <rect x="0" y="${Math.min(yTarget, yEntry)}" width="${W}" height="${Math.abs(yEntry - yTarget)}" fill="#9fe1cb" opacity="0.55"/>
+          <rect x="0" y="${Math.min(yEntry, ySl)}" width="${W}" height="${Math.abs(ySl - yEntry)}" fill="#f0997b" opacity="${riskZoneOpacity}"/>
           ${candlesSvg}
           ${refLinesSvg}
           ${pointsScaleSvg}
