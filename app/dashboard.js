@@ -162,9 +162,11 @@
     "swing-trader": "Swing Trader",
   };
 
-  // Lot quantity per instrument (NSE/BSE F&O contracts). Indices first
-  // (always available), then a set of popular stock F&O — this is also
-  // the mock "broker instrument master" returned by
+  // Lot quantity per index instrument (NSE/BSE F&O contracts). Indices
+  // only for now — confirmed with the trader: stocks were genuinely
+  // confusing alongside indices and are deliberately removed from this
+  // list until that's built out properly as its own decision later. This
+  // is also the mock "broker instrument master" returned by
   // getMockBrokerTradableInstruments() below, standing in for what a real
   // broker's scrip/contract master API would return once connected.
   const INSTRUMENT_INFO = {
@@ -172,14 +174,6 @@
     banknifty:  { label: "Bank Nifty", qty: 30,  category: "index" },
     finnifty:   { label: "FinNifty",   qty: 60,  category: "index" },
     sensex:     { label: "Sensex",     qty: 20,  category: "index" },
-    reliance:   { label: "Reliance",   qty: 250, category: "stock" },
-    tcs:        { label: "TCS",        qty: 125, category: "stock" },
-    hdfcbank:   { label: "HDFC Bank",  qty: 550, category: "stock" },
-    infy:       { label: "Infosys",    qty: 300, category: "stock" },
-    icicibank:  { label: "ICICI Bank", qty: 700, category: "stock" },
-    sbin:       { label: "SBI",        qty: 1500, category: "stock" },
-    tatamotors: { label: "Tata Motors", qty: 1400, category: "stock" },
-    adanient:   { label: "Adani Enterprises", qty: 300, category: "stock" },
   };
 
   // Returns the mock "broker instrument master" — standing in for what a
@@ -643,8 +637,14 @@
   function updateContinueButtonState() {
     const btn = document.getElementById('profile-continue-btn');
     if (!btn) return;
-    const instrumentsOk = Object.keys(selectedInstruments).length > 0 || customStocks.length > 0;
-    btn.disabled = !(selectedTier && selectedTraderTypes.size > 0 && startingCapital !== null && instrumentsOk);
+    // Validates only the CURRENT step now, not the whole flow at once —
+    // each step's own requirement gates moving past IT, via
+    // setupWizardStepIsValid() above. setupWizardCurrentStep may not exist
+    // yet on first script parse (function hoisting is fine, but guard
+    // anyway in case this is ever called before the wizard initializes).
+    const step = typeof setupWizardCurrentStep !== 'undefined' ? setupWizardCurrentStep : 1;
+    btn.disabled = !setupWizardStepIsValid(step);
+    btn.innerText = step >= SETUP_WIZARD_STEP_COUNT ? 'Continue to Dashboard' : 'Continue';
   }
 
   function todayDateString() {
@@ -662,6 +662,116 @@
   // Trading style still has to be asked directly — a broker can tell us
   // balance and trade history, but never the trader's stated intent.
   let setupFetchedInstrumentKeys = []; // which mock-fetched instruments the user has multi-selected during setup
+
+  // ---------- Profile setup wizard (4 steps: Broker, Trading Style,
+  // Instruments, Confirm) — added for the Claude Design visual restyle.
+  // The mockup's own shape (Broker/Style/Capital) didn't fit this app's
+  // real logic (broker-fetch sets tier+capital+instruments together;
+  // manual fallback needs tier+capital as one step, not split; the
+  // instrument picker has enough of its own UI to deserve a dedicated
+  // step) — confirmed with the trader to restructure into this 4-step
+  // shape instead. Capital is a READ-ONLY confirmation on step 4 for BOTH
+  // paths; it is never an editable re-entry field, since broker-fetched
+  // balance should never ask the trader to retype what was already
+  // fetched. setupWizardCurrentStep is reset to 1 every time this
+  // component is freshly loaded (see showTierSelect()); applyTierHighlight
+  // jumps it back to step 1 too when re-opened for editing, since an
+  // existing profile should land on a sensible step, not always step 1
+  // — see the tab-select branch of applyTierHighlight for that logic.
+  let setupWizardCurrentStep = 1;
+  const SETUP_WIZARD_STEP_COUNT = 4;
+
+  function setupWizardStepIsValid(step) {
+    if (step === 1) {
+      // Either a broker is connected (tier+capital fetched), or the
+      // manual path has both a tier AND a valid capital amount.
+      return !!connectedBrokerName || (selectedTier !== null && startingCapital !== null);
+    }
+    if (step === 2) {
+      return selectedTraderTypes.size > 0;
+    }
+    if (step === 3) {
+      return Object.keys(selectedInstruments).length > 0 || customStocks.length > 0;
+    }
+    return true; // step 4 (confirm) has nothing further to validate
+  }
+
+  function setupWizardGoToStep(step) {
+    setupWizardCurrentStep = Math.max(1, Math.min(SETUP_WIZARD_STEP_COUNT, step));
+
+    for (let i = 1; i <= SETUP_WIZARD_STEP_COUNT; i++) {
+      const stepEl = document.getElementById(`setup-wizard-step-${i}`);
+      if (stepEl) stepEl.classList.toggle('hidden', i !== setupWizardCurrentStep);
+
+      const dot = document.getElementById(`setup-stepper-dot-${i}`);
+      const label = document.getElementById(`setup-stepper-label-${i}`);
+      const bar = document.getElementById(`setup-stepper-bar-${i}`);
+      if (dot) {
+        const isDone = i < setupWizardCurrentStep;
+        const isActive = i === setupWizardCurrentStep;
+        dot.classList.toggle('setup-stepper-dot-active', isActive);
+        dot.classList.toggle('setup-stepper-dot-done', isDone);
+        dot.innerHTML = isDone ? '&#10003;' : String(i);
+      }
+      if (label) label.classList.toggle('setup-stepper-label-active', i <= setupWizardCurrentStep);
+      if (bar) bar.classList.toggle('setup-stepper-bar-done', i < setupWizardCurrentStep);
+    }
+
+    // Step 3 shows whichever instrument picker matches the active path —
+    // both wrappers exist in the DOM at all times; only one is unhidden.
+    if (setupWizardCurrentStep === 3) {
+      const fetchedWrap = document.getElementById('setup-fetched-instrument-step-wrap');
+      const manualWrap = document.getElementById('setup-manual-instrument-step');
+      const isBrokerPath = !!connectedBrokerName;
+      if (fetchedWrap) fetchedWrap.classList.toggle('hidden', !isBrokerPath);
+      if (manualWrap) manualWrap.classList.toggle('hidden', isBrokerPath);
+      if (isBrokerPath && document.getElementById('setup-fetched-instrument-picker')) {
+        renderInstrumentPicker('setup-fetched-instrument-picker', getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
+      } else if (document.getElementById('manual-instrument-picker')) {
+        renderManualInstrumentGrid();
+      }
+    }
+
+    if (setupWizardCurrentStep === 4) {
+      renderSetupWizardConfirmSummary();
+    }
+
+    const backBtn = document.getElementById('setup-wizard-back-btn');
+    if (backBtn) backBtn.disabled = setupWizardCurrentStep === 1;
+
+    const indicator = document.getElementById('setup-wizard-step-indicator');
+    if (indicator) indicator.innerText = `Step ${setupWizardCurrentStep} of ${SETUP_WIZARD_STEP_COUNT}`;
+
+    updateContinueButtonState();
+  }
+
+  function setupWizardNext() {
+    if (!setupWizardStepIsValid(setupWizardCurrentStep)) return;
+    if (setupWizardCurrentStep === SETUP_WIZARD_STEP_COUNT) {
+      confirmProfile();
+      return;
+    }
+    setupWizardGoToStep(setupWizardCurrentStep + 1);
+  }
+
+  function setupWizardBack() {
+    setupWizardGoToStep(setupWizardCurrentStep - 1);
+  }
+
+  function renderSetupWizardConfirmSummary() {
+    const methodEl = document.getElementById('setup-confirm-method');
+    const styleEl = document.getElementById('setup-confirm-style');
+    const tierEl = document.getElementById('setup-confirm-tier');
+    const capitalEl = document.getElementById('setup-confirm-capital');
+
+    if (methodEl) methodEl.innerText = connectedBrokerName ? `Connected to ${connectedBrokerName}` : 'Manual setup';
+    if (styleEl) {
+      const styleNames = Array.from(selectedTraderTypes).map(t => TRADER_TYPE_LABELS[t]).join(', ');
+      styleEl.innerText = styleNames || '\u2014';
+    }
+    if (tierEl) tierEl.innerText = selectedTier ? `${TIER_LABELS[selectedTier]} Tier` : '\u2014';
+    if (capitalEl) capitalEl.innerText = startingCapital !== null ? `Rs. ${fmt(startingCapital)}` : '\u2014';
+  }
 
   function generateMockFetchedBalance() {
     // A plausible-looking account balance spanning roughly the Small
@@ -986,6 +1096,8 @@
     if (manualStepsWrap) manualStepsWrap.classList.remove('hidden');
     const manualInstrumentStep = document.getElementById('setup-manual-instrument-step');
     if (manualInstrumentStep) manualInstrumentStep.classList.remove('hidden');
+    const fetchedInstrumentStepWrap = document.getElementById('setup-fetched-instrument-step-wrap');
+    if (fetchedInstrumentStepWrap) fetchedInstrumentStepWrap.classList.add('hidden');
 
     renderManualInstrumentGrid();
     updateContinueButtonState();
@@ -1518,10 +1630,15 @@
       <div class="mini-ladder-cell mini-ladder-head num">Qty/Lot</div>
       <div class="mini-ladder-cell mini-ladder-head num">Lots</div>
       <div class="mini-ladder-cell mini-ladder-head num">Points SL</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Your SL (pts)</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Loss If Hit (Rs.)</div>
     `;
 
     keys.forEach(key => {
       const info = INSTRUMENT_INFO[key];
+      if (!info) return;
+      const isIndex = info.category === 'index';
+
       let lots = selectedInstruments[key].lots || 1;
       // Clamp to whatever is currently allowed — e.g. if balance dropped
       // back below a threshold after a losing day, lots reduce automatically.
@@ -1529,17 +1646,62 @@
         lots = maxAllowedLots;
         selectedInstruments[key].lots = lots;
       }
-      const totalQty = info.qty * lots;
+
+      // Qty/lot: editable for STOCKS (exchanges revise stock lot sizes
+      // periodically); locked for INDICES (Nifty/Bank Nifty/FinNifty/
+      // Sensex), confirmed with the trader — index lot sizes change far
+      // less often and aren't meant to be hand-edited here. Stocks track
+      // their current qty in selectedInstruments[key].qty once edited, so
+      // it persists across re-renders the same way .lots already does;
+      // falls back to the INSTRUMENT_INFO default until first edited.
+      const currentQty = (!isIndex && selectedInstruments[key].qty !== undefined)
+        ? selectedInstruments[key].qty
+        : info.qty;
+
+      const totalQty = currentQty * lots;
       const pointsSl = totalQty > 0 ? (maxLoss / totalQty) : 0;
+
+      const qtyCell = isIndex
+        ? `<div class="mini-ladder-cell num">${currentQty}</div>`
+        : `<div class="mini-ladder-cell num">
+             <input type="number" class="sl-lots-input" data-instrument-key="${key}" min="1" step="1" value="${currentQty}"
+                    oninput="onSlTableQtyInput('${key}', this.value)">
+           </div>`;
+
+      // "Your SL (pts)" + "Loss If Hit (Rs.)" — INDEX-ONLY (confirmed with
+      // the trader), and DELIBERATELY independent of the Points SL column
+      // to its left: that column is mathematically forced to always equal
+      // the flat tier max-loss (it's derived backwards FROM maxLoss), so
+      // multiplying it back by qty*lots would just return the same flat
+      // Rs figure every time regardless of lot count — not useful here.
+      // This pair instead lets the trader type their OWN real stop-loss
+      // distance for that specific trade, and shows what it would
+      // actually cost in rupees at their current lot count — genuinely
+      // varies with lots, unlike the tier's flat cap.
+      const ownSlPoints = isIndex ? (selectedInstruments[key].slPoints || '') : '';
+      const ownSlRupees = isIndex && ownSlPoints !== '' ? (parseFloat(ownSlPoints) * currentQty * lots) : null;
+
+      const ownSlInputCell = isIndex
+        ? `<div class="mini-ladder-cell num">
+             <input type="number" class="sl-lots-input" data-instrument-key="${key}" min="0" step="0.5" value="${ownSlPoints}"
+                    placeholder="e.g. 15" oninput="onSlTableSlPointsInput('${key}', this.value)">
+           </div>`
+        : `<div class="mini-ladder-cell num">&mdash;</div>`;
+
+      const ownSlRupeesCell = isIndex
+        ? `<div class="mini-ladder-cell num sl-rupees-output" data-row-key="${key}" style="font-weight:600; color:#C53D22;">${ownSlRupees !== null ? 'Rs. ' + fmt(ownSlRupees) : '&mdash;'}</div>`
+        : `<div class="mini-ladder-cell num">&mdash;</div>`;
 
       html += `
         <div class="mini-ladder-cell mini-ladder-label">${info.label}</div>
-        <div class="mini-ladder-cell num">${info.qty}</div>
+        ${qtyCell}
         <div class="mini-ladder-cell num">
           <input type="number" class="sl-lots-input" data-instrument-key="${key}" min="1" max="${maxAllowedLots}" step="1" value="${lots}"
                  oninput="onSlTableLotsInput('${key}', this.value)">
         </div>
-        <div class="mini-ladder-cell num sl-points-output" data-row-key="${key}" style="font-weight:600; color:#2e75b6;">${pointsSl.toFixed(2)} pts</div>
+        <div class="mini-ladder-cell num sl-points-output" data-row-key="${key}" style="font-weight:600; color:#2C6FD6;">${pointsSl.toFixed(2)} pts</div>
+        ${ownSlInputCell}
+        ${ownSlRupeesCell}
       `;
     });
 
@@ -1559,6 +1721,69 @@
         noteEl.classList.add('hidden');
       }
     }
+  }
+
+  // Called when the user edits a stock's Qty/Lot directly (exchanges
+  // revise stock lot sizes periodically; locked for indices — see
+  // renderInstrumentSlTable's comment). Patches just that row's Points SL
+  // output in place, same pattern as onSlTableLotsInput below, to avoid
+  // stealing focus mid-typing.
+  function onSlTableQtyInput(key, value) {
+    if (!selectedInstruments[key]) return;
+    const qty = parseInt(value, 10);
+    const validQty = (isNaN(qty) || qty < 1) ? 1 : qty;
+    selectedInstruments[key].qty = validQty;
+
+    const maxLoss = getCurrentMaxLossRupees();
+    const lots = selectedInstruments[key].lots || 1;
+    if (maxLoss === null) return;
+
+    const totalQty = validQty * lots;
+    const pointsSl = totalQty > 0 ? (maxLoss / totalQty) : 0;
+
+    const outputCell = document.querySelector(`.sl-points-output[data-row-key="${key}"]`);
+    if (outputCell) {
+      outputCell.innerText = `${pointsSl.toFixed(2)} pts`;
+    }
+    // Qty changing also affects the index-only Rs-loss column if this
+    // instrument happens to have one (it won't, since qty is only
+    // editable for stocks and the Rs-loss column is index-only — but
+    // re-check defensively in case that ever changes).
+    refreshSlRupeesOutput(key);
+  }
+
+  // Called when the user types their own real stop-loss distance (points)
+  // for an INDEX instrument — independent of the tier's flat max-loss
+  // figure, see renderInstrumentSlTable's comment for why. Patches just
+  // that row's Rs-loss output in place.
+  function onSlTableSlPointsInput(key, value) {
+    if (!selectedInstruments[key]) return;
+    const points = parseFloat(value);
+    if (value.trim() === '' || isNaN(points) || points < 0) {
+      selectedInstruments[key].slPoints = null;
+    } else {
+      selectedInstruments[key].slPoints = points;
+    }
+    refreshSlRupeesOutput(key);
+  }
+
+  function refreshSlRupeesOutput(key) {
+    const outputCell = document.querySelector(`.sl-rupees-output[data-row-key="${key}"]`);
+    if (!outputCell || !selectedInstruments[key]) return;
+
+    const info = INSTRUMENT_INFO[key];
+    const slPoints = selectedInstruments[key].slPoints;
+    const lots = selectedInstruments[key].lots || 1;
+    const qty = (info && info.category !== 'index' && selectedInstruments[key].qty !== undefined)
+      ? selectedInstruments[key].qty
+      : (info ? info.qty : 0);
+
+    if (slPoints === null || slPoints === undefined || slPoints === '') {
+      outputCell.innerText = '\u2014';
+      return;
+    }
+    const rsLoss = slPoints * qty * lots;
+    outputCell.innerText = `Rs. ${fmt(rsLoss)}`;
   }
 
   // Called when the user edits a lot count directly in the points-SL table
@@ -1590,13 +1815,18 @@
     const info = INSTRUMENT_INFO[key];
     if (maxLoss === null || !info) return;
 
-    const totalQty = info.qty * validLots;
+    const currentQty = (info.category !== 'index' && selectedInstruments[key].qty !== undefined)
+      ? selectedInstruments[key].qty
+      : info.qty;
+    const totalQty = currentQty * validLots;
     const pointsSl = totalQty > 0 ? (maxLoss / totalQty) : 0;
 
     const outputCell = document.querySelector(`.sl-points-output[data-row-key="${key}"]`);
     if (outputCell) {
       outputCell.innerText = `${pointsSl.toFixed(2)} pts`;
     }
+    // Lots changing also affects the index-only Rs-loss column.
+    refreshSlRupeesOutput(key);
   }
 
   let lotCapFlashTimeoutId = null;
@@ -2002,6 +2232,14 @@
     if (tabId === 'tab-select') {
       renderSetupBrokerPicker();
 
+      // Every fresh load of this component (first-time setup, OR
+      // re-opening via "Change Tier" / "Edit Profile") starts the wizard
+      // back at step 1 — the step-gating logic below will correctly
+      // re-populate whichever step the trader had already completed, but
+      // landing on step 1 gives a consistent, predictable re-entry point
+      // rather than guessing which step to resume on.
+      setupWizardGoToStep(1);
+
       if (selectedTier) {
         container.querySelectorAll('.tier-select-card').forEach(card => {
           card.classList.toggle('selected', card.dataset.tier === selectedTier);
@@ -2018,17 +2256,24 @@
           input.value = startingCapital;
         }
 
-        // Reaching this screen with a tier already set (e.g. via "Change
-        // Tier" after initial setup) means we're editing an existing
-        // manual-path profile — reveal the manual steps directly and skip
-        // straight past the broker-connect prompt, rather than asking
-        // someone editing their profile to reconnect a broker.
-        const brokerStepWrap = document.getElementById('setup-broker-step');
-        if (brokerStepWrap) brokerStepWrap.classList.add('hidden');
-        const manualStepsWrap = document.getElementById('setup-manual-steps');
-        if (manualStepsWrap) manualStepsWrap.classList.remove('hidden');
-        const manualInstrumentStep = document.getElementById('setup-manual-instrument-step');
-        if (manualInstrumentStep) manualInstrumentStep.classList.remove('hidden');
+        // Reaching this screen with a tier already set AND no broker
+        // connected (e.g. via "Change Tier" after an original manual-path
+        // setup) means we're editing an existing manual-path profile —
+        // reveal the manual steps directly and skip straight past the
+        // broker-connect prompt, rather than asking someone editing their
+        // profile to reconnect a broker. If a broker IS connected, leave
+        // the broker-step/fetched-wrap visibility as connectBroker() left
+        // it (don't fight that state here).
+        if (!brokerConnected) {
+          const brokerStepWrap = document.getElementById('setup-broker-step');
+          if (brokerStepWrap) brokerStepWrap.classList.add('hidden');
+          const manualStepsWrap = document.getElementById('setup-manual-steps');
+          if (manualStepsWrap) manualStepsWrap.classList.remove('hidden');
+          const manualInstrumentStep = document.getElementById('setup-manual-instrument-step');
+          if (manualInstrumentStep) manualInstrumentStep.classList.remove('hidden');
+          const fetchedInstrumentStepWrap = document.getElementById('setup-fetched-instrument-step-wrap');
+          if (fetchedInstrumentStepWrap) fetchedInstrumentStepWrap.classList.add('hidden');
+        }
       }
       if (selectedTraderTypes.size > 0) {
         container.querySelectorAll('.trader-type-card').forEach(card => {
@@ -2038,7 +2283,9 @@
       // Re-render (rather than patch) the instrument picker so it reflects
       // whichever instruments are currently selected — covers both the
       // manual path (re-opened via "Change Tier") and, if ever reached with
-      // a broker already connected, the fetched path too.
+      // a broker already connected, the fetched path too. Both pickers are
+      // safe to pre-render even while step 3 is hidden — setupWizardGoToStep
+      // re-renders again once the trader actually reaches that step.
       if (document.getElementById('manual-instrument-picker')) {
         renderManualInstrumentGrid();
       }
@@ -2124,6 +2371,8 @@
   window.renderInstrumentSlTable = renderInstrumentSlTable;
   window.renderTierReferenceTable = renderTierReferenceTable;
   window.onSlTableLotsInput = onSlTableLotsInput;
+  window.onSlTableQtyInput = onSlTableQtyInput;
+  window.onSlTableSlPointsInput = onSlTableSlPointsInput;
   window.getMaxAllowedLots = getMaxAllowedLots;
   window.getNextLotUnlockInfo = getNextLotUnlockInfo;
   window.getOfficialSubLevelKey = getOfficialSubLevelKey;
@@ -2153,6 +2402,8 @@
   window.onSetupBrokerPickerSearch = onSetupBrokerPickerSearch;
   window.toggleSetupFetchedInstrument = toggleSetupFetchedInstrument;
   window.showManualProfileSetup = showManualProfileSetup;
+  window.setupWizardNext = setupWizardNext;
+  window.setupWizardBack = setupWizardBack;
   window.disconnectMockBroker = disconnectMockBroker;
   window.renderBrokerArea = renderBrokerArea;
   window.getBrokerPnlHistory = getBrokerPnlHistory;
