@@ -1,0 +1,365 @@
+/* ===========================================================
+   DARK THEME — 1CrTrader
+   Loaded after dashboard.css. Every rule here is scoped under
+   `body.dark-mode`, toggled via toggleDarkMode() in dashboard.js (adds/
+   removes the class, persisted to localStorage). dashboard.css itself
+   (the light theme) is never edited or risked by this file — confirmed
+   as the required approach: dark mode ships as a fully separate
+   stylesheet, not a rewrite of the existing one into CSS variables.
+
+   Covers the whole application (every tab, the sidebar included) per
+   the trader's explicit scope. The public website (website/index.html)
+   is intentionally NOT covered yet — confirmed as app-first, website
+   later.
+
+   Brand accent colors (gold #D4A828, the green/red profit-loss
+   semantics) are mostly kept as-is or lightly brightened for contrast —
+   only structural surfaces (backgrounds, borders, body text) actually
+   change between light and dark.
+   =========================================================== */
+
+/* ---------- Base page ---------- */
+body.dark-mode {
+  background: #0f1115;
+  color: #e8eaed;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3 {
+  color: #e8eaed;
+}
+
+body.dark-mode .section-note {
+  color: #a0a8b5;
+}
+
+body.dark-mode .foot-note {
+  color: #7a8290;
+}
+
+/* ---------- Scrollbar ---------- */
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #3a3f47;
+}
+
+/* ---------- Sidebar ---------- */
+/* Confirmed in scope ("whole application... sidebar too") even though the
+   sidebar is already dark in light mode — give it a slightly deeper,
+   more neutral tone in dark mode so it doesn't read identically to the
+   light-mode sidebar, and so its border/divider lines stay visible
+   against the now-dark page behind it. */
+body.dark-mode .sidebar {
+  background: linear-gradient(180deg, #0a1015 0%, #050709 100%);
+}
+
+body.dark-mode .sidebar-nav-group-bottom {
+  border-top-color: rgba(212, 168, 40, 0.1);
+}
+
+/* ---------- Top bar / header ---------- */
+body.dark-mode .top-bar {
+  background: #15171c;
+  border-bottom-color: #262a31;
+}
+
+body.dark-mode .top-bar-page-title {
+  color: #e8eaed;
+}
+
+body.dark-mode .dark-mode-toggle-btn {
+  background: #1f2228;
+  border-color: #33373f;
+  color: #a0a8b5;
+}
+
+body.dark-mode .dark-mode-toggle-btn:hover {
+  background: #262a31;
+  border-color: #d4a828;
+  color: #d4a828;
+}
+
+body.dark-mode .header-account-menu {
+  background: #1a1d23;
+  border-color: #33373f;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .header-account-menu-name {
+  color: #e8eaed;
+}
+
+body.dark-mode .header-account-menu-email {
+  color: #7a8290;
+}
+
+body.dark-mode .header-account-menu-item {
+  color: #c7ccd3;
+}
+
+body.dark-mode .header-account-menu-item:hover {
+  background: #22252b;
+}
+
+/* ---------- Content shell ---------- */
+body.dark-mode .content-section {
+  background: #1a1d23;
+  border-color: #262a31;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Generic text/border tokens used everywhere ---------- */
+body.dark-mode .mini-ladder-title,
+body.dark-mode .select-step-title,
+body.dark-mode .dash-stat-label,
+body.dark-mode .dash-quicklinks-title,
+body.dark-mode .instrument-tier-summary-chip,
+body.dark-mode .broker-order-time,
+body.dark-mode .suggestions-row-title {
+  color: #a0a8b5;
+}
+
+body.dark-mode .mini-ladder-cell,
+body.dark-mode .grid-table .cell,
+body.dark-mode .broker-scrip-grid > div,
+body.dark-mode .dash-stat-card,
+body.dark-mode .dash-quicklink-card,
+body.dark-mode .instrument-card,
+body.dark-mode .tier-select-card,
+body.dark-mode .trader-type-card,
+body.dark-mode .pricing-card,
+body.dark-mode .journal-stat-card,
+body.dark-mode .journal-analysis-stat-card,
+body.dark-mode .strategy-card,
+body.dark-mode .suggestions-panel {
+  background: #1a1d23;
+  border-color: #2a2e36;
+  color: #c7ccd3;
+}
+
+body.dark-mode .mini-ladder-grid,
+body.dark-mode .grid-table,
+body.dark-mode .broker-scrip-grid {
+  background: #2a2e36;
+  border-color: #2a2e36;
+}
+
+body.dark-mode .mini-ladder-cell.mini-ladder-head,
+body.dark-mode .grid-table .head,
+body.dark-mode .broker-scrip-grid-head {
+  background: #20232a;
+  color: #8a93a3;
+}
+
+body.dark-mode .mini-ladder-label,
+body.dark-mode .grid-table .label,
+body.dark-mode .tier-select-name,
+body.dark-mode .trader-type-name,
+body.dark-mode .dash-quicklink-title,
+body.dark-mode .instrument-name,
+body.dark-mode .suggestions-panel-title {
+  color: #e8eaed;
+}
+
+body.dark-mode .dash-stat-value,
+body.dark-mode .header-balance-value {
+  color: #e8eaed;
+}
+
+/* Tier-highlight rows (gold cream in light mode) — darker gold tint
+   keeps the same "this is your row" meaning without a jarring pale
+   patch on an otherwise dark table. */
+body.dark-mode .mini-ladder-label.tier-highlight,
+body.dark-mode .mini-ladder-cell.tier-highlight-row,
+body.dark-mode .grid-table .label.tier-highlight {
+  background: rgba(212, 168, 40, 0.16) !important;
+  color: #e8c766 !important;
+}
+
+/* ---------- Inputs ---------- */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode .sl-lots-input,
+body.dark-mode .capital-amount-input,
+body.dark-mode .journal-input,
+body.dark-mode .broker-day-picker-input {
+  background: #1f2228;
+  border-color: #33373f;
+  color: #e8eaed;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #5e6571;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+  border-color: #d4a828;
+}
+
+/* ---------- Buttons ---------- */
+body.dark-mode .profile-continue-btn,
+body.dark-mode .trade-submit-btn,
+body.dark-mode .outcome-btn,
+body.dark-mode .change-tier-btn,
+body.dark-mode .account-edit-btn,
+body.dark-mode .setup-wizard-back-btn,
+body.dark-mode .setup-skip-btn,
+body.dark-mode .journal-list-btn,
+body.dark-mode .suggestions-panel-nav-btn,
+body.dark-mode .broker-import-btn,
+body.dark-mode .custom-stock-add-btn {
+  background: #20232a;
+  border-color: #33373f;
+  color: #c7ccd3;
+}
+
+body.dark-mode .outcome-btn:hover:not(:disabled),
+body.dark-mode .suggestions-panel-nav-btn:hover:not(:disabled) {
+  border-color: #d4a828;
+  background: rgba(212, 168, 40, 0.08);
+}
+
+body.dark-mode .profile-continue-btn:not(:disabled) {
+  background: #20232a;
+  color: #e8eaed;
+}
+
+body.dark-mode .profile-continue-btn:hover:not(:disabled) {
+  background: #8c6510;
+  color: #ffffff;
+}
+
+body.dark-mode .broker-import-btn {
+  background: linear-gradient(135deg, #d4a828 0%, #b6890f 100%);
+  border: none;
+  color: #ffffff;
+}
+
+/* ---------- Selected/active states (kept gold, brightened slightly) --- */
+body.dark-mode .tier-select-card.selected,
+body.dark-mode .trader-type-card.selected,
+body.dark-mode .instrument-card.selected,
+body.dark-mode .goal-amount-btn-cr {
+  border-color: #d4a828;
+  background: rgba(212, 168, 40, 0.07);
+}
+
+body.dark-mode .sidebar-link.active {
+  background: #262011;
+}
+
+body.dark-mode .broker-range-pill-active {
+  background: rgba(91, 147, 232, 0.14);
+  border-color: #5b93e8;
+  color: #e8eaed;
+}
+
+/* ---------- Sub-text / dropdown / dividers ---------- */
+body.dark-mode .tier-select-range,
+body.dark-mode .trader-type-desc,
+body.dark-mode .instrument-picker-row-qty,
+body.dark-mode .dash-quicklink-desc,
+body.dark-mode .capital-amount-hint,
+body.dark-mode .broker-range-label-pill {
+  color: #8a93a3;
+}
+
+body.dark-mode hr,
+body.dark-mode .suggestions-category-header,
+body.dark-mode .broker-day-detail-header,
+body.dark-mode .suggestions-panel-header,
+body.dark-mode .suggestions-panel-footer,
+body.dark-mode .suggestions-row {
+  border-color: #2a2e36;
+}
+
+body.dark-mode .suggestions-row:hover {
+  background: rgba(212, 168, 40, 0.06);
+}
+
+/* ---------- Risk/info banners (blue, amber, etc.) ---------- */
+body.dark-mode .lot-unlock-note {
+  background: rgba(91, 147, 232, 0.1);
+  border-color: rgba(91, 147, 232, 0.3);
+  color: #b9d2f7;
+}
+
+body.dark-mode .lot-unlock-note-icon {
+  color: #5b93e8;
+}
+
+body.dark-mode .lot-unlock-note.lot-cap-flash {
+  background: rgba(212, 168, 40, 0.12);
+  border-color: rgba(212, 168, 40, 0.35);
+  color: #e8c766;
+}
+
+body.dark-mode .lot-unlock-note.lot-cap-flash .lot-unlock-note-icon {
+  color: #d4a828;
+}
+
+body.dark-mode .sl-exceeds-warning {
+  background: rgba(212, 168, 40, 0.14);
+  border-color: rgba(212, 168, 40, 0.35);
+  color: #e8c766;
+}
+
+body.dark-mode .broker-range-empty-state {
+  background: #20232a;
+  border-color: #33373f;
+  color: #7a8290;
+}
+
+body.dark-mode .suggestions-panel-category {
+  background: rgba(212, 168, 40, 0.16);
+  color: #e8c766;
+}
+
+body.dark-mode .suggestions-category-count {
+  background: #20232a;
+  color: #8a93a3;
+}
+
+/* ---------- Pale status-tint backgrounds (catch-all) ---------- */
+body.dark-mode .broker-stat-icon-loss,
+body.dark-mode .header-balance-pill {
+  background: linear-gradient(135deg, #b6890f 0%, #8c6510 100%);
+}
+
+body.dark-mode .header-avatar-btn {
+  background: linear-gradient(135deg, #2a2210 0%, #b6890f 100%);
+}
+
+body.dark-mode .dash-risk-card,
+body.dark-mode .your-limit-callout,
+body.dark-mode .roadmap-balance-card,
+body.dark-mode .goal-result-card {
+  background: linear-gradient(140deg, #20180c 0%, #110d08 100%);
+}
+
+/* ---------- Trade Manager chart ---------- */
+/* The chart's own SVG colors (price line, candles, zone fills) are
+   rendered inline by trade-manager.js, not via these CSS classes, so they
+   already work reasonably against either background — only the
+   surrounding chrome (price labels, result cards) needs adjusting here. */
+body.dark-mode .tm-rr-summary,
+body.dark-mode .tm-result-card.tm-result-open {
+  background: #20232a;
+  border-color: #2a2e36;
+}
+
+body.dark-mode .tm-rr-chip {
+  background: #20232a;
+  border-color: #33373f;
+  color: #c7ccd3;
+}
+
+/* ---------- Scrollable horizontal-overflow zones ---------- */
+body.dark-mode .mini-ladder-wrap,
+body.dark-mode .broker-multi-month-grid {
+  scrollbar-color: #3a3f47 #1a1d23;
+}

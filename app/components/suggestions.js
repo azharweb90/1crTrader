@@ -13,7 +13,6 @@
    =========================================================== */
 
 (function () {
-
   // Each suggestion: a short title (the headline) + the full explanation
   // (the "why", not just the rule) — confirmed pattern from the trader's
   // own three examples, which all paired a directive with a concrete
@@ -29,7 +28,7 @@
         },
         {
           title: "Revenge trading rarely recovers the loss",
-          body: "The urge to \"win it back immediately\" after a loss is one of the most common ways a single bad trade turns into a bad week. The position sizing and clear thinking that made you money earlier are usually the first things to go when you're trying to revenge trade.",
+          body: 'The urge to "win it back immediately" after a loss is one of the most common ways a single bad trade turns into a bad week. The position sizing and clear thinking that made you money earlier are usually the first things to go when you\'re trying to revenge trade.',
         },
         {
           title: "FOMO entries put you in at the worst price",
@@ -51,7 +50,7 @@
         },
         {
           title: "Stop-loss isn't optional",
-          body: "Moving your stop further away \"to give the trade room\" after you've already entered is one of the most common ways a small, planned loss turns into a large, unplanned one. The time to decide your stop is before you enter \u2014 not after the trade starts going against you.",
+          body: 'Moving your stop further away "to give the trade room" after you\'ve already entered is one of the most common ways a small, planned loss turns into a large, unplanned one. The time to decide your stop is before you enter \u2014 not after the trade starts going against you.',
         },
         {
           title: "Position sizing matters more than entry timing",
@@ -68,7 +67,8 @@
       icon: "\u{1F4C8}",
       items: [
         {
-          title: "Expiry-day \"zero hero\" trades are a common way to breach your daily limit",
+          title:
+            'Expiry-day "zero hero" trades are a common way to breach your daily limit',
           body: "Buying deep out-of-the-money options for a few rupees on expiry day, hoping for a big last-minute move, has a very low win rate \u2014 and the combined losses from repeated attempts in the same session are exactly how traders blow through a daily loss limit they'd otherwise have respected.",
         },
         {
@@ -87,25 +87,52 @@
     },
   ];
 
+  // Flat index built once for Previous/Next navigation — lets the trader
+  // move through the whole list (across category boundaries) without
+  // closing the panel, confirmed as the more natural reading flow than
+  // being stuck inside one category.
+  const FLAT_ITEMS = [];
+  SUGGESTIONS.forEach((section, sectionIndex) => {
+    section.items.forEach((item, itemIndex) => {
+      FLAT_ITEMS.push({
+        ...item,
+        category: section.category,
+        sectionIndex,
+        itemIndex,
+      });
+    });
+  });
+
+  let currentPanelIndex = -1;
+
   function renderSuggestions() {
-    const container = document.getElementById('suggestions-list-area');
+    const container = document.getElementById("suggestions-list-area");
     if (!container) return;
 
-    let html = '';
-    SUGGESTIONS.forEach(section => {
+    let html = "";
+    let flatCursor = 0;
+    SUGGESTIONS.forEach((section) => {
       html += `
         <div class="suggestions-category">
           <div class="suggestions-category-header">
             <span class="suggestions-category-icon">${section.icon}</span>
             <span class="suggestions-category-title">${section.category}</span>
+            <span class="suggestions-category-count">${section.items.length}</span>
           </div>
-          <div class="suggestions-grid">
-            ${section.items.map(item => `
-              <div class="suggestions-card">
-                <div class="suggestions-card-title">${item.title}</div>
-                <p class="suggestions-card-body">${item.body}</p>
-              </div>
-            `).join('')}
+          <div class="suggestions-list">
+            ${section.items
+              .map(() => {
+                const flatIndex = flatCursor;
+                flatCursor++;
+                const item = FLAT_ITEMS[flatIndex];
+                return `
+                <button type="button" class="suggestions-row" onclick="openSuggestionPanel(${flatIndex})">
+                  <span class="suggestions-row-title">${item.title}</span>
+                  <span class="suggestions-row-arrow">&rsaquo;</span>
+                </button>
+              `;
+              })
+              .join("")}
           </div>
         </div>
       `;
@@ -114,11 +141,61 @@
     container.innerHTML = html;
   }
 
+  // Opens the side panel showing the full suggestion text — replaces the
+  // old always-expanded card body, which doesn't scale once a category
+  // has more than a handful of items (confirmed with the trader: a
+  // category could realistically hold 100+ suggestions).
+  function openSuggestionPanel(flatIndex) {
+    currentPanelIndex = flatIndex;
+    renderPanelContent();
+    const overlay = document.getElementById("suggestions-panel-overlay");
+    if (overlay) overlay.classList.remove("hidden");
+  }
+
+  function closeSuggestionPanel(event) {
+    // Clicking the dimmed backdrop closes the panel; clicking inside the
+    // panel itself doesn't (stopPropagation on the panel element handles
+    // that) — only fires this from a real backdrop click or the explicit
+    // close button.
+    if (event && event.target.id !== "suggestions-panel-overlay") return;
+    const overlay = document.getElementById("suggestions-panel-overlay");
+    if (overlay) overlay.classList.add("hidden");
+  }
+
+  function navigateSuggestionPanel(direction) {
+    const nextIndex = currentPanelIndex + direction;
+    if (nextIndex < 0 || nextIndex >= FLAT_ITEMS.length) return;
+    currentPanelIndex = nextIndex;
+    renderPanelContent();
+  }
+
+  function renderPanelContent() {
+    const item = FLAT_ITEMS[currentPanelIndex];
+    if (!item) return;
+
+    const categoryEl = document.getElementById("suggestions-panel-category");
+    const titleEl = document.getElementById("suggestions-panel-title");
+    const textEl = document.getElementById("suggestions-panel-text");
+    const positionEl = document.getElementById("suggestions-panel-position");
+    const prevBtn = document.getElementById("suggestions-panel-prev");
+    const nextBtn = document.getElementById("suggestions-panel-next");
+
+    if (categoryEl) categoryEl.innerText = item.category;
+    if (titleEl) titleEl.innerText = item.title;
+    if (textEl) textEl.innerText = item.body;
+    if (positionEl)
+      positionEl.innerText = `${currentPanelIndex + 1} of ${FLAT_ITEMS.length}`;
+    if (prevBtn) prevBtn.disabled = currentPanelIndex <= 0;
+    if (nextBtn) nextBtn.disabled = currentPanelIndex >= FLAT_ITEMS.length - 1;
+  }
+
   window.renderSuggestions = renderSuggestions;
+  window.openSuggestionPanel = openSuggestionPanel;
+  window.closeSuggestionPanel = closeSuggestionPanel;
+  window.navigateSuggestionPanel = navigateSuggestionPanel;
 
   // Auto-render once on load, the same way other purely-static lazy-loaded
   // tabs (e.g. Books, Education) don't need an external trigger — there's
   // no profile-dependent state this view needs to wait for.
   renderSuggestions();
-
 })();

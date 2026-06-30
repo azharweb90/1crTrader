@@ -7,4 +7,31 @@
 
   <div id="suggestions-list-area"></div>
 </section>
+
+<!-- Side panel: clicking a title row opens this rather than expanding the
+     list inline — confirmed with the trader, since a category could grow
+     to 100+ items and showing full text inline for all of them wouldn't
+     scale. Slides in from the right; page content stays visible behind it
+     (not a centered modal). Previous/Next lets the trader read through a
+     whole category without closing and reopening each item. -->
+<div id="suggestions-panel-overlay" class="suggestions-panel-overlay hidden" onclick="closeSuggestionPanel(event)">
+  <div id="suggestions-panel" class="suggestions-panel" onclick="event.stopPropagation()">
+    <div class="suggestions-panel-header">
+      <span id="suggestions-panel-category" class="suggestions-panel-category">&mdash;</span>
+      <button type="button" class="suggestions-panel-close" onclick="closeSuggestionPanel()"
+        aria-label="Close">&times;</button>
+    </div>
+    <div class="suggestions-panel-body">
+      <h3 id="suggestions-panel-title" class="suggestions-panel-title">&mdash;</h3>
+      <p id="suggestions-panel-text" class="suggestions-panel-text"></p>
+    </div>
+    <div class="suggestions-panel-footer">
+      <button type="button" id="suggestions-panel-prev" class="suggestions-panel-nav-btn"
+        onclick="navigateSuggestionPanel(-1)">&larr; Previous</button>
+      <span id="suggestions-panel-position" class="suggestions-panel-position">&mdash;</span>
+      <button type="button" id="suggestions-panel-next" class="suggestions-panel-nav-btn"
+        onclick="navigateSuggestionPanel(1)">Next &rarr;</button>
+    </div>
+  </div>
+</div>
 <!-- END COMPONENT: suggestions -->
