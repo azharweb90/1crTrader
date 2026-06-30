@@ -85,7 +85,7 @@
           </div>
           <div class="dash-risk-card">
             <div class="dash-risk-label">Max Loss Today</div>
-            <div class="dash-risk-value">Rs. ${fmt(riskSummary.maxLossRupees)}</div>
+            <div class="dash-risk-value">₹${fmt(riskSummary.maxLossRupees)}</div>
             <div class="dash-risk-sublabel">${riskSummary.maxLossPct}% of capital</div>
           </div>
           <div class="dash-risk-card">
@@ -95,7 +95,7 @@
         `;
         if (riskLotNote) {
           riskLotNote.innerText = riskSummary.nextLotUnlock
-            ? `Reach Rs. ${fmt(riskSummary.nextLotUnlock.requiredBalance)} balance (Rs. ${fmt(riskSummary.nextLotUnlock.remaining)} more) to unlock lot ${riskSummary.nextLotUnlock.nextLotCount}.`
+            ? `Reach ₹${fmt(riskSummary.nextLotUnlock.requiredBalance)} balance (₹${fmt(riskSummary.nextLotUnlock.remaining)} more) to unlock lot ${riskSummary.nextLotUnlock.nextLotCount}.`
             : `You're at the maximum lot allowance for your tier.`;
         }
       }
@@ -124,15 +124,15 @@
         capitalGrid.innerHTML = `
           <div class="settings-stat">
             <div class="settings-stat-label">Starting Capital</div>
-            <div class="settings-stat-value">Rs. ${fmt(state.startingCapital)}</div>
+            <div class="settings-stat-value">₹${fmt(state.startingCapital)}</div>
           </div>
           <div class="settings-stat">
             <div class="settings-stat-label">Current Balance</div>
-            <div class="settings-stat-value">Rs. ${fmt(state.currentBalance)}</div>
+            <div class="settings-stat-value">₹${fmt(state.currentBalance)}</div>
           </div>
           <div class="settings-stat">
             <div class="settings-stat-label">P&amp;L Since Joining</div>
-            <div class="settings-stat-value ${pnlClass}">${pnlSign}Rs. ${fmt(Math.abs(pnl))}</div>
+            <div class="settings-stat-value ${pnlClass}">${pnlSign}₹${fmt(Math.abs(pnl))}</div>
           </div>
           <div class="settings-stat">
             <div class="settings-stat-label">Member Since</div>

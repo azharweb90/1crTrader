@@ -3,52 +3,57 @@
   <p class="section-note">This is your main screen — log today's trade outcomes here to stay inside your daily risk
     limits. Completed days automatically update your running balance shown in the header and roadmap.</p>
 
-  <!-- Full sub-tier-level rules reference (all 12 sub-tiers across the 4
-       broad tiers — Tier | Capital | Max Lots | Max Loss Rs. | Max Loss %).
-       Rows are generated in dashboard.js from tierRulesMatrix (the single
-       source of truth) rather than hand-typed here, so this table can
-       never drift out of sync with the actual rule data again.
-       Collapsible: these are static rules, not today's action items, so
-       they default to collapsed after the first visit (state remembered
-       in localStorage) to keep the page shorter for returning users, while
-       staying one click away since they're genuinely useful to check while
-       sizing a trade. -->
-  <div class="mini-ladder-wrap">
-    <button type="button" id="tier-ref-toggle" class="mini-ladder-toggle-header"
-      onclick="toggleReferenceSection('tier-ref')">
-      <span class="mini-ladder-title">Capital Tier, Lots &amp; Daily Loss Reference</span>
-      <span id="tier-ref-chevron" class="mini-ladder-chevron">&#9660;</span>
-    </button>
-    <div id="tier-ref-body" class="mini-ladder-collapsible-body">
-      <div id="tier-ref-grid" class="mini-ladder-grid mini-ladder-grid-5col"></div>
-      <p class="foot-note">Max Lots is the most lots you may use across your trades for the day — it's a ceiling, not
-        a requirement; you can always trade fewer. Max Loss does NOT multiply by lots: whether you use 1 lot or your
-        full allowance, your loss limit for the day stays the same. Lots increase either by starting with more
-        capital (you enter directly at the matching row) or by growing your balance 50% above where you started
-        (this only ever moves you up, never back down on a losing day). Maximum 2 trades per day across all tiers,
-        with a mandatory 30-minute cooldown between them (unless Trade 1 hits the kill switch).</p>
-    </div>
-  </div>
-
-  <!-- Points stop-loss per selected instrument, derived from this tier's max
-       rupee loss and the lot size/count chosen during profile setup.
-       Same collapsible treatment as the tier reference table above. -->
+  <!-- Points stop-loss per selected instrument, derived from this tier's
+       max rupee loss and the lot size/count chosen during profile setup.
+       Previously a separate static 12-row "Capital Tier, Lots & Daily Loss
+       Reference" table sat above this one — merged per the trader's
+       request, since seeing two separate tables (one generic across all
+       12 sub-tiers, one their own live working numbers) was confusing.
+       The trader's OWN tier's Max Lots/Max Loss now show once, in
+       #instrument-tier-summary below, rather than repeating per-row
+       (confirmed with the trader — same number every row otherwise, since
+       one trader has one tier). -->
   <div id="instrument-sl-wrap" class="mini-ladder-wrap hidden">
     <button type="button" id="instrument-ref-toggle" class="mini-ladder-toggle-header"
       onclick="toggleReferenceSection('instrument-ref')">
-      <span class="mini-ladder-title">Points Stop-Loss By Instrument</span>
-      <span id="instrument-ref-chevron" class="mini-ladder-chevron">&#9660;</span>
+      <span class="mini-ladder-title">Capital Tier &amp; Points Stop-Loss By Instrument</span>
+      <span id="instrument-ref-chevron" class="mini-ladder-chevron"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
     </button>
     <div id="instrument-ref-body" class="mini-ladder-collapsible-body">
+      <div id="instrument-tier-summary" class="instrument-tier-summary"></div>
       <div id="instrument-sl-grid" class="mini-ladder-grid instrument-sl-grid"></div>
       <p class="foot-note">Points SL = today's max rupee loss &divide; (lot quantity &times; lots). Edit lots directly
         above for today's trade size; add or remove instruments via "Change Tier." Enter your own real stop-loss in
         points to see what it would actually cost in rupees at your current lot count &mdash; independent of the flat
-        Points SL figure, which always equals today's max loss exactly.</p>
+        Points SL figure, which always equals today's max loss exactly. If that figure exceeds what your tier allows
+        for the lots you're using, it's flagged in red &mdash; shown for your own calculation, never blocked.</p>
       <p id="lot-unlock-note" class="lot-unlock-note hidden"></p>
     </div>
   </div>
 
+
+
+  <!-- Full all-tiers reference table — restored per the trader's request:
+       collapsed by default (so it doesn't compete with the live working
+       table above), but always available for a trader to understand WHY
+       a smaller capital tier takes a higher percentage loss than a larger
+       one. Purely educational/static; shows every tier regardless of
+       which one the trader is actually on. -->
+  <div id="tier-ref-wrap" class="mini-ladder-wrap">
+    <button type="button" id="tier-ref-toggle" class="mini-ladder-toggle-header"
+      onclick="toggleReferenceSection('tier-ref')">
+      <span class="mini-ladder-title">See How Loss % Changes By Tier (all tiers, for reference)</span>
+      <span id="tier-ref-chevron" class="mini-ladder-chevron"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </button>
+    <div id="tier-ref-body" class="mini-ladder-collapsible-body">
+      <div id="tier-ref-grid" class="mini-ladder-grid mini-ladder-grid-5col"></div>
+      <p class="foot-note">Max Lots is a ceiling, not a requirement &mdash; you can always trade fewer. Max Loss does
+        NOT multiply by lots: whether you use 1 lot or your full allowance, your loss limit for the day stays the
+        same. Lots increase either by starting with more capital (you enter directly at the matching row) or by
+        growing your balance 50% above where you started (this only ever moves you up, never back down on a losing
+        day). Maximum 2 trades per day, with a 30-minute cooldown between them.</p>
+    </div>
+  </div>
 
 
   <!-- Broker P&L browser: shown instead of the manual entry panel below
@@ -63,62 +68,55 @@
     <div class="broker-synced-header">
       <div>
         <div class="broker-synced-title">Synced from <span id="broker-synced-name">your broker</span></div>
-        <p class="section-note" style="margin:4px 0 0;">This mirrors your broker's P&amp;L report exactly as they show
+        <p class="section-note" style="margin:4px 0 0;">This mirrors your broker's order history exactly as they show
           it &mdash; browse a range, click a day, and import it into your Trade Log when you're ready. Nothing here is
           checked against your rules until you import it.</p>
       </div>
     </div>
 
-    <!-- Stat cards: Realized P&L / Total Charges / Net Realized P&L for
-         whichever range is currently selected below. -->
-    <div class="broker-stats-row">
-      <div class="broker-stat-card">
-        <div class="broker-stat-icon broker-stat-icon-loss">₹</div>
-        <div>
-          <div class="broker-stat-label">Realized P&amp;L</div>
-          <div id="broker-stat-realized" class="broker-stat-value">&mdash;</div>
+    <!-- Two columns: controls/message on the left (range pills, date-range
+         label, empty-state prompt, legend), calendar itself on the right —
+         confirmed with the trader: stacking everything vertically above
+         the calendar left too much empty white space beside it and read
+         as messy. -->
+    <div class="broker-range-columns">
+      <div class="broker-range-controls">
+        <!-- Range pills: nothing is pre-selected — the trader picks one
+             explicitly before any data renders, rather than the calendar
+             loading pre-populated with a default range. -->
+        <div class="broker-range-pills">
+          <button type="button" id="broker-range-day" class="broker-range-pill" onclick="setBrokerRange('day')">Pick a Day</button>
+          <button type="button" id="broker-range-month" class="broker-range-pill" onclick="setBrokerRange('month')">This Month</button>
+          <button type="button" id="broker-range-3months" class="broker-range-pill" onclick="setBrokerRange('3months')">3 Months</button>
+          <button type="button" id="broker-range-fy" class="broker-range-pill" onclick="setBrokerRange('fy')">This Financial Year</button>
         </div>
-      </div>
-      <div class="broker-stat-card">
-        <div class="broker-stat-icon broker-stat-icon-neutral">📄</div>
-        <div>
-          <div class="broker-stat-label">Total Charges</div>
-          <div id="broker-stat-charges" class="broker-stat-value">&mdash;</div>
+        <div id="broker-day-picker-wrap" class="broker-day-picker-wrap hidden">
+          <input type="date" id="broker-day-picker-input" class="broker-day-picker-input" onchange="onBrokerDayPicked(this.value)">
         </div>
-      </div>
-      <div class="broker-stat-card">
-        <div class="broker-stat-icon broker-stat-icon-loss">₹</div>
-        <div>
-          <div class="broker-stat-label">Net Realized P&amp;L</div>
-          <div id="broker-stat-net" class="broker-stat-value">&mdash;</div>
-        </div>
-      </div>
-    </div>
+        <div id="broker-range-label" class="broker-range-label-pill">&mdash;</div>
 
-    <!-- Range pills: This Month / 3 Months / This Financial Year. -->
-    <div class="broker-range-pills">
-      <button type="button" id="broker-range-month" class="broker-range-pill" onclick="setBrokerRange('month')">This
-        Month</button>
-      <button type="button" id="broker-range-3months" class="broker-range-pill" onclick="setBrokerRange('3months')">3
-        Months</button>
-      <button type="button" id="broker-range-fy" class="broker-range-pill" onclick="setBrokerRange('fy')">This Financial
-        Year</button>
-    </div>
-    <div id="broker-range-label" class="broker-range-label-pill">&mdash;</div>
+        <!-- Shown before the trader has picked any range — replaces the
+             old behavior of the calendar loading pre-populated by default. -->
+        <div id="broker-range-empty-state" class="broker-range-empty-state">
+          Pick a day, month, or year to see your trades for that period.
+        </div>
 
-    <!-- Multi-month dot grid: one column per month in the selected range,
-         5 rows of day-dots, monthly net total underneath each column. -->
-    <div id="broker-multi-month-grid" class="broker-multi-month-grid"></div>
-    <p class="foot-note" style="margin-top:10px;"><span class="broker-legend-dot broker-legend-green"></span> Profit day
-      &nbsp; <span class="broker-legend-dot broker-legend-red"></span> Loss day &nbsp; <span
-        class="broker-legend-dot broker-legend-gray"></span> No trades &nbsp;&middot;&nbsp; click a day to view and
-      import it</p>
+        <p id="broker-legend-note" class="foot-note hidden" style="margin-top:14px;"><span class="broker-legend-dot broker-legend-green"></span> Profit day
+          &nbsp; <span class="broker-legend-dot broker-legend-red"></span> Loss day &nbsp; <span
+            class="broker-legend-dot broker-legend-gray"></span> No trades &nbsp;&middot;&nbsp; click a day to view and
+          import it</p>
+      </div>
+
+      <!-- Multi-month dot grid: one calendar block per month in the
+           selected range, weekday-aligned, monthly net total underneath
+           each block. -->
+      <div id="broker-multi-month-grid" class="broker-multi-month-grid hidden"></div>
+    </div>
 
     <div id="broker-day-detail" class="broker-day-detail hidden">
       <div class="broker-day-detail-header">
         <div id="broker-day-detail-title" class="broker-day-detail-title">&mdash;</div>
-        <button type="button" id="broker-import-btn" class="trade-submit-btn outcome-btn"
-          style="width:auto; padding:9px 16px;" onclick="requestImportBrokerDay()">Import This Day</button>
+        <button type="button" id="broker-import-btn" class="broker-import-btn" onclick="requestImportBrokerDay()">Import This Day</button>
       </div>
       <div id="broker-day-scrip-table"></div>
     </div>
@@ -129,8 +127,7 @@
     <div id="broker-import-confirm" class="broker-import-confirm hidden">
       <p id="broker-import-confirm-text" class="broker-import-confirm-text"></p>
       <div class="broker-import-confirm-actions">
-        <button type="button" class="trade-submit-btn outcome-btn" style="width:auto; padding:8px 16px;"
-          onclick="confirmImportBrokerDay()">Yes, Import</button>
+        <button type="button" class="broker-import-btn" onclick="confirmImportBrokerDay()">Yes, Import</button>
         <button type="button" class="journal-list-btn" style="width:auto;"
           onclick="cancelImportBrokerDay()">Cancel</button>
       </div>
@@ -158,18 +155,18 @@
       <div class="form-group">
         <label for="calc-tier">Operational Tier Level</label>
         <select id="calc-tier" class="select-input" onchange="onTierChange()">
-          <option value="small-1">Small - Level 1 (Rs. 25,000 Cap)</option>
-          <option value="small-2">Small - Level 2 (Rs. 50,000 Cap)</option>
-          <option value="small-3">Small - Level 3 (Rs. 75,000 Cap)</option>
-          <option value="medium-1">Medium - Level 1 (Rs. 1,00,000 Cap)</option>
-          <option value="medium-2">Medium - Level 2 (Rs. 2,00,000 Cap)</option>
-          <option value="medium-3">Medium - Level 3 (Rs. 5,00,000 Cap)</option>
-          <option value="large-1">Large - Level 1 (Rs. 5,00,000 Cap)</option>
-          <option value="large-2">Large - Level 2 (Rs. 7,50,000 Cap)</option>
-          <option value="large-3">Large - Level 3 (Rs. 10,00,000 Cap)</option>
-          <option value="pro-1">Pro - Level 1 (Rs. 10,00,000 Cap)</option>
-          <option value="pro-2">Pro - Level 2 (Rs. 15,00,000 Cap)</option>
-          <option value="pro-3">Pro - Level 3 (Rs. 20,00,000 Cap)</option>
+          <option value="small-1">Small - Level 1 (₹25,000 Cap)</option>
+          <option value="small-2">Small - Level 2 (₹50,000 Cap)</option>
+          <option value="small-3">Small - Level 3 (₹75,000 Cap)</option>
+          <option value="medium-1">Medium - Level 1 (₹1,00,000 Cap)</option>
+          <option value="medium-2">Medium - Level 2 (₹2,00,000 Cap)</option>
+          <option value="medium-3">Medium - Level 3 (₹5,00,000 Cap)</option>
+          <option value="large-1">Large - Level 1 (₹5,00,000 Cap)</option>
+          <option value="large-2">Large - Level 2 (₹7,50,000 Cap)</option>
+          <option value="large-3">Large - Level 3 (₹10,00,000 Cap)</option>
+          <option value="pro-1">Pro - Level 1 (₹10,00,000 Cap)</option>
+          <option value="pro-2">Pro - Level 2 (₹15,00,000 Cap)</option>
+          <option value="pro-3">Pro - Level 3 (₹20,00,000 Cap)</option>
         </select>
       </div>
 
@@ -202,7 +199,7 @@
             <button type="button" id="t1-loss" class="outcome-btn" onclick="setOutcome(1, 'loss')">Stopped Out</button>
           </div>
           <div id="t1-amount-wrap" class="amount-input-wrap hidden">
-            <label class="amount-label" id="t1-amount-label">Enter loss amount (Rs.)</label>
+            <label class="amount-label" id="t1-amount-label">Enter loss amount (₹)</label>
             <input type="number" id="t1-amount" class="amount-input" min="0" step="1" placeholder="e.g. 500"
               oninput="onAmountInput(1)">
           </div>
@@ -269,7 +266,7 @@
               Out</button>
           </div>
           <div id="t2-amount-wrap" class="amount-input-wrap hidden">
-            <label class="amount-label" id="t2-amount-label">Enter loss amount (Rs.)</label>
+            <label class="amount-label" id="t2-amount-label">Enter loss amount (₹)</label>
             <input type="number" id="t2-amount" class="amount-input" min="0" step="1" placeholder="e.g. 500"
               oninput="onAmountInput(2)">
           </div>

@@ -356,7 +356,7 @@
       html += `
         <div class="journal-list-cell">${formatDate(trade.date)}</div>
         <div class="journal-list-cell">${trade.instrument || '&mdash;'}</div>
-        <div class="journal-list-cell num ${resultClass}">${sign}Rs. ${fmt(Math.abs(trade.netResult))}</div>
+        <div class="journal-list-cell num ${resultClass}">${sign}₹${fmt(Math.abs(trade.netResult))}</div>
         <div class="journal-list-cell">${statusHtml}</div>
         <div class="journal-list-cell">
           <button type="button" class="journal-list-btn" onclick="openJournalForm('${trade.id}')">${entry ? 'Edit' : 'Write Entry'}</button>
@@ -431,7 +431,7 @@
     if (metaEl) {
       const isWin = trade.netResult > 0;
       const sign = isWin ? '+' : (trade.netResult < 0 ? '-' : '');
-      metaEl.innerText = `${formatDate(trade.date)} \u00b7 ${sign}Rs. ${fmt(Math.abs(trade.netResult))} \u00b7 Balance after: Rs. ${fmt(trade.balanceAfter)}`;
+      metaEl.innerText = `${formatDate(trade.date)} \u00b7 ${sign}₹${fmt(Math.abs(trade.netResult))} \u00b7 Balance after: ₹${fmt(trade.balanceAfter)}`;
     }
 
     const existing = (typeof window.getJournalEntry === 'function') ? window.getJournalEntry(tradeId) : null;

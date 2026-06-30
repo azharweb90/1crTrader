@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300C389'/%3E%3Cstop offset='100%25' stop-color='%23089E6E'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='34' height='34' rx='10' fill='url(%23g)'/%3E%3Ctext x='17' y='21.5' font-family='Arial, Helvetica, sans-serif' font-weight='700' font-size='13' fill='%2306231A' text-anchor='middle' letter-spacing='-0.3'%3E1Cr%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23F1D888'/%3E%3Cstop offset='100%25' stop-color='%23E0B355'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='0.75' y='0.75' width='32.5' height='32.5' rx='9.5' fill='url(%23g)' stroke='rgba(255,255,255,0.35)' stroke-width='1'/%3E%3Crect x='0.75' y='26' width='32.5' height='7.25' rx='2' fill='%2315110A'/%3E%3Ctext x='17' y='20.5' font-family='Arial, Helvetica, sans-serif' font-weight='700' font-size='13' fill='%2315110A' text-anchor='middle' letter-spacing='-0.3'%3E1Cr%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="/app/dashboard.css">
 </head>
 <body>
@@ -20,53 +20,54 @@
       <svg class="sidebar-brand-mark" width="34" height="34" viewBox="0 0 34 34" role="img" aria-label="1CrTrader logo">
         <defs>
           <linearGradient id="brandMarkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#00C389"/>
-            <stop offset="100%" stop-color="#089E6E"/>
+            <stop offset="0%" stop-color="#F1D888"/>
+            <stop offset="100%" stop-color="#E0B355"/>
           </linearGradient>
         </defs>
-        <rect width="34" height="34" rx="10" fill="url(#brandMarkGradient)"/>
-        <text x="17" y="21.5" font-family="'IBM Plex Mono', monospace" font-weight="600" font-size="13" fill="#06231A" text-anchor="middle" letter-spacing="-0.3">1Cr</text>
+        <rect x="0.75" y="0.75" width="32.5" height="32.5" rx="9.5" fill="url(#brandMarkGradient)" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+        <rect x="0.75" y="26" width="32.5" height="7.25" rx="2" fill="#15110A"/>
+        <text x="17" y="20.5" font-family="'IBM Plex Mono', monospace" font-weight="700" font-size="13" fill="#15110A" text-anchor="middle" letter-spacing="-0.3">1Cr</text>
       </svg>
       <div class="sidebar-brand-text">
         <div class="sidebar-brand-title">1CrTrader</div>
-        <div class="sidebar-brand-subtitle">Risk Discipline</div>
+        <div class="sidebar-brand-subtitle">Reward Above Risk</div>
       </div>
     </button>
 
     <div class="sidebar-menu-label">Menu</div>
     <div class="sidebar-nav-group">
       <button class="sidebar-link" data-tab="tab-dashboard" onclick="switchTab(event, 'tab-dashboard')">
-        <span class="sidebar-link-icon">⌂</span><span>Dashboard</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span><span>Dashboard</span>
       </button>
       <button class="sidebar-link" data-tab="tab-calculator" onclick="switchTab(event, 'tab-calculator')">
-        <span class="sidebar-link-icon">⏱</span><span>Daily Limits Tool</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 13l3.5-2.5M12 5v0"/></svg></span><span>Daily Limits Tool</span>
       </button>
       <button class="sidebar-link" data-tab="tab-trade-manager" onclick="switchTab(event, 'tab-trade-manager')">
-        <span class="sidebar-link-icon">📈</span><span>Trade Manager</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17V9l-3 3M7 9l3 3M17 7v8l3-3M17 15l-3-3"/></svg></span><span>Trade Manager</span>
       </button>
       <button class="sidebar-link" data-tab="tab-roadmap" onclick="switchTab(event, 'tab-roadmap')">
-        <span class="sidebar-link-icon">↗</span><span>Roadmap</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.4"/><circle cx="18" cy="5" r="2.4"/><path d="M8.4 19H14a3 3 0 0 0 3-3V8"/></svg></span><span>Roadmap</span>
       </button>
       <button class="sidebar-link" data-tab="tab-journal" onclick="switchTab(event, 'tab-journal')">
-        <span class="sidebar-link-icon">✎</span><span>Trading Journal</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span>Trading Journal</span>
       </button>
       <button class="sidebar-link" data-tab="tab-education" onclick="switchTab(event, 'tab-education')">
-        <span class="sidebar-link-icon">▶</span><span>Education</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg></span><span>Education</span>
       </button>
       <button class="sidebar-link" data-tab="tab-books" onclick="switchTab(event, 'tab-books')">
-        <span class="sidebar-link-icon">▤</span><span>Books</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 0 2 2h12"/></svg></span><span>Books</span>
       </button>
       <button class="sidebar-link" data-tab="tab-strategies" onclick="switchTab(event, 'tab-strategies')">
-        <span class="sidebar-link-icon">🧩</span><span>Strategies</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></span><span>Strategies</span>
       </button>
     </div>
 
     <div class="sidebar-nav-group sidebar-nav-group-bottom">
       <button class="sidebar-link" data-tab="tab-settings" onclick="switchTab(event, 'tab-settings')">
-        <span class="sidebar-link-icon">⚙</span><span>Account</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span><span>Account</span>
       </button>
       <button class="sidebar-link" data-tab="tab-subs" onclick="switchTab(event, 'tab-subs')">
-        <span class="sidebar-link-icon">★</span><span>Subscription Pricing</span>
+        <span class="sidebar-link-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg></span><span>Subscription Pricing</span>
       </button>
     </div>
   </nav>

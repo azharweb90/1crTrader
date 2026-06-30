@@ -177,11 +177,11 @@
     const rule = currentRule();
     const el = document.getElementById('your-limit-value');
     if (rule && el) {
-      el.innerText = `Rs. ${fmt(rule.loss)} (${rule.pct.toFixed(2)}%)`;
+      el.innerText = `₹${fmt(rule.loss)} (${rule.pct.toFixed(2)}%)`;
     }
     const maxLossEl = document.getElementById('out-max-loss');
     if (maxLossEl) {
-      maxLossEl.innerText = rule ? `Rs. ${fmt(rule.loss)} (${rule.pct.toFixed(2)}%)` : '—';
+      maxLossEl.innerText = rule ? `₹${fmt(rule.loss)} (${rule.pct.toFixed(2)}%)` : '—';
     }
   }
 
@@ -320,10 +320,10 @@
     if (outcome === 'profit') {
       // Profit amount isn't needed for rule evaluation, but we still let the
       // user log it for their own record (label adjusts accordingly).
-      label.innerText = 'Enter profit amount (Rs.) — optional';
+      label.innerText = 'Enter profit amount (₹) — optional';
       wrap.classList.remove('hidden');
     } else {
-      label.innerText = 'Enter loss amount (Rs.)';
+      label.innerText = 'Enter loss amount (₹)';
       wrap.classList.remove('hidden');
     }
   }
@@ -445,10 +445,10 @@
       if (trade2Submitted) {
         const t2Net = trade2Status === 'profit' ? trade2Amount : -trade2Amount;
         const combined = t1Net + t2Net;
-        pnlText = `${combined >= 0 ? '+' : '-'}Rs. ${fmt(Math.abs(combined))} (Day Complete)`;
+        pnlText = `${combined >= 0 ? '+' : '-'}₹${fmt(Math.abs(combined))} (Day Complete)`;
         pnlColor = combined >= 0 ? '#1d9e75' : '#d9381e';
       } else {
-        pnlText = `${t1Net >= 0 ? '+' : '-'}Rs. ${fmt(Math.abs(t1Net))} (Trade 1 Submitted)`;
+        pnlText = `${t1Net >= 0 ? '+' : '-'}₹${fmt(Math.abs(t1Net))} (Trade 1 Submitted)`;
         pnlColor = t1Net >= 0 ? '#1d9e75' : '#d9381e';
       }
     }
@@ -559,12 +559,12 @@
       if (trade1Amount >= rule.loss) {
         setAlert(alertBox, alertTitle, alertMsg, "danger",
           "Kill Switch Activated — Day Over",
-          `Trade #1 loss has reached or exceeded your maximum daily loss of Rs. ${fmt(rule.loss)}. Shut down the system. Come back fresh tomorrow.`);
+          `Trade #1 loss has reached or exceeded your maximum daily loss of ₹${fmt(rule.loss)}. Shut down the system. Come back fresh tomorrow.`);
         trade2Unlocked = false;
       } else if (lossRatio >= SOFT_BLOCK_RATIO) {
         setAlert(alertBox, alertTitle, alertMsg, "warning",
           "Trade #2 Not Allowed Today",
-          `Trade #1 loss has used ${(lossRatio * 100).toFixed(0)}% of today's Rs. ${fmt(rule.loss)} limit — at or above the 75% cutoff. Trade #2 is blocked as a precaution, even though the full limit isn't breached yet.`);
+          `Trade #1 loss has used ${(lossRatio * 100).toFixed(0)}% of today's ₹${fmt(rule.loss)} limit — at or above the 75% cutoff. Trade #2 is blocked as a precaution, even though the full limit isn't breached yet.`);
         trade2Unlocked = false;
       } else {
         setAlert(alertBox, alertTitle, alertMsg, "cooldown",
@@ -769,8 +769,8 @@
         : `<span class="rule-status-badge rule-status-violation" title="${(status.message || '').replace(/"/g, '&quot;')}">\u26a0 ${status.label}</span>`;
       html += `
         <div class="calc-history-cell">${formatDateShort(entry.date)}</div>
-        <div class="calc-history-cell num ${resultClass}">${sign}Rs. ${fmt(Math.abs(entry.netResult))}</div>
-        <div class="calc-history-cell num">Rs. ${fmt(entry.balanceAfter)}</div>
+        <div class="calc-history-cell num ${resultClass}">${sign}₹${fmt(Math.abs(entry.netResult))}</div>
+        <div class="calc-history-cell num">₹${fmt(entry.balanceAfter)}</div>
         <div class="calc-history-cell">${statusHtml}</div>
       `;
     });
@@ -888,7 +888,8 @@
   // same as the manual entry flow, so a day with 3+ broker trades will
   // correctly trip the overtrading flag, and a same day's second trade taken
   // inside the cooldown window will correctly trip the cooldown-broken flag.
-  let brokerActiveRange = 'fy'; // 'month' | '3months' | 'fy'
+  let brokerActiveRange = null; // null | 'day' | 'month' | '3months' | 'fy' — null means no range chosen yet, confirmed with the trader: nothing should pre-populate by default
+  let brokerSelectedDay = null;   // 'YYYY-MM-DD' chosen via the day picker, only meaningful when brokerActiveRange === 'day'
   let brokerSelectedDate = null;  // 'YYYY-MM-DD' of the day currently shown in detail
   let brokerImportPendingDate = null; // date awaiting confirm/cancel
 
@@ -909,6 +910,10 @@
       brokerPanel.classList.remove('hidden');
       const nameEl = document.getElementById('broker-synced-name');
       if (nameEl) nameEl.innerText = state.connectedBrokerName || 'your broker';
+      // No default range — confirmed with the trader: don't pre-populate
+      // the calendar with 3 months (or any range) of data on load. The
+      // trader picks Day/Month/3 Months/Year explicitly, and only THEN
+      // does anything render.
       renderBrokerRangeView();
     } else {
       manualPanel.classList.remove('hidden');
@@ -931,7 +936,10 @@
   function resolveBrokerRange(range) {
     const today = new Date();
     let from;
-    if (range === 'month') {
+    if (range === 'day') {
+      const dayDate = brokerSelectedDay ? new Date(brokerSelectedDay + 'T00:00:00') : today;
+      return { from: dayDate, to: dayDate };
+    } else if (range === 'month') {
       from = new Date(today.getFullYear(), today.getMonth(), 1);
     } else if (range === '3months') {
       from = new Date(today.getFullYear(), today.getMonth() - 2, 1);
@@ -943,6 +951,22 @@
 
   function setBrokerRange(range) {
     brokerActiveRange = range;
+    const dayPickerWrap = document.getElementById('broker-day-picker-wrap');
+    if (dayPickerWrap) dayPickerWrap.classList.toggle('hidden', range !== 'day');
+
+    // Picking "Pick a Day" alone doesn't render anything yet — wait for an
+    // actual date to be chosen in the date input (see onBrokerDayPicked).
+    if (range === 'day' && !brokerSelectedDay) {
+      renderBrokerRangeView();
+      return;
+    }
+    renderBrokerRangeView();
+  }
+
+  function onBrokerDayPicked(dateString) {
+    if (!dateString) return;
+    brokerSelectedDay = dateString;
+    brokerActiveRange = 'day';
     renderBrokerRangeView();
   }
 
@@ -952,42 +976,38 @@
   }
 
   function renderBrokerRangeView() {
-    ['month', '3months', 'fy'].forEach(r => {
-      const pillId = r === '3months' ? 'broker-range-3months' : (r === 'fy' ? 'broker-range-fy' : 'broker-range-month');
+    ['day', 'month', '3months', 'fy'].forEach(r => {
+      const pillId = r === '3months' ? 'broker-range-3months' : (r === 'fy' ? 'broker-range-fy' : (r === 'day' ? 'broker-range-day' : 'broker-range-month'));
       const pillEl = document.getElementById(pillId);
       if (pillEl) pillEl.classList.toggle('broker-range-pill-active', r === brokerActiveRange);
     });
 
-    const { from, to } = resolveBrokerRange(brokerActiveRange);
-    const fromStr = ymdLocal(from);
-    const toStr = ymdLocal(to);
-
+    const emptyStateEl = document.getElementById('broker-range-empty-state');
+    const gridEl = document.getElementById('broker-multi-month-grid');
+    const legendEl = document.getElementById('broker-legend-note');
     const rangeLabelEl = document.getElementById('broker-range-label');
+
+    // Nothing chosen yet (fresh load, or "Pick a Day" clicked but no date
+    // entered) — show the prompt instead of any data. This is the actual
+    // fix: the calendar no longer auto-populates with a default range.
+    const noRangeYet = brokerActiveRange === null || (brokerActiveRange === 'day' && !brokerSelectedDay);
+    if (noRangeYet) {
+      if (emptyStateEl) emptyStateEl.classList.remove('hidden');
+      if (gridEl) gridEl.classList.add('hidden');
+      if (legendEl) legendEl.classList.add('hidden');
+      if (rangeLabelEl) rangeLabelEl.innerText = '\u2014';
+      return;
+    }
+
+    if (emptyStateEl) emptyStateEl.classList.add('hidden');
+    if (gridEl) gridEl.classList.remove('hidden');
+    if (legendEl) legendEl.classList.remove('hidden');
+
+    const { from, to } = resolveBrokerRange(brokerActiveRange);
+
     if (rangeLabelEl) {
       const fmtLabel = (d) => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-      rangeLabelEl.innerText = `${fmtLabel(from)} - ${fmtLabel(to)}`;
-    }
-
-    // Stat cards for the selected range.
-    const summary = (typeof window.getBrokerPnlSummary === 'function')
-      ? window.getBrokerPnlSummary(fromStr, toStr)
-      : { realizedPnl: 0, totalCharges: 0, netRealizedPnl: 0 };
-
-    const fmtSigned = (n) => {
-      const sign = n < 0 ? '-' : '';
-      return `${sign}\u20b9${fmt(Math.abs(n))}`;
-    };
-    const realizedEl = document.getElementById('broker-stat-realized');
-    const chargesEl = document.getElementById('broker-stat-charges');
-    const netEl = document.getElementById('broker-stat-net');
-    if (realizedEl) {
-      realizedEl.innerText = fmtSigned(summary.realizedPnl);
-      realizedEl.className = 'broker-stat-value ' + (summary.realizedPnl >= 0 ? 'calc-history-win' : 'calc-history-loss');
-    }
-    if (chargesEl) chargesEl.innerText = `\u20b9${fmt(summary.totalCharges)}`;
-    if (netEl) {
-      netEl.innerText = fmtSigned(summary.netRealizedPnl);
-      netEl.className = 'broker-stat-value ' + (summary.netRealizedPnl >= 0 ? 'calc-history-win' : 'calc-history-loss');
+      rangeLabelEl.innerText = brokerActiveRange === 'day' ? fmtLabel(from) : `${fmtLabel(from)} - ${fmtLabel(to)}`;
     }
 
     renderBrokerMultiMonthGrid(from, to);
@@ -998,6 +1018,7 @@
     if (!gridEl) return;
 
     const pnlData = (typeof window.getBrokerPnlHistory === 'function') ? window.getBrokerPnlHistory() : {};
+    const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
     // Build the list of months spanning [from, to], oldest first.
     const months = [];
@@ -1013,16 +1034,25 @@
       const year = monthDate.getFullYear();
       const month = monthDate.getMonth();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const monthLabel = monthDate.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' });
+      const firstWeekday = new Date(year, month, 1).getDay(); // 0=Sun..6=Sat
+      const monthLabel = monthDate.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
 
       let monthTotal = 0;
       let hasAnyTrade = false;
-      let dotsHtml = '';
+
+      // Real calendar grid: blank cells for the days before the 1st falls
+      // on its actual weekday, then one cell per day in date order —
+      // matches a normal calendar's layout instead of just chunking day
+      // numbers into rows of 5 regardless of weekday.
+      let cellsHtml = '';
+      for (let i = 0; i < firstWeekday; i++) {
+        cellsHtml += '<span class="broker-month-dot broker-month-dot-empty"></span>';
+      }
 
       for (let day = 1; day <= daysInMonth; day++) {
         const dateObj = new Date(year, month, day);
         if (dateObj < from || dateObj > to) {
-          dotsHtml += '<span class="broker-month-dot broker-month-dot-empty"></span>';
+          cellsHtml += `<span class="broker-month-dot broker-month-dot-empty">${day}</span>`;
           continue;
         }
         const dateStr = ymdLocal(dateObj);
@@ -1037,16 +1067,19 @@
         }
 
         const selectedClass = dateStr === brokerSelectedDate ? 'broker-month-dot-selected' : '';
-        dotsHtml += `<button type="button" class="broker-month-dot ${dotClass} ${selectedClass}" title="${dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}" onclick="showBrokerDayDetail('${dateStr}')"></button>`;
+        cellsHtml += `<button type="button" class="broker-month-dot ${dotClass} ${selectedClass}" title="${dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}" onclick="showBrokerDayDetail('${dateStr}')">${day}</button>`;
       }
 
       const totalClass = monthTotal >= 0 ? 'calc-history-win' : 'calc-history-loss';
       const totalText = hasAnyTrade ? `${monthTotal >= 0 ? '+' : '-'}\u20b9${fmt(Math.abs(monthTotal))}` : '\u2014';
 
+      const weekdayHeaderHtml = WEEKDAY_LABELS.map(w => `<span class="broker-month-weekday">${w}</span>`).join('');
+
       html += `
-        <div class="broker-month-column">
-          <div class="broker-month-column-label">${monthLabel}</div>
-          <div class="broker-month-dots">${dotsHtml}</div>
+        <div class="broker-month-block">
+          <div class="broker-month-block-label">${monthLabel}</div>
+          <div class="broker-month-weekday-row">${weekdayHeaderHtml}</div>
+          <div class="broker-month-dots">${cellsHtml}</div>
           <div class="broker-month-column-total ${hasAnyTrade ? totalClass : ''}">${totalText}</div>
         </div>
       `;
@@ -1084,30 +1117,23 @@
 
     const alreadyLogged = dailyTradeCountForDate(dateString) > 0;
 
-    let html = '<div class="broker-scrip-grid"><div class="broker-scrip-grid-head">Scrip</div><div class="broker-scrip-grid-head num">Qty</div><div class="broker-scrip-grid-head num">Buy</div><div class="broker-scrip-grid-head num">Sell</div><div class="broker-scrip-grid-head num">Charges</div><div class="broker-scrip-grid-head num">Net P&amp;L</div></div>';
-    let dayTotal = 0;
+    // Order-history style — matches how a real broker's Order History tab
+    // shows things (Stock/Type/Qty/Price/Status), not a P&L statement.
+    // Confirmed with the trader: no charges, no Realized/Net P&L shown
+    // here — that calculation only matters once a day is actually
+    // imported into the Trade Log, not while just browsing what's there.
+    let html = '<div class="broker-scrip-grid"><div class="broker-scrip-grid-head">Scrip</div><div class="broker-scrip-grid-head num">Qty</div><div class="broker-scrip-grid-head num">Buy Price</div><div class="broker-scrip-grid-head num">Sell Price</div><div class="broker-scrip-grid-head">Time</div><div class="broker-scrip-grid-head">Status</div></div>';
     rows.forEach(r => {
-      dayTotal += r.netPnl;
-      const isWin = r.netPnl >= 0;
-      const cls = isWin ? 'calc-history-win' : 'calc-history-loss';
-      const sign = isWin ? '+' : '-';
       html += `<div class="broker-scrip-grid">
         <div>${r.scrip}</div>
         <div class="num">${fmt(r.qty)}</div>
         <div class="num">\u20b9${r.buyPrice.toFixed(2)}</div>
         <div class="num">\u20b9${r.sellPrice.toFixed(2)}</div>
-        <div class="num">\u20b9${r.charges.toFixed(2)}</div>
-        <div class="num ${cls}">${sign}\u20b9${fmt(Math.abs(r.netPnl))}</div>
+        <div class="broker-order-time">${r.executedTime || '\u2014'}</div>
+        <div><span class="broker-order-status-badge">Executed</span></div>
       </div>`;
     });
     tableEl.innerHTML = html;
-
-    const totalIsWin = dayTotal >= 0;
-    tableEl.insertAdjacentHTML('beforeend', `
-      <div class="broker-day-total ${totalIsWin ? 'calc-history-win' : 'calc-history-loss'}">
-        Net for the day: ${totalIsWin ? '+' : '-'}\u20b9${fmt(Math.abs(dayTotal))} across ${rows.length} trade${rows.length === 1 ? '' : 's'}
-      </div>
-    `);
 
     if (alreadyLogged) {
       tableEl.insertAdjacentHTML('beforeend', '<p class="foot-note" style="margin-top:8px;">Heads up: this date already has trades in your Trade Log. Importing will add these as additional entries alongside them.</p>');
@@ -1258,6 +1284,7 @@
   window.saveQuickJournalNote = saveQuickJournalNote;
   window.renderCalculatorBrokerMode = renderCalculatorBrokerMode;
   window.setBrokerRange = setBrokerRange;
+  window.onBrokerDayPicked = onBrokerDayPicked;
   window.showBrokerDayDetail = showBrokerDayDetail;
   window.requestImportBrokerDay = requestImportBrokerDay;
   window.cancelImportBrokerDay = cancelImportBrokerDay;
@@ -1273,10 +1300,6 @@
   initLogDate();
   renderCalculatorHistory();
   renderCalculatorBrokerMode();
-  if (typeof window.renderTierReferenceTable === 'function') {
-    window.renderTierReferenceTable();
-  }
-  applyReferenceSectionState('tier-ref');
   // NOTE: applyReferenceSectionState('instrument-ref') is intentionally NOT
   // called here. renderInstrumentSlTable() (dashboard.js) already calls it
   // itself at the exact moment the section becomes visible — calling it here

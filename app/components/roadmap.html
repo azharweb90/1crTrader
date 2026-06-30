@@ -8,7 +8,7 @@
   <!-- Current balance, large and prominent -->
   <div class="roadmap-balance-card">
     <div class="roadmap-balance-label">Current Balance</div>
-    <div id="roadmap-balance-value" class="roadmap-balance-value">Rs. &mdash;</div>
+    <div id="roadmap-balance-value" class="roadmap-balance-value">₹&mdash;</div>
     <div id="roadmap-balance-sub" class="roadmap-balance-sub">&mdash;</div>
   </div>
 
@@ -18,35 +18,35 @@
       <div class="roadmap-stage-line"></div>
       <div class="roadmap-stage-dot"></div>
       <div class="roadmap-stage-name">Small</div>
-      <div class="roadmap-stage-range">Rs. 25,000+</div>
+      <div class="roadmap-stage-range">₹25,000+</div>
     </div>
     <div class="roadmap-stage" data-stage="medium">
       <div class="roadmap-stage-line"></div>
       <div class="roadmap-stage-dot"></div>
       <div class="roadmap-stage-name">Medium</div>
-      <div class="roadmap-stage-range">Rs. 1,00,000+</div>
+      <div class="roadmap-stage-range">₹1,00,000+</div>
     </div>
     <div class="roadmap-stage" data-stage="large">
       <div class="roadmap-stage-line"></div>
       <div class="roadmap-stage-dot"></div>
       <div class="roadmap-stage-name">Large</div>
-      <div class="roadmap-stage-range">Rs. 5,00,000+</div>
+      <div class="roadmap-stage-range">₹5,00,000+</div>
     </div>
     <div class="roadmap-stage" data-stage="pro">
       <div class="roadmap-stage-line"></div>
       <div class="roadmap-stage-dot"></div>
       <div class="roadmap-stage-name">Pro</div>
-      <div class="roadmap-stage-range">Rs. 10,00,000+</div>
+      <div class="roadmap-stage-range">₹10,00,000+</div>
     </div>
   </div>
 
   <!-- Average win input, used to project trades needed -->
   <div class="roadmap-input-card">
     <label class="amount-label" for="roadmap-avg-win-input" style="text-transform:uppercase; font-weight:600; font-size:12.5px; color:#5f6b7a;">
-      Average profit per winning trade (Rs.)
+      Average profit per winning trade (₹)
     </label>
     <div class="roadmap-input-row" style="margin-top:8px;">
-      <span class="roadmap-input-prefix">Rs.</span>
+      <span class="roadmap-input-prefix">₹</span>
       <input type="number" id="roadmap-avg-win-input" class="roadmap-input" min="0" step="1" placeholder="e.g. 800" oninput="onRoadmapAvgWinInput()">
     </div>
     <p class="foot-note" style="margin-top:8px;">Used to project trades needed to reach the next tier. This updates automatically using your actual win/loss ratio once you've logged a few real trading days.</p>
@@ -60,30 +60,30 @@
   <!-- Goal Tracker: pick a target amount (1L up to 1Cr) and see trades/days needed -->
   <div class="goal-tracker-wrap">
     <div class="select-step-title" style="margin-top:8px;">Set Your Goal</div>
-    <p class="section-note" style="margin-bottom:14px;">Pick a target amount &mdash; from your next tier all the way to Rs. 1 crore &mdash; and see how many trades and days it takes at your current pace.</p>
+    <p class="section-note" style="margin-bottom:14px;">Pick a target amount &mdash; from your next tier all the way to ₹1 crore &mdash; and see how many trades and days it takes at your current pace.</p>
 
     <div class="goal-amount-grid" id="goal-amount-grid">
-      <button type="button" class="goal-amount-btn" data-goal="100000" onclick="selectGoalAmount(100000)">Rs. 1L</button>
-      <button type="button" class="goal-amount-btn" data-goal="500000" onclick="selectGoalAmount(500000)">Rs. 5L</button>
-      <button type="button" class="goal-amount-btn" data-goal="1000000" onclick="selectGoalAmount(1000000)">Rs. 10L</button>
-      <button type="button" class="goal-amount-btn" data-goal="1500000" onclick="selectGoalAmount(1500000)">Rs. 15L</button>
-      <button type="button" class="goal-amount-btn" data-goal="2000000" onclick="selectGoalAmount(2000000)">Rs. 20L</button>
-      <button type="button" class="goal-amount-btn" data-goal="2500000" onclick="selectGoalAmount(2500000)">Rs. 25L</button>
-      <button type="button" class="goal-amount-btn" data-goal="3000000" onclick="selectGoalAmount(3000000)">Rs. 30L</button>
-      <button type="button" class="goal-amount-btn" data-goal="3500000" onclick="selectGoalAmount(3500000)">Rs. 35L</button>
-      <button type="button" class="goal-amount-btn" data-goal="4000000" onclick="selectGoalAmount(4000000)">Rs. 40L</button>
-      <button type="button" class="goal-amount-btn" data-goal="4500000" onclick="selectGoalAmount(4500000)">Rs. 45L</button>
-      <button type="button" class="goal-amount-btn" data-goal="5000000" onclick="selectGoalAmount(5000000)">Rs. 50L</button>
-      <button type="button" class="goal-amount-btn" data-goal="5500000" onclick="selectGoalAmount(5500000)">Rs. 55L</button>
-      <button type="button" class="goal-amount-btn" data-goal="6000000" onclick="selectGoalAmount(6000000)">Rs. 60L</button>
-      <button type="button" class="goal-amount-btn" data-goal="6500000" onclick="selectGoalAmount(6500000)">Rs. 65L</button>
-      <button type="button" class="goal-amount-btn" data-goal="7000000" onclick="selectGoalAmount(7000000)">Rs. 70L</button>
-      <button type="button" class="goal-amount-btn" data-goal="7500000" onclick="selectGoalAmount(7500000)">Rs. 75L</button>
-      <button type="button" class="goal-amount-btn" data-goal="8000000" onclick="selectGoalAmount(8000000)">Rs. 80L</button>
-      <button type="button" class="goal-amount-btn" data-goal="8500000" onclick="selectGoalAmount(8500000)">Rs. 85L</button>
-      <button type="button" class="goal-amount-btn" data-goal="9000000" onclick="selectGoalAmount(9000000)">Rs. 90L</button>
-      <button type="button" class="goal-amount-btn" data-goal="9500000" onclick="selectGoalAmount(9500000)">Rs. 95L</button>
-      <button type="button" class="goal-amount-btn goal-amount-btn-cr" data-goal="10000000" onclick="selectGoalAmount(10000000)">Rs. 1 Crore</button>
+      <button type="button" class="goal-amount-btn" data-goal="100000" onclick="selectGoalAmount(100000)">₹1L</button>
+      <button type="button" class="goal-amount-btn" data-goal="500000" onclick="selectGoalAmount(500000)">₹5L</button>
+      <button type="button" class="goal-amount-btn" data-goal="1000000" onclick="selectGoalAmount(1000000)">₹10L</button>
+      <button type="button" class="goal-amount-btn" data-goal="1500000" onclick="selectGoalAmount(1500000)">₹15L</button>
+      <button type="button" class="goal-amount-btn" data-goal="2000000" onclick="selectGoalAmount(2000000)">₹20L</button>
+      <button type="button" class="goal-amount-btn" data-goal="2500000" onclick="selectGoalAmount(2500000)">₹25L</button>
+      <button type="button" class="goal-amount-btn" data-goal="3000000" onclick="selectGoalAmount(3000000)">₹30L</button>
+      <button type="button" class="goal-amount-btn" data-goal="3500000" onclick="selectGoalAmount(3500000)">₹35L</button>
+      <button type="button" class="goal-amount-btn" data-goal="4000000" onclick="selectGoalAmount(4000000)">₹40L</button>
+      <button type="button" class="goal-amount-btn" data-goal="4500000" onclick="selectGoalAmount(4500000)">₹45L</button>
+      <button type="button" class="goal-amount-btn" data-goal="5000000" onclick="selectGoalAmount(5000000)">₹50L</button>
+      <button type="button" class="goal-amount-btn" data-goal="5500000" onclick="selectGoalAmount(5500000)">₹55L</button>
+      <button type="button" class="goal-amount-btn" data-goal="6000000" onclick="selectGoalAmount(6000000)">₹60L</button>
+      <button type="button" class="goal-amount-btn" data-goal="6500000" onclick="selectGoalAmount(6500000)">₹65L</button>
+      <button type="button" class="goal-amount-btn" data-goal="7000000" onclick="selectGoalAmount(7000000)">₹70L</button>
+      <button type="button" class="goal-amount-btn" data-goal="7500000" onclick="selectGoalAmount(7500000)">₹75L</button>
+      <button type="button" class="goal-amount-btn" data-goal="8000000" onclick="selectGoalAmount(8000000)">₹80L</button>
+      <button type="button" class="goal-amount-btn" data-goal="8500000" onclick="selectGoalAmount(8500000)">₹85L</button>
+      <button type="button" class="goal-amount-btn" data-goal="9000000" onclick="selectGoalAmount(9000000)">₹90L</button>
+      <button type="button" class="goal-amount-btn" data-goal="9500000" onclick="selectGoalAmount(9500000)">₹95L</button>
+      <button type="button" class="goal-amount-btn goal-amount-btn-cr" data-goal="10000000" onclick="selectGoalAmount(10000000)">₹1 Crore</button>
     </div>
 
     <div id="goal-result-area"></div>

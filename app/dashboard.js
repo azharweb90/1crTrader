@@ -441,7 +441,7 @@
     if (wrap) wrap.classList.remove('hidden');
     if (hint) {
       const range = TIER_RANGES[tier];
-      hint.innerText = `Enter an amount between Rs. ${fmt(range.min)} and Rs. ${fmt(range.max)} for the ${TIER_LABELS[tier]} tier.`;
+      hint.innerText = `Enter an amount between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[tier]} tier.`;
     }
     validateCapitalAmount();
 
@@ -490,7 +490,7 @@
       startingCapital = null;
       row.classList.add('input-error');
       errorEl.classList.remove('hidden');
-      errorEl.innerText = `Amount must be between Rs. ${fmt(range.min)} and Rs. ${fmt(range.max)} for the ${TIER_LABELS[selectedTier]} tier.`;
+      errorEl.innerText = `Amount must be between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[selectedTier]} tier.`;
       updateContinueButtonState();
       return false;
     }
@@ -770,7 +770,7 @@
       styleEl.innerText = styleNames || '\u2014';
     }
     if (tierEl) tierEl.innerText = selectedTier ? `${TIER_LABELS[selectedTier]} Tier` : '\u2014';
-    if (capitalEl) capitalEl.innerText = startingCapital !== null ? `Rs. ${fmt(startingCapital)}` : '\u2014';
+    if (capitalEl) capitalEl.innerText = startingCapital !== null ? `₹${fmt(startingCapital)}` : '\u2014';
   }
 
   function generateMockFetchedBalance() {
@@ -915,7 +915,7 @@
     if (nameEl) nameEl.innerText = brokerName;
 
     const balanceEl = document.getElementById('setup-fetched-balance');
-    if (balanceEl) balanceEl.innerText = `Rs. ${fmt(fetchedBalance)}`;
+    if (balanceEl) balanceEl.innerText = `₹${fmt(fetchedBalance)}`;
 
     const tierEl = document.getElementById('setup-fetched-tier');
     if (tierEl) tierEl.innerText = `${TIER_LABELS[derivedTier]} Tier`;
@@ -1194,7 +1194,7 @@
 
     if (balancePill && balanceValue && currentBalance !== null) {
       balancePill.style.display = 'flex';
-      balanceValue.innerText = `Rs. ${fmt(currentBalance)}`;
+      balanceValue.innerText = `₹${fmt(currentBalance)}`;
     }
   }
 
@@ -1430,6 +1430,27 @@
     return tierRulesMatrix[subLevelKey].loss;
   }
 
+  // Per-lot-scaled max loss — confirmed with the trader as a real fairness
+  // fix, not just a display tweak: the tier's flat max loss (e.g. Medium-1's
+  // ₹4,000) is sized assuming the FULL lot allowance (4 lots) spreads
+  // that risk. A trader who chooses to trade fewer lots than their tier
+  // allows should NOT be permitted to risk the full flat amount on fewer
+  // lots — that would mean a much higher risk-per-lot than the tier's
+  // rules actually intend. Formula: (tier's flat loss / tier's maxLots) *
+  // lotsActuallySelected. This is intentionally always <= the flat tier
+  // loss (equal only when lotsUsed === maxLots), and scales down linearly
+  // as fewer lots are used. Used as the comparison baseline for the
+  // typed-SL-in-points warning in renderInstrumentSlTable below — that
+  // warning is advisory only (still shows the calculated number), never
+  // blocking, per the trader's own instruction.
+  function getPerLotMaxLossRupees(lotsUsed) {
+    const subLevelKey = getOfficialSubLevelKey();
+    if (!subLevelKey || !tierRulesMatrix[subLevelKey]) return null;
+    const rule = tierRulesMatrix[subLevelKey];
+    if (!rule.maxLots || rule.maxLots <= 0) return rule.loss;
+    return (rule.loss / rule.maxLots) * lotsUsed;
+  }
+
   // Full risk-rules summary — max daily loss in rupees and %, max lots
   // right now, and how far to the next lot unlock. Built for the
   // Dashboard's risk-at-a-glance card, but safe to call from anywhere once
@@ -1458,7 +1479,7 @@
   // things combine here (see tierRulesMatrix's maxLots comment above):
   //
   // 1. ENTRY sub-tier — whichever sub-tier their ORIGINAL starting capital
-  //    fell into. A trader who deposits Rs. 60,000 into Small enters
+  //    fell into. A trader who deposits ₹60,000 into Small enters
   //    directly at small-2 (2 lots) from day one — base capital alone can
   //    place you above sub-tier 1, no need to "grow into" a tier you
   //    already qualified for by deposit.
@@ -1562,46 +1583,93 @@
     };
   }
 
-  // Generates the Calculator tab's "Capital Tier, Lots & Daily Loss
-  // Reference" table — all 12 sub-tiers, straight from tierRulesMatrix (the
-  // single source of truth), so this table can never hand-typed-drift out
-  // of sync with the actual rule data the way the old 4-row merged version
-  // did. Each row carries data-sublevel-row="small-1" etc. for exact
-  // highlighting (see applyTierHighlight's tab-calculator branch), not just
-  // a broad-tier match — a trader at small-2 should see THAT row
-  // highlighted, not every Small row.
+  // Shared formatter for the "Loss If Hit (₹)" cell — used at initial
+  // render AND every live-update path (qty/lots/SL-points edits), so the
+  // warning logic can't drift between them. Confirmed with the trader:
+  // the warning compares against the PER-LOT-SCALED allowance (tier loss
+  // / tier maxLots * lotsUsed), not the flat tier max loss — see
+  // getPerLotMaxLossRupees()'s comment for why. This is advisory only —
+  // the calculated Rs figure is always shown and never blocked, just
+  // flagged when it exceeds what that lot count should risk.
+  function formatSlRupeesCellContent(rsLoss, lotsUsed) {
+    if (rsLoss === null || rsLoss === undefined) return '&mdash;';
+
+    const perLotAllowance = getPerLotMaxLossRupees(lotsUsed);
+    const exceedsAllowance = perLotAllowance !== null && rsLoss > perLotAllowance;
+
+    // Loss If Hit is always shown in red — it's a loss figure, full stop,
+    // regardless of whether it happens to be within or over the allowance.
+    const amountHtml = `<span style="font-weight:700; color:#C53D22;">₹${fmt(rsLoss)}</span>`;
+
+    if (!exceedsAllowance) return amountHtml;
+
+    // Over-allowance warning: a real warning chip (icon + text, amber
+    // background) rather than small grey text that read as disabled/
+    // unimportant — this needs to actually catch the eye. Wraps onto a
+    // second line rather than forcing single-line nowrap, so it reads
+    // cleanly even when the column has room to spare.
+    return `${amountHtml}<div class="sl-exceeds-warning">&#9888; exceeds ₹${fmt(perLotAllowance)} allowed for ${lotsUsed} lot${lotsUsed === 1 ? '' : 's'}</div>`;
+  }
+
+  // Full all-tiers reference table — restored per the trader's request
+  // after the earlier table merge removed it. Purely educational: shows
+  // every sub-tier's capital/lots/loss/percentage regardless of which one
+  // the trader is actually on, so a smaller-capital trader can see WHY
+  // they're allowed a higher loss PERCENTAGE than a larger-capital trader
+  // (the live merged table above only shows the trader's own numbers).
+  // Collapsed by DEFAULT on first visit (not the usual "expand once then
+  // collapse" pattern the other reference sections use) — this table is
+  // reference material a trader can choose to open, not something that
+  // should compete with the live working table above for attention.
   function renderTierReferenceTable() {
     const grid = document.getElementById('tier-ref-grid');
     if (!grid) return;
+
+    // Seed the collapse-state storage BEFORE the section ever applies its
+    // state, so this section is collapsed from the very first visit —
+    // bypassing isReferenceSectionCollapsed()'s normal "show expanded once"
+    // first-visit behavior, which is right for sections a trader needs to
+    // see immediately but wrong here.
+    if (localStorage.getItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + 'tier-ref') === null) {
+      localStorage.setItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + 'tier-ref', 'true');
+    }
+    if (typeof window.applyReferenceSectionState === 'function') {
+      window.applyReferenceSectionState('tier-ref');
+    }
 
     let html = `
       <div class="mini-ladder-cell mini-ladder-head">Tier</div>
       <div class="mini-ladder-cell mini-ladder-head num">Capital</div>
       <div class="mini-ladder-cell mini-ladder-head num">Max Lots</div>
-      <div class="mini-ladder-cell mini-ladder-head num">Max Loss Rs.</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Max Loss ₹</div>
       <div class="mini-ladder-cell mini-ladder-head num">Max Loss %</div>
     `;
 
-    TIER_ORDER.forEach(tier => {
-      ['1', '2', '3'].forEach(subNum => {
-        const key = `${tier}-${subNum}`;
-        const rule = tierRulesMatrix[key];
-        if (!rule) return;
-        const label = `${TIER_LABELS[tier]} ${subNum}`;
-        html += `
-          <div class="mini-ladder-cell mini-ladder-label" data-sublevel-row="${key}">${label}</div>
-          <div class="mini-ladder-cell num" data-sublevel-row="${key}">Rs. ${fmt(rule.cap)}+</div>
-          <div class="mini-ladder-cell num" data-sublevel-row="${key}">${rule.maxLots}</div>
-          <div class="mini-ladder-cell num" data-sublevel-row="${key}">Rs. ${fmt(rule.loss)}</div>
-          <div class="mini-ladder-cell num" data-sublevel-row="${key}">${rule.pct.toFixed(2)}%</div>
-        `;
-      });
+    const officialKey = getOfficialSubLevelKey();
+
+    Object.keys(tierRulesMatrix).forEach(key => {
+      const rule = tierRulesMatrix[key];
+      const [broadTier, subLevel] = key.split('-');
+      const label = `${TIER_LABELS[broadTier]} ${subLevel}`;
+      const isOwnRow = key === officialKey;
+      const rowClass = isOwnRow ? ' tier-highlight-row' : '';
+      const labelClass = isOwnRow ? ' tier-highlight' : '';
+
+      html += `
+        <div class="mini-ladder-cell mini-ladder-label${labelClass}${rowClass}">${label}</div>
+        <div class="mini-ladder-cell num${rowClass}">₹${fmt(rule.cap)}+</div>
+        <div class="mini-ladder-cell num${rowClass}">${rule.maxLots}</div>
+        <div class="mini-ladder-cell num${rowClass}">₹${fmt(rule.loss)}</div>
+        <div class="mini-ladder-cell num${rowClass}">${rule.pct.toFixed(2)}%</div>
+      `;
     });
 
     grid.innerHTML = html;
   }
 
   function renderInstrumentSlTable() {
+    renderTierReferenceTable();
+
     const wrap = document.getElementById('instrument-sl-wrap');
     const grid = document.getElementById('instrument-sl-grid');
     if (!wrap || !grid) return;
@@ -1625,13 +1693,32 @@
 
     const maxAllowedLots = getMaxAllowedLots();
 
+    // Shown ONCE above the table (not per-row, confirmed with the trader —
+    // same number every row otherwise, since one trader has one tier) —
+    // replaces the most useful info from the deleted standalone 12-row
+    // "Capital Tier, Lots & Daily Loss Reference" table, now that the two
+    // tables are merged into this single one.
+    const summaryEl = document.getElementById('instrument-tier-summary');
+    if (summaryEl) {
+      const officialKey = getOfficialSubLevelKey();
+      const tierLabel = officialKey && tierRulesMatrix[officialKey]
+        ? `${TIER_LABELS[selectedTier]} ${officialKey.split('-')[1]}`
+        : TIER_LABELS[selectedTier];
+      summaryEl.innerHTML = `
+        <span class="instrument-tier-summary-chip">Your tier: <strong>${tierLabel}</strong></span>
+        <span class="instrument-tier-summary-chip">Max lots: <strong>${maxAllowedLots}</strong></span>
+        <span class="instrument-tier-summary-chip">Max loss: <strong>₹${fmt(maxLoss)}</strong></span>
+      `;
+    }
+
     let html = `
       <div class="mini-ladder-cell mini-ladder-head">Instrument</div>
       <div class="mini-ladder-cell mini-ladder-head num">Qty/Lot</div>
       <div class="mini-ladder-cell mini-ladder-head num">Lots</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Max Lots Allowed</div>
       <div class="mini-ladder-cell mini-ladder-head num">Points SL</div>
       <div class="mini-ladder-cell mini-ladder-head num">Your SL (pts)</div>
-      <div class="mini-ladder-cell mini-ladder-head num">Loss If Hit (Rs.)</div>
+      <div class="mini-ladder-cell mini-ladder-head num">Loss If Hit (₹)</div>
     `;
 
     keys.forEach(key => {
@@ -1659,7 +1746,16 @@
         : info.qty;
 
       const totalQty = currentQty * lots;
-      const pointsSl = totalQty > 0 ? (maxLoss / totalQty) : 0;
+      // Points SL is the per-lot-scaled allowance divided by total quantity
+      // — NOT the flat tier max loss divided by quantity. At 1 lot, the
+      // budget for that 1 lot is (tier loss / tier maxLots), not the full
+      // tier loss meant to cover all lots. Confirmed with the trader: at
+      // Large-1 (loss=10,000, maxLots=8), 1 lot of Nifty (qty=65) should
+      // show ~19.23 pts (1,250/65), not 153.85 pts (10,000/65) — the old
+      // figure silently assumed the trader was using their full lot
+      // allowance even when the Lots column showed 1.
+      const perLotBudget = getPerLotMaxLossRupees(lots);
+      const pointsSl = (totalQty > 0 && perLotBudget !== null) ? (perLotBudget / totalQty) : 0;
 
       const qtyCell = isIndex
         ? `<div class="mini-ladder-cell num">${currentQty}</div>`
@@ -1668,17 +1764,14 @@
                     oninput="onSlTableQtyInput('${key}', this.value)">
            </div>`;
 
-      // "Your SL (pts)" + "Loss If Hit (Rs.)" — INDEX-ONLY (confirmed with
+      // "Your SL (pts)" + "Loss If Hit (₹)" — INDEX-ONLY (confirmed with
       // the trader), and DELIBERATELY independent of the Points SL column
-      // to its left: that column is mathematically forced to always equal
-      // the flat tier max-loss (it's derived backwards FROM maxLoss), so
-      // multiplying it back by qty*lots would just return the same flat
-      // Rs figure every time regardless of lot count — not useful here.
-      // This pair instead lets the trader type their OWN real stop-loss
-      // distance for that specific trade, and shows what it would
-      // actually cost in rupees at their current lot count — genuinely
-      // varies with lots, unlike the tier's flat cap.
-      const ownSlPoints = isIndex ? (selectedInstruments[key].slPoints || '') : '';
+      // to its left: that column is now correctly per-lot-scaled, but this
+      // pair lets the trader type their OWN real stop-loss distance for
+      // this specific trade. Confirmed with the trader: Loss If Hit stays
+      // EMPTY until they actually type their own SL — defaulting to the
+      // Points SL figure was tried and found cluttered/confusing, reverted.
+      const ownSlPoints = isIndex ? (selectedInstruments[key].slPoints !== null && selectedInstruments[key].slPoints !== undefined ? selectedInstruments[key].slPoints : '') : '';
       const ownSlRupees = isIndex && ownSlPoints !== '' ? (parseFloat(ownSlPoints) * currentQty * lots) : null;
 
       const ownSlInputCell = isIndex
@@ -1689,7 +1782,7 @@
         : `<div class="mini-ladder-cell num">&mdash;</div>`;
 
       const ownSlRupeesCell = isIndex
-        ? `<div class="mini-ladder-cell num sl-rupees-output" data-row-key="${key}" style="font-weight:600; color:#C53D22;">${ownSlRupees !== null ? 'Rs. ' + fmt(ownSlRupees) : '&mdash;'}</div>`
+        ? `<div class="mini-ladder-cell num sl-rupees-output" data-row-key="${key}">${formatSlRupeesCellContent(ownSlRupees, lots)}</div>`
         : `<div class="mini-ladder-cell num">&mdash;</div>`;
 
       html += `
@@ -1699,6 +1792,7 @@
           <input type="number" class="sl-lots-input" data-instrument-key="${key}" min="1" max="${maxAllowedLots}" step="1" value="${lots}"
                  oninput="onSlTableLotsInput('${key}', this.value)">
         </div>
+        <div class="mini-ladder-cell num" style="color:#8A98AD;">${maxAllowedLots}</div>
         <div class="mini-ladder-cell num sl-points-output" data-row-key="${key}" style="font-weight:600; color:#2C6FD6;">${pointsSl.toFixed(2)} pts</div>
         ${ownSlInputCell}
         ${ownSlRupeesCell}
@@ -1712,10 +1806,10 @@
     if (noteEl) {
       const nextUnlock = getNextLotUnlockInfo();
       if (nextUnlock) {
-        noteEl.innerText = `You're cleared for up to ${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'} per trade right now. Reach Rs. ${fmt(nextUnlock.requiredBalance)} balance (50% profit on your original starting capital of Rs. ${fmt(originalStartingCapital)}) to unlock ${nextUnlock.nextLotCount} lots — Rs. ${fmt(nextUnlock.remaining)} to go.`;
+        noteEl.innerHTML = `<span class="lot-unlock-note-icon">&#9432;</span><span>You're cleared for up to <strong>${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'}</strong> per trade right now. Reach <strong>₹${fmt(nextUnlock.requiredBalance)}</strong> balance (50% profit on your original starting capital of ₹${fmt(originalStartingCapital)}) to unlock ${nextUnlock.nextLotCount} lots &mdash; ₹${fmt(nextUnlock.remaining)} to go.</span>`;
         noteEl.classList.remove('hidden');
       } else if (maxAllowedLots >= 1) {
-        noteEl.innerText = `You're cleared for up to ${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'} per trade. That's the highest currently configured for your tier — no further lot unlock is defined yet.`;
+        noteEl.innerHTML = `<span class="lot-unlock-note-icon">&#9432;</span><span>You're cleared for up to <strong>${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'}</strong> per trade. That's the highest currently configured for your tier &mdash; no further lot unlock is defined yet.</span>`;
         noteEl.classList.remove('hidden');
       } else {
         noteEl.classList.add('hidden');
@@ -1734,12 +1828,12 @@
     const validQty = (isNaN(qty) || qty < 1) ? 1 : qty;
     selectedInstruments[key].qty = validQty;
 
-    const maxLoss = getCurrentMaxLossRupees();
     const lots = selectedInstruments[key].lots || 1;
-    if (maxLoss === null) return;
+    const perLotBudget = getPerLotMaxLossRupees(lots);
+    if (perLotBudget === null) return;
 
     const totalQty = validQty * lots;
-    const pointsSl = totalQty > 0 ? (maxLoss / totalQty) : 0;
+    const pointsSl = totalQty > 0 ? (perLotBudget / totalQty) : 0;
 
     const outputCell = document.querySelector(`.sl-points-output[data-row-key="${key}"]`);
     if (outputCell) {
@@ -1779,11 +1873,11 @@
       : (info ? info.qty : 0);
 
     if (slPoints === null || slPoints === undefined || slPoints === '') {
-      outputCell.innerText = '\u2014';
+      outputCell.innerHTML = '&mdash;';
       return;
     }
     const rsLoss = slPoints * qty * lots;
-    outputCell.innerText = `Rs. ${fmt(rsLoss)}`;
+    outputCell.innerHTML = formatSlRupeesCellContent(rsLoss, lots);
   }
 
   // Called when the user edits a lot count directly in the points-SL table
@@ -1811,15 +1905,15 @@
 
     selectedInstruments[key].lots = validLots;
 
-    const maxLoss = getCurrentMaxLossRupees();
     const info = INSTRUMENT_INFO[key];
-    if (maxLoss === null || !info) return;
+    const perLotBudget = getPerLotMaxLossRupees(validLots);
+    if (perLotBudget === null || !info) return;
 
     const currentQty = (info.category !== 'index' && selectedInstruments[key].qty !== undefined)
       ? selectedInstruments[key].qty
       : info.qty;
     const totalQty = currentQty * validLots;
-    const pointsSl = totalQty > 0 ? (maxLoss / totalQty) : 0;
+    const pointsSl = totalQty > 0 ? (perLotBudget / totalQty) : 0;
 
     const outputCell = document.querySelector(`.sl-points-output[data-row-key="${key}"]`);
     if (outputCell) {
@@ -1840,10 +1934,10 @@
 
     const nextUnlock = getNextLotUnlockInfo();
     const ceilingNote = nextUnlock
-      ? `Reach Rs. ${fmt(nextUnlock.requiredBalance)} to unlock lot ${nextUnlock.nextLotCount} (Rs. ${fmt(nextUnlock.remaining)} to go).`
+      ? `Reach ₹${fmt(nextUnlock.requiredBalance)} to unlock lot ${nextUnlock.nextLotCount} (₹${fmt(nextUnlock.remaining)} to go).`
       : `${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'} is the maximum currently defined for this account size — there's no further unlock configured yet.`;
 
-    noteEl.innerText = `You typed ${attemptedLots} lots, but you're only cleared for ${maxAllowedLots} right now — it's been set back to ${maxAllowedLots}. ${ceilingNote}`;
+    noteEl.innerHTML = `<span class="lot-unlock-note-icon">&#9888;</span><span>You typed ${attemptedLots} lots, but you're only cleared for <strong>${maxAllowedLots}</strong> right now &mdash; it's been set back to ${maxAllowedLots}. ${ceilingNote}</span>`;
     noteEl.classList.remove('hidden');
     noteEl.classList.add('lot-cap-flash');
 
@@ -2103,6 +2197,21 @@
 
       const tradeCount = 1 + Math.floor(Math.random() * 4); // 1-4 scrip rows that day
       const rows = [];
+
+      // Market hours for NSE/BSE F&O: 9:15 AM to 3:30 PM. Generate each
+      // row's execution time within that window, spaced out across the day
+      // in chronological order (earliest trade first) — matches how a
+      // real order history naturally reads when trades happened at
+      // different points in the session, not all bunched at once.
+      const marketOpenMinutes = 9 * 60 + 15;  // 9:15 AM
+      const marketCloseMinutes = 15 * 60 + 30; // 3:30 PM
+      const marketWindowMinutes = marketCloseMinutes - marketOpenMinutes;
+      const tradeTimesMinutes = [];
+      for (let t = 0; t < tradeCount; t++) {
+        tradeTimesMinutes.push(marketOpenMinutes + Math.floor(Math.random() * marketWindowMinutes));
+      }
+      tradeTimesMinutes.sort((a, b) => a - b);
+
       for (let j = 0; j < tradeCount; j++) {
         const chosen = pool[Math.floor(Math.random() * pool.length)];
         const qty = (1 + Math.floor(Math.random() * 4)) * 65;
@@ -2114,6 +2223,12 @@
         const gross = Math.round((sellPrice - buyPrice) * qty * 100) / 100;
         const netPnl = Math.round((gross - charges) * 100) / 100;
 
+        const totalMinutes = tradeTimesMinutes[j];
+        const execHour = Math.floor(totalMinutes / 60);
+        const execMinute = totalMinutes % 60;
+        const execSecond = Math.floor(Math.random() * 60);
+        const executedTime = `${String(execHour).padStart(2, '0')}:${String(execMinute).padStart(2, '0')}:${String(execSecond).padStart(2, '0')}`;
+
         rows.push({
           scrip: buildScripName(chosen.label),
           instrumentLabel: chosen.label,
@@ -2122,6 +2237,7 @@
           sellPrice,
           charges,
           netPnl,
+          executedTime,
         });
       }
       data[ymd(day)] = rows;
@@ -2250,7 +2366,7 @@
         if (wrap) wrap.classList.remove('hidden');
         if (hint) {
           const range = TIER_RANGES[selectedTier];
-          hint.innerText = `Enter an amount between Rs. ${fmt(range.min)} and Rs. ${fmt(range.max)} for the ${TIER_LABELS[selectedTier]} tier.`;
+          hint.innerText = `Enter an amount between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[selectedTier]} tier.`;
         }
         if (input && startingCapital !== null && input.value === '') {
           input.value = startingCapital;
@@ -2320,15 +2436,6 @@
         ? window.getOfficialSubLevelKey()
         : null;
 
-      // Highlight the matching EXACT sub-tier row (not the whole broad
-      // tier) in the 12-row reference table — a trader at small-2 should
-      // see only that row highlighted, not every Small row.
-      container.querySelectorAll('.mini-ladder-cell[data-sublevel-row]').forEach(cell => {
-        const isMatch = officialKey && cell.dataset.sublevelRow === officialKey;
-        cell.classList.toggle('tier-highlight', isMatch && cell.classList.contains('mini-ladder-label'));
-        cell.classList.toggle('tier-highlight-row', isMatch && !cell.classList.contains('mini-ladder-label'));
-      });
-
       const select = document.getElementById('calc-tier');
       if (select) {
         select.value = officialKey || TIER_FIRST_SUBLEVEL[selectedTier];
@@ -2374,6 +2481,7 @@
   window.onSlTableQtyInput = onSlTableQtyInput;
   window.onSlTableSlPointsInput = onSlTableSlPointsInput;
   window.getMaxAllowedLots = getMaxAllowedLots;
+  window.getPerLotMaxLossRupees = getPerLotMaxLossRupees;
   window.getNextLotUnlockInfo = getNextLotUnlockInfo;
   window.getOfficialSubLevelKey = getOfficialSubLevelKey;
   window.computeTrailingSl = computeTrailingSl;

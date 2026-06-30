@@ -106,7 +106,7 @@
     if (gap <= 0) {
       container.innerHTML = `
         <div class="goal-result-card">
-          <div class="goal-result-headline">🎉 You've already reached this goal — Rs. ${fmt(selectedGoalAmount)}!</div>
+          <div class="goal-result-headline">🎉 You've already reached this goal — ₹${fmt(selectedGoalAmount)}!</div>
         </div>
       `;
       return;
@@ -136,7 +136,7 @@
 
       container.innerHTML = `
         <div class="goal-result-card">
-          <div class="goal-result-headline">To reach Rs. ${fmt(selectedGoalAmount)}, here's what it takes at your current pace:</div>
+          <div class="goal-result-headline">To reach ₹${fmt(selectedGoalAmount)}, here's what it takes at your current pace:</div>
           <div class="goal-result-grid">
             <div>
               <div class="goal-result-stat-label">Trades Needed</div>
@@ -152,11 +152,11 @@
             </div>
             <div>
               <div class="goal-result-stat-label">Gap To Goal</div>
-              <div class="goal-result-stat-value">Rs. ${fmt(gap)}</div>
+              <div class="goal-result-stat-value">₹${fmt(gap)}</div>
             </div>
           </div>
           <div class="goal-result-note">
-            At a ${(winRate * 100).toFixed(0)}% win rate, your average win of Rs. ${fmt(avgWin)} against a typical loss of Rs. ${fmt(avgLoss)} means each trade loses Rs. ${fmt(Math.abs(expectedNetPerTrade))} on average — so more trades at this exact pace move you further from the goal, not closer.
+            At a ${(winRate * 100).toFixed(0)}% win rate, your average win of ₹${fmt(avgWin)} against a typical loss of ₹${fmt(avgLoss)} means each trade loses ₹${fmt(Math.abs(expectedNetPerTrade))} on average — so more trades at this exact pace move you further from the goal, not closer.
             ${breakevenWinRate !== null
               ? ` Markets are sideways or choppy often, so a string of losing days doesn't mean you're doing something wrong — but mathematically, you'd need at least a ${(breakevenWinRate * 100).toFixed(1)}% win rate at this win/loss size just to break even, and higher than that to make real progress. Raising your win rate, improving your reward-to-risk (winning more per trade relative to what you risk), or both, are the two levers that change this.`
               : ''}
@@ -173,7 +173,7 @@
 
     container.innerHTML = `
       <div class="goal-result-card">
-        <div class="goal-result-headline">To reach Rs. ${fmt(selectedGoalAmount)}, here's what it takes at your current pace:</div>
+        <div class="goal-result-headline">To reach ₹${fmt(selectedGoalAmount)}, here's what it takes at your current pace:</div>
         <div class="goal-result-grid">
           <div>
             <div class="goal-result-stat-label">Trades Needed</div>
@@ -189,12 +189,12 @@
           </div>
           <div>
             <div class="goal-result-stat-label">Gap To Goal</div>
-            <div class="goal-result-stat-value">Rs. ${fmt(gap)}</div>
+            <div class="goal-result-stat-value">₹${fmt(gap)}</div>
           </div>
         </div>
         <div class="goal-result-note">
           ${usingActual
-            ? `Based on your actual logged trades (${actual.sampleSize} day${actual.sampleSize === 1 ? '' : 's'} so far) — win rate ${(winRate * 100).toFixed(0)}%, average win Rs. ${fmt(avgWin)}, assumed average loss Rs. ${fmt(avgLoss)} per losing trade.`
+            ? `Based on your actual logged trades (${actual.sampleSize} day${actual.sampleSize === 1 ? '' : 's'} so far) — win rate ${(winRate * 100).toFixed(0)}%, average win ₹${fmt(avgWin)}, assumed average loss ₹${fmt(avgLoss)} per losing trade.`
             : `Based on the average win you entered above, assuming every trade wins (no logged history yet to measure a real win rate).`
           } Keep your win rate at or above ${(winRate * 100).toFixed(0)}% to stay on this pace — slipping below it will need more trades to reach the same goal.
         </div>
@@ -256,8 +256,8 @@
       const resultClass = isWin ? 'roadmap-history-win' : (day.netResult < 0 ? 'roadmap-history-loss' : '');
       html += `
         <div class="roadmap-history-cell">${formatDate(day.date)}</div>
-        <div class="roadmap-history-cell num ${resultClass}">${sign}Rs. ${fmt(Math.abs(day.netResult))}</div>
-        <div class="roadmap-history-cell num">Rs. ${fmt(day.balanceAfter)}</div>
+        <div class="roadmap-history-cell num ${resultClass}">${sign}₹${fmt(Math.abs(day.netResult))}</div>
+        <div class="roadmap-history-cell num">₹${fmt(day.balanceAfter)}</div>
       `;
     });
 
@@ -281,7 +281,7 @@
 
     const balanceValueEl = document.getElementById('roadmap-balance-value');
     const balanceSubEl = document.getElementById('roadmap-balance-sub');
-    if (balanceValueEl) balanceValueEl.innerText = `Rs. ${fmt(balance)}`;
+    if (balanceValueEl) balanceValueEl.innerText = `₹${fmt(balance)}`;
 
     const currentTier = tierForBalance(balance);
     const currentTierIndex = TIER_ORDER.indexOf(currentTier);
@@ -306,7 +306,7 @@
     const gap = TIER_MIN[nextTier] - balance;
     if (balanceSubEl) {
       balanceSubEl.innerText = gap > 0
-        ? `Rs. ${fmt(gap)} away from the ${TIER_LABELS[nextTier]} tier (Rs. ${fmt(TIER_MIN[nextTier])})`
+        ? `₹${fmt(gap)} away from the ${TIER_LABELS[nextTier]} tier (₹${fmt(TIER_MIN[nextTier])})`
         : `You've already crossed into the ${TIER_LABELS[nextTier]} tier range.`;
     }
 
@@ -329,7 +329,7 @@
     html += `
       <div class="roadmap-stat">
         <div class="roadmap-stat-label">Avg. Win Used</div>
-        <div class="roadmap-stat-value">Rs. ${fmt(avgWin)}</div>
+        <div class="roadmap-stat-value">₹${fmt(avgWin)}</div>
       </div>
       <div class="roadmap-stat">
         <div class="roadmap-stat-label">Trades Needed</div>

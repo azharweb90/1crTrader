@@ -4,14 +4,19 @@
 
   <div id="dash-stat-grid" class="dash-stat-grid"></div>
 
-  <!-- Risk-rules-at-a-glance: tier bracket, max daily loss (Rs. and %), and
+  <!-- Risk-rules-at-a-glance: tier bracket, max daily loss (₹and %), and
        max lots right now, all computed from the trader's actual current
        balance via window.getRiskSummary() in dashboard.js — not a separate
        set of numbers, the exact same rules the Daily Limits Tool enforces. -->
   <div id="dash-risk-wrap" class="dash-risk-wrap hidden">
     <div class="mini-ladder-title">Your Risk Rules Right Now</div>
     <div id="dash-risk-grid" class="dash-risk-grid"></div>
-    <p id="dash-risk-lot-note" class="foot-note" style="margin-top:10px;"></p>
+    <div id="dash-lot-progress-row" class="dash-lot-progress-row hidden">
+      <div class="dash-lot-progress-track">
+        <div id="dash-lot-progress-fill" class="dash-lot-progress-fill"></div>
+      </div>
+      <p id="dash-risk-lot-note" class="dash-lot-progress-note"></p>
+    </div>
   </div>
 
   <div class="dash-quicklinks-title">Jump back in</div>

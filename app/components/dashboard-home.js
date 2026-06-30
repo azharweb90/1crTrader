@@ -45,7 +45,7 @@
     grid.innerHTML = `
       <div class="dash-stat-card">
         <div class="dash-stat-label">Current Balance</div>
-        <div class="dash-stat-value">${balance !== null && balance !== undefined ? 'Rs. ' + fmt(balance) : '&mdash;'}</div>
+        <div class="dash-stat-value">${balance !== null && balance !== undefined ? '₹' + fmt(balance) : '&mdash;'}</div>
       </div>
       <div class="dash-stat-card">
         <div class="dash-stat-label">Win Rate</div>
@@ -57,7 +57,7 @@
       </div>
       <div class="dash-stat-card">
         <div class="dash-stat-label">Net P&amp;L</div>
-        <div class="dash-stat-value ${netPnlClass}">${totalTrades > 0 ? netPnlSign + 'Rs. ' + fmt(Math.abs(netPnl)) : '&mdash;'}</div>
+        <div class="dash-stat-value ${netPnlClass}">${totalTrades > 0 ? netPnlSign + '₹' + fmt(Math.abs(netPnl)) : '&mdash;'}</div>
       </div>
     `;
   }
@@ -88,7 +88,7 @@
       </div>
       <div class="dash-risk-card">
         <div class="dash-risk-label">Max Loss Today</div>
-        <div class="dash-risk-value">Rs. ${fmt(summary.maxLossRupees)}</div>
+        <div class="dash-risk-value">₹${fmt(summary.maxLossRupees)}</div>
         <div class="dash-risk-sublabel">${summary.maxLossPct}% of capital</div>
       </div>
       <div class="dash-risk-card">
@@ -102,10 +102,24 @@
     `;
 
     if (lotNote) {
+      const progressRow = document.getElementById('dash-lot-progress-row');
+      const progressFill = document.getElementById('dash-lot-progress-fill');
       if (summary.nextLotUnlock) {
-        lotNote.innerText = `Reach Rs. ${fmt(summary.nextLotUnlock.requiredBalance)} to unlock ${summary.nextLotUnlock.nextLotCount} lots (Rs. ${fmt(summary.nextLotUnlock.remaining)} to go).`;
+        lotNote.innerHTML = `Reach ₹<strong>${fmt(summary.nextLotUnlock.requiredBalance)}</strong> to unlock ${summary.nextLotUnlock.nextLotCount} lots &mdash; ₹${fmt(summary.nextLotUnlock.remaining)} to go`;
+        if (progressRow && progressFill) {
+          const profile = (typeof window.getProfileState === 'function') ? window.getProfileState() : null;
+          const currentBalance = profile ? profile.currentBalance : null;
+          const requiredBalance = summary.nextLotUnlock.requiredBalance;
+          let pct = 0;
+          if (currentBalance !== null && requiredBalance > 0) {
+            pct = Math.max(0, Math.min(100, (currentBalance / requiredBalance) * 100));
+          }
+          progressFill.style.width = `${pct}%`;
+          progressRow.classList.remove('hidden');
+        }
       } else {
         lotNote.innerText = `${summary.maxLots} lots is the highest currently configured for your account size.`;
+        if (progressRow) progressRow.classList.add('hidden');
       }
     }
   }
@@ -145,8 +159,8 @@
       const resultClass = isWin ? 'calc-history-win' : (entry.netResult < 0 ? 'calc-history-loss' : '');
       html += `
         <div class="calc-history-cell">${formatDateShort(entry.date)}</div>
-        <div class="calc-history-cell num ${resultClass}">${sign}Rs. ${fmt(Math.abs(entry.netResult))}</div>
-        <div class="calc-history-cell num">Rs. ${fmt(entry.balanceAfter)}</div>
+        <div class="calc-history-cell num ${resultClass}">${sign}₹${fmt(Math.abs(entry.netResult))}</div>
+        <div class="calc-history-cell num">₹${fmt(entry.balanceAfter)}</div>
       `;
     });
     html += '</div>';
