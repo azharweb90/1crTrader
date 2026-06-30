@@ -55,6 +55,10 @@
       html: "/app/components/strategies.html",
       js: "/app/components/strategies.js",
     },
+    "tab-suggestions": {
+      html: "/app/components/suggestions.html",
+      js: "/app/components/suggestions.js",
+    },
     "tab-settings": {
       html: "/app/components/settings.html",
       js: "/app/components/settings.js",
@@ -76,6 +80,7 @@
     "tab-education": "Education",
     "tab-books": "Books",
     "tab-strategies": "Strategies",
+    "tab-suggestions": "Suggestions",
     "tab-settings": "Account",
     "tab-subs": "Subscription Pricing",
   };
