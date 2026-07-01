@@ -129,7 +129,17 @@
     const history = getHistory();
 
     if (!history || history.length === 0) {
-      container.innerHTML = '<div class="roadmap-empty-state">No trades logged yet. Head to the Daily Limits Tool to log your first trade.</div>';
+      container.innerHTML = `
+        <div class="dash-recent-empty-state">
+          <div class="dash-recent-empty-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+          </div>
+          <p class="dash-recent-empty-text">No trades logged yet. Head to the
+            <a href="#" class="dash-recent-empty-link" onclick="switchTab(null, 'tab-calculator'); return false;">Daily Limits Tool</a>
+            to log your first trade.
+          </p>
+        </div>
+      `;
       return;
     }
 

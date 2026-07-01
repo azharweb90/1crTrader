@@ -2,6 +2,7 @@
    Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
    Original section markers preserved below. */
 
+/* ===========================================================
    13. COMPONENT: settings (now "Account" in the UI — internal class/id
    names below keep their original "settings-" prefix where they're still
    reused as-is, to avoid unnecessary churn; new account-specific pieces
