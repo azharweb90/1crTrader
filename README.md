@@ -23,13 +23,30 @@ src/
 
   app/                The actual trading-discipline application. Requires a session.
     app-shell.html      App shell (sidebar, top bar, tab containers)
-    app-shell.js        Shared app state, tab switching, broker mocks, auth gate, tier/risk rules
+    app-shell.js        Tab switching, most shared state, broker mocks, auth gate,
+                         and the state-coupled risk functions (see shared/risk-engine/)
     layout/             Reserved — Sidebar/TopBar/ResourceHub, currently still inline in app-shell.*
     features/           One folder per tab (tier-select, dashboard-home, daily-limits,
                          trade-manager, roadmap, trading-journal, education, books,
                          strategies, suggestions, settings, pricing)
-    shared/             Reserved — risk-engine, state, mock-broker, utils will move here
-                         out of app-shell.js in a later pass
+    shared/
+      risk-engine/
+        tier-rules.js    tierRulesMatrix, subLevelForBalance, computeTrailingSl —
+                          the pure, stateless subset of the risk engine (loaded
+                          before app-shell.js). The rest (getOfficialSubLevelKey,
+                          getRiskSummary, getMaxAllowedLots, getPerLotMaxLossRupees,
+                          getNextLotUnlockInfo) stays in app-shell.js on purpose:
+                          they read/write shared mutable state (selectedTier,
+                          currentBalance, originalStartingCapital) from dozens of
+                          call sites, and splitting that out safely means the
+                          state itself needs a new home too — a wide, easy-to-get-
+                          wrong change in vanilla JS with no way to visually verify
+                          it here. That naturally resolves during the real React
+                          conversion (selectedTier/currentBalance become useState,
+                          the risk functions become a useRiskEngine() hook) rather
+                          than being worth the risk to do by hand now.
+      state/, mock-broker/, utils/   Reserved — same reasoning as above, still
+                          inline in app-shell.js pending the React conversion
     styles/
       main.css           Entry point — @imports every file below in exact
                           original cascade order (base -> layout-shell ->
@@ -38,7 +55,6 @@ src/
       layout-shell.css   Sidebar + top bar + main content column chrome
       shared.css         Cross-component styles (grid-table, demo-banner)
       responsive-overrides.css   All @media overrides — kept last on purpose
-      dashboard.css.bak  The original monolith, kept for one review cycle
       themes/
         dark-theme.css   Dark mode overrides, scoped entirely under body.dark-mode
       components/        Per-feature CSS, split out of dashboard.css along its
