@@ -1,0 +1,1 @@
+Reserved for Phase 2: generateMockBrokerPnlHistory and related mock-broker helpers currently live in src/app/app-shell.js. Not split yet.

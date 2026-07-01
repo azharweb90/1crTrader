@@ -1,0 +1,1 @@
+Reserved for Phase 2: extracted from src/app/app-shell.html/js — TopBar (dark-mode toggle, font-size control, balance pill, account menu) currently lives inline in the shell. Not split yet.

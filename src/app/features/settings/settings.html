@@ -1,0 +1,58 @@
+<!-- COMPONENT: settings (now "Account" in the sidebar/title — internal id
+     kept as tab-settings/settings.html/settings.js to avoid touching every
+     reference across app-shell.js; only the user-facing label changed.) -->
+<section class="content-section">
+
+  <div class="account-profile-header">
+    <div id="account-avatar" class="account-avatar"></div>
+    <div class="account-profile-identity">
+      <div id="account-name" class="account-profile-name"></div>
+      <div id="account-email" class="account-profile-email"></div>
+      <div class="account-profile-meta">
+        <span id="account-phone"></span>
+        <span id="account-member-since"></span>
+      </div>
+    </div>
+    <button type="button" class="profile-continue-btn account-edit-btn" onclick="showTierSelect()">
+      Edit Profile
+    </button>
+  </div>
+
+  <div class="account-section">
+    <div class="account-section-title">Your Risk Rules Right Now</div>
+    <div id="account-risk-grid" class="dash-risk-grid"></div>
+    <p id="account-risk-lot-note" class="foot-note" style="margin-top:10px;"></p>
+  </div>
+
+  <div class="account-section">
+    <div class="account-section-title">Trading Style</div>
+    <div id="account-trader-types" class="account-chip-row"></div>
+  </div>
+
+  <div class="account-section">
+    <div class="account-section-title">Capital</div>
+    <div id="account-capital-grid" class="settings-summary-grid"></div>
+  </div>
+
+  <div class="account-section">
+    <div class="account-section-title">Instruments You Trade</div>
+    <div id="account-instruments" class="account-chip-row"></div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Broker Connection</div>
+    <p class="section-note">Connect a broker to auto-sync today's trades instead of entering them manually on the Daily Limits Tool. This is a prototype simulation — no real broker is contacted and no credentials are collected.</p>
+    <div id="broker-connect-area"></div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">About This Tool</div>
+    <p class="section-note">1CrTrader &mdash; a daily limits tracker, goal roadmap, and trading journal built around your tier's risk rules. All data lives in this browser session only; refreshing the page clears it.</p>
+  </div>
+
+  <div class="settings-section">
+    <button type="button" class="setup-manual-link" style="color:#d9381e;" onclick="handleLogout()">Log Out</button>
+  </div>
+
+</section>
+<!-- END COMPONENT: settings -->

@@ -1,0 +1,1172 @@
+/* ===========================================================
+   DARK THEME — 1CrTrader
+   Loaded after dashboard.css. Every rule here is scoped under
+   `body.dark-mode`, toggled via toggleDarkMode() in app-shell.js (adds/
+   removes the class, persisted to localStorage). dashboard.css itself
+   (the light theme) is never edited or risked by this file — confirmed
+   as the required approach: dark mode ships as a fully separate
+   stylesheet, not a rewrite of the existing one into CSS variables.
+
+   Covers the whole application (every tab, the sidebar included) per
+   the trader's explicit scope. The public marketing site
+   (src/marketing/pages/landing/landing-page.html) is intentionally NOT
+   covered yet — confirmed as app-first, marketing site later.
+
+   Brand accent colors (gold #D4A828, the green/red profit-loss
+   semantics) are mostly kept as-is or lightly brightened for contrast —
+   only structural surfaces (backgrounds, borders, body text) actually
+   change between light and dark.
+   =========================================================== */
+
+/* ---------- Base page ---------- */
+body.dark-mode {
+  background: #0F1115;
+  color: #E8EAED;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3 {
+  color: #E8EAED;
+}
+
+body.dark-mode .section-note {
+  color: #A0A8B5;
+}
+
+body.dark-mode .foot-note {
+  color: #7A8290;
+}
+
+/* ---------- Scrollbar ---------- */
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #3A3F47;
+}
+
+/* ---------- Sidebar ---------- */
+/* Confirmed in scope ("whole application... sidebar too") even though the
+   sidebar is already dark in light mode — give it a slightly deeper,
+   more neutral tone in dark mode so it doesn't read identically to the
+   light-mode sidebar, and so its border/divider lines stay visible
+   against the now-dark page behind it. */
+body.dark-mode .sidebar {
+  background: linear-gradient(180deg, #0A1015 0%, #050709 100%);
+}
+
+body.dark-mode .sidebar-nav-group-bottom {
+  border-top-color: rgba(212, 168, 40, 0.1);
+}
+
+/* ---------- Top bar / header ---------- */
+body.dark-mode .top-bar {
+  background: #15171C;
+  border-bottom-color: #262A31;
+}
+
+body.dark-mode .top-bar-page-title {
+  color: #E8EAED;
+}
+
+body.dark-mode .dark-mode-toggle-btn {
+  background: #1F2228;
+  border-color: #33373F;
+  color: #A0A8B5;
+}
+
+body.dark-mode .font-size-control {
+  background: #1F2228;
+  border-color: #33373F;
+}
+
+body.dark-mode .font-size-btn {
+  color: #A0A8B5;
+}
+
+body.dark-mode .font-size-btn:hover {
+  background: #2A2E36;
+  color: #E8EAED;
+}
+
+body.dark-mode .font-size-label {
+  color: #7A8290;
+}
+
+body.dark-mode .dark-mode-toggle-btn:hover {
+  background: #262A31;
+  border-color: #D4A828;
+  color: #D4A828;
+}
+
+body.dark-mode .header-account-menu {
+  background: #1A1D23;
+  border-color: #33373F;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .header-account-menu-name {
+  color: #E8EAED;
+}
+
+body.dark-mode .header-account-menu-email {
+  color: #7A8290;
+}
+
+body.dark-mode .header-account-menu-item {
+  color: #C7CCD3;
+}
+
+body.dark-mode .header-account-menu-item:hover {
+  background: #22252B;
+}
+
+/* ---------- Content shell ---------- */
+body.dark-mode .content-section {
+  background: #1A1D23;
+  border-color: #262A31;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Generic text/border tokens used everywhere ---------- */
+body.dark-mode .mini-ladder-title,
+body.dark-mode .select-step-title,
+body.dark-mode .dash-stat-label,
+body.dark-mode .dash-quicklinks-title,
+body.dark-mode .instrument-tier-summary-chip,
+body.dark-mode .broker-order-time,
+body.dark-mode .suggestions-row-title {
+  color: #A0A8B5;
+}
+
+body.dark-mode .mini-ladder-cell,
+body.dark-mode .grid-table .cell,
+body.dark-mode .broker-scrip-grid > div,
+body.dark-mode .dash-stat-card,
+body.dark-mode .dash-quicklink-card,
+body.dark-mode .instrument-card,
+body.dark-mode .tier-select-card,
+body.dark-mode .trader-type-card,
+body.dark-mode .pricing-card,
+body.dark-mode .journal-stat-card,
+body.dark-mode .journal-analysis-stat-card,
+body.dark-mode .strategy-card,
+body.dark-mode .suggestions-panel {
+  background: #1A1D23;
+  border-color: #2A2E36;
+  color: #C7CCD3;
+}
+
+body.dark-mode .mini-ladder-grid,
+body.dark-mode .grid-table,
+body.dark-mode .broker-scrip-grid {
+  background: #2A2E36;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .mini-ladder-cell.mini-ladder-head,
+body.dark-mode .grid-table .head,
+body.dark-mode .broker-scrip-grid-head {
+  background: #20232A;
+  color: #8A93A3;
+}
+
+body.dark-mode .mini-ladder-label,
+body.dark-mode .grid-table .label,
+body.dark-mode .tier-select-name,
+body.dark-mode .trader-type-name,
+body.dark-mode .dash-quicklink-title,
+body.dark-mode .instrument-name,
+body.dark-mode .suggestions-panel-title {
+  color: #E8EAED;
+}
+
+body.dark-mode .dash-stat-value,
+body.dark-mode .header-balance-value {
+  color: #E8EAED;
+}
+
+/* Tier-highlight rows (gold cream in light mode) — darker gold tint
+   keeps the same "this is your row" meaning without a jarring pale
+   patch on an otherwise dark table. */
+body.dark-mode .mini-ladder-label.tier-highlight,
+body.dark-mode .mini-ladder-cell.tier-highlight-row,
+body.dark-mode .grid-table .label.tier-highlight {
+  background: rgba(212, 168, 40, 0.16) !important;
+  color: #E8C766 !important;
+}
+
+/* ---------- Inputs ---------- */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode .sl-lots-input,
+body.dark-mode .capital-amount-input,
+body.dark-mode .journal-input,
+body.dark-mode .broker-day-picker-input {
+  background: #1F2228;
+  border-color: #33373F;
+  color: #E8EAED;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #5E6571;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+  border-color: #D4A828;
+}
+
+/* ---------- Buttons ---------- */
+body.dark-mode .profile-continue-btn,
+body.dark-mode .trade-submit-btn,
+body.dark-mode .outcome-btn,
+body.dark-mode .change-tier-btn,
+body.dark-mode .account-edit-btn,
+body.dark-mode .setup-wizard-back-btn,
+body.dark-mode .setup-skip-btn,
+body.dark-mode .journal-list-btn,
+body.dark-mode .suggestions-panel-nav-btn,
+body.dark-mode .broker-import-btn,
+body.dark-mode .custom-stock-add-btn {
+  background: #20232A;
+  border-color: #33373F;
+  color: #C7CCD3;
+}
+
+body.dark-mode .outcome-btn:hover:not(:disabled),
+body.dark-mode .suggestions-panel-nav-btn:hover:not(:disabled) {
+  border-color: #D4A828;
+  background: rgba(212, 168, 40, 0.08);
+}
+
+body.dark-mode .profile-continue-btn:not(:disabled) {
+  background: #20232A;
+  color: #E8EAED;
+}
+
+body.dark-mode .profile-continue-btn:hover:not(:disabled) {
+  background: #8C6510;
+  color: #ffffff;
+}
+
+body.dark-mode .broker-import-btn {
+  background: linear-gradient(135deg, #D4A828 0%, #B6890F 100%);
+  border: none;
+  color: #ffffff;
+}
+
+/* ---------- Selected/active states (kept gold, brightened slightly) --- */
+body.dark-mode .tier-select-card.selected,
+body.dark-mode .trader-type-card.selected,
+body.dark-mode .instrument-card.selected,
+body.dark-mode .goal-amount-btn-cr {
+  border-color: #D4A828;
+  background: rgba(212, 168, 40, 0.07);
+}
+
+body.dark-mode .sidebar-link.active {
+  background: #262011;
+}
+
+body.dark-mode .broker-range-pill-active {
+  background: rgba(91, 147, 232, 0.14);
+  border-color: #5B93E8;
+  color: #E8EAED;
+}
+
+/* ---------- Sub-text / dropdown / dividers ---------- */
+body.dark-mode .tier-select-range,
+body.dark-mode .trader-type-desc,
+body.dark-mode .instrument-picker-row-qty,
+body.dark-mode .dash-quicklink-desc,
+body.dark-mode .capital-amount-hint,
+body.dark-mode .broker-range-label-pill {
+  color: #8A93A3;
+}
+
+body.dark-mode hr,
+body.dark-mode .suggestions-category-header,
+body.dark-mode .broker-day-detail-header,
+body.dark-mode .suggestions-panel-header,
+body.dark-mode .suggestions-panel-footer,
+body.dark-mode .suggestions-row {
+  border-color: #2A2E36;
+}
+
+body.dark-mode .suggestions-row:hover {
+  background: rgba(212, 168, 40, 0.06);
+}
+
+/* ---------- Risk/info banners (blue, amber, etc.) ---------- */
+body.dark-mode .lot-unlock-note {
+  background: rgba(91, 147, 232, 0.1);
+  border-color: rgba(91, 147, 232, 0.3);
+  color: #B9D2F7;
+}
+
+body.dark-mode .lot-unlock-note-icon {
+  color: #5B93E8;
+}
+
+body.dark-mode .lot-unlock-note.lot-cap-flash {
+  background: rgba(212, 168, 40, 0.12);
+  border-color: rgba(212, 168, 40, 0.35);
+  color: #E8C766;
+}
+
+body.dark-mode .lot-unlock-note.lot-cap-flash .lot-unlock-note-icon {
+  color: #D4A828;
+}
+
+body.dark-mode .sl-exceeds-warning {
+  background: rgba(212, 168, 40, 0.14);
+  border-color: rgba(212, 168, 40, 0.35);
+  color: #E8C766;
+}
+
+body.dark-mode .broker-range-empty-state {
+  background: #20232A;
+  border-color: #33373F;
+  color: #7A8290;
+}
+
+body.dark-mode .suggestions-panel-category {
+  background: rgba(212, 168, 40, 0.16);
+  color: #E8C766;
+}
+
+body.dark-mode .suggestions-category-count {
+  background: #20232A;
+  color: #8A93A3;
+}
+
+/* ---------- Pale status-tint backgrounds (catch-all) ---------- */
+body.dark-mode .broker-stat-icon-loss,
+body.dark-mode .header-balance-pill {
+  background: linear-gradient(135deg, #B6890F 0%, #8C6510 100%);
+}
+
+body.dark-mode .header-avatar-btn {
+  background: linear-gradient(135deg, #2A2210 0%, #B6890F 100%);
+}
+
+body.dark-mode .dash-risk-card,
+body.dark-mode .your-limit-callout,
+body.dark-mode .roadmap-balance-card,
+body.dark-mode .goal-result-card {
+  background: linear-gradient(140deg, #20180C 0%, #110D08 100%);
+}
+
+/* ---------- Trade Manager chart ---------- */
+/* The chart's own SVG colors (price line, candles, zone fills) are
+   rendered inline by trade-manager.js, not via these CSS classes, so they
+   already work reasonably against either background — only the
+   surrounding chrome (price labels, result cards) needs adjusting here. */
+body.dark-mode .tm-rr-summary,
+body.dark-mode .tm-result-card.tm-result-open {
+  background: #20232A;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .tm-rr-chip {
+  background: #20232A;
+  border-color: #33373F;
+  color: #C7CCD3;
+}
+
+/* ---------- Scrollable horizontal-overflow zones ---------- */
+body.dark-mode .mini-ladder-wrap,
+body.dark-mode .broker-multi-month-grid {
+  scrollbar-color: #3A3F47 #1A1D23;
+}
+
+/* ---------- Dashboard section cards dark mode ---------- */
+body.dark-mode .dash-section-card {
+  background: #1A1D23;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .dash-risk-wrap {
+  background: #1A1D23;
+  border-color: #2A2E36;
+}
+
+/* Quicklink icon: use a warm dark gold tint in dark mode so it reads as
+   intentionally styled, not a leftover cream blob on a dark background. */
+body.dark-mode .dash-quicklink-icon {
+  background: rgba(212, 168, 40, 0.15);
+  color: #D4A828;
+}
+
+body.dark-mode .dash-quicklink-icon svg {
+  stroke: #D4A828;
+}
+
+/* ---------- Journal dark mode ---------- */
+body.dark-mode .journal-analysis-wrap {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .journal-list-grid {
+  background: #2A2E36;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .journal-list-cell {
+  background: #1A1D23;
+  color: #C7CCD3;
+}
+
+body.dark-mode .journal-list-head {
+  background: #20232A;
+  color: #8A93A3;
+}
+
+body.dark-mode .journal-list-btn {
+  background: #20232A;
+  border-color: #33373F;
+  color: #C7CCD3;
+}
+
+
+body.dark-mode .tm-type-pill {
+  background: #20232A;
+  border-color: #33373F;
+}
+
+body.dark-mode .tm-type-pill:hover {
+  background: rgba(212, 168, 40, 0.08);
+  border-color: #D4A828;
+}
+
+body.dark-mode .tm-type-pill.tm-type-pill-active {
+  background: rgba(212, 168, 40, 0.14);
+  border-color: #D4A828;
+}
+
+body.dark-mode .tm-type-pill-name { color: #E8EAED; }
+body.dark-mode .tm-type-pill-sub  { color: #7A8290; }
+
+body.dark-mode .tm-lots-stepper {
+  border-color: #33373F;
+}
+
+body.dark-mode .tm-lots-step-btn {
+  background: #20232A;
+  color: #E8EAED;
+}
+
+body.dark-mode .tm-lots-step-btn:hover:not(:disabled) {
+  background: #2A2E36;
+}
+
+body.dark-mode .tm-lots-input {
+  background: #1A1D23;
+  color: #E8EAED;
+  border-color: #33373F;
+}
+
+body.dark-mode .tm-lots-stat { color: #A0A8B5; }
+body.dark-mode .tm-lots-stat strong { color: #E8EAED; }
+
+body.dark-mode .tm-position-summary {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .tm-position-cell-risk {
+  background: rgba(217, 56, 30, 0.14);
+  border-color: rgba(217, 56, 30, 0.25);
+}
+
+body.dark-mode .tm-position-cell-reward {
+  background: rgba(29, 158, 117, 0.14);
+  border-color: rgba(29, 158, 117, 0.25);
+}
+
+body.dark-mode .tm-position-cell-margin {
+  background: rgba(44, 111, 214, 0.12);
+  border-color: rgba(44, 111, 214, 0.22);
+}
+
+body.dark-mode .tm-position-label { color: #7A8290; }
+body.dark-mode .tm-position-sub   { color: #7A8290; }
+body.dark-mode .tm-position-cell-risk .tm-position-value   { color: #E0563A; }
+body.dark-mode .tm-position-cell-reward .tm-position-value { color: #3DBF8F; }
+body.dark-mode .tm-position-cell-margin .tm-position-value { color: #5B93E8; }
+
+body.dark-mode .tm-collapsed-setup {
+  background: #20232A;
+  border-color: #33373F;
+}
+
+body.dark-mode .tm-collapsed-setup:hover {
+  background: #22252B;
+}
+
+body.dark-mode .tm-collapsed-chip {
+  background: #1A1D23;
+  border-color: #33373F;
+  color: #A0A8B5;
+}
+
+body.dark-mode .tm-setup-review {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .tm-review-label { color: #7A8290; }
+body.dark-mode .tm-review-value { color: #E8EAED; }
+
+body.dark-mode .tm-direction-badge-long {
+  background: rgba(29, 158, 117, 0.14);
+  border-color: rgba(29, 158, 117, 0.3);
+}
+
+body.dark-mode .tm-direction-badge-short {
+  background: rgba(217, 56, 30, 0.14);
+  border-color: rgba(217, 56, 30, 0.28);
+}
+
+body.dark-mode .tm-direction-badge-label { color: #E8EAED; }
+body.dark-mode .tm-direction-badge-note  { color: #A0A8B5; }
+
+/* ---------- Setup Wizard dark mode (comprehensive) ---------- */
+body.dark-mode .setup-wizard-header,
+body.dark-mode .setup-wizard-footer {
+  border-color: #2A2E36;
+}
+
+body.dark-mode .setup-wizard-eyebrow {
+  color: #7A8290;
+}
+
+body.dark-mode .setup-wizard-title,
+body.dark-mode .select-step-title {
+  color: #E8EAED;
+}
+
+body.dark-mode .setup-wizard-step-indicator {
+  color: #7A8290;
+}
+
+body.dark-mode .setup-confirm-summary {
+  background: #20232A;
+  border-color: #33373F;
+}
+
+/* Broker tiles */
+body.dark-mode .broker-option-btn {
+  background: #20232A;
+  border-color: #33373F;
+  color: #E8EAED;
+}
+
+body.dark-mode .broker-option-btn:hover:not(:disabled) {
+  border-color: #5B93E8;
+}
+
+body.dark-mode .broker-more-wrap {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .broker-more-row {
+  background: #20232A;
+  border-color: #33373F;
+  color: #E8EAED;
+}
+
+body.dark-mode .broker-more-row:hover {
+  border-color: #5B93E8;
+}
+
+/* Instrument picker — the "Indices" category box */
+body.dark-mode .instrument-card {
+  background: #1F2228;
+  border-color: #33373F;
+}
+
+body.dark-mode .instrument-name {
+  color: #E8EAED;
+}
+
+body.dark-mode .instrument-check {
+  border-color: #3A3F47;
+}
+
+/* Fetched summary box */
+body.dark-mode .setup-fetched-summary {
+  background: #20232A;
+  border-color: #33373F;
+}
+
+body.dark-mode .setup-fetched-label {
+  color: #7A8290;
+}
+
+body.dark-mode .setup-fetched-value {
+  color: #E8EAED;
+}
+
+/* Security note (the blue "read-only connection" box) */
+body.dark-mode .setup-wizard-note {
+  background: rgba(44, 111, 214, 0.1);
+  border-color: rgba(44, 111, 214, 0.25);
+  color: #B9D2F7;
+}
+
+/* Capital amount input wrapper */
+body.dark-mode .capital-amount-wrap {
+  background: #20232A;
+  border-color: #33373F;
+}
+
+body.dark-mode .capital-amount-label {
+  color: #A0A8B5;
+}
+
+body.dark-mode .capital-amount-input-row {
+  background: #1F2228;
+  border-color: #33373F;
+}
+
+body.dark-mode .capital-amount-prefix {
+  background: #20232A;
+  border-color: #33373F;
+  color: #A0A8B5;
+}
+
+/* ---------- Daily Limits Tool dark mode (comprehensive) ---------- */
+/* Profit decision card ("Trade closed in profit — take it home?") */
+body.dark-mode .profit-decision-card {
+  background: rgba(14, 159, 110, 0.12);
+  border-color: rgba(14, 159, 110, 0.28);
+}
+
+body.dark-mode .profit-decision-message {
+  color: #A0C8B8;
+}
+
+body.dark-mode .profit-decision-secondary-btn {
+  background: #20232A;
+  border-color: #33373F;
+  color: #C7CCD3;
+}
+
+body.dark-mode .profit-decision-secondary-btn:hover {
+  border-color: #3DBF8F;
+  color: #3DBF8F;
+}
+
+/* Active outcome button states */
+body.dark-mode .outcome-btn.active-profit {
+  background: rgba(14, 159, 110, 0.16);
+  border-color: #3DBF8F;
+  color: #3DBF8F;
+}
+
+body.dark-mode .outcome-btn.active-loss {
+  background: rgba(197, 61, 34, 0.16);
+  border-color: #E0563A;
+  color: #E0563A;
+}
+
+/* Trade-submitted state */
+body.dark-mode .trade-submit-btn:disabled {
+  background: #20232A;
+  color: #5E6571;
+  border-color: #2A2E36;
+}
+
+/* Calc history table */
+body.dark-mode .calc-history-wrap {
+  background: #1E2126;
+  border-color: #2A2E36;
+  border-radius: 10px;
+}
+
+body.dark-mode .calc-history-grid {
+  background: #2A2E36;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .calc-history-cell {
+  background: #1A1D23;
+  color: #C7CCD3;
+}
+
+body.dark-mode .calc-history-head {
+  background: #20232A;
+  color: #8A93A3;
+}
+
+/* ---------- Roadmap dark mode (comprehensive) ---------- */
+body.dark-mode .roadmap-input-card {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .roadmap-input-row {
+  background: #1F2228;
+  border-color: #33373F;
+}
+
+body.dark-mode .roadmap-input-prefix {
+  background: #20232A;
+  border-color: #33373F;
+  color: #A0A8B5;
+}
+
+body.dark-mode .roadmap-input {
+  background: #1F2228;
+  color: #E8EAED;
+}
+
+body.dark-mode .roadmap-stat {
+  background: #1A1D23;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .roadmap-stat-label {
+  color: #7A8290;
+}
+
+body.dark-mode .roadmap-stat-value {
+  color: #E8EAED;
+}
+
+body.dark-mode .roadmap-stage-name {
+  color: #A0A8B5;
+}
+
+body.dark-mode .roadmap-stage-range {
+  color: #7A8290;
+}
+
+body.dark-mode .roadmap-stage-line {
+  background: #2A2E36;
+}
+
+body.dark-mode .roadmap-empty-state {
+  color: #7A8290;
+}
+
+/* Daily log history table on Roadmap */
+body.dark-mode .roadmap-log-grid,
+body.dark-mode [class*="roadmap-log"] {
+  background: #1A1D23;
+  border-color: #2A2E36;
+  color: #C7CCD3;
+}
+
+/* ---------- Setup wizard stepper dots & bars ---------- */
+body.dark-mode .setup-stepper {
+  border-bottom-color: #2A2E36;
+}
+
+body.dark-mode .setup-stepper-dot {
+  background: #20232A;
+  color: #5E6571;
+  border-color: #33373F;
+}
+
+body.dark-mode .setup-stepper-dot-active {
+  background: rgba(212, 168, 40, 0.18);
+  color: #D4A828;
+  border-color: #D4A828;
+}
+
+body.dark-mode .setup-stepper-dot-done {
+  background: #D4A828;
+  color: #fff;
+  border-color: #D4A828;
+}
+
+body.dark-mode .setup-stepper-label {
+  color: #5E6571;
+}
+
+body.dark-mode .setup-stepper-label-active {
+  color: #E8EAED;
+}
+
+body.dark-mode .setup-stepper-bar {
+  background: #2A2E36;
+}
+
+body.dark-mode .setup-stepper-bar-done {
+  background: #D4A828;
+}
+
+/* ---------- Roadmap goal-amount buttons (dark mode) ---------- */
+/* The white buttons were jarring — use a dark surface with a subtle
+   border, matching how the goal-amount grid looks in the rest of the
+   dark app. Selected state stays inverted (dark bg, white text). */
+body.dark-mode .goal-amount-btn {
+  background: #20232A;
+  border-color: #33373F;
+  color: #C7CCD3;
+}
+
+body.dark-mode .goal-amount-btn:hover {
+  border-color: #5B93E8;
+  background: rgba(91, 147, 232, 0.1);
+  color: #E8EAED;
+}
+
+body.dark-mode .goal-amount-btn.selected {
+  background: #E8EAED;
+  border-color: #E8EAED;
+  color: #14233D;
+}
+
+body.dark-mode .goal-amount-btn-cr {
+  border-color: #B6890F;
+  color: #D4A828;
+}
+
+body.dark-mode .goal-amount-btn-cr.selected {
+  background: linear-gradient(135deg, #D4A828 0%, #B6890F 100%);
+  border-color: #D4A828;
+  color: #fff;
+}
+
+body.dark-mode .goal-result-warning {
+  background: rgba(197, 61, 34, 0.14);
+  border-color: rgba(197, 61, 34, 0.3);
+  color: #F09080;
+}
+
+/* ---------- Daily Limits Tool dark mode (comprehensive) ---------- */
+body.dark-mode .log-date-wrap {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .log-date-input {
+  background: #1F2228;
+  border-color: #33373F;
+  color: #E8EAED;
+}
+
+body.dark-mode .broker-connected-row {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .broker-connected-text {
+  color: #E8EAED;
+}
+
+body.dark-mode .broker-last-sync {
+  color: #7A8290;
+}
+
+body.dark-mode .broker-disconnect-btn {
+  background: rgba(197, 61, 34, 0.15);
+  border-color: rgba(197, 61, 34, 0.3);
+  color: #E0563A;
+}
+
+/* ---------- Journal dark mode (comprehensive) ---------- */
+body.dark-mode .journal-analysis-wrap {
+  background: #1A1D23;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .journal-filter-row {
+  background: transparent;
+}
+
+body.dark-mode .journal-filter-clear-btn {
+  background: #20232A;
+  border-color: #33373F;
+  color: #C7CCD3;
+}
+
+body.dark-mode .journal-form-wrap {
+  background: #1A1D23;
+  border-color: #2A2E36;
+}
+
+body.dark-mode .journal-section {
+  border-color: #2A2E36;
+}
+
+body.dark-mode .journal-section-title {
+  color: #E8EAED;
+}
+
+body.dark-mode .journal-screenshot-dropzone {
+  background: #1E2126;
+  border-color: #33373F;
+}
+
+body.dark-mode .journal-screenshot-empty {
+  color: #7A8290;
+}
+
+body.dark-mode .journal-close-btn {
+  color: #7A8290;
+}
+
+body.dark-mode .journal-close-btn:hover {
+  color: #E8EAED;
+}
+
+body.dark-mode .journal-delete-btn {
+  background: rgba(197, 61, 34, 0.14);
+  border-color: rgba(197, 61, 34, 0.3);
+  color: #E0563A;
+}
+
+/* ---------- Roadmap redesign — slider, simulator, challenge, modal ---------- */
+body.dark-mode .rm-step-label { color: #7A8290; }
+body.dark-mode .rm-goal-slider-min,
+body.dark-mode .rm-goal-slider-max { color: #7A8290; }
+body.dark-mode .rm-goal-slider {
+  background: linear-gradient(to right, #D4A828 0%, #D4A828 50%, #2A2E36 50%);
+}
+body.dark-mode .rm-goal-slider::-webkit-slider-thumb { border-color: #1A1D23; }
+body.dark-mode .rm-goal-custom-label { color: #A0A8B5; }
+body.dark-mode .rm-goal-custom-input-wrap { background: #1F2228; border-color: #33373F; }
+body.dark-mode .rm-goal-prefix { background: #20232A; border-color: #33373F; color: #7A8290; }
+body.dark-mode .rm-goal-custom-input { color: #E8EAED; }
+body.dark-mode .rm-goal-display { color: #E8EAED; }
+
+body.dark-mode .rm-status-warning { background: rgba(197,61,34,0.13); border-color: rgba(197,61,34,0.3); color: #F09080; }
+body.dark-mode .rm-status-ok { background: rgba(14,159,110,0.12); border-color: rgba(14,159,110,0.28); color: #3DBF8F; }
+body.dark-mode .rm-status-reached { background: rgba(14,159,110,0.12); border-color: rgba(14,159,110,0.28); color: #3DBF8F; }
+
+body.dark-mode .rm-sim-hint { color: #A0A8B5; }
+body.dark-mode .rm-sim-slider-label { color: #E8EAED; }
+
+body.dark-mode .rm-metric-card { background: #20232A; border-color: #2A2E36; }
+body.dark-mode .rm-metric-label { color: #7A8290; }
+body.dark-mode .rm-metric-value { color: #E8EAED; }
+body.dark-mode .rm-metric-sub { color: #7A8290; }
+body.dark-mode .rm-metric-warn { color: #E0563A; }
+
+body.dark-mode .rm-challenge-card { }
+body.dark-mode .rm-challenge-name { color: #E8EAED; }
+body.dark-mode .rm-challenge-empty { color: #7A8290; }
+body.dark-mode .rm-challenge-pct { color: #E8EAED; }
+body.dark-mode .rm-challenge-progress-track { background: #2A2E36; }
+body.dark-mode .rm-challenge-stat { background: #20232A; border-color: #2A2E36; }
+body.dark-mode .rm-challenge-stat-value { color: #E8EAED; }
+
+body.dark-mode .rm-modal { background: #1A1D23; box-shadow: 0 16px 40px rgba(0,0,0,0.5); }
+body.dark-mode .rm-modal-header { border-bottom-color: #2A2E36; }
+body.dark-mode .rm-modal-title { color: #E8EAED; }
+body.dark-mode .rm-modal-close { color: #7A8290; }
+body.dark-mode .rm-modal-footer { border-top-color: #2A2E36; }
+
+/* ---------- Trade Manager — new elements dark mode ---------- */
+body.dark-mode .tm-broker-import-strip {
+  background: #20232A;
+  border-color: #33373F;
+}
+body.dark-mode .tm-broker-import-label { color: #A0A8B5; }
+body.dark-mode .tm-broker-import-mini-btn,
+body.dark-mode .tm-broker-mini-import-btn {
+  background: #E8EAED;
+  color: #14233D;
+}
+
+body.dark-mode .tm-metrics-panel {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+body.dark-mode .tm-metrics-panel-empty { color: #5E6571; }
+body.dark-mode .tm-metric-row { border-bottom-color: #2A2E36; }
+body.dark-mode .tm-metric-heading { color: #7A8290; }
+body.dark-mode .tm-metric-detail { color: #7A8290; }
+body.dark-mode .tm-metric-risk   .tm-metric-amount { color: #E0563A; }
+body.dark-mode .tm-metric-reward .tm-metric-amount { color: #3DBF8F; }
+body.dark-mode .tm-metric-margin .tm-metric-amount { color: #5B93E8; }
+body.dark-mode .tm-price-hint { color: #A0A8B5; }
+
+body.dark-mode .tm-end-btn {
+  background: #20232A;
+  border-color: #33373F;
+  color: #A0A8B5;
+}
+body.dark-mode .tm-end-btn:hover {
+  background: rgba(197,61,34,0.14);
+  border-color: rgba(197,61,34,0.35);
+  color: #E0563A;
+}
+
+body.dark-mode .tm-rr-suggest-btn-selected {
+  background: #E8EAED !important;
+  border-color: #E8EAED !important;
+  color: #14233D !important;
+}
+
+/* Trade closed overlay in dark mode */
+body.dark-mode .tm-rr-animation-area [style*="rgba(248,250,252"] {
+  background: rgba(26,29,35,0.85) !important;
+}
+
+/* ---------- Daily Limits Tool — comprehensive dark mode fix ---------- */
+/* The trade log area, outcome buttons, and inner panel boxes
+   were still showing as white in dark mode. */
+body.dark-mode .tool-layout,
+body.dark-mode .input-panel,
+body.dark-mode .right-panel,
+body.dark-mode .calc-right-column {
+  background: transparent;
+}
+
+body.dark-mode .form-group label,
+body.dark-mode .trade-log-title {
+  color: #A0A8B5;
+}
+
+body.dark-mode .trade-log-container {
+  background: #1E2126;
+  border-color: #2A2E36;
+  border-radius: 10px;
+}
+
+body.dark-mode .broker-quick-connect-wrap {
+  background: #1E2126;
+  border: 1px solid #2A2E36;
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+body.dark-mode .broker-synced-panel {
+  background: #1E2126;
+  border: 1px solid #2A2E36;
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+body.dark-mode .broker-synced-title { color: #E8EAED; }
+
+body.dark-mode .broker-range-pill {
+  background: #20232A;
+  border-color: #33373F;
+  color: #C7CCD3;
+}
+
+body.dark-mode .broker-range-pill:hover {
+  border-color: #D4A828;
+}
+
+body.dark-mode .broker-range-pill-active {
+  background: rgba(91,147,232,0.14);
+  border-color: #5B93E8;
+  color: #E8EAED;
+}
+
+body.dark-mode .broker-day-detail {
+  background: #20232A;
+  border-color: #2A2E36;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+body.dark-mode .broker-day-detail-title { color: #E8EAED; }
+
+body.dark-mode .profit-decision-card {
+  background: rgba(14,159,110,0.12);
+  border: 1px solid rgba(14,159,110,0.28);
+}
+body.dark-mode .profit-decision-title { color: #3DBF8F; }
+body.dark-mode .profit-decision-secondary-btn {
+  background: #20232A;
+  border-color: #33373F;
+  color: #C7CCD3;
+}
+
+/* ---------- Comprehensive remaining dark mode fixes ---------- */
+
+/* Roadmap history table (white cells) */
+body.dark-mode .roadmap-history-grid {
+  background: #2A2E36;
+  border-color: #2A2E36;
+}
+body.dark-mode .roadmap-history-cell {
+  background: #1A1D23;
+  color: #C7CCD3;
+}
+body.dark-mode .roadmap-history-head {
+  background: #20232A;
+  color: #8A93A3;
+}
+
+/* Trade Manager result cards — open/open-profit white backgrounds */
+body.dark-mode .tm-result-card.tm-result-open {
+  background: #20232A;
+  border-color: #2A2E36;
+}
+body.dark-mode .tm-result-card.tm-result-open .tm-result-title { color: #E8EAED; }
+body.dark-mode .tm-result-card.tm-result-open .tm-result-message { color: #A0A8B5; }
+
+body.dark-mode .tm-result-card.tm-result-open-profit {
+  background: rgba(44, 111, 214, 0.1);
+  border-color: rgba(44, 111, 214, 0.25);
+}
+body.dark-mode .tm-result-card.tm-result-open-profit .tm-result-title { color: #5B93E8; }
+body.dark-mode .tm-result-card.tm-result-open-profit .tm-result-message { color: #A0B8D8; }
+
+/* Trade closed overlay */
+body.dark-mode .tm-rr-animation-area .tm-closed-overlay {
+  background: rgba(26,29,35,0.85);
+}
+
+/* Setup instrument picker — white box in dark mode */
+body.dark-mode .instrument-picker-wrap,
+body.dark-mode .instrument-picker-category {
+  background: #1E2126;
+  border-color: #2A2E36;
+}
+body.dark-mode .instrument-picker-category-header {
+  background: #20232A;
+  border-color: #2A2E36;
+  color: #A0A8B5;
+}
+body.dark-mode .instrument-picker-row {
+  background: #1A1D23;
+  border-color: #2A2E36;
+  color: #C7CCD3;
+}
+body.dark-mode .instrument-picker-search {
+  background: #1F2228;
+  border-color: #33373F;
+  color: #E8EAED;
+}
+
+/* Roadmap metric cards */
+body.dark-mode .rm-metric-card {
+  background: #20232A;
+  border-color: #2A2E36;
+}
+
+/* Challenge stat cards */
+body.dark-mode .rm-challenge-stat {
+  background: #20232A;
+  border-color: #2A2E36;
+}
+
+/* Right-side panels (suggestions pattern reused) */
+body.dark-mode .suggestions-panel {
+  background: #1A1D23;
+}
+body.dark-mode .suggestions-panel-header {
+  border-bottom-color: #2A2E36;
+}
+body.dark-mode .suggestions-panel-footer {
+  border-top-color: #2A2E36;
+}
+body.dark-mode .suggestions-panel-title { color: #E8EAED; }
+body.dark-mode .suggestions-panel-text { color: #A0A8B5; }
+
+/* broker-import-confirm inside dark panel */
+body.dark-mode .broker-import-confirm-text { color: #C7CCD3; }

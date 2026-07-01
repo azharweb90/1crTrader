@@ -1,0 +1,1 @@
+Reserved for Phase 2: shared formatters (₹ formatting, date helpers) currently live inline across src/app/app-shell.js and feature files. Not split yet.

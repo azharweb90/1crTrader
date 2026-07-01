@@ -1,0 +1,1 @@
+Reserved for Phase 2: session/profile/balance state currently lives at the top of src/app/app-shell.js. Not split yet.
