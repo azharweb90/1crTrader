@@ -1,13 +1,11 @@
 <!-- COMPONENT: dashboard-home -->
-<section class="content-section">
-  <p class="section-note">A quick look at where things stand, and shortcuts to where you'll spend most of your time.</p>
+<div class="dash-home-wrap">
+  <p class="section-note" style="margin-bottom:20px;">A quick look at where things stand, and shortcuts to where you'll spend most of your time.</p>
 
+  <!-- Four stat boxes — each its own independent card -->
   <div id="dash-stat-grid" class="dash-stat-grid"></div>
 
-  <!-- Risk-rules-at-a-glance: tier bracket, max daily loss (₹and %), and
-       max lots right now, all computed from the trader's actual current
-       balance via window.getRiskSummary() in dashboard.js — not a separate
-       set of numbers, the exact same rules the Daily Limits Tool enforces. -->
+  <!-- Risk rules at-a-glance — its own card, visually distinct -->
   <div id="dash-risk-wrap" class="dash-risk-wrap hidden">
     <div class="mini-ladder-title">Your Risk Rules Right Now</div>
     <div id="dash-risk-grid" class="dash-risk-grid"></div>
@@ -19,41 +17,45 @@
     </div>
   </div>
 
-  <div class="dash-quicklinks-title">Jump back in</div>
-  <div class="dash-quicklink-grid">
-    <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-calculator')">
-      <span class="dash-quicklink-icon">⏱</span>
-      <div>
-        <div class="dash-quicklink-title">Daily Limits Tool</div>
-        <div class="dash-quicklink-desc">Log today's trades and stay inside your risk limits</div>
-      </div>
-    </button>
-    <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-roadmap')">
-      <span class="dash-quicklink-icon">↗</span>
-      <div>
-        <div class="dash-quicklink-title">Roadmap</div>
-        <div class="dash-quicklink-desc">See your tier progress and goal projections</div>
-      </div>
-    </button>
-    <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-journal')">
-      <span class="dash-quicklink-icon">✎</span>
-      <div>
-        <div class="dash-quicklink-title">Trading Journal</div>
-        <div class="dash-quicklink-desc">Write up strategy, emotion, and review past trades</div>
-      </div>
-    </button>
-    <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-settings')">
-      <span class="dash-quicklink-icon">⚙</span>
-      <div>
-        <div class="dash-quicklink-title">Account</div>
-        <div class="dash-quicklink-desc">Change tier, capital, trading style, or instruments</div>
-      </div>
-    </button>
+  <!-- Jump back in — Trade Manager added, Account removed -->
+  <div class="dash-section-card">
+    <div class="dash-quicklinks-title">Jump back in</div>
+    <div class="dash-quicklink-grid">
+      <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-calculator')">
+        <span class="dash-quicklink-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 13l3.5-2.5"/></svg></span>
+        <div>
+          <div class="dash-quicklink-title">Daily Limits Tool</div>
+          <div class="dash-quicklink-desc">Log today's trades and stay inside your risk limits</div>
+        </div>
+      </button>
+      <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-trade-manager')">
+        <span class="dash-quicklink-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17V9l-3 3M7 9l3 3M17 7v8l3-3M17 15l-3-3"/></svg></span>
+        <div>
+          <div class="dash-quicklink-title">Trade Manager</div>
+          <div class="dash-quicklink-desc">Track a live position and manage your trailing stop</div>
+        </div>
+      </button>
+      <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-roadmap')">
+        <span class="dash-quicklink-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.4"/><circle cx="18" cy="5" r="2.4"/><path d="M8.4 19H14a3 3 0 0 0 3-3V8"/></svg></span>
+        <div>
+          <div class="dash-quicklink-title">Roadmap</div>
+          <div class="dash-quicklink-desc">See your tier progress and goal projections</div>
+        </div>
+      </button>
+      <button type="button" class="dash-quicklink-card" onclick="switchTab(null, 'tab-journal')">
+        <span class="dash-quicklink-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+        <div>
+          <div class="dash-quicklink-title">Trading Journal</div>
+          <div class="dash-quicklink-desc">Write up strategy, emotion, and review past trades</div>
+        </div>
+      </button>
+    </div>
   </div>
 
-  <div id="dash-recent-wrap" class="dash-recent-wrap">
+  <!-- Recent activity -->
+  <div id="dash-recent-wrap" class="dash-recent-wrap dash-section-card">
     <div class="mini-ladder-title">Recent Activity</div>
     <div id="dash-recent-area"></div>
   </div>
-</section>
+</div>
 <!-- END COMPONENT: dashboard-home -->

@@ -1,98 +1,172 @@
 <!-- COMPONENT: roadmap -->
-<section class="content-section">
-  <h1>Capital Growth Roadmap</h1>
-  <p class="section-note">Track your progress toward the next tier and project how many winning trades it takes to get there, following the daily trading rules.</p>
+<div class="dash-home-wrap">
+
+  <!-- ── STEP 1: WHERE YOU ARE ─────────────────────────────────── -->
+  <div class="roadmap-balance-card">
+    <div class="roadmap-balance-label">Current Balance</div>
+    <div id="roadmap-balance-value" class="roadmap-balance-value">₹—</div>
+    <div id="roadmap-balance-sub" class="roadmap-balance-sub">—</div>
+  </div>
 
   <div id="congrats-banner-slot"></div>
 
-  <!-- Current balance, large and prominent -->
-  <div class="roadmap-balance-card">
-    <div class="roadmap-balance-label">Current Balance</div>
-    <div id="roadmap-balance-value" class="roadmap-balance-value">₹&mdash;</div>
-    <div id="roadmap-balance-sub" class="roadmap-balance-sub">&mdash;</div>
-  </div>
-
-  <!-- Tier progress track: Small -> Medium -> Large -> Pro -->
-  <div class="roadmap-progress-track" id="roadmap-progress-track">
-    <div class="roadmap-stage" data-stage="small">
-      <div class="roadmap-stage-line"></div>
-      <div class="roadmap-stage-dot"></div>
-      <div class="roadmap-stage-name">Small</div>
-      <div class="roadmap-stage-range">₹25,000+</div>
-    </div>
-    <div class="roadmap-stage" data-stage="medium">
-      <div class="roadmap-stage-line"></div>
-      <div class="roadmap-stage-dot"></div>
-      <div class="roadmap-stage-name">Medium</div>
-      <div class="roadmap-stage-range">₹1,00,000+</div>
-    </div>
-    <div class="roadmap-stage" data-stage="large">
-      <div class="roadmap-stage-line"></div>
-      <div class="roadmap-stage-dot"></div>
-      <div class="roadmap-stage-name">Large</div>
-      <div class="roadmap-stage-range">₹5,00,000+</div>
-    </div>
-    <div class="roadmap-stage" data-stage="pro">
-      <div class="roadmap-stage-line"></div>
-      <div class="roadmap-stage-dot"></div>
-      <div class="roadmap-stage-name">Pro</div>
-      <div class="roadmap-stage-range">₹10,00,000+</div>
+  <div class="dash-section-card" style="padding:20px 28px;">
+    <div class="roadmap-progress-track" id="roadmap-progress-track">
+      <div class="roadmap-stage" data-stage="small">
+        <div class="roadmap-stage-line"></div>
+        <div class="roadmap-stage-dot"></div>
+        <div class="roadmap-stage-name">Small</div>
+        <div class="roadmap-stage-range">₹25,000+</div>
+      </div>
+      <div class="roadmap-stage" data-stage="medium">
+        <div class="roadmap-stage-line"></div>
+        <div class="roadmap-stage-dot"></div>
+        <div class="roadmap-stage-name">Medium</div>
+        <div class="roadmap-stage-range">₹1,00,000+</div>
+      </div>
+      <div class="roadmap-stage" data-stage="large">
+        <div class="roadmap-stage-line"></div>
+        <div class="roadmap-stage-dot"></div>
+        <div class="roadmap-stage-name">Large</div>
+        <div class="roadmap-stage-range">₹5,00,000+</div>
+      </div>
+      <div class="roadmap-stage" data-stage="pro">
+        <div class="roadmap-stage-line"></div>
+        <div class="roadmap-stage-dot"></div>
+        <div class="roadmap-stage-name">Pro</div>
+        <div class="roadmap-stage-range">₹10,00,000+</div>
+      </div>
     </div>
   </div>
 
-  <!-- Average win input, used to project trades needed -->
-  <div class="roadmap-input-card">
-    <label class="amount-label" for="roadmap-avg-win-input" style="text-transform:uppercase; font-weight:600; font-size:12.5px; color:#5f6b7a;">
-      Average profit per winning trade (₹)
-    </label>
-    <div class="roadmap-input-row" style="margin-top:8px;">
-      <span class="roadmap-input-prefix">₹</span>
-      <input type="number" id="roadmap-avg-win-input" class="roadmap-input" min="0" step="1" placeholder="e.g. 800" oninput="onRoadmapAvgWinInput()">
+  <!-- ── STEP 2: GOAL SIMULATOR ────────────────────────────────── -->
+  <div class="dash-section-card">
+    <div class="rm-step-label">Step 2 — Set Your Goal</div>
+    <p class="section-note" style="margin-bottom:18px;">Pick a target and simulate what it takes at your current pace — or adjust win rate and profit to find a path that works.</p>
+
+    <!-- Slider goal picker -->
+    <div class="rm-goal-slider-wrap">
+      <div class="rm-goal-slider-row">
+        <span class="rm-goal-slider-min">₹10L</span>
+        <input type="range" id="rm-goal-slider" class="rm-goal-slider"
+          min="1000000" max="10000000" step="500000" value="5000000"
+          oninput="onRoadmapSliderInput(this.value)">
+        <span class="rm-goal-slider-max">₹1 Crore</span>
+      </div>
+      <div class="rm-goal-custom-row">
+        <span class="rm-goal-custom-label">Target amount</span>
+        <div class="rm-goal-custom-input-wrap">
+          <span class="rm-goal-prefix">₹</span>
+          <input type="number" id="rm-goal-custom-input" class="rm-goal-custom-input"
+            placeholder="e.g. 5000000" min="100000" max="100000000"
+            oninput="onRoadmapGoalCustomInput(this.value)">
+        </div>
+        <div id="rm-goal-display" class="rm-goal-display">₹50,00,000</div>
+      </div>
     </div>
-    <p class="foot-note" style="margin-top:8px;">Used to project trades needed to reach the next tier. This updates automatically using your actual win/loss ratio once you've logged a few real trading days.</p>
   </div>
 
-  <!-- Projection stats -->
-  <div id="roadmap-projection-area"></div>
+  <!-- ── STEP 3: SIMULATOR & METRICS ───────────────────────────── -->
+  <div class="dash-section-card">
+    <div class="rm-step-label">Step 3 — Roadmap Simulator</div>
 
-  <p class="foot-note">This is a simple projection (gap to next tier &divide; average win amount). It assumes winning trades only until real trade history is available, and does not account for losing trades.</p>
+    <div id="rm-simulator-status" class="rm-simulator-status"></div>
 
-  <!-- Goal Tracker: pick a target amount (1L up to 1Cr) and see trades/days needed -->
-  <div class="goal-tracker-wrap">
-    <div class="select-step-title" style="margin-top:8px;">Set Your Goal</div>
-    <p class="section-note" style="margin-bottom:14px;">Pick a target amount &mdash; from your next tier all the way to ₹1 crore &mdash; and see how many trades and days it takes at your current pace.</p>
-
-    <div class="goal-amount-grid" id="goal-amount-grid">
-      <button type="button" class="goal-amount-btn" data-goal="100000" onclick="selectGoalAmount(100000)">₹1L</button>
-      <button type="button" class="goal-amount-btn" data-goal="500000" onclick="selectGoalAmount(500000)">₹5L</button>
-      <button type="button" class="goal-amount-btn" data-goal="1000000" onclick="selectGoalAmount(1000000)">₹10L</button>
-      <button type="button" class="goal-amount-btn" data-goal="1500000" onclick="selectGoalAmount(1500000)">₹15L</button>
-      <button type="button" class="goal-amount-btn" data-goal="2000000" onclick="selectGoalAmount(2000000)">₹20L</button>
-      <button type="button" class="goal-amount-btn" data-goal="2500000" onclick="selectGoalAmount(2500000)">₹25L</button>
-      <button type="button" class="goal-amount-btn" data-goal="3000000" onclick="selectGoalAmount(3000000)">₹30L</button>
-      <button type="button" class="goal-amount-btn" data-goal="3500000" onclick="selectGoalAmount(3500000)">₹35L</button>
-      <button type="button" class="goal-amount-btn" data-goal="4000000" onclick="selectGoalAmount(4000000)">₹40L</button>
-      <button type="button" class="goal-amount-btn" data-goal="4500000" onclick="selectGoalAmount(4500000)">₹45L</button>
-      <button type="button" class="goal-amount-btn" data-goal="5000000" onclick="selectGoalAmount(5000000)">₹50L</button>
-      <button type="button" class="goal-amount-btn" data-goal="5500000" onclick="selectGoalAmount(5500000)">₹55L</button>
-      <button type="button" class="goal-amount-btn" data-goal="6000000" onclick="selectGoalAmount(6000000)">₹60L</button>
-      <button type="button" class="goal-amount-btn" data-goal="6500000" onclick="selectGoalAmount(6500000)">₹65L</button>
-      <button type="button" class="goal-amount-btn" data-goal="7000000" onclick="selectGoalAmount(7000000)">₹70L</button>
-      <button type="button" class="goal-amount-btn" data-goal="7500000" onclick="selectGoalAmount(7500000)">₹75L</button>
-      <button type="button" class="goal-amount-btn" data-goal="8000000" onclick="selectGoalAmount(8000000)">₹80L</button>
-      <button type="button" class="goal-amount-btn" data-goal="8500000" onclick="selectGoalAmount(8500000)">₹85L</button>
-      <button type="button" class="goal-amount-btn" data-goal="9000000" onclick="selectGoalAmount(9000000)">₹90L</button>
-      <button type="button" class="goal-amount-btn" data-goal="9500000" onclick="selectGoalAmount(9500000)">₹95L</button>
-      <button type="button" class="goal-amount-btn goal-amount-btn-cr" data-goal="10000000" onclick="selectGoalAmount(10000000)">₹1 Crore</button>
+    <!-- Simulation sliders — shown when "not reachable" to let the user
+         find a path. Hidden when already reachable at current pace. -->
+    <div id="rm-sim-controls" class="rm-sim-controls hidden">
+      <p class="rm-sim-hint">Adjust below to simulate what changes are needed to reach this goal:</p>
+      <div class="rm-sim-slider-group">
+        <div class="rm-sim-slider-label-row">
+          <span class="rm-sim-slider-label">Win Rate</span>
+          <span id="rm-sim-winrate-val" class="rm-sim-slider-value">50%</span>
+        </div>
+        <input type="range" id="rm-sim-winrate" class="rm-goal-slider"
+          min="10" max="100" step="5" value="50"
+          oninput="onSimulatorInput()">
+        <div class="rm-sim-slider-hint" id="rm-sim-winrate-hint"></div>
+      </div>
+      <div class="rm-sim-slider-group">
+        <div class="rm-sim-slider-label-row">
+          <span class="rm-sim-slider-label">Avg. Profit per Winning Trade</span>
+          <span id="rm-sim-avgwin-val" class="rm-sim-slider-value">₹2,500</span>
+        </div>
+        <input type="range" id="rm-sim-avgwin" class="rm-goal-slider"
+          min="500" max="20000" step="500" value="2500"
+          oninput="onSimulatorInput()">
+      </div>
     </div>
 
+    <!-- Average win input (when no history exists) -->
+    <div id="rm-avg-win-wrap" class="rm-avg-win-wrap hidden">
+      <label class="amount-label" for="roadmap-avg-win-input">Your average profit per winning trade (₹)</label>
+      <div class="roadmap-input-row" style="margin-top:6px; max-width:260px;">
+        <span class="roadmap-input-prefix">₹</span>
+        <input type="number" id="roadmap-avg-win-input" class="roadmap-input"
+          min="0" step="1" placeholder="e.g. 2500"
+          oninput="onRoadmapAvgWinInput()">
+      </div>
+      <p class="foot-note" style="margin-top:6px;">Once you've logged real trades, this updates automatically from your history.</p>
+    </div>
+
+    <!-- Result metric cards -->
+    <div id="roadmap-projection-area"></div>
     <div id="goal-result-area"></div>
   </div>
 
-  <!-- Daily trade log history -->
-  <div class="roadmap-history-wrap">
-    <div class="select-step-title" style="margin-top:28px;">Daily Log History</div>
+  <!-- ── CHALLENGE ─────────────────────────────────────────────── -->
+  <div class="dash-section-card rm-challenge-card">
+    <div class="rm-challenge-header">
+      <div>
+        <div class="rm-step-label" style="margin-bottom:4px;">Personal Challenge</div>
+        <p class="section-note" style="margin-bottom:0;">Set a specific money target with a deadline. Track your daily progress here.</p>
+      </div>
+      <button type="button" class="rm-challenge-set-btn" id="rm-challenge-set-btn" onclick="openChallengeModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 21 12"/></svg>
+        Set Challenge
+      </button>
+    </div>
+    <div id="rm-challenge-body"></div>
+  </div>
+
+  <!-- ── DAILY LOG HISTORY ──────────────────────────────────────── -->
+  <div class="dash-section-card">
+    <div class="rm-step-label" style="margin-bottom:14px;">Daily Log History</div>
     <div id="roadmap-history-area"></div>
   </div>
-</section>
+
+</div>
+
+<!-- Challenge modal -->
+<div id="rm-challenge-modal-overlay" class="rm-modal-overlay hidden" onclick="closeChallengeModalIfOutside(event)">
+  <div class="rm-modal">
+    <div class="rm-modal-header">
+      <span class="rm-modal-title">Set a Trading Challenge</span>
+      <button type="button" class="rm-modal-close" onclick="closeChallengeModal()">&times;</button>
+    </div>
+    <div class="rm-modal-body">
+      <div class="rm-modal-field">
+        <label class="amount-label">Target Capital (₹)</label>
+        <div class="roadmap-input-row" style="margin-top:6px;">
+          <span class="roadmap-input-prefix">₹</span>
+          <input type="number" id="rm-ch-target" class="roadmap-input" placeholder="e.g. 500000" min="1000">
+        </div>
+      </div>
+      <div class="rm-modal-field">
+        <label class="amount-label">Target Date</label>
+        <input type="date" id="rm-ch-date" class="select-input" style="margin-top:6px; width:100%;">
+      </div>
+      <div class="rm-modal-field">
+        <label class="amount-label">Challenge Name (optional)</label>
+        <input type="text" id="rm-ch-name" class="amount-input" style="margin-top:6px;" placeholder="e.g. My ₹5L Goal">
+      </div>
+    </div>
+    <div class="rm-modal-footer">
+      <button type="button" class="broker-import-btn" style="min-width:140px; border-radius:8px;" onclick="saveChallengeModal()">
+        ✓ Set Challenge
+      </button>
+      <button type="button" class="setup-wizard-back-btn" onclick="closeChallengeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 <!-- END COMPONENT: roadmap -->

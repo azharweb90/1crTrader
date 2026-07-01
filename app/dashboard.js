@@ -12,6 +12,7 @@
    =========================================================== */
 
 (function () {
+
   // Unique per page-load, used to cache-bust fetches for HTML fragments and
   // their JS files (see loadComponent below) — guarantees a hard refresh
   // always gets the latest files even on dev servers that cache aggressively.
@@ -92,7 +93,7 @@
     pro: "pro-1",
   };
 
-  const TIER_ORDER = ["small", "medium", "large", "pro"];
+  const TIER_ORDER = ['small', 'medium', 'large', 'pro'];
 
   const TIER_LABELS = {
     small: "Small",
@@ -104,10 +105,10 @@
   // Min/max capital range per tier, used to validate the entered amount
   // and to detect when a running balance crosses into a new tier.
   const TIER_RANGES = {
-    small: { min: 25000, max: 75000 },
-    medium: { min: 100000, max: 500000 },
-    large: { min: 500000, max: 1000000 },
-    pro: { min: 1000000, max: 2000000 },
+    small:  { min: 25000,    max: 75000 },
+    medium: { min: 100000,   max: 500000 },
+    large:  { min: 500000,   max: 1000000 },
+    pro:    { min: 1000000,  max: 2000000 },
   };
 
   // Single source of truth for max daily loss by tier+sub-level. Lives here
@@ -126,18 +127,18 @@
   // BALANCE GROWTH (from originalStartingCapital, compounding) combine to
   // determine their actual current lot allowance.
   const tierRulesMatrix = {
-    "small-1": { cap: 25000, pct: 7.0, loss: 1750, maxLots: 1 },
-    "small-2": { cap: 50000, pct: 6.0, loss: 3000, maxLots: 2 },
-    "small-3": { cap: 75000, pct: 5.0, loss: 3750, maxLots: 3 },
-    "medium-1": { cap: 100000, pct: 4.0, loss: 4000, maxLots: 4 },
-    "medium-2": { cap: 300000, pct: 2.0, loss: 6000, maxLots: 6 },
-    "medium-3": { cap: 400000, pct: 2.0, loss: 8000, maxLots: 8 },
-    "large-1": { cap: 500000, pct: 2.0, loss: 10000, maxLots: 8 },
-    "large-2": { cap: 700000, pct: 2.0, loss: 14000, maxLots: 16 },
-    "large-3": { cap: 900000, pct: 2.0, loss: 18000, maxLots: 24 },
-    "pro-1": { cap: 1000000, pct: 2.0, loss: 20000, maxLots: 16 },
-    "pro-2": { cap: 1500000, pct: 2.0, loss: 30000, maxLots: 32 },
-    "pro-3": { cap: 1900000, pct: 2.0, loss: 38000, maxLots: 48 },
+    "small-1":  { cap: 25000,    pct: 7.00, loss: 1750,  maxLots: 1 },
+    "small-2":  { cap: 50000,    pct: 6.00, loss: 3000,  maxLots: 2 },
+    "small-3":  { cap: 75000,    pct: 5.00, loss: 3750,  maxLots: 3 },
+    "medium-1": { cap: 100000,   pct: 4.00,  loss: 4000,  maxLots: 4 },
+    "medium-2": { cap: 300000,   pct: 2.00,  loss: 6000,  maxLots: 6 },
+    "medium-3": { cap: 400000,   pct: 2.00,  loss: 8000,  maxLots: 8 },
+    "large-1":  { cap: 500000,   pct: 2.00, loss: 10000, maxLots: 8 },
+    "large-2":  { cap: 700000,   pct: 2.00, loss: 14000, maxLots: 16 },
+    "large-3":  { cap: 900000,   pct: 2.00, loss: 18000, maxLots: 24 },
+    "pro-1":    { cap: 1000000,  pct: 2.00, loss: 20000, maxLots: 16 },
+    "pro-2":    { cap: 1500000,  pct: 2.00, loss: 30000, maxLots: 32 },
+    "pro-3":    { cap: 1900000,  pct: 2.00, loss: 38000, maxLots: 48 },
   };
 
   // Given a broad tier ('small'..'pro') and a rupee balance, finds which
@@ -145,9 +146,7 @@
   // sub-level's cap within that tier — used so the Dashboard's risk summary
   // reflects the trader's CURRENT balance, not always sub-level 1.
   function subLevelForBalance(tier, balance) {
-    const subLevels = ["1", "2", "3"]
-      .map((n) => `${tier}-${n}`)
-      .filter((key) => tierRulesMatrix[key]);
+    const subLevels = ['1', '2', '3'].map(n => `${tier}-${n}`).filter(key => tierRulesMatrix[key]);
     if (subLevels.length === 0) return null;
 
     let chosen = subLevels[0];
@@ -164,7 +163,7 @@
     "hedged-seller": "Hedged Seller",
     "equity-trader": "Equity / Cash Trader",
     "spread-trader": "Spread Trader",
-    scalper: "Scalper",
+    "scalper": "Scalper",
     "swing-trader": "Swing Trader",
   };
 
@@ -176,10 +175,10 @@
   // getMockBrokerTradableInstruments() below, standing in for what a real
   // broker's scrip/contract master API would return once connected.
   const INSTRUMENT_INFO = {
-    nifty: { label: "Nifty", qty: 65, category: "index" },
-    banknifty: { label: "Bank Nifty", qty: 30, category: "index" },
-    finnifty: { label: "FinNifty", qty: 60, category: "index" },
-    sensex: { label: "Sensex", qty: 20, category: "index" },
+    nifty:      { label: "Nifty",      qty: 65,  category: "index" },
+    banknifty:  { label: "Bank Nifty", qty: 30,  category: "index" },
+    finnifty:   { label: "FinNifty",   qty: 60,  category: "index" },
+    sensex:     { label: "Sensex",     qty: 20,  category: "index" },
   };
 
   // Returns the mock "broker instrument master" — standing in for what a
@@ -190,7 +189,7 @@
   // shape (value/label/qty/category) is exactly what the setup screen
   // already expects.
   function getMockBrokerTradableInstruments() {
-    return Object.keys(INSTRUMENT_INFO).map((key) => ({
+    return Object.keys(INSTRUMENT_INFO).map(key => ({
       value: key,
       label: INSTRUMENT_INFO[key].label,
       qty: INSTRUMENT_INFO[key].qty,
@@ -202,39 +201,39 @@
   const scriptLoaded = {};
 
   // ---------- Global profile state ----------
-  let selectedTier = null; // 'small' | 'medium' | 'large' | 'pro' | null
-  let selectedTraderTypes = new Set(); // multi-select: any combination of keys from TRADER_TYPE_LABELS above
-  let startingCapital = null; // rupees, entered by the user, validated against tier range
-  let currentBalance = null; // rupees, running balance — starts equal to startingCapital,
-  // then shifts as trade P&L is applied (hook for the calculator)
-  let profileConfirmed = false; // true once "Continue to Dashboard" has been clicked at least once
-  let tradeHistory = []; // [{ id, date, netResult, balanceAfter }], one entry per submitted trade
-  let journalEntries = {}; // { [tradeId]: { tradeDetails, execution, logic, psychology, score, grade } }
-  let lastTierForBalance = null; // tracks which tier bucket the balance was in, to detect crossings
-  let pendingCongrats = null; // { fromTier, toTier } queued until the roadmap screen can show it
-  let selectedInstruments = {}; // { nifty: { lots: 1 }, banknifty: { lots: 2 }, ... } — only selected ones are keys
-  let customStocks = []; // ['Reliance', 'TCS', ...] — user's own stock names, freeform
-  let joinDate = null; // YYYY-MM-DD, set once on first profile confirmation — earliest selectable log date
+  let selectedTier = null;        // 'small' | 'medium' | 'large' | 'pro' | null
+  let selectedTraderTypes = new Set();  // multi-select: any combination of keys from TRADER_TYPE_LABELS above
+  let startingCapital = null;     // rupees, entered by the user, validated against tier range
+  let currentBalance = null;      // rupees, running balance — starts equal to startingCapital,
+                                   // then shifts as trade P&L is applied (hook for the calculator)
+  let profileConfirmed = false;   // true once "Continue to Dashboard" has been clicked at least once
+  let tradeHistory = [];          // [{ id, date, netResult, balanceAfter }], one entry per submitted trade
+  let journalEntries = {};        // { [tradeId]: { tradeDetails, execution, logic, psychology, score, grade } }
+  let lastTierForBalance = null;  // tracks which tier bucket the balance was in, to detect crossings
+  let pendingCongrats = null;     // { fromTier, toTier } queued until the roadmap screen can show it
+  let selectedInstruments = {};   // { nifty: { lots: 1 }, banknifty: { lots: 2 }, ... } — only selected ones are keys
+  let customStocks = [];          // ['Reliance', 'TCS', ...] — user's own stock names, freeform
+  let joinDate = null;             // YYYY-MM-DD, set once on first profile confirmation — earliest selectable log date
   let originalStartingCapital = null; // rupees, set ONCE on first profile confirmation — never changes again, even
-  // if startingCapital is later edited via Change Tier. This is the fixed
-  // baseline the lot-unlock thresholds below are measured against.
+                                       // if startingCapital is later edited via Change Tier. This is the fixed
+                                       // baseline the lot-unlock thresholds below are measured against.
   let highestOfficialSubLevelNum = null; // 1/2/3 (or null until profile confirmed) — the highest official
-  // sub-tier EVER reached via entry-capital + growth. A ratchet, not a
-  // live computation: a losing day that drops currentBalance below the
-  // growth threshold must NOT undo a lot/loss tier already earned. See
-  // getOfficialSubLevelKey() below, the only place this is written to.
+                                          // sub-tier EVER reached via entry-capital + growth. A ratchet, not a
+                                          // live computation: a losing day that drops currentBalance below the
+                                          // growth threshold must NOT undo a lot/loss tier already earned. See
+                                          // getOfficialSubLevelKey() below, the only place this is written to.
   let highestOfficialSubLevelTier = null; // which broad tier highestOfficialSubLevelNum was reached under —
-  // if selectedTier changes (Change Tier to a different broad tier),
-  // the ratchet resets, since "sub-tier 3" means something different
-  // in Small vs. Medium and shouldn't carry across.
+                                           // if selectedTier changes (Change Tier to a different broad tier),
+                                           // the ratchet resets, since "sub-tier 3" means something different
+                                           // in Small vs. Medium and shouldn't carry across.
 
   // ---------- Mock broker connection (PROTOTYPE ONLY — no real broker API calls) ----------
   // This entire block simulates what a real Kite Connect / SmartAPI integration would feel
   // like, using fake data generated client-side. Nothing here talks to a real broker. When the
   // real backend exists, this is the seam where actual OAuth + tradebook fetch would replace it.
-  let brokerConnected = false; // true once a mock broker is "connected"
-  let connectedBrokerName = null; // 'Zerodha' | 'Angel One' | 'Upstox' | null
-  let lastSyncedAt = null; // timestamp (ms) of the last successful mock sync, or null
+  let brokerConnected = false;     // true once a mock broker is "connected"
+  let connectedBrokerName = null;  // 'Zerodha' | 'Angel One' | 'Upstox' | null
+  let lastSyncedAt = null;         // timestamp (ms) of the last successful mock sync, or null
 
   // (Lot-unlock-by-growth multiplier logic now lives directly in
   // getMaxAllowedLots()/getNextLotUnlockInfo() below, reading maxLots from
@@ -242,10 +241,52 @@
   // for why lot count and risk amount are no longer the same axis.)
 
   function fmt(n) {
-    return Math.round(n).toLocaleString("en-IN");
+    return Math.round(n).toLocaleString('en-IN');
   }
 
-  // ---------- Dark mode ----------
+  // ---------- Font size ----------
+  // Scales the whole app via CSS `zoom` on #app-shell — confirmed as the
+  // right approach for a codebase with 4800+ lines of hardcoded px values
+  // (retro-fitting to rem units would be a full rewrite, not a feature).
+  // zoom scales everything proportionally including hardcoded px values,
+  // borders, and box-shadows without touching a single line of existing CSS.
+  // 5 steps: 85%, 92%, 100% (default), 108%, 116%. Persisted to localStorage.
+  const FONT_SIZE_STORAGE_KEY = 'fontSizeStep';
+  const FONT_SIZE_STEPS = [0.85, 0.92, 1.0, 1.08, 1.16];
+  const FONT_SIZE_LABELS = ['85%', '92%', '100%', '108%', '116%'];
+  let currentFontSizeStep = 2; // default = 100%
+
+  function applyFontSizePreference() {
+    const saved = parseInt(localStorage.getItem(FONT_SIZE_STORAGE_KEY), 10);
+    if (!isNaN(saved) && saved >= 0 && saved < FONT_SIZE_STEPS.length) {
+      currentFontSizeStep = saved;
+    }
+    applyFontSize();
+  }
+
+  function applyFontSize() {
+    const shell = document.getElementById('app-shell');
+    if (shell) {
+      shell.style.zoom = FONT_SIZE_STEPS[currentFontSizeStep];
+    }
+    const label = document.getElementById('font-size-label');
+    if (label) label.innerText = FONT_SIZE_LABELS[currentFontSizeStep];
+    // Disable the buttons at their respective limits
+    const btns = document.querySelectorAll('.font-size-btn');
+    if (btns.length === 2) {
+      btns[0].disabled = currentFontSizeStep === 0;
+      btns[1].disabled = currentFontSizeStep === FONT_SIZE_STEPS.length - 1;
+    }
+  }
+
+  function adjustFontSize(direction) {
+    const next = currentFontSizeStep + direction;
+    if (next < 0 || next >= FONT_SIZE_STEPS.length) return;
+    currentFontSizeStep = next;
+    localStorage.setItem(FONT_SIZE_STORAGE_KEY, String(currentFontSizeStep));
+    applyFontSize();
+  }
+
   // Whole-application dark theme, confirmed with the trader: covers every
   // tab including the sidebar, persists across visits via localStorage.
   // Implementation: a 'dark-mode' class on <body>, with all the actual
@@ -253,28 +294,28 @@
   // (confirmed approach — keeps dashboard.css, the light theme, completely
   // untouched and unrisked). This function only toggles the class and
   // updates the sun/moon icon + saves the choice; it owns no colors itself.
-  const DARK_MODE_STORAGE_KEY = "darkModeEnabled";
+  const DARK_MODE_STORAGE_KEY = 'darkModeEnabled';
 
   function applyDarkModePreference() {
-    const enabled = localStorage.getItem(DARK_MODE_STORAGE_KEY) === "true";
+    const enabled = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
     setDarkMode(enabled);
   }
 
   function toggleDarkMode() {
-    const isCurrentlyDark = document.body.classList.contains("dark-mode");
+    const isCurrentlyDark = document.body.classList.contains('dark-mode');
     setDarkMode(!isCurrentlyDark);
     localStorage.setItem(DARK_MODE_STORAGE_KEY, String(!isCurrentlyDark));
   }
 
   function setDarkMode(enabled) {
-    document.body.classList.toggle("dark-mode", enabled);
-    const sunIcon = document.getElementById("dark-mode-icon-sun");
-    const moonIcon = document.getElementById("dark-mode-icon-moon");
+    document.body.classList.toggle('dark-mode', enabled);
+    const sunIcon = document.getElementById('dark-mode-icon-sun');
+    const moonIcon = document.getElementById('dark-mode-icon-moon');
     // Sun shown in dark mode (tap to go back to light); moon shown in
     // light mode (tap to go dark) — the icon represents the destination,
     // not the current state, matching the common toggle convention.
-    if (sunIcon) sunIcon.style.display = enabled ? "" : "none";
-    if (moonIcon) moonIcon.style.display = enabled ? "none" : "";
+    if (sunIcon) sunIcon.style.display = enabled ? '' : 'none';
+    if (moonIcon) moonIcon.style.display = enabled ? 'none' : '';
   }
 
   // Trailing stop-loss formula, worked out directly with the trader:
@@ -291,8 +332,7 @@
   // some of the original capital, positive = guaranteed profit locked in)
   // and lockedProfit is slFromEntry when positive, else null.
   function computeTrailingSl(riskPoints, pointsInFavor) {
-    if (riskPoints === null || riskPoints === undefined || riskPoints <= 0)
-      return null;
+    if (riskPoints === null || riskPoints === undefined || riskPoints <= 0) return null;
     if (pointsInFavor === null || pointsInFavor === undefined) return null;
 
     if (pointsInFavor < riskPoints) {
@@ -322,12 +362,10 @@
   // returning users get a shorter page, while staying one click away since
   // they're genuinely useful to check while sizing a trade. State persists
   // across visits via localStorage, per section, keyed by id.
-  const REFERENCE_COLLAPSE_STORAGE_PREFIX = "refCollapsed:";
+  const REFERENCE_COLLAPSE_STORAGE_PREFIX = 'refCollapsed:';
 
   function isReferenceSectionCollapsed(sectionId) {
-    const stored = localStorage.getItem(
-      REFERENCE_COLLAPSE_STORAGE_PREFIX + sectionId,
-    );
+    const stored = localStorage.getItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + sectionId);
     // No stored value yet = genuine first-ever visit: show it expanded once,
     // then immediately record that it's been seen so every visit AFTER this
     // one defaults to collapsed (manual toggles afterward are respected via
@@ -336,14 +374,11 @@
       setReferenceSectionCollapsed(sectionId, true);
       return false;
     }
-    return stored === "true";
+    return stored === 'true';
   }
 
   function setReferenceSectionCollapsed(sectionId, collapsed) {
-    localStorage.setItem(
-      REFERENCE_COLLAPSE_STORAGE_PREFIX + sectionId,
-      String(collapsed),
-    );
+    localStorage.setItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + sectionId, String(collapsed));
   }
 
   function applyReferenceSectionState(sectionId) {
@@ -351,8 +386,8 @@
     const chevron = document.getElementById(`${sectionId}-chevron`);
     if (!body || !chevron) return;
     const collapsed = isReferenceSectionCollapsed(sectionId);
-    body.classList.toggle("mini-ladder-collapsed", collapsed);
-    chevron.classList.toggle("mini-ladder-chevron-collapsed", collapsed);
+    body.classList.toggle('mini-ladder-collapsed', collapsed);
+    chevron.classList.toggle('mini-ladder-chevron-collapsed', collapsed);
   }
 
   function toggleReferenceSection(sectionId) {
@@ -365,9 +400,7 @@
     // no-op. The DOM's current class is the one source of truth that
     // can't be fooled by that side effect.
     const body = document.getElementById(`${sectionId}-body`);
-    const isCurrentlyCollapsed = body
-      ? body.classList.contains("mini-ladder-collapsed")
-      : false;
+    const isCurrentlyCollapsed = body ? body.classList.contains('mini-ladder-collapsed') : false;
     setReferenceSectionCollapsed(sectionId, !isCurrentlyCollapsed);
     applyReferenceSectionState(sectionId);
   }
@@ -377,7 +410,7 @@
       const t = TIER_ORDER[i];
       if (balance >= TIER_RANGES[t].min) return t;
     }
-    return "small";
+    return 'small';
   }
 
   // ---------- Component loading ----------
@@ -399,9 +432,7 @@
     // even after a hard refresh, since the browser doesn't always treat
     // them the same as the initial page's own resources.
     const cacheBust = `v=${PAGE_LOAD_ID}`;
-    const htmlUrl = config.html.includes("?")
-      ? `${config.html}&${cacheBust}`
-      : `${config.html}?${cacheBust}`;
+    const htmlUrl = config.html.includes('?') ? `${config.html}&${cacheBust}` : `${config.html}?${cacheBust}`;
 
     try {
       const res = await fetch(htmlUrl);
@@ -423,12 +454,8 @@
 
   function loadScript(src, cacheBust) {
     return new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = cacheBust
-        ? src.includes("?")
-          ? `${src}&${cacheBust}`
-          : `${src}?${cacheBust}`
-        : src;
+      const script = document.createElement('script');
+      script.src = cacheBust ? (src.includes('?') ? `${src}&${cacheBust}` : `${src}?${cacheBust}`) : src;
       script.onload = resolve;
       script.onerror = () => reject(new Error(`Failed to load ${src}`));
       document.body.appendChild(script);
@@ -443,49 +470,36 @@
     // render meaningfully. showTierSelect()/confirmProfile() are unaffected
     // since they call switchTab-adjacent logic directly, not through here
     // with a sidebar-originated event.
-    const sidebar = document.getElementById("sidebar");
-    if (
-      sidebar &&
-      sidebar.classList.contains("sidebar-setup-mode") &&
-      tabId !== "tab-select"
-    ) {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('sidebar-setup-mode') && tabId !== 'tab-select') {
       return;
     }
 
-    document
-      .querySelectorAll(".tab-content")
-      .forEach((tab) => tab.classList.remove("active"));
-    document
-      .querySelectorAll(".sidebar-link")
-      .forEach((link) => link.classList.remove("active"));
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
 
     const targetTab = document.getElementById(tabId);
-    if (targetTab) targetTab.classList.add("active");
+    if (targetTab) targetTab.classList.add('active');
 
-    const sidebarLink = document.querySelector(
-      `.sidebar-link[data-tab="${tabId}"]`,
-    );
-    if (sidebarLink) sidebarLink.classList.add("active");
+    const sidebarLink = document.querySelector(`.sidebar-link[data-tab="${tabId}"]`);
+    if (sidebarLink) sidebarLink.classList.add('active');
     else if (event && event.currentTarget) {
-      event.currentTarget.classList.add("active");
+      event.currentTarget.classList.add('active');
     }
 
-    const titleEl = document.getElementById("top-bar-page-title");
+    const titleEl = document.getElementById('top-bar-page-title');
     if (titleEl && PAGE_TITLES[tabId]) {
       titleEl.innerText = PAGE_TITLES[tabId];
     }
 
     loadComponent(tabId).then(() => {
-      if (tabId === "tab-roadmap") {
+      if (tabId === 'tab-roadmap') {
         renderPendingCongratsIfReady();
-        if (typeof window.renderRoadmap === "function") {
+        if (typeof window.renderRoadmap === 'function') {
           window.renderRoadmap();
         }
       }
-      if (
-        tabId === "tab-dashboard" &&
-        typeof window.renderDashboardHome === "function"
-      ) {
+      if (tabId === 'tab-dashboard' && typeof window.renderDashboardHome === 'function') {
         window.renderDashboardHome();
       }
       // Start the per-tab tour the first time this tab is visited —
@@ -495,7 +509,7 @@
       // Confirmed scope: every tab gets a tour, seen-state persisted
       // via localStorage (see product-tour.js).
       setTimeout(() => {
-        if (typeof window.startTabTourIfNeeded === "function") {
+        if (typeof window.startTabTourIfNeeded === 'function') {
           window.startTabTourIfNeeded(tabId);
         }
       }, 300);
@@ -506,15 +520,15 @@
   function selectTier(tier) {
     selectedTier = tier;
 
-    document.querySelectorAll(".tier-select-card").forEach((card) => {
-      card.classList.toggle("selected", card.dataset.tier === tier);
+    document.querySelectorAll('.tier-select-card').forEach(card => {
+      card.classList.toggle('selected', card.dataset.tier === tier);
     });
 
     // Reveal the capital-amount field now that a tier is chosen, and
     // show its valid range as a hint. Re-validate any amount already typed.
-    const wrap = document.getElementById("capital-amount-wrap");
-    const hint = document.getElementById("capital-amount-hint");
-    if (wrap) wrap.classList.remove("hidden");
+    const wrap = document.getElementById('capital-amount-wrap');
+    const hint = document.getElementById('capital-amount-hint');
+    if (wrap) wrap.classList.remove('hidden');
     if (hint) {
       const range = TIER_RANGES[tier];
       hint.innerText = `Enter an amount between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[tier]} tier.`;
@@ -535,17 +549,17 @@
   }
 
   function validateCapitalAmount() {
-    const input = document.getElementById("capital-amount-input");
-    const row = input ? input.closest(".capital-amount-input-row") : null;
-    const errorEl = document.getElementById("capital-amount-error");
+    const input = document.getElementById('capital-amount-input');
+    const row = input ? input.closest('.capital-amount-input-row') : null;
+    const errorEl = document.getElementById('capital-amount-error');
     if (!input || !errorEl) return false;
 
     const raw = input.value.trim();
-    if (raw === "") {
+    if (raw === '') {
       startingCapital = null;
-      row.classList.remove("input-error");
-      errorEl.classList.add("hidden");
-      errorEl.innerText = "";
+      row.classList.remove('input-error');
+      errorEl.classList.add('hidden');
+      errorEl.innerText = '';
       updateContinueButtonState();
       return false;
     }
@@ -555,17 +569,17 @@
 
     if (isNaN(amount) || amount <= 0) {
       startingCapital = null;
-      row.classList.add("input-error");
-      errorEl.classList.remove("hidden");
-      errorEl.innerText = "Enter a valid positive amount.";
+      row.classList.add('input-error');
+      errorEl.classList.remove('hidden');
+      errorEl.innerText = 'Enter a valid positive amount.';
       updateContinueButtonState();
       return false;
     }
 
     if (range && (amount < range.min || amount > range.max)) {
       startingCapital = null;
-      row.classList.add("input-error");
-      errorEl.classList.remove("hidden");
+      row.classList.add('input-error');
+      errorEl.classList.remove('hidden');
       errorEl.innerText = `Amount must be between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[selectedTier]} tier.`;
       updateContinueButtonState();
       return false;
@@ -578,9 +592,9 @@
     // for their running balance too, not just on the very first entry.
     currentBalance = amount;
     lastTierForBalance = tierForBalance(currentBalance);
-    row.classList.remove("input-error");
-    errorEl.classList.add("hidden");
-    errorEl.innerText = "";
+    row.classList.remove('input-error');
+    errorEl.classList.add('hidden');
+    errorEl.innerText = '';
     updateContinueButtonState();
     return true;
   }
@@ -592,11 +606,8 @@
       selectedTraderTypes.add(traderType);
     }
 
-    document.querySelectorAll(".trader-type-card").forEach((card) => {
-      card.classList.toggle(
-        "selected",
-        selectedTraderTypes.has(card.dataset.traderType),
-      );
+    document.querySelectorAll('.trader-type-card').forEach(card => {
+      card.classList.toggle('selected', selectedTraderTypes.has(card.dataset.traderType));
     });
 
     updateContinueButtonState();
@@ -618,7 +629,7 @@
     }
 
     updateContinueButtonState();
-    if (document.getElementById("manual-instrument-picker")) {
+    if (document.getElementById('manual-instrument-picker')) {
       renderManualInstrumentGrid();
     }
 
@@ -631,40 +642,27 @@
   // real broker's 50-200+ instruments at once is rarely the intent, but
   // selecting all instruments WITHIN one category (e.g. all 4 indices) is
   // a reasonable, common action, so it's offered per-category instead.
-  function toggleSelectAllInCategory(
-    containerId,
-    category,
-    instrumentListFn,
-    onToggleFn,
-  ) {
+  function toggleSelectAllInCategory(containerId, category, instrumentListFn, onToggleFn) {
     const instrumentList = instrumentListFn();
-    const rowsInCategory = instrumentList.filter(
-      (i) => (i.category || "other") === category,
-    );
-    const allSelected = rowsInCategory.every(
-      (i) => selectedInstruments[i.value],
-    );
+    const rowsInCategory = instrumentList.filter(i => (i.category || 'other') === category);
+    const allSelected = rowsInCategory.every(i => selectedInstruments[i.value]);
 
-    rowsInCategory.forEach((inst) => {
+    rowsInCategory.forEach(inst => {
       if (allSelected) {
         delete selectedInstruments[inst.value];
-        if (containerId === "setup-fetched-instrument-picker") {
+        if (containerId === 'setup-fetched-instrument-picker') {
           const idx = setupFetchedInstrumentKeys.indexOf(inst.value);
           if (idx !== -1) setupFetchedInstrumentKeys.splice(idx, 1);
         }
       } else {
-        if (!selectedInstruments[inst.value])
-          selectedInstruments[inst.value] = { lots: 1 };
-        if (
-          containerId === "setup-fetched-instrument-picker" &&
-          !setupFetchedInstrumentKeys.includes(inst.value)
-        ) {
+        if (!selectedInstruments[inst.value]) selectedInstruments[inst.value] = { lots: 1 };
+        if (containerId === 'setup-fetched-instrument-picker' && !setupFetchedInstrumentKeys.includes(inst.value)) {
           setupFetchedInstrumentKeys.push(inst.value);
         }
       }
     });
 
-    if (containerId === "setup-fetched-instrument-picker") {
+    if (containerId === 'setup-fetched-instrument-picker') {
       regenerateBrokerPnlForCurrentInstruments();
     }
     updateContinueButtonState();
@@ -676,97 +674,74 @@
   }
 
   function toggleSelectAllInManualCategory(category) {
-    toggleSelectAllInCategory(
-      "manual-instrument-picker",
-      category,
-      getMockBrokerTradableInstruments,
-      toggleInstrument,
-    );
+    toggleSelectAllInCategory('manual-instrument-picker', category, getMockBrokerTradableInstruments, toggleInstrument);
   }
 
   function toggleSelectAllInFetchedCategory(category) {
-    toggleSelectAllInCategory(
-      "setup-fetched-instrument-picker",
-      category,
-      getMockBrokerTradableInstruments,
-      toggleSetupFetchedInstrument,
-    );
+    toggleSelectAllInCategory('setup-fetched-instrument-picker', category, getMockBrokerTradableInstruments, toggleSetupFetchedInstrument);
   }
 
   // ---------- Custom stocks (freeform, for stock option buyers/sellers) ----------
   function addCustomStock() {
-    const input = document.getElementById("custom-stock-input");
+    const input = document.getElementById('custom-stock-input');
     if (!input) return;
     const raw = input.value.trim();
     if (!raw) return;
 
     // Support comma-separated entry too (e.g. "Reliance, TCS")
-    const names = raw
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    names.forEach((name) => {
-      const alreadyExists = customStocks.some(
-        (s) => s.toLowerCase() === name.toLowerCase(),
-      );
+    const names = raw.split(',').map(s => s.trim()).filter(Boolean);
+    names.forEach(name => {
+      const alreadyExists = customStocks.some(s => s.toLowerCase() === name.toLowerCase());
       if (!alreadyExists) customStocks.push(name);
     });
 
-    input.value = "";
+    input.value = '';
     renderCustomStockChips();
     updateContinueButtonState();
   }
 
   function onCustomStockKeydown(event) {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       event.preventDefault();
       addCustomStock();
     }
   }
 
   function removeCustomStock(name) {
-    customStocks = customStocks.filter((s) => s !== name);
+    customStocks = customStocks.filter(s => s !== name);
     renderCustomStockChips();
     updateContinueButtonState();
   }
 
   function renderCustomStockChips() {
-    const container = document.getElementById("custom-stock-chips");
+    const container = document.getElementById('custom-stock-chips');
     if (!container) return;
-    container.innerHTML = customStocks
-      .map(
-        (name) => `
+    container.innerHTML = customStocks.map(name => `
       <span class="custom-stock-chip">
         ${name}
         <button type="button" class="custom-stock-chip-remove" onclick="removeCustomStock('${name.replace(/'/g, "\\'")}')">&times;</button>
       </span>
-    `,
-      )
-      .join("");
+    `).join('');
   }
 
   function updateContinueButtonState() {
-    const btn = document.getElementById("profile-continue-btn");
+    const btn = document.getElementById('profile-continue-btn');
     if (!btn) return;
     // Validates only the CURRENT step now, not the whole flow at once —
     // each step's own requirement gates moving past IT, via
     // setupWizardStepIsValid() above. setupWizardCurrentStep may not exist
     // yet on first script parse (function hoisting is fine, but guard
     // anyway in case this is ever called before the wizard initializes).
-    const step =
-      typeof setupWizardCurrentStep !== "undefined"
-        ? setupWizardCurrentStep
-        : 1;
+    const step = typeof setupWizardCurrentStep !== 'undefined' ? setupWizardCurrentStep : 1;
     btn.disabled = !setupWizardStepIsValid(step);
-    btn.innerText =
-      step >= SETUP_WIZARD_STEP_COUNT ? "Continue to Dashboard" : "Continue";
+    btn.innerText = step >= SETUP_WIZARD_STEP_COUNT ? 'Continue to Dashboard' : 'Continue';
   }
 
   function todayDateString() {
     const d = new Date();
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
@@ -800,32 +775,23 @@
     if (step === 1) {
       // Either a broker is connected (tier+capital fetched), or the
       // manual path has both a tier AND a valid capital amount.
-      return (
-        !!connectedBrokerName ||
-        (selectedTier !== null && startingCapital !== null)
-      );
+      return !!connectedBrokerName || (selectedTier !== null && startingCapital !== null);
     }
     if (step === 2) {
       return selectedTraderTypes.size > 0;
     }
     if (step === 3) {
-      return (
-        Object.keys(selectedInstruments).length > 0 || customStocks.length > 0
-      );
+      return Object.keys(selectedInstruments).length > 0 || customStocks.length > 0;
     }
     return true; // step 4 (confirm) has nothing further to validate
   }
 
   function setupWizardGoToStep(step) {
-    setupWizardCurrentStep = Math.max(
-      1,
-      Math.min(SETUP_WIZARD_STEP_COUNT, step),
-    );
+    setupWizardCurrentStep = Math.max(1, Math.min(SETUP_WIZARD_STEP_COUNT, step));
 
     for (let i = 1; i <= SETUP_WIZARD_STEP_COUNT; i++) {
       const stepEl = document.getElementById(`setup-wizard-step-${i}`);
-      if (stepEl)
-        stepEl.classList.toggle("hidden", i !== setupWizardCurrentStep);
+      if (stepEl) stepEl.classList.toggle('hidden', i !== setupWizardCurrentStep);
 
       const dot = document.getElementById(`setup-stepper-dot-${i}`);
       const label = document.getElementById(`setup-stepper-label-${i}`);
@@ -833,44 +799,25 @@
       if (dot) {
         const isDone = i < setupWizardCurrentStep;
         const isActive = i === setupWizardCurrentStep;
-        dot.classList.toggle("setup-stepper-dot-active", isActive);
-        dot.classList.toggle("setup-stepper-dot-done", isDone);
-        dot.innerHTML = isDone ? "&#10003;" : String(i);
+        dot.classList.toggle('setup-stepper-dot-active', isActive);
+        dot.classList.toggle('setup-stepper-dot-done', isDone);
+        dot.innerHTML = isDone ? '&#10003;' : String(i);
       }
-      if (label)
-        label.classList.toggle(
-          "setup-stepper-label-active",
-          i <= setupWizardCurrentStep,
-        );
-      if (bar)
-        bar.classList.toggle(
-          "setup-stepper-bar-done",
-          i < setupWizardCurrentStep,
-        );
+      if (label) label.classList.toggle('setup-stepper-label-active', i <= setupWizardCurrentStep);
+      if (bar) bar.classList.toggle('setup-stepper-bar-done', i < setupWizardCurrentStep);
     }
 
     // Step 3 shows whichever instrument picker matches the active path —
     // both wrappers exist in the DOM at all times; only one is unhidden.
     if (setupWizardCurrentStep === 3) {
-      const fetchedWrap = document.getElementById(
-        "setup-fetched-instrument-step-wrap",
-      );
-      const manualWrap = document.getElementById(
-        "setup-manual-instrument-step",
-      );
+      const fetchedWrap = document.getElementById('setup-fetched-instrument-step-wrap');
+      const manualWrap = document.getElementById('setup-manual-instrument-step');
       const isBrokerPath = !!connectedBrokerName;
-      if (fetchedWrap) fetchedWrap.classList.toggle("hidden", !isBrokerPath);
-      if (manualWrap) manualWrap.classList.toggle("hidden", isBrokerPath);
-      if (
-        isBrokerPath &&
-        document.getElementById("setup-fetched-instrument-picker")
-      ) {
-        renderInstrumentPicker(
-          "setup-fetched-instrument-picker",
-          getMockBrokerTradableInstruments(),
-          toggleSetupFetchedInstrument,
-        );
-      } else if (document.getElementById("manual-instrument-picker")) {
+      if (fetchedWrap) fetchedWrap.classList.toggle('hidden', !isBrokerPath);
+      if (manualWrap) manualWrap.classList.toggle('hidden', isBrokerPath);
+      if (isBrokerPath && document.getElementById('setup-fetched-instrument-picker')) {
+        renderInstrumentPicker('setup-fetched-instrument-picker', getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
+      } else if (document.getElementById('manual-instrument-picker')) {
         renderManualInstrumentGrid();
       }
     }
@@ -879,12 +826,11 @@
       renderSetupWizardConfirmSummary();
     }
 
-    const backBtn = document.getElementById("setup-wizard-back-btn");
+    const backBtn = document.getElementById('setup-wizard-back-btn');
     if (backBtn) backBtn.disabled = setupWizardCurrentStep === 1;
 
-    const indicator = document.getElementById("setup-wizard-step-indicator");
-    if (indicator)
-      indicator.innerText = `Step ${setupWizardCurrentStep} of ${SETUP_WIZARD_STEP_COUNT}`;
+    const indicator = document.getElementById('setup-wizard-step-indicator');
+    if (indicator) indicator.innerText = `Step ${setupWizardCurrentStep} of ${SETUP_WIZARD_STEP_COUNT}`;
 
     updateContinueButtonState();
   }
@@ -903,28 +849,18 @@
   }
 
   function renderSetupWizardConfirmSummary() {
-    const methodEl = document.getElementById("setup-confirm-method");
-    const styleEl = document.getElementById("setup-confirm-style");
-    const tierEl = document.getElementById("setup-confirm-tier");
-    const capitalEl = document.getElementById("setup-confirm-capital");
+    const methodEl = document.getElementById('setup-confirm-method');
+    const styleEl = document.getElementById('setup-confirm-style');
+    const tierEl = document.getElementById('setup-confirm-tier');
+    const capitalEl = document.getElementById('setup-confirm-capital');
 
-    if (methodEl)
-      methodEl.innerText = connectedBrokerName
-        ? `Connected to ${connectedBrokerName}`
-        : "Manual setup";
+    if (methodEl) methodEl.innerText = connectedBrokerName ? `Connected to ${connectedBrokerName}` : 'Manual setup';
     if (styleEl) {
-      const styleNames = Array.from(selectedTraderTypes)
-        .map((t) => TRADER_TYPE_LABELS[t])
-        .join(", ");
-      styleEl.innerText = styleNames || "\u2014";
+      const styleNames = Array.from(selectedTraderTypes).map(t => TRADER_TYPE_LABELS[t]).join(', ');
+      styleEl.innerText = styleNames || '\u2014';
     }
-    if (tierEl)
-      tierEl.innerText = selectedTier
-        ? `${TIER_LABELS[selectedTier]} Tier`
-        : "\u2014";
-    if (capitalEl)
-      capitalEl.innerText =
-        startingCapital !== null ? `₹${fmt(startingCapital)}` : "\u2014";
+    if (tierEl) tierEl.innerText = selectedTier ? `${TIER_LABELS[selectedTier]} Tier` : '\u2014';
+    if (capitalEl) capitalEl.innerText = startingCapital !== null ? `₹${fmt(startingCapital)}` : '\u2014';
   }
 
   function generateMockFetchedBalance() {
@@ -950,31 +886,27 @@
   // lifecycle and what "connect" should do are genuinely different from
   // the post-setup Settings/Daily-Limits-Tool connect widget.
   let setupBrokerPickerExpanded = false;
-  let setupBrokerPickerSearchTerm = "";
+  let setupBrokerPickerSearchTerm = '';
 
   function renderSetupBrokerPicker() {
-    const container = document.getElementById("setup-broker-picker");
+    const container = document.getElementById('setup-broker-picker');
     if (!container) return;
 
-    const featured = BROKERS.filter((b) => b.featured);
-    const more = BROKERS.filter((b) => !b.featured);
+    const featured = BROKERS.filter(b => b.featured);
+    const more = BROKERS.filter(b => !b.featured);
 
     if (!container.dataset.shellInitialized) {
-      container.dataset.shellInitialized = "true";
+      container.dataset.shellInitialized = 'true';
       container.innerHTML = `
         <div class="broker-grid" id="setup-broker-featured"></div>
-        ${
-          more.length > 0
-            ? `
+        ${more.length > 0 ? `
           <button type="button" class="broker-more-toggle" id="setup-broker-more-toggle" onclick="toggleSetupMoreBrokers()"></button>
           <div class="broker-more-wrap hidden" id="setup-broker-more-wrap">
             <input type="text" class="instrument-picker-search" id="setup-broker-search"
                    placeholder="Search brokers..." oninput="onSetupBrokerPickerSearch(this.value)">
             <div class="broker-more-list" id="setup-broker-more-list"></div>
           </div>
-        `
-            : ""
-        }
+        ` : ''}
       `;
     }
 
@@ -982,149 +914,103 @@
   }
 
   function refreshSetupBrokerPickerContent(featured, more) {
-    const featuredEl = document.getElementById("setup-broker-featured");
+    const featuredEl = document.getElementById('setup-broker-featured');
     if (featuredEl) {
-      featuredEl.innerHTML = featured
-        .map(
-          (b) => `
+      featuredEl.innerHTML = featured.map(b => `
         <button type="button" class="broker-option-btn setup-broker-option-btn" onclick="startSetupBrokerConnect('${b.name}')">
           <span class="broker-chip ${b.colorClass}">${b.initial}</span>
           <span>${b.name}</span>
         </button>
-      `,
-        )
-        .join("");
+      `).join('');
     }
 
-    const toggleBtn = document.getElementById("setup-broker-more-toggle");
+    const toggleBtn = document.getElementById('setup-broker-more-toggle');
     if (toggleBtn) {
-      toggleBtn.innerText = setupBrokerPickerExpanded
-        ? "Hide other brokers"
-        : `More brokers (${more.length})`;
+      toggleBtn.innerText = setupBrokerPickerExpanded ? 'Hide other brokers' : `More brokers (${more.length})`;
     }
 
-    const moreWrap = document.getElementById("setup-broker-more-wrap");
-    if (moreWrap)
-      moreWrap.classList.toggle("hidden", !setupBrokerPickerExpanded);
+    const moreWrap = document.getElementById('setup-broker-more-wrap');
+    if (moreWrap) moreWrap.classList.toggle('hidden', !setupBrokerPickerExpanded);
 
-    const moreListEl = document.getElementById("setup-broker-more-list");
+    const moreListEl = document.getElementById('setup-broker-more-list');
     if (moreListEl) {
       const searchTerm = setupBrokerPickerSearchTerm.toLowerCase().trim();
       const filteredMore = searchTerm
-        ? more.filter((b) => b.name.toLowerCase().includes(searchTerm))
+        ? more.filter(b => b.name.toLowerCase().includes(searchTerm))
         : more;
-      moreListEl.innerHTML =
-        filteredMore.length > 0
-          ? filteredMore
-              .map(
-                (b) => `
+      moreListEl.innerHTML = filteredMore.length > 0 ? filteredMore.map(b => `
         <button type="button" class="broker-more-row setup-broker-option-btn" onclick="startSetupBrokerConnect('${b.name}')">
           <span class="broker-chip ${b.colorClass}">${b.initial}</span>
           <span>${b.name}</span>
         </button>
-      `,
-              )
-              .join("")
-          : '<div class="roadmap-empty-state">No brokers match your search.</div>';
+      `).join('') : '<div class="roadmap-empty-state">No brokers match your search.</div>';
     }
   }
 
   function toggleSetupMoreBrokers() {
     setupBrokerPickerExpanded = !setupBrokerPickerExpanded;
-    if (!setupBrokerPickerExpanded) setupBrokerPickerSearchTerm = "";
-    refreshSetupBrokerPickerContent(
-      BROKERS.filter((b) => b.featured),
-      BROKERS.filter((b) => !b.featured),
-    );
+    if (!setupBrokerPickerExpanded) setupBrokerPickerSearchTerm = '';
+    refreshSetupBrokerPickerContent(BROKERS.filter(b => b.featured), BROKERS.filter(b => !b.featured));
   }
 
   function onSetupBrokerPickerSearch(value) {
     setupBrokerPickerSearchTerm = value;
-    refreshSetupBrokerPickerContent(
-      BROKERS.filter((b) => b.featured),
-      BROKERS.filter((b) => !b.featured),
-    );
+    refreshSetupBrokerPickerContent(BROKERS.filter(b => b.featured), BROKERS.filter(b => !b.featured));
   }
 
   function startSetupBrokerConnect(brokerName) {
-    const statusEl = document.getElementById("setup-broker-status");
+    const statusEl = document.getElementById('setup-broker-status');
     if (statusEl) statusEl.innerText = `Connecting to ${brokerName}...`;
 
-    document.querySelectorAll(".setup-broker-option-btn").forEach((btn) => {
-      btn.disabled = true;
-    });
+    document.querySelectorAll('.setup-broker-option-btn').forEach(btn => { btn.disabled = true; });
 
     connectBroker(brokerName, () => {
       const fetchedBalance = generateMockFetchedBalance();
       const derivedTier = tierForBalance(fetchedBalance);
       const fetchedInstruments = getMockBrokerTradableInstruments();
 
-      applyFetchedBrokerProfile(
-        brokerName,
-        fetchedBalance,
-        derivedTier,
-        fetchedInstruments,
-      );
+      applyFetchedBrokerProfile(brokerName, fetchedBalance, derivedTier, fetchedInstruments);
     });
   }
 
-  function applyFetchedBrokerProfile(
-    brokerName,
-    fetchedBalance,
-    derivedTier,
-    fetchedInstruments,
-  ) {
+  function applyFetchedBrokerProfile(brokerName, fetchedBalance, derivedTier, fetchedInstruments) {
     // Default to selecting the index instruments (the most universally
     // traded), leaving stock F&O for the user to add if relevant — mirrors
     // how a real "select which of your tradable instruments to track"
     // step would reasonably default.
     setupFetchedInstrumentKeys = fetchedInstruments
-      .filter((i) => i.category === "index")
-      .map((i) => i.value);
+      .filter(i => i.category === 'index')
+      .map(i => i.value);
 
     selectedTier = derivedTier;
     startingCapital = fetchedBalance;
     currentBalance = fetchedBalance;
     selectedInstruments = {};
-    setupFetchedInstrumentKeys.forEach((key) => {
+    setupFetchedInstrumentKeys.forEach(key => {
       selectedInstruments[key] = { lots: 1 };
     });
 
-    renderSetupFetchedProfile(
-      brokerName,
-      fetchedBalance,
-      derivedTier,
-      fetchedInstruments,
-    );
+    renderSetupFetchedProfile(brokerName, fetchedBalance, derivedTier, fetchedInstruments);
     regenerateBrokerPnlForCurrentInstruments();
     updateContinueButtonState();
   }
 
-  function renderSetupFetchedProfile(
-    brokerName,
-    fetchedBalance,
-    derivedTier,
-    fetchedInstruments,
-  ) {
-    const connectWrap = document.getElementById("setup-broker-connect-wrap");
-    const fetchedWrap = document.getElementById("setup-broker-fetched-wrap");
-    if (connectWrap) connectWrap.classList.add("hidden");
-    if (fetchedWrap) fetchedWrap.classList.remove("hidden");
+  function renderSetupFetchedProfile(brokerName, fetchedBalance, derivedTier, fetchedInstruments) {
+    const connectWrap = document.getElementById('setup-broker-connect-wrap');
+    const fetchedWrap = document.getElementById('setup-broker-fetched-wrap');
+    if (connectWrap) connectWrap.classList.add('hidden');
+    if (fetchedWrap) fetchedWrap.classList.remove('hidden');
 
-    const nameEl = document.getElementById("setup-fetched-broker-name");
+    const nameEl = document.getElementById('setup-fetched-broker-name');
     if (nameEl) nameEl.innerText = brokerName;
 
-    const balanceEl = document.getElementById("setup-fetched-balance");
+    const balanceEl = document.getElementById('setup-fetched-balance');
     if (balanceEl) balanceEl.innerText = `₹${fmt(fetchedBalance)}`;
 
-    const tierEl = document.getElementById("setup-fetched-tier");
+    const tierEl = document.getElementById('setup-fetched-tier');
     if (tierEl) tierEl.innerText = `${TIER_LABELS[derivedTier]} Tier`;
 
-    renderInstrumentPicker(
-      "setup-fetched-instrument-picker",
-      fetchedInstruments,
-      toggleSetupFetchedInstrument,
-    );
+    renderInstrumentPicker('setup-fetched-instrument-picker', fetchedInstruments, toggleSetupFetchedInstrument);
   }
 
   function toggleSetupFetchedInstrument(key) {
@@ -1139,11 +1025,7 @@
 
     regenerateBrokerPnlForCurrentInstruments();
     updateContinueButtonState();
-    renderInstrumentPicker(
-      "setup-fetched-instrument-picker",
-      getMockBrokerTradableInstruments(),
-      toggleSetupFetchedInstrument,
-    );
+    renderInstrumentPicker('setup-fetched-instrument-picker', getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
   }
 
   // ---------- Shared instrument picker: search + category grouping + a
@@ -1156,7 +1038,7 @@
   let instrumentPickerSearchTerms = {}; // { [containerId]: 'current search text' }
   let instrumentPickerCollapsedCategories = {}; // { [containerId]: Set of collapsed category keys }
 
-  const CATEGORY_LABELS = { index: "Indices", stock: "Stocks" };
+  const CATEGORY_LABELS = { index: 'Indices', stock: 'Stocks' };
 
   function renderInstrumentPicker(containerId, instrumentList, onToggleFn) {
     const container = document.getElementById(containerId);
@@ -1166,7 +1048,7 @@
     // subsequent calls just refresh the rows/chips inside it, so the
     // search input never loses focus while the user is typing.
     if (!container.dataset.pickerInitialized) {
-      container.dataset.pickerInitialized = "true";
+      container.dataset.pickerInitialized = 'true';
       container.innerHTML = `
         <div class="instrument-picker-chips" id="${containerId}-chips"></div>
         <input type="text" class="instrument-picker-search" id="${containerId}-search"
@@ -1175,12 +1057,8 @@
       `;
     }
 
-    const searchTerm = (instrumentPickerSearchTerms[containerId] || "")
-      .toLowerCase()
-      .trim();
-    const selectedKeys = instrumentList
-      .filter((i) => selectedInstruments[i.value])
-      .map((i) => i.value);
+    const searchTerm = (instrumentPickerSearchTerms[containerId] || '').toLowerCase().trim();
+    const selectedKeys = instrumentList.filter(i => selectedInstruments[i.value]).map(i => i.value);
 
     // "Your selection" chips — lets the user see/remove everything they've
     // picked without scrolling through every category, however long the
@@ -1188,23 +1066,20 @@
     const chipsEl = document.getElementById(`${containerId}-chips`);
     if (chipsEl) {
       if (selectedKeys.length === 0) {
-        chipsEl.innerHTML =
-          '<span class="instrument-picker-chips-empty">No instruments selected yet.</span>';
+        chipsEl.innerHTML = '<span class="instrument-picker-chips-empty">No instruments selected yet.</span>';
       } else {
-        chipsEl.innerHTML = selectedKeys
-          .map((key) => {
-            const inst = instrumentList.find((i) => i.value === key);
-            const label = inst ? inst.label : key;
-            return `<span class="instrument-picker-chip">${label}<button type="button" class="instrument-picker-chip-remove" onclick="${onToggleFn.name}('${key}')">&times;</button></span>`;
-          })
-          .join("");
+        chipsEl.innerHTML = selectedKeys.map(key => {
+          const inst = instrumentList.find(i => i.value === key);
+          const label = inst ? inst.label : key;
+          return `<span class="instrument-picker-chip">${label}<button type="button" class="instrument-picker-chip-remove" onclick="${onToggleFn.name}('${key}')">&times;</button></span>`;
+        }).join('');
       }
     }
 
     // Group by category, preserving INSTRUMENT_INFO's natural order within each.
     const categories = {};
-    instrumentList.forEach((inst) => {
-      const cat = inst.category || "other";
+    instrumentList.forEach(inst => {
+      const cat = inst.category || 'other';
       if (!categories[cat]) categories[cat] = [];
       if (!searchTerm || inst.label.toLowerCase().includes(searchTerm)) {
         categories[cat].push(inst);
@@ -1220,77 +1095,61 @@
     if (!categoriesEl) return;
 
     const categoryKeys = Object.keys(categories);
-    const anyMatches = categoryKeys.some((cat) => categories[cat].length > 0);
+    const anyMatches = categoryKeys.some(cat => categories[cat].length > 0);
 
     if (!anyMatches) {
-      categoriesEl.innerHTML =
-        '<div class="roadmap-empty-state">No instruments match your search.</div>';
+      categoriesEl.innerHTML = '<div class="roadmap-empty-state">No instruments match your search.</div>';
       return;
     }
 
-    categoriesEl.innerHTML = categoryKeys
-      .map((cat) => {
-        const rows = categories[cat];
-        if (rows.length === 0) return ""; // hide categories with zero matches while searching
+    categoriesEl.innerHTML = categoryKeys.map(cat => {
+      const rows = categories[cat];
+      if (rows.length === 0) return ''; // hide categories with zero matches while searching
 
-        const selectedInCat = rows.filter(
-          (r) => selectedInstruments[r.value],
-        ).length;
-        const allSelectedInCat = selectedInCat === rows.length;
-        const isCollapsed = collapsedSet.has(cat) && !searchTerm; // never collapse while actively searching
-        const catLabel = CATEGORY_LABELS[cat] || cat;
-        const selectAllFnName =
-          containerId === "setup-fetched-instrument-picker"
-            ? "toggleSelectAllInFetchedCategory"
-            : "toggleSelectAllInManualCategory";
+      const selectedInCat = rows.filter(r => selectedInstruments[r.value]).length;
+      const allSelectedInCat = selectedInCat === rows.length;
+      const isCollapsed = collapsedSet.has(cat) && !searchTerm; // never collapse while actively searching
+      const catLabel = CATEGORY_LABELS[cat] || cat;
+      const selectAllFnName = containerId === 'setup-fetched-instrument-picker'
+        ? 'toggleSelectAllInFetchedCategory'
+        : 'toggleSelectAllInManualCategory';
 
-        const rowsHtml = rows
-          .map((inst) => {
-            const isSelected = !!selectedInstruments[inst.value];
-            return `
-          <button type="button" class="instrument-picker-row ${isSelected ? "selected" : ""}" data-instrument="${inst.value}" onclick="${onToggleFn.name}('${inst.value}')">
+      const rowsHtml = rows.map(inst => {
+        const isSelected = !!selectedInstruments[inst.value];
+        return `
+          <button type="button" class="instrument-picker-row ${isSelected ? 'selected' : ''}" data-instrument="${inst.value}" onclick="${onToggleFn.name}('${inst.value}')">
             <span class="instrument-check"></span>
             <span class="instrument-picker-row-name">${inst.label}</span>
             <span class="instrument-picker-row-qty">${inst.qty} qty/lot</span>
           </button>
         `;
-          })
-          .join("");
+      }).join('');
 
-        return `
+      return `
         <div class="instrument-picker-category">
           <div class="instrument-picker-category-header-row">
             <button type="button" class="instrument-picker-category-header" onclick="toggleInstrumentPickerCategory('${containerId}', '${cat}')">
-              <span class="instrument-picker-chevron ${isCollapsed ? "instrument-picker-chevron-collapsed" : ""}">&#9660;</span>
+              <span class="instrument-picker-chevron ${isCollapsed ? 'instrument-picker-chevron-collapsed' : ''}">&#9660;</span>
               <span class="instrument-picker-category-title">${catLabel}</span>
               <span class="instrument-picker-category-count">${selectedInCat} of ${rows.length} selected</span>
             </button>
-            <button type="button" class="instrument-picker-select-all-btn" onclick="${selectAllFnName}('${cat}')">${allSelectedInCat ? "Clear" : "Select all"}</button>
+            <button type="button" class="instrument-picker-select-all-btn" onclick="${selectAllFnName}('${cat}')">${allSelectedInCat ? 'Clear' : 'Select all'}</button>
           </div>
-          <div class="instrument-picker-rows ${isCollapsed ? "instrument-picker-rows-collapsed" : ""}">${rowsHtml}</div>
+          <div class="instrument-picker-rows ${isCollapsed ? 'instrument-picker-rows-collapsed' : ''}">${rowsHtml}</div>
         </div>
       `;
-      })
-      .join("");
+    }).join('');
   }
 
   function onInstrumentPickerSearch(containerId) {
     const input = document.getElementById(`${containerId}-search`);
-    instrumentPickerSearchTerms[containerId] = input ? input.value : "";
+    instrumentPickerSearchTerms[containerId] = input ? input.value : '';
 
     // Re-render whichever list this container is currently showing.
-    if (containerId === "setup-fetched-instrument-picker") {
-      renderInstrumentPicker(
-        containerId,
-        getMockBrokerTradableInstruments(),
-        toggleSetupFetchedInstrument,
-      );
-    } else if (containerId === "manual-instrument-picker") {
-      renderInstrumentPicker(
-        containerId,
-        getMockBrokerTradableInstruments(),
-        toggleInstrument,
-      );
+    if (containerId === 'setup-fetched-instrument-picker') {
+      renderInstrumentPicker(containerId, getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
+    } else if (containerId === 'manual-instrument-picker') {
+      renderInstrumentPicker(containerId, getMockBrokerTradableInstruments(), toggleInstrument);
     }
   }
 
@@ -1302,27 +1161,15 @@
     if (set.has(category)) set.delete(category);
     else set.add(category);
 
-    if (containerId === "setup-fetched-instrument-picker") {
-      renderInstrumentPicker(
-        containerId,
-        getMockBrokerTradableInstruments(),
-        toggleSetupFetchedInstrument,
-      );
-    } else if (containerId === "manual-instrument-picker") {
-      renderInstrumentPicker(
-        containerId,
-        getMockBrokerTradableInstruments(),
-        toggleInstrument,
-      );
+    if (containerId === 'setup-fetched-instrument-picker') {
+      renderInstrumentPicker(containerId, getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
+    } else if (containerId === 'manual-instrument-picker') {
+      renderInstrumentPicker(containerId, getMockBrokerTradableInstruments(), toggleInstrument);
     }
   }
 
   function renderManualInstrumentGrid() {
-    renderInstrumentPicker(
-      "manual-instrument-picker",
-      getMockBrokerTradableInstruments(),
-      toggleInstrument,
-    );
+    renderInstrumentPicker('manual-instrument-picker', getMockBrokerTradableInstruments(), toggleInstrument);
   }
 
   function showManualProfileSetup() {
@@ -1333,33 +1180,33 @@
     selectedInstruments = {};
     setupFetchedInstrumentKeys = [];
 
-    const brokerStepWrap = document.getElementById("setup-broker-step");
-    if (brokerStepWrap) brokerStepWrap.classList.add("hidden");
-    const manualStepsWrap = document.getElementById("setup-manual-steps");
-    if (manualStepsWrap) manualStepsWrap.classList.remove("hidden");
-    const manualInstrumentStep = document.getElementById(
-      "setup-manual-instrument-step",
-    );
-    if (manualInstrumentStep) manualInstrumentStep.classList.remove("hidden");
-    const fetchedInstrumentStepWrap = document.getElementById(
-      "setup-fetched-instrument-step-wrap",
-    );
-    if (fetchedInstrumentStepWrap)
-      fetchedInstrumentStepWrap.classList.add("hidden");
+    const brokerStepWrap = document.getElementById('setup-broker-step');
+    if (brokerStepWrap) brokerStepWrap.classList.add('hidden');
+    const manualStepsWrap = document.getElementById('setup-manual-steps');
+    if (manualStepsWrap) manualStepsWrap.classList.remove('hidden');
+    const manualInstrumentStep = document.getElementById('setup-manual-instrument-step');
+    if (manualInstrumentStep) manualInstrumentStep.classList.remove('hidden');
+    const fetchedInstrumentStepWrap = document.getElementById('setup-fetched-instrument-step-wrap');
+    if (fetchedInstrumentStepWrap) fetchedInstrumentStepWrap.classList.add('hidden');
 
     renderManualInstrumentGrid();
     updateContinueButtonState();
   }
 
+  // Reverse of showManualProfileSetup — goes back to the broker picker.
+  function showBrokerSetup() {
+    selectedTier = null;
+    startingCapital = null;
+    const manualStepsWrap = document.getElementById('setup-manual-steps');
+    if (manualStepsWrap) manualStepsWrap.classList.add('hidden');
+    const brokerStepWrap = document.getElementById('setup-broker-step');
+    if (brokerStepWrap) brokerStepWrap.classList.remove('hidden');
+    updateContinueButtonState();
+  }
+
+
   function confirmProfile() {
-    if (
-      !(
-        selectedTier &&
-        selectedTraderTypes.size > 0 &&
-        startingCapital !== null
-      )
-    )
-      return;
+    if (!(selectedTier && selectedTraderTypes.size > 0 && startingCapital !== null)) return;
 
     if (!profileConfirmed) {
       // Only set once — the very first confirmation is "join day", the
@@ -1375,49 +1222,39 @@
     // least once — purely informational in this prototype, since profile
     // data itself doesn't persist across reloads; see the auth gate comment
     // in DOMContentLoaded for why this doesn't yet skip setup on return.
-    if (typeof window.Auth !== "undefined") {
+    if (typeof window.Auth !== 'undefined') {
       window.Auth.markProfileComplete();
     }
 
     // The shell has been visible since page load (see DOMContentLoaded
     // below) — confirming the profile just exits "setup mode" so the
     // sidebar nav becomes clickable.
-    const sidebar = document.getElementById("sidebar");
-    if (sidebar) sidebar.classList.remove("sidebar-setup-mode");
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('sidebar-setup-mode');
     refreshHeaderBadge();
 
     // Switch into the Dashboard tab as the new default landing screen.
-    document
-      .querySelectorAll(".tab-content")
-      .forEach((tab) => tab.classList.remove("active"));
-    document
-      .querySelectorAll(".sidebar-link")
-      .forEach((link) => link.classList.remove("active"));
-    const dashboardTab = document.getElementById("tab-dashboard");
-    if (dashboardTab) dashboardTab.classList.add("active");
-    const dashboardLink = document.querySelector(
-      '.sidebar-link[data-tab="tab-dashboard"]',
-    );
-    if (dashboardLink) dashboardLink.classList.add("active");
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+    const dashboardTab = document.getElementById('tab-dashboard');
+    if (dashboardTab) dashboardTab.classList.add('active');
+    const dashboardLink = document.querySelector('.sidebar-link[data-tab="tab-dashboard"]');
+    if (dashboardLink) dashboardLink.classList.add('active');
 
-    const titleEl = document.getElementById("top-bar-page-title");
-    if (titleEl) titleEl.innerText = PAGE_TITLES["tab-dashboard"];
+    const titleEl = document.getElementById('top-bar-page-title');
+    if (titleEl) titleEl.innerText = PAGE_TITLES['tab-dashboard'];
 
-    loadComponent("tab-dashboard");
+    loadComponent('tab-dashboard');
 
     Object.keys(COMPONENTS).forEach(applyTierHighlight);
   }
 
   function showTierSelect() {
-    document
-      .querySelectorAll(".tab-content")
-      .forEach((tab) => tab.classList.remove("active"));
-    document
-      .querySelectorAll(".sidebar-link")
-      .forEach((link) => link.classList.remove("active"));
-    const selectTab = document.getElementById("tab-select");
-    if (selectTab) selectTab.classList.add("active");
-    loadComponent("tab-select");
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+    const selectTab = document.getElementById('tab-select');
+    if (selectTab) selectTab.classList.add('active');
+    loadComponent('tab-select');
   }
 
   // Header identity: a small avatar (initials, like Gmail/Slack/Notion)
@@ -1427,40 +1264,37 @@
   // they have room to be shown properly (chips, cards) rather than
   // squeezed into one line of header text.
   function getInitials(name) {
-    if (!name) return "?";
+    if (!name) return '?';
     const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return "?";
+    if (parts.length === 0) return '?';
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
   function refreshHeaderBadge() {
-    const avatarWrap = document.getElementById("header-avatar-wrap");
-    const avatarInitials = document.getElementById("header-avatar-initials");
-    const menuName = document.getElementById("header-account-menu-name");
-    const menuEmail = document.getElementById("header-account-menu-email");
-    const menuTier = document.getElementById("header-account-menu-tier");
-    const balancePill = document.getElementById("header-balance-pill");
-    const balanceValue = document.getElementById("header-balance-value");
+    const avatarWrap = document.getElementById('header-avatar-wrap');
+    const avatarInitials = document.getElementById('header-avatar-initials');
+    const menuName = document.getElementById('header-account-menu-name');
+    const menuEmail = document.getElementById('header-account-menu-email');
+    const menuTier = document.getElementById('header-account-menu-tier');
+    const balancePill = document.getElementById('header-balance-pill');
+    const balanceValue = document.getElementById('header-balance-value');
 
-    const session =
-      typeof window.Auth !== "undefined" ? window.Auth.getSession() : null;
+    const session = (typeof window.Auth !== 'undefined') ? window.Auth.getSession() : null;
 
     if (avatarWrap && avatarInitials) {
-      avatarWrap.style.display = "inline-flex";
-      avatarInitials.innerText = getInitials(session ? session.name : "");
-      if (menuName) menuName.innerText = session ? session.name : "Trader";
-      if (menuEmail) menuEmail.innerText = session ? session.email : "";
+      avatarWrap.style.display = 'inline-flex';
+      avatarInitials.innerText = getInitials(session ? session.name : '');
+      if (menuName) menuName.innerText = session ? session.name : 'Trader';
+      if (menuEmail) menuEmail.innerText = session ? session.email : '';
       if (menuTier) {
-        const tierText = selectedTier
-          ? TIER_LABELS[selectedTier] + " Tier"
-          : "Profile setup pending";
+        const tierText = selectedTier ? TIER_LABELS[selectedTier] + ' Tier' : 'Profile setup pending';
         menuTier.innerText = tierText;
       }
     }
 
     if (balancePill && balanceValue && currentBalance !== null) {
-      balancePill.style.display = "flex";
+      balancePill.style.display = 'flex';
       balanceValue.innerText = `₹${fmt(currentBalance)}`;
     }
   }
@@ -1471,25 +1305,25 @@
   // any outside click so it never lingers open across tab switches etc.
   function toggleAccountMenu(event) {
     if (event) event.stopPropagation();
-    const btn = document.getElementById("header-avatar-btn");
-    const menu = document.getElementById("header-account-menu");
+    const btn = document.getElementById('header-avatar-btn');
+    const menu = document.getElementById('header-account-menu');
     if (!btn || !menu) return;
-    const isHidden = menu.classList.contains("hidden");
+    const isHidden = menu.classList.contains('hidden');
     if (isHidden) {
-      menu.classList.remove("hidden");
-      btn.setAttribute("aria-expanded", "true");
+      menu.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
     } else {
-      menu.classList.add("hidden");
-      btn.setAttribute("aria-expanded", "false");
+      menu.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
     }
   }
 
-  document.addEventListener("click", () => {
-    const menu = document.getElementById("header-account-menu");
-    const btn = document.getElementById("header-avatar-btn");
-    if (menu && !menu.classList.contains("hidden")) {
-      menu.classList.add("hidden");
-      if (btn) btn.setAttribute("aria-expanded", "false");
+  document.addEventListener('click', () => {
+    const menu = document.getElementById('header-account-menu');
+    const btn = document.getElementById('header-avatar-btn');
+    if (menu && !menu.classList.contains('hidden')) {
+      menu.classList.add('hidden');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
     }
   });
 
@@ -1497,13 +1331,11 @@
   // header avatar menu — and its Log Out button — is visible from the very
   // first page load, before Settings/Account has ever been opened once.
   function handleLogout() {
-    if (typeof window.Auth === "undefined") return;
-    const ok = window.confirm(
-      "Log out of 1CrTrader? You'll need to log back in to continue.",
-    );
+    if (typeof window.Auth === 'undefined') return;
+    const ok = window.confirm('Log out of 1CrTrader? You\'ll need to log back in to continue.');
     if (!ok) return;
     window.Auth.logout();
-    window.location.href = "/website/auth.html?view=login";
+    window.location.href = '/website/auth.html?view=login';
   }
 
   // ---------- Running balance + trade history ----------
@@ -1519,12 +1351,7 @@
   // within a date, and every entry's balanceAfter is recalculated from
   // startingCapital forward in that order — so backfilling a missed earlier
   // day correctly rolls forward into every later day's running balance too.
-  function recordCompletedDay(
-    netResult,
-    dateString,
-    instrumentLabel,
-    ruleStatus,
-  ) {
+  function recordCompletedDay(netResult, dateString, instrumentLabel, ruleStatus) {
     if (currentBalance === null || startingCapital === null) return null;
 
     const date = dateString || todayDateString();
@@ -1541,11 +1368,7 @@
       // ruleStatus: { compliant: bool, label: string, source: 'manual'|'broker' }
       // Defaults to a compliant manual entry when the caller doesn't evaluate
       // its own rule context (keeps this param backward-compatible).
-      ruleStatus: ruleStatus || {
-        compliant: true,
-        label: "Within rules",
-        source: "manual",
-      },
+      ruleStatus: ruleStatus || { compliant: true, label: 'Within rules', source: 'manual' },
     });
 
     tradeHistory.sort((a, b) => {
@@ -1557,7 +1380,7 @@
     // Recalculate every entry's running balance from the starting capital,
     // walking forward in date (then submission) order.
     let runningBalance = startingCapital;
-    tradeHistory.forEach((entry) => {
+    tradeHistory.forEach(entry => {
       runningBalance += entry.netResult;
       entry.balanceAfter = runningBalance;
     });
@@ -1567,35 +1390,31 @@
     refreshHeaderBadge();
     renderInstrumentSlTable();
 
-    if (typeof window.renderCalculatorHistory === "function") {
+    if (typeof window.renderCalculatorHistory === 'function') {
       window.renderCalculatorHistory();
     }
 
-    if (typeof window.renderJournalList === "function") {
+    if (typeof window.renderJournalList === 'function') {
       window.renderJournalList();
     }
 
-    if (typeof window.renderJournalAnalysis === "function") {
+    if (typeof window.renderJournalAnalysis === 'function') {
       window.renderJournalAnalysis();
     }
 
-    if (typeof window.renderCalculatorBrokerMode === "function") {
+    if (typeof window.renderCalculatorBrokerMode === 'function') {
       window.renderCalculatorBrokerMode();
     }
 
-    if (
-      document.getElementById("tab-settings") &&
-      document.getElementById("tab-settings").classList.contains("active") &&
-      typeof window.renderSettings === "function"
-    ) {
+    if (document.getElementById('tab-settings') &&
+        document.getElementById('tab-settings').classList.contains('active') &&
+        typeof window.renderSettings === 'function') {
       window.renderSettings();
     }
 
-    if (
-      document.getElementById("tab-roadmap") &&
-      document.getElementById("tab-roadmap").classList.contains("active") &&
-      typeof window.renderRoadmap === "function"
-    ) {
+    if (document.getElementById('tab-roadmap') &&
+        document.getElementById('tab-roadmap').classList.contains('active') &&
+        typeof window.renderRoadmap === 'function') {
       window.renderRoadmap();
     }
 
@@ -1608,13 +1427,13 @@
   // ("stopped for today" vs. "pushed for Trade 2") depends on a choice made
   // a moment later via the profit decision card.
   function updateTradeRuleStatus(tradeId, ruleStatus) {
-    const entry = tradeHistory.find((t) => t.id === tradeId);
+    const entry = tradeHistory.find(t => t.id === tradeId);
     if (!entry) return;
     entry.ruleStatus = ruleStatus;
-    if (typeof window.renderCalculatorHistory === "function") {
+    if (typeof window.renderCalculatorHistory === 'function') {
       window.renderCalculatorHistory();
     }
-    if (typeof window.renderJournalAnalysis === "function") {
+    if (typeof window.renderJournalAnalysis === 'function') {
       window.renderJournalAnalysis();
     }
   }
@@ -1628,11 +1447,9 @@
     checkTierCrossing();
     refreshHeaderBadge();
 
-    if (
-      document.getElementById("tab-roadmap") &&
-      document.getElementById("tab-roadmap").classList.contains("active") &&
-      typeof window.renderRoadmap === "function"
-    ) {
+    if (document.getElementById('tab-roadmap') &&
+        document.getElementById('tab-roadmap').classList.contains('active') &&
+        typeof window.renderRoadmap === 'function') {
       window.renderRoadmap();
     }
   }
@@ -1659,33 +1476,31 @@
     pendingCongrats = { fromTier, toTier };
 
     // Immediate, always-visible notice regardless of which tab is currently open.
-    showHeaderToast(
-      `🎉 Congratulations — you've reached the ${TIER_LABELS[toTier]} tier!`,
-    );
+    showHeaderToast(`🎉 Congratulations — you've reached the ${TIER_LABELS[toTier]} tier!`);
 
     // If the roadmap screen happens to already be loaded, render its banner now too.
     renderPendingCongratsIfReady();
   }
 
   function showHeaderToast(message) {
-    let toast = document.getElementById("header-toast");
+    let toast = document.getElementById('header-toast');
     if (!toast) {
-      toast = document.createElement("div");
-      toast.id = "header-toast";
-      toast.className = "header-toast";
+      toast = document.createElement('div');
+      toast.id = 'header-toast';
+      toast.className = 'header-toast';
       document.body.appendChild(toast);
     }
     toast.innerText = message;
-    toast.classList.add("visible");
+    toast.classList.add('visible');
     clearTimeout(toast._hideTimer);
     toast._hideTimer = setTimeout(() => {
-      toast.classList.remove("visible");
+      toast.classList.remove('visible');
     }, 6000);
   }
 
   function renderPendingCongratsIfReady() {
     if (!pendingCongrats) return;
-    const slot = document.getElementById("congrats-banner-slot");
+    const slot = document.getElementById('congrats-banner-slot');
     if (!slot) return; // roadmap.html not in the DOM yet — stays queued
 
     const { fromTier, toTier } = pendingCongrats;
@@ -1790,17 +1605,12 @@
   // the live entry+growth walk on every call but never reporting a LOWER
   // sub-tier than the highest one ever actually reached.
   function getOfficialSubLevelKey() {
-    if (
-      !selectedTier ||
-      originalStartingCapital === null ||
-      currentBalance === null
-    )
-      return null;
+    if (!selectedTier || originalStartingCapital === null || currentBalance === null) return null;
 
     const entryKey = subLevelForBalance(selectedTier, originalStartingCapital);
     if (!entryKey || !tierRulesMatrix[entryKey]) return null;
 
-    let subLevelNum = parseInt(entryKey.split("-")[1], 10);
+    let subLevelNum = parseInt(entryKey.split('-')[1], 10);
 
     // Each further step requires the NEXT power of 1.5x on top of the
     // ORIGINAL starting capital (1.5x for the first step up, 2.25x for the
@@ -1825,10 +1635,7 @@
       highestOfficialSubLevelNum = null;
       highestOfficialSubLevelTier = selectedTier;
     }
-    if (
-      highestOfficialSubLevelNum === null ||
-      subLevelNum > highestOfficialSubLevelNum
-    ) {
+    if (highestOfficialSubLevelNum === null || subLevelNum > highestOfficialSubLevelNum) {
       highestOfficialSubLevelNum = subLevelNum;
     } else if (subLevelNum < highestOfficialSubLevelNum) {
       subLevelNum = highestOfficialSubLevelNum;
@@ -1839,23 +1646,18 @@
 
   function getMaxAllowedLots() {
     const key = getOfficialSubLevelKey();
-    return key && tierRulesMatrix[key] ? tierRulesMatrix[key].maxLots : 1;
+    return (key && tierRulesMatrix[key]) ? tierRulesMatrix[key].maxLots : 1;
   }
 
   // Balance still needed to reach the NEXT lot unlock (the next sub-tier
   // WITHIN the trader's tier, via the growth step-up described above), or
   // null if already at sub-tier 3 (the highest currently configured).
   function getNextLotUnlockInfo() {
-    if (
-      !selectedTier ||
-      originalStartingCapital === null ||
-      currentBalance === null
-    )
-      return null;
+    if (!selectedTier || originalStartingCapital === null || currentBalance === null) return null;
 
     const officialKey = getOfficialSubLevelKey();
     if (!officialKey) return null;
-    const subLevelNum = parseInt(officialKey.split("-")[1], 10);
+    const subLevelNum = parseInt(officialKey.split('-')[1], 10);
     const nextKey = `${selectedTier}-${subLevelNum + 1}`;
     if (!tierRulesMatrix[nextKey]) return null; // already at sub-tier 3
 
@@ -1867,7 +1669,7 @@
     // exact multiplier by walking from the entry point, mirroring
     // getOfficialSubLevelKey()'s own walk, so the two can never disagree.
     const entryKey = subLevelForBalance(selectedTier, originalStartingCapital);
-    const entrySubLevelNum = parseInt(entryKey.split("-")[1], 10);
+    const entrySubLevelNum = parseInt(entryKey.split('-')[1], 10);
     let growthMultiplier = 1.5;
     for (let n = entrySubLevelNum; n < subLevelNum; n++) {
       growthMultiplier *= 1.5;
@@ -1891,11 +1693,10 @@
   // the calculated Rs figure is always shown and never blocked, just
   // flagged when it exceeds what that lot count should risk.
   function formatSlRupeesCellContent(rsLoss, lotsUsed) {
-    if (rsLoss === null || rsLoss === undefined) return "&mdash;";
+    if (rsLoss === null || rsLoss === undefined) return '&mdash;';
 
     const perLotAllowance = getPerLotMaxLossRupees(lotsUsed);
-    const exceedsAllowance =
-      perLotAllowance !== null && rsLoss > perLotAllowance;
+    const exceedsAllowance = perLotAllowance !== null && rsLoss > perLotAllowance;
 
     // Loss If Hit is always shown in red — it's a loss figure, full stop,
     // regardless of whether it happens to be within or over the allowance.
@@ -1908,7 +1709,7 @@
     // unimportant — this needs to actually catch the eye. Wraps onto a
     // second line rather than forcing single-line nowrap, so it reads
     // cleanly even when the column has room to spare.
-    return `${amountHtml}<div class="sl-exceeds-warning">&#9888; exceeds ₹${fmt(perLotAllowance)} allowed for ${lotsUsed} lot${lotsUsed === 1 ? "" : "s"}</div>`;
+    return `${amountHtml}<div class="sl-exceeds-warning">&#9888; exceeds ₹${fmt(perLotAllowance)} allowed for ${lotsUsed} lot${lotsUsed === 1 ? '' : 's'}</div>`;
   }
 
   // Full all-tiers reference table — restored per the trader's request
@@ -1922,7 +1723,7 @@
   // reference material a trader can choose to open, not something that
   // should compete with the live working table above for attention.
   function renderTierReferenceTable() {
-    const grid = document.getElementById("tier-ref-grid");
+    const grid = document.getElementById('tier-ref-grid');
     if (!grid) return;
 
     // Seed the collapse-state storage BEFORE the section ever applies its
@@ -1930,17 +1731,11 @@
     // bypassing isReferenceSectionCollapsed()'s normal "show expanded once"
     // first-visit behavior, which is right for sections a trader needs to
     // see immediately but wrong here.
-    if (
-      localStorage.getItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + "tier-ref") ===
-      null
-    ) {
-      localStorage.setItem(
-        REFERENCE_COLLAPSE_STORAGE_PREFIX + "tier-ref",
-        "true",
-      );
+    if (localStorage.getItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + 'tier-ref') === null) {
+      localStorage.setItem(REFERENCE_COLLAPSE_STORAGE_PREFIX + 'tier-ref', 'true');
     }
-    if (typeof window.applyReferenceSectionState === "function") {
-      window.applyReferenceSectionState("tier-ref");
+    if (typeof window.applyReferenceSectionState === 'function') {
+      window.applyReferenceSectionState('tier-ref');
     }
 
     let html = `
@@ -1953,13 +1748,13 @@
 
     const officialKey = getOfficialSubLevelKey();
 
-    Object.keys(tierRulesMatrix).forEach((key) => {
+    Object.keys(tierRulesMatrix).forEach(key => {
       const rule = tierRulesMatrix[key];
-      const [broadTier, subLevel] = key.split("-");
+      const [broadTier, subLevel] = key.split('-');
       const label = `${TIER_LABELS[broadTier]} ${subLevel}`;
       const isOwnRow = key === officialKey;
-      const rowClass = isOwnRow ? " tier-highlight-row" : "";
-      const labelClass = isOwnRow ? " tier-highlight" : "";
+      const rowClass = isOwnRow ? ' tier-highlight-row' : '';
+      const labelClass = isOwnRow ? ' tier-highlight' : '';
 
       html += `
         <div class="mini-ladder-cell mini-ladder-label${labelClass}${rowClass}">${label}</div>
@@ -1976,25 +1771,25 @@
   function renderInstrumentSlTable() {
     renderTierReferenceTable();
 
-    const wrap = document.getElementById("instrument-sl-wrap");
-    const grid = document.getElementById("instrument-sl-grid");
+    const wrap = document.getElementById('instrument-sl-wrap');
+    const grid = document.getElementById('instrument-sl-grid');
     if (!wrap || !grid) return;
 
     const keys = Object.keys(selectedInstruments);
     if (keys.length === 0) {
-      wrap.classList.add("hidden");
+      wrap.classList.add('hidden');
       return;
     }
 
     const maxLoss = getCurrentMaxLossRupees();
     if (maxLoss === null) {
-      wrap.classList.add("hidden");
+      wrap.classList.add('hidden');
       return;
     }
 
-    wrap.classList.remove("hidden");
-    if (typeof window.applyReferenceSectionState === "function") {
-      window.applyReferenceSectionState("instrument-ref");
+    wrap.classList.remove('hidden');
+    if (typeof window.applyReferenceSectionState === 'function') {
+      window.applyReferenceSectionState('instrument-ref');
     }
 
     const maxAllowedLots = getMaxAllowedLots();
@@ -2004,13 +1799,12 @@
     // replaces the most useful info from the deleted standalone 12-row
     // "Capital Tier, Lots & Daily Loss Reference" table, now that the two
     // tables are merged into this single one.
-    const summaryEl = document.getElementById("instrument-tier-summary");
+    const summaryEl = document.getElementById('instrument-tier-summary');
     if (summaryEl) {
       const officialKey = getOfficialSubLevelKey();
-      const tierLabel =
-        officialKey && tierRulesMatrix[officialKey]
-          ? `${TIER_LABELS[selectedTier]} ${officialKey.split("-")[1]}`
-          : TIER_LABELS[selectedTier];
+      const tierLabel = officialKey && tierRulesMatrix[officialKey]
+        ? `${TIER_LABELS[selectedTier]} ${officialKey.split('-')[1]}`
+        : TIER_LABELS[selectedTier];
       summaryEl.innerHTML = `
         <span class="instrument-tier-summary-chip">Your tier: <strong>${tierLabel}</strong></span>
         <span class="instrument-tier-summary-chip">Max lots: <strong>${maxAllowedLots}</strong></span>
@@ -2028,10 +1822,10 @@
       <div class="mini-ladder-cell mini-ladder-head num">Loss If Hit (₹)</div>
     `;
 
-    keys.forEach((key) => {
+    keys.forEach(key => {
       const info = INSTRUMENT_INFO[key];
       if (!info) return;
-      const isIndex = info.category === "index";
+      const isIndex = info.category === 'index';
 
       let lots = selectedInstruments[key].lots || 1;
       // Clamp to whatever is currently allowed — e.g. if balance dropped
@@ -2048,10 +1842,9 @@
       // their current qty in selectedInstruments[key].qty once edited, so
       // it persists across re-renders the same way .lots already does;
       // falls back to the INSTRUMENT_INFO default until first edited.
-      const currentQty =
-        !isIndex && selectedInstruments[key].qty !== undefined
-          ? selectedInstruments[key].qty
-          : info.qty;
+      const currentQty = (!isIndex && selectedInstruments[key].qty !== undefined)
+        ? selectedInstruments[key].qty
+        : info.qty;
 
       const totalQty = currentQty * lots;
       // Points SL is the per-lot-scaled allowance divided by total quantity
@@ -2063,8 +1856,7 @@
       // figure silently assumed the trader was using their full lot
       // allowance even when the Lots column showed 1.
       const perLotBudget = getPerLotMaxLossRupees(lots);
-      const pointsSl =
-        totalQty > 0 && perLotBudget !== null ? perLotBudget / totalQty : 0;
+      const pointsSl = (totalQty > 0 && perLotBudget !== null) ? (perLotBudget / totalQty) : 0;
 
       const qtyCell = isIndex
         ? `<div class="mini-ladder-cell num">${currentQty}</div>`
@@ -2080,16 +1872,8 @@
       // this specific trade. Confirmed with the trader: Loss If Hit stays
       // EMPTY until they actually type their own SL — defaulting to the
       // Points SL figure was tried and found cluttered/confusing, reverted.
-      const ownSlPoints = isIndex
-        ? selectedInstruments[key].slPoints !== null &&
-          selectedInstruments[key].slPoints !== undefined
-          ? selectedInstruments[key].slPoints
-          : ""
-        : "";
-      const ownSlRupees =
-        isIndex && ownSlPoints !== ""
-          ? parseFloat(ownSlPoints) * currentQty * lots
-          : null;
+      const ownSlPoints = isIndex ? (selectedInstruments[key].slPoints !== null && selectedInstruments[key].slPoints !== undefined ? selectedInstruments[key].slPoints : '') : '';
+      const ownSlRupees = isIndex && ownSlPoints !== '' ? (parseFloat(ownSlPoints) * currentQty * lots) : null;
 
       const ownSlInputCell = isIndex
         ? `<div class="mini-ladder-cell num">
@@ -2119,17 +1903,17 @@
     grid.innerHTML = html;
 
     // Show the lot-unlock progress note below the table.
-    const noteEl = document.getElementById("lot-unlock-note");
+    const noteEl = document.getElementById('lot-unlock-note');
     if (noteEl) {
       const nextUnlock = getNextLotUnlockInfo();
       if (nextUnlock) {
-        noteEl.innerHTML = `<span class="lot-unlock-note-icon">&#9432;</span><span>You're cleared for up to <strong>${maxAllowedLots} lot${maxAllowedLots === 1 ? "" : "s"}</strong> per trade right now. Reach <strong>₹${fmt(nextUnlock.requiredBalance)}</strong> balance (50% profit on your original starting capital of ₹${fmt(originalStartingCapital)}) to unlock ${nextUnlock.nextLotCount} lots &mdash; ₹${fmt(nextUnlock.remaining)} to go.</span>`;
-        noteEl.classList.remove("hidden");
+        noteEl.innerHTML = `<span class="lot-unlock-note-icon">&#9432;</span><span>You're cleared for up to <strong>${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'}</strong> per trade right now. Reach <strong>₹${fmt(nextUnlock.requiredBalance)}</strong> balance (50% profit on your original starting capital of ₹${fmt(originalStartingCapital)}) to unlock ${nextUnlock.nextLotCount} lots &mdash; ₹${fmt(nextUnlock.remaining)} to go.</span>`;
+        noteEl.classList.remove('hidden');
       } else if (maxAllowedLots >= 1) {
-        noteEl.innerHTML = `<span class="lot-unlock-note-icon">&#9432;</span><span>You're cleared for up to <strong>${maxAllowedLots} lot${maxAllowedLots === 1 ? "" : "s"}</strong> per trade. That's the highest currently configured for your tier &mdash; no further lot unlock is defined yet.</span>`;
-        noteEl.classList.remove("hidden");
+        noteEl.innerHTML = `<span class="lot-unlock-note-icon">&#9432;</span><span>You're cleared for up to <strong>${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'}</strong> per trade. That's the highest currently configured for your tier &mdash; no further lot unlock is defined yet.</span>`;
+        noteEl.classList.remove('hidden');
       } else {
-        noteEl.classList.add("hidden");
+        noteEl.classList.add('hidden');
       }
     }
   }
@@ -2142,7 +1926,7 @@
   function onSlTableQtyInput(key, value) {
     if (!selectedInstruments[key]) return;
     const qty = parseInt(value, 10);
-    const validQty = isNaN(qty) || qty < 1 ? 1 : qty;
+    const validQty = (isNaN(qty) || qty < 1) ? 1 : qty;
     selectedInstruments[key].qty = validQty;
 
     const lots = selectedInstruments[key].lots || 1;
@@ -2150,11 +1934,9 @@
     if (perLotBudget === null) return;
 
     const totalQty = validQty * lots;
-    const pointsSl = totalQty > 0 ? perLotBudget / totalQty : 0;
+    const pointsSl = totalQty > 0 ? (perLotBudget / totalQty) : 0;
 
-    const outputCell = document.querySelector(
-      `.sl-points-output[data-row-key="${key}"]`,
-    );
+    const outputCell = document.querySelector(`.sl-points-output[data-row-key="${key}"]`);
     if (outputCell) {
       outputCell.innerText = `${pointsSl.toFixed(2)} pts`;
     }
@@ -2172,7 +1954,7 @@
   function onSlTableSlPointsInput(key, value) {
     if (!selectedInstruments[key]) return;
     const points = parseFloat(value);
-    if (value.trim() === "" || isNaN(points) || points < 0) {
+    if (value.trim() === '' || isNaN(points) || points < 0) {
       selectedInstruments[key].slPoints = null;
     } else {
       selectedInstruments[key].slPoints = points;
@@ -2181,25 +1963,18 @@
   }
 
   function refreshSlRupeesOutput(key) {
-    const outputCell = document.querySelector(
-      `.sl-rupees-output[data-row-key="${key}"]`,
-    );
+    const outputCell = document.querySelector(`.sl-rupees-output[data-row-key="${key}"]`);
     if (!outputCell || !selectedInstruments[key]) return;
 
     const info = INSTRUMENT_INFO[key];
     const slPoints = selectedInstruments[key].slPoints;
     const lots = selectedInstruments[key].lots || 1;
-    const qty =
-      info &&
-      info.category !== "index" &&
-      selectedInstruments[key].qty !== undefined
-        ? selectedInstruments[key].qty
-        : info
-          ? info.qty
-          : 0;
+    const qty = (info && info.category !== 'index' && selectedInstruments[key].qty !== undefined)
+      ? selectedInstruments[key].qty
+      : (info ? info.qty : 0);
 
-    if (slPoints === null || slPoints === undefined || slPoints === "") {
-      outputCell.innerHTML = "&mdash;";
+    if (slPoints === null || slPoints === undefined || slPoints === '') {
+      outputCell.innerHTML = '&mdash;';
       return;
     }
     const rsLoss = slPoints * qty * lots;
@@ -2215,7 +1990,7 @@
     if (!selectedInstruments[key]) return;
     const lots = parseInt(value, 10);
     const maxAllowedLots = getMaxAllowedLots();
-    let validLots = isNaN(lots) || lots < 1 ? 1 : lots;
+    let validLots = (isNaN(lots) || lots < 1) ? 1 : lots;
 
     // Enforce the lot cap. If the typed value had to be clamped down, show
     // an immediate, specific reason right at the note location — relying
@@ -2224,9 +1999,7 @@
     if (validLots > maxAllowedLots) {
       const attemptedLots = validLots;
       validLots = maxAllowedLots;
-      const inputEl = document.querySelector(
-        `.sl-lots-input[data-instrument-key="${key}"]`,
-      );
+      const inputEl = document.querySelector(`.sl-lots-input[data-instrument-key="${key}"]`);
       if (inputEl) inputEl.value = validLots;
       flashLotCapMessage(attemptedLots, maxAllowedLots);
     }
@@ -2237,16 +2010,13 @@
     const perLotBudget = getPerLotMaxLossRupees(validLots);
     if (perLotBudget === null || !info) return;
 
-    const currentQty =
-      info.category !== "index" && selectedInstruments[key].qty !== undefined
-        ? selectedInstruments[key].qty
-        : info.qty;
+    const currentQty = (info.category !== 'index' && selectedInstruments[key].qty !== undefined)
+      ? selectedInstruments[key].qty
+      : info.qty;
     const totalQty = currentQty * validLots;
-    const pointsSl = totalQty > 0 ? perLotBudget / totalQty : 0;
+    const pointsSl = totalQty > 0 ? (perLotBudget / totalQty) : 0;
 
-    const outputCell = document.querySelector(
-      `.sl-points-output[data-row-key="${key}"]`,
-    );
+    const outputCell = document.querySelector(`.sl-points-output[data-row-key="${key}"]`);
     if (outputCell) {
       outputCell.innerText = `${pointsSl.toFixed(2)} pts`;
     }
@@ -2260,21 +2030,21 @@
   // location, then restores the normal unlock-progress message after a few
   // seconds. This is in addition to (not instead of) the static note.
   function flashLotCapMessage(attemptedLots, maxAllowedLots) {
-    const noteEl = document.getElementById("lot-unlock-note");
+    const noteEl = document.getElementById('lot-unlock-note');
     if (!noteEl) return;
 
     const nextUnlock = getNextLotUnlockInfo();
     const ceilingNote = nextUnlock
       ? `Reach ₹${fmt(nextUnlock.requiredBalance)} to unlock lot ${nextUnlock.nextLotCount} (₹${fmt(nextUnlock.remaining)} to go).`
-      : `${maxAllowedLots} lot${maxAllowedLots === 1 ? "" : "s"} is the maximum currently defined for this account size — there's no further unlock configured yet.`;
+      : `${maxAllowedLots} lot${maxAllowedLots === 1 ? '' : 's'} is the maximum currently defined for this account size — there's no further unlock configured yet.`;
 
     noteEl.innerHTML = `<span class="lot-unlock-note-icon">&#9888;</span><span>You typed ${attemptedLots} lots, but you're only cleared for <strong>${maxAllowedLots}</strong> right now &mdash; it's been set back to ${maxAllowedLots}. ${ceilingNote}</span>`;
-    noteEl.classList.remove("hidden");
-    noteEl.classList.add("lot-cap-flash");
+    noteEl.classList.remove('hidden');
+    noteEl.classList.add('lot-cap-flash');
 
     if (lotCapFlashTimeoutId) clearTimeout(lotCapFlashTimeoutId);
     lotCapFlashTimeoutId = setTimeout(() => {
-      noteEl.classList.remove("lot-cap-flash");
+      noteEl.classList.remove('lot-cap-flash');
       renderInstrumentSlTable(); // restores the normal static unlock note
     }, 4000);
   }
@@ -2284,7 +2054,7 @@
     return {
       tier: selectedTier,
       traderType: traderTypesArray[0] || null, // first selected, kept for backward compatibility
-      traderTypes: traderTypesArray, // full multi-select list
+      traderTypes: traderTypesArray,           // full multi-select list
       startingCapital: startingCapital,
       currentBalance: currentBalance,
       joinDate: joinDate,
@@ -2310,86 +2080,26 @@
   // buttons everywhere; the rest appear in a searchable "More brokers"
   // list so this never turns into a wall of buttons as it grows.
   const BROKERS = [
-    {
-      id: "zerodha",
-      name: "Zerodha",
-      initial: "Z",
-      colorClass: "broker-chip-orange",
-      featured: true,
-    },
-    {
-      id: "groww",
-      name: "Groww",
-      initial: "G",
-      colorClass: "broker-chip-teal",
-      featured: true,
-    },
-    {
-      id: "angelone",
-      name: "Angel One",
-      initial: "A",
-      colorClass: "broker-chip-red",
-      featured: true,
-    },
-    {
-      id: "upstox",
-      name: "Upstox",
-      initial: "U",
-      colorClass: "broker-chip-purple",
-      featured: true,
-    },
-    {
-      id: "icicidirect",
-      name: "ICICI Direct",
-      initial: "I",
-      colorClass: "broker-chip-blue",
-      featured: false,
-    },
-    {
-      id: "kotak",
-      name: "Kotak Securities",
-      initial: "K",
-      colorClass: "broker-chip-maroon",
-      featured: false,
-    },
-    {
-      id: "hdfcsec",
-      name: "HDFC Securities",
-      initial: "H",
-      colorClass: "broker-chip-navy",
-      featured: false,
-    },
-    {
-      id: "dhan",
-      name: "Dhan",
-      initial: "D",
-      colorClass: "broker-chip-teal",
-      featured: false,
-    },
-    {
-      id: "motilal",
-      name: "Motilal Oswal",
-      initial: "M",
-      colorClass: "broker-chip-orange",
-      featured: false,
-    },
-    {
-      id: "sbicap",
-      name: "SBICAP Securities",
-      initial: "S",
-      colorClass: "broker-chip-blue",
-      featured: false,
-    },
+    { id: 'zerodha', name: 'Zerodha', initial: 'Z', colorClass: 'broker-chip-orange', featured: true },
+    { id: 'groww', name: 'Groww', initial: 'G', colorClass: 'broker-chip-teal', featured: true },
+    { id: 'angelone', name: 'Angel One', initial: 'A', colorClass: 'broker-chip-red', featured: true },
+    { id: 'upstox', name: 'Upstox', initial: 'U', colorClass: 'broker-chip-purple', featured: true },
+    { id: 'icicidirect', name: 'ICICI Direct', initial: 'I', colorClass: 'broker-chip-blue', featured: false },
+    { id: 'kotak', name: 'Kotak Securities', initial: 'K', colorClass: 'broker-chip-maroon', featured: false },
+    { id: 'hdfcsec', name: 'HDFC Securities', initial: 'H', colorClass: 'broker-chip-navy', featured: false },
+    { id: 'dhan', name: 'Dhan', initial: 'D', colorClass: 'broker-chip-teal', featured: false },
+    { id: 'motilal', name: 'Motilal Oswal', initial: 'M', colorClass: 'broker-chip-orange', featured: false },
+    { id: 'sbicap', name: 'SBICAP Securities', initial: 'S', colorClass: 'broker-chip-blue', featured: false },
   ];
   let brokerConnecting = null; // broker id currently mid-"connect", or null
-  let brokerPickerSearchTerm = ""; // current text in the "More brokers" search box, shared across instances
+  let brokerPickerSearchTerm = ''; // current text in the "More brokers" search box, shared across instances
   let brokerPickerExpanded = false; // whether "More brokers" is currently showing its search+list
 
   // Renders the connect/connected broker UI into EVERY container id that has
   // this markup structure that's currently present in the DOM — used by
   // both the Settings tab and the Daily Limits Tool's broker panel, so
   // connecting/disconnecting works identically from either screen.
-  const BROKER_AREA_IDS = ["broker-connect-area", "calc-broker-connect-area"];
+  const BROKER_AREA_IDS = ['broker-connect-area', 'calc-broker-connect-area'];
 
   function renderBrokerArea() {
     BROKER_AREA_IDS.forEach(renderBrokerAreaInto);
@@ -2400,17 +2110,14 @@
     if (!area) return;
 
     if (brokerConnected) {
-      area.dataset.brokerShellInitialized = ""; // reset so a future disconnect rebuilds the picker shell fresh
-      const broker = BROKERS.find((b) => b.name === connectedBrokerName);
+      area.dataset.brokerShellInitialized = ''; // reset so a future disconnect rebuilds the picker shell fresh
+      const broker = BROKERS.find(b => b.name === connectedBrokerName);
       const lastSync = lastSyncedAt
-        ? new Date(lastSyncedAt).toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : "Not synced yet";
+        ? new Date(lastSyncedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        : 'Not synced yet';
       area.innerHTML = `
         <div class="broker-connected-row">
-          <span class="broker-chip ${broker ? broker.colorClass : ""}">${broker ? broker.initial : "?"}</span>
+          <span class="broker-chip ${broker ? broker.colorClass : ''}">${broker ? broker.initial : '?'}</span>
           <span class="broker-connected-text">Connected to ${connectedBrokerName}</span>
           <span class="broker-last-sync">Last synced: ${lastSync}</span>
           <button type="button" class="broker-disconnect-btn" onclick="disconnectMockBroker()">Disconnect</button>
@@ -2419,29 +2126,25 @@
       return;
     }
 
-    const featured = BROKERS.filter((b) => b.featured);
-    const more = BROKERS.filter((b) => !b.featured);
+    const featured = BROKERS.filter(b => b.featured);
+    const more = BROKERS.filter(b => !b.featured);
 
     // Build the static shell (featured buttons + toggle + search input) only
     // once per container; re-typing in the search box must NOT replace the
     // input element itself, or it loses focus on every keystroke. Only the
     // filtered list and button disabled-states get refreshed after that.
     if (!area.dataset.brokerShellInitialized) {
-      area.dataset.brokerShellInitialized = "true";
+      area.dataset.brokerShellInitialized = 'true';
       area.innerHTML = `
         <div class="broker-grid" id="${containerId}-featured"></div>
-        ${
-          more.length > 0
-            ? `
+        ${more.length > 0 ? `
           <button type="button" class="broker-more-toggle" id="${containerId}-more-toggle" onclick="toggleMoreBrokers('${containerId}')"></button>
           <div class="broker-more-wrap hidden" id="${containerId}-more-wrap">
             <input type="text" class="instrument-picker-search" id="${containerId}-search"
                    placeholder="Search brokers..." oninput="onBrokerPickerSearch('${containerId}', this.value)">
             <div class="broker-more-list" id="${containerId}-more-list"></div>
           </div>
-        `
-            : ""
-        }
+        ` : ''}
       `;
     }
 
@@ -2451,56 +2154,43 @@
   function refreshBrokerAreaContent(containerId, featured, more) {
     const featuredEl = document.getElementById(`${containerId}-featured`);
     if (featuredEl) {
-      featuredEl.innerHTML = featured
-        .map(
-          (b) => `
-        <button type="button" class="broker-option-btn" onclick="connectMockBroker('${b.name}')" ${brokerConnecting ? "disabled" : ""}>
+      featuredEl.innerHTML = featured.map(b => `
+        <button type="button" class="broker-option-btn" onclick="connectMockBroker('${b.name}')" ${brokerConnecting ? 'disabled' : ''}>
           <span class="broker-chip ${b.colorClass}">${b.initial}</span>
-          <span>${brokerConnecting === b.id ? "Connecting..." : b.name}</span>
+          <span>${brokerConnecting === b.id ? 'Connecting...' : b.name}</span>
         </button>
-      `,
-        )
-        .join("");
+      `).join('');
     }
 
     const toggleBtn = document.getElementById(`${containerId}-more-toggle`);
     if (toggleBtn) {
-      toggleBtn.innerText = brokerPickerExpanded
-        ? "Hide other brokers"
-        : `More brokers (${more.length})`;
+      toggleBtn.innerText = brokerPickerExpanded ? 'Hide other brokers' : `More brokers (${more.length})`;
     }
 
     const moreWrap = document.getElementById(`${containerId}-more-wrap`);
-    if (moreWrap) moreWrap.classList.toggle("hidden", !brokerPickerExpanded);
+    if (moreWrap) moreWrap.classList.toggle('hidden', !brokerPickerExpanded);
 
     const moreListEl = document.getElementById(`${containerId}-more-list`);
     if (moreListEl) {
       const searchTerm = brokerPickerSearchTerm.toLowerCase().trim();
       const filteredMore = searchTerm
-        ? more.filter((b) => b.name.toLowerCase().includes(searchTerm))
+        ? more.filter(b => b.name.toLowerCase().includes(searchTerm))
         : more;
-      moreListEl.innerHTML =
-        filteredMore.length > 0
-          ? filteredMore
-              .map(
-                (b) => `
-        <button type="button" class="broker-more-row" onclick="connectMockBroker('${b.name}')" ${brokerConnecting ? "disabled" : ""}>
+      moreListEl.innerHTML = filteredMore.length > 0 ? filteredMore.map(b => `
+        <button type="button" class="broker-more-row" onclick="connectMockBroker('${b.name}')" ${brokerConnecting ? 'disabled' : ''}>
           <span class="broker-chip ${b.colorClass}">${b.initial}</span>
-          <span>${brokerConnecting === b.id ? "Connecting..." : b.name}</span>
+          <span>${brokerConnecting === b.id ? 'Connecting...' : b.name}</span>
         </button>
-      `,
-              )
-              .join("")
-          : '<div class="roadmap-empty-state">No brokers match your search.</div>';
+      `).join('') : '<div class="roadmap-empty-state">No brokers match your search.</div>';
     }
   }
 
   function toggleMoreBrokers(containerId) {
     brokerPickerExpanded = !brokerPickerExpanded;
-    if (!brokerPickerExpanded) brokerPickerSearchTerm = ""; // reset search when collapsing
-    BROKER_AREA_IDS.forEach((id) => {
-      const featured = BROKERS.filter((b) => b.featured);
-      const more = BROKERS.filter((b) => !b.featured);
+    if (!brokerPickerExpanded) brokerPickerSearchTerm = ''; // reset search when collapsing
+    BROKER_AREA_IDS.forEach(id => {
+      const featured = BROKERS.filter(b => b.featured);
+      const more = BROKERS.filter(b => !b.featured);
       refreshBrokerAreaContent(id, featured, more);
     });
   }
@@ -2510,20 +2200,20 @@
     // Only refresh the list contents for the container the user is
     // actually typing in — re-running the other container's full init
     // would steal focus from this input.
-    const featured = BROKERS.filter((b) => b.featured);
-    const more = BROKERS.filter((b) => !b.featured);
+    const featured = BROKERS.filter(b => b.featured);
+    const more = BROKERS.filter(b => !b.featured);
     refreshBrokerAreaContent(containerId, featured, more);
   }
 
   function connectMockBroker(brokerName) {
-    const broker = BROKERS.find((b) => b.name === brokerName);
+    const broker = BROKERS.find(b => b.name === brokerName);
     brokerConnecting = broker ? broker.id : brokerName;
     renderBrokerArea();
 
     connectBroker(brokerName, () => {
       brokerConnecting = null;
       renderBrokerArea();
-      if (typeof window.renderCalculatorBrokerMode === "function") {
+      if (typeof window.renderCalculatorBrokerMode === 'function') {
         window.renderCalculatorBrokerMode();
       }
     });
@@ -2532,7 +2222,7 @@
   function disconnectMockBroker() {
     disconnectBroker();
     renderBrokerArea();
-    if (typeof window.renderCalculatorBrokerMode === "function") {
+    if (typeof window.renderCalculatorBrokerMode === 'function') {
       window.renderCalculatorBrokerMode();
     }
   }
@@ -2544,7 +2234,7 @@
       connectedBrokerName = brokerName;
       lastSyncedAt = null;
       brokerPnlData = generateMockBrokerPnlHistory();
-      if (typeof onConnected === "function") onConnected();
+      if (typeof onConnected === 'function') onConnected();
     }, 1400);
   }
 
@@ -2556,25 +2246,20 @@
   }
 
   function ymd(d) {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
   // Builds a realistic-looking scrip name, e.g. "NIFTY 2026-04-21 PE 24400",
   // matching how a real broker P&L statement labels option contracts.
   function buildScripName(instrumentLabel) {
-    const base = instrumentLabel.toUpperCase().replace(/\s+/g, "");
+    const base = instrumentLabel.toUpperCase().replace(/\s+/g, '');
     const today = new Date();
     const expiryOffsetDays = Math.floor(Math.random() * 28) + 1;
     const expiry = new Date(today);
-    expiry.setDate(
-      expiry.getDate() - expiryOffsetDays - Math.floor(Math.random() * 60),
-    );
+    expiry.setDate(expiry.getDate() - expiryOffsetDays - Math.floor(Math.random() * 60));
     const expiryStr = ymd(expiry);
-    const optType = Math.random() < 0.5 ? "CE" : "PE";
-    const strikeBase =
-      { NIFTY: 24000, BANKNIFTY: 51000, FINNIFTY: 23000, SENSEX: 77000 }[
-        base
-      ] || 24000;
+    const optType = Math.random() < 0.5 ? 'CE' : 'PE';
+    const strikeBase = { NIFTY: 24000, BANKNIFTY: 51000, FINNIFTY: 23000, SENSEX: 77000 }[base] || 24000;
     const strike = strikeBase + (Math.floor(Math.random() * 20) - 10) * 50;
     return `${base} ${expiryStr} ${optType} ${strike}`;
   }
@@ -2597,10 +2282,7 @@
   // call the broker's reports API instead.
   function generateMockBrokerPnlHistory() {
     const instruments = getAllTradableInstruments();
-    const pool =
-      instruments.length > 0
-        ? instruments
-        : [{ value: "nifty", label: "Nifty" }];
+    const pool = instruments.length > 0 ? instruments : [{ value: 'nifty', label: 'Nifty' }];
     const data = {};
     const today = new Date();
     const fyStart = startOfFinancialYear(today);
@@ -2622,14 +2304,12 @@
       // in chronological order (earliest trade first) — matches how a
       // real order history naturally reads when trades happened at
       // different points in the session, not all bunched at once.
-      const marketOpenMinutes = 9 * 60 + 15; // 9:15 AM
+      const marketOpenMinutes = 9 * 60 + 15;  // 9:15 AM
       const marketCloseMinutes = 15 * 60 + 30; // 3:30 PM
       const marketWindowMinutes = marketCloseMinutes - marketOpenMinutes;
       const tradeTimesMinutes = [];
       for (let t = 0; t < tradeCount; t++) {
-        tradeTimesMinutes.push(
-          marketOpenMinutes + Math.floor(Math.random() * marketWindowMinutes),
-        );
+        tradeTimesMinutes.push(marketOpenMinutes + Math.floor(Math.random() * marketWindowMinutes));
       }
       tradeTimesMinutes.sort((a, b) => a - b);
 
@@ -2640,8 +2320,7 @@
         const isProfit = Math.random() < 0.5;
         const pctMove = (isProfit ? 1 : -1) * (0.02 + Math.random() * 0.4);
         const sellPrice = Math.round(buyPrice * (1 + pctMove) * 100) / 100;
-        const charges =
-          Math.round((qty * 0.06 + Math.random() * 40) * 100) / 100;
+        const charges = Math.round((qty * 0.06 + Math.random() * 40) * 100) / 100;
         const gross = Math.round((sellPrice - buyPrice) * qty * 100) / 100;
         const netPnl = Math.round((gross - charges) * 100) / 100;
 
@@ -2649,7 +2328,7 @@
         const execHour = Math.floor(totalMinutes / 60);
         const execMinute = totalMinutes % 60;
         const execSecond = Math.floor(Math.random() * 60);
-        const executedTime = `${String(execHour).padStart(2, "0")}:${String(execMinute).padStart(2, "0")}:${String(execSecond).padStart(2, "0")}`;
+        const executedTime = `${String(execHour).padStart(2, '0')}:${String(execMinute).padStart(2, '0')}:${String(execSecond).padStart(2, '0')}`;
 
         rows.push({
           scrip: buildScripName(chosen.label),
@@ -2695,9 +2374,9 @@
     let totalCharges = 0;
     let netRealizedPnl = 0;
 
-    Object.keys(brokerPnlData).forEach((date) => {
+    Object.keys(brokerPnlData).forEach(date => {
       if (date < fromDateString || date > toDateString) return;
-      brokerPnlData[date].forEach((row) => {
+      brokerPnlData[date].forEach(row => {
         totalCharges += row.charges;
         netRealizedPnl += row.netPnl;
         realizedPnl += row.netPnl + row.charges; // gross = net + charges added back
@@ -2716,20 +2395,10 @@
   // moment. Also stamps lastSyncedAt so the Settings/Connected chip reflects
   // a real import time. dateString lets the caller import a past day's data,
   // not just "today."
-  function recordBrokerSyncedTrade(
-    netResult,
-    instrumentLabel,
-    ruleStatus,
-    dateString,
-  ) {
+  function recordBrokerSyncedTrade(netResult, instrumentLabel, ruleStatus, dateString) {
     if (!brokerConnected) return null;
     lastSyncedAt = Date.now();
-    return recordCompletedDay(
-      netResult,
-      dateString || todayDateString(),
-      instrumentLabel,
-      ruleStatus,
-    );
+    return recordCompletedDay(netResult, dateString || todayDateString(), instrumentLabel, ruleStatus);
   }
 
   // Combined list of everything the user can pick as "today's instrument"
@@ -2738,11 +2407,11 @@
   // `label` for display and a `value` safe to use in a <select>.
   function getAllTradableInstruments() {
     const list = [];
-    Object.keys(selectedInstruments).forEach((key) => {
+    Object.keys(selectedInstruments).forEach(key => {
       const info = INSTRUMENT_INFO[key];
       if (info) list.push({ value: key, label: info.label });
     });
-    customStocks.forEach((name) => {
+    customStocks.forEach(name => {
       list.push({ value: `stock:${name}`, label: name });
     });
     return list;
@@ -2757,11 +2426,7 @@
   // so each entry attaches to one specific submitted trade.
   function saveJournalEntry(tradeId, entryData) {
     if (!tradeId) return;
-    journalEntries[tradeId] = Object.assign(
-      {},
-      journalEntries[tradeId],
-      entryData,
-    );
+    journalEntries[tradeId] = Object.assign({}, journalEntries[tradeId], entryData);
   }
 
   function getJournalEntry(tradeId) {
@@ -2781,7 +2446,7 @@
     const container = document.getElementById(tabId);
     if (!container) return;
 
-    if (tabId === "tab-select") {
+    if (tabId === 'tab-select') {
       renderSetupBrokerPicker();
 
       // Every fresh load of this component (first-time setup, OR
@@ -2793,18 +2458,18 @@
       setupWizardGoToStep(1);
 
       if (selectedTier) {
-        container.querySelectorAll(".tier-select-card").forEach((card) => {
-          card.classList.toggle("selected", card.dataset.tier === selectedTier);
+        container.querySelectorAll('.tier-select-card').forEach(card => {
+          card.classList.toggle('selected', card.dataset.tier === selectedTier);
         });
-        const wrap = document.getElementById("capital-amount-wrap");
-        const hint = document.getElementById("capital-amount-hint");
-        const input = document.getElementById("capital-amount-input");
-        if (wrap) wrap.classList.remove("hidden");
+        const wrap = document.getElementById('capital-amount-wrap');
+        const hint = document.getElementById('capital-amount-hint');
+        const input = document.getElementById('capital-amount-input');
+        if (wrap) wrap.classList.remove('hidden');
         if (hint) {
           const range = TIER_RANGES[selectedTier];
           hint.innerText = `Enter an amount between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[selectedTier]} tier.`;
         }
-        if (input && startingCapital !== null && input.value === "") {
+        if (input && startingCapital !== null && input.value === '') {
           input.value = startingCapital;
         }
 
@@ -2817,28 +2482,19 @@
         // the broker-step/fetched-wrap visibility as connectBroker() left
         // it (don't fight that state here).
         if (!brokerConnected) {
-          const brokerStepWrap = document.getElementById("setup-broker-step");
-          if (brokerStepWrap) brokerStepWrap.classList.add("hidden");
-          const manualStepsWrap = document.getElementById("setup-manual-steps");
-          if (manualStepsWrap) manualStepsWrap.classList.remove("hidden");
-          const manualInstrumentStep = document.getElementById(
-            "setup-manual-instrument-step",
-          );
-          if (manualInstrumentStep)
-            manualInstrumentStep.classList.remove("hidden");
-          const fetchedInstrumentStepWrap = document.getElementById(
-            "setup-fetched-instrument-step-wrap",
-          );
-          if (fetchedInstrumentStepWrap)
-            fetchedInstrumentStepWrap.classList.add("hidden");
+          const brokerStepWrap = document.getElementById('setup-broker-step');
+          if (brokerStepWrap) brokerStepWrap.classList.add('hidden');
+          const manualStepsWrap = document.getElementById('setup-manual-steps');
+          if (manualStepsWrap) manualStepsWrap.classList.remove('hidden');
+          const manualInstrumentStep = document.getElementById('setup-manual-instrument-step');
+          if (manualInstrumentStep) manualInstrumentStep.classList.remove('hidden');
+          const fetchedInstrumentStepWrap = document.getElementById('setup-fetched-instrument-step-wrap');
+          if (fetchedInstrumentStepWrap) fetchedInstrumentStepWrap.classList.add('hidden');
         }
       }
       if (selectedTraderTypes.size > 0) {
-        container.querySelectorAll(".trader-type-card").forEach((card) => {
-          card.classList.toggle(
-            "selected",
-            selectedTraderTypes.has(card.dataset.traderType),
-          );
+        container.querySelectorAll('.trader-type-card').forEach(card => {
+          card.classList.toggle('selected', selectedTraderTypes.has(card.dataset.traderType));
         });
       }
       // Re-render (rather than patch) the instrument picker so it reflects
@@ -2847,18 +2503,11 @@
       // a broker already connected, the fetched path too. Both pickers are
       // safe to pre-render even while step 3 is hidden — setupWizardGoToStep
       // re-renders again once the trader actually reaches that step.
-      if (document.getElementById("manual-instrument-picker")) {
+      if (document.getElementById('manual-instrument-picker')) {
         renderManualInstrumentGrid();
       }
-      if (
-        brokerConnected &&
-        document.getElementById("setup-fetched-instrument-picker")
-      ) {
-        renderInstrumentPicker(
-          "setup-fetched-instrument-picker",
-          getMockBrokerTradableInstruments(),
-          toggleSetupFetchedInstrument,
-        );
+      if (brokerConnected && document.getElementById('setup-fetched-instrument-picker')) {
+        renderInstrumentPicker('setup-fetched-instrument-picker', getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
       }
       renderCustomStockChips();
       updateContinueButtonState();
@@ -2867,32 +2516,31 @@
 
     if (!selectedTier) return;
 
-    if (tabId === "tab-subs") {
+    if (tabId === 'tab-subs') {
       const targetLabel = TIER_LABELS[selectedTier];
-      container.querySelectorAll(".pricing-card").forEach((card) => {
-        const nameEl = card.querySelector(".tier-name");
+      container.querySelectorAll('.pricing-card').forEach(card => {
+        const nameEl = card.querySelector('.tier-name');
         const matches = nameEl && nameEl.textContent.trim() === targetLabel;
-        card.classList.toggle("tier-highlight", !!matches);
+        card.classList.toggle('tier-highlight', !!matches);
       });
       return;
     }
 
-    if (tabId === "tab-calculator") {
+    if (tabId === 'tab-calculator') {
       // Auto-select the trader's OFFICIAL sub-tier (entry capital + the
       // formal +50%-growth rule — see getOfficialSubLevelKey()), not
       // always sub-tier 1. A Small trader who entered at small-2 (or
       // grew into it) should see small-2's rules here by default, not
       // be silently shown small-1's lower maxLots/loss every time they
       // open this tab.
-      const officialKey =
-        typeof window.getOfficialSubLevelKey === "function"
-          ? window.getOfficialSubLevelKey()
-          : null;
+      const officialKey = (typeof window.getOfficialSubLevelKey === 'function')
+        ? window.getOfficialSubLevelKey()
+        : null;
 
-      const select = document.getElementById("calc-tier");
+      const select = document.getElementById('calc-tier');
       if (select) {
         select.value = officialKey || TIER_FIRST_SUBLEVEL[selectedTier];
-        if (typeof window.onTierChange === "function") {
+        if (typeof window.onTierChange === 'function') {
           window.onTierChange(); // this already calls renderInstrumentSlTable() internally
         }
       }
@@ -2900,9 +2548,9 @@
       return;
     }
 
-    if (tabId === "tab-roadmap") {
+    if (tabId === 'tab-roadmap') {
       renderPendingCongratsIfReady();
-      if (typeof window.renderRoadmap === "function") {
+      if (typeof window.renderRoadmap === 'function') {
         window.renderRoadmap();
       }
       return;
@@ -2946,6 +2594,8 @@
   window.confirmProfile = confirmProfile;
   window.toggleDarkMode = toggleDarkMode;
   window.applyDarkModePreference = applyDarkModePreference;
+  window.adjustFontSize = adjustFontSize;
+  window.applyFontSizePreference = applyFontSizePreference;
   window.showTierSelect = showTierSelect;
   window.applyBalanceChange = applyBalanceChange;
   window.recordCompletedDay = recordCompletedDay;
@@ -2965,6 +2615,7 @@
   window.onSetupBrokerPickerSearch = onSetupBrokerPickerSearch;
   window.toggleSetupFetchedInstrument = toggleSetupFetchedInstrument;
   window.showManualProfileSetup = showManualProfileSetup;
+  window.showBrokerSetup = showBrokerSetup;
   window.setupWizardNext = setupWizardNext;
   window.setupWizardBack = setupWizardBack;
   window.disconnectMockBroker = disconnectMockBroker;
@@ -2981,7 +2632,7 @@
   // clickable) until there's something to navigate to. See
   // `.sidebar-setup-mode` in dashboard.css and the early-return guard added
   // to switchTab() for the enforcement side of this.
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener('DOMContentLoaded', () => {
     // ---------- Auth gate (PROTOTYPE MOCK — see auth.js) ----------
     // No logged-in session at all -> bounce to the login screen before
     // anything else renders. NOTE: this prototype only gates ACCESS to the
@@ -2990,33 +2641,33 @@
     // been in-memory only, independent of this auth layer). A returning
     // logged-in user still goes through profile setup once per session;
     // making the profile itself persist is a separate, larger change.
-    if (typeof window.Auth === "undefined") {
-      console.warn(
-        "auth.js not loaded — skipping the auth gate (app will behave as if logged in).",
-      );
+    if (typeof window.Auth === 'undefined') {
+      console.warn('auth.js not loaded — skipping the auth gate (app will behave as if logged in).');
     } else if (!window.Auth.getSession()) {
-      window.location.href = "/website/auth.html?view=login";
+      window.location.href = '/website/auth.html?view=login';
       return;
     }
 
-    const sidebar = document.getElementById("sidebar");
-    const topBar = document.getElementById("top-bar");
+    const sidebar = document.getElementById('sidebar');
+    const topBar = document.getElementById('top-bar');
 
     // Apply any saved dark-mode preference immediately, before anything
     // else renders — confirmed with the trader: the choice persists across
     // visits via localStorage, applying it here (rather than only inside
     // toggleDarkMode) avoids a flash of light mode on every reload.
     applyDarkModePreference();
+    applyFontSizePreference();
 
     if (sidebar) {
-      sidebar.classList.remove("hidden");
-      sidebar.classList.add("sidebar-setup-mode");
+      sidebar.classList.remove('hidden');
+      sidebar.classList.add('sidebar-setup-mode');
     }
-    if (topBar) topBar.classList.remove("hidden");
+    if (topBar) topBar.classList.remove('hidden');
 
-    const titleEl = document.getElementById("top-bar-page-title");
-    if (titleEl) titleEl.innerText = PAGE_TITLES["tab-select"];
+    const titleEl = document.getElementById('top-bar-page-title');
+    if (titleEl) titleEl.innerText = PAGE_TITLES['tab-select'];
 
-    loadComponent("tab-select");
+    loadComponent('tab-select');
   });
+
 })();

@@ -1093,51 +1093,52 @@
     brokerImportPendingDate = null;
     renderBrokerRangeView(); // re-render to highlight the selected dot
 
-    const detailWrap = document.getElementById('broker-day-detail');
-    const titleEl = document.getElementById('broker-day-detail-title');
-    const tableEl = document.getElementById('broker-day-scrip-table');
+    const overlay  = document.getElementById('broker-import-panel-overlay');
+    const titleEl  = document.getElementById('broker-panel-title');
+    const subEl    = document.getElementById('broker-panel-subtitle');
+    const tableEl  = document.getElementById('broker-day-scrip-table');
     const confirmWrap = document.getElementById('broker-import-confirm');
     if (confirmWrap) confirmWrap.classList.add('hidden');
-    if (!detailWrap || !titleEl || !tableEl) return;
+    if (!overlay || !tableEl) return;
 
-    detailWrap.classList.remove('hidden');
     const niceDate = new Date(dateString + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-    titleEl.innerText = niceDate;
+    if (titleEl) titleEl.innerText = niceDate;
 
     const rows = (typeof window.getBrokerPnlHistory === 'function') ? window.getBrokerPnlHistory(dateString) : [];
     const importBtn = document.getElementById('broker-import-btn');
+    const alreadyLogged = dailyTradeCountForDate(dateString) > 0;
+
+    if (subEl) subEl.innerText = alreadyLogged ? 'This date already has trades in your Trade Log. Importing adds more.' : '';
 
     if (rows.length === 0) {
       tableEl.innerHTML = '<div class="roadmap-empty-state">No trades reported by your broker on this day.</div>';
       if (importBtn) importBtn.disabled = true;
-      return;
+    } else {
+      if (importBtn) importBtn.disabled = false;
+      let html = '<div class="broker-scrip-grid"><div class="broker-scrip-grid-head">Scrip</div><div class="broker-scrip-grid-head num">Qty</div><div class="broker-scrip-grid-head num">Buy Price</div><div class="broker-scrip-grid-head num">Sell Price</div><div class="broker-scrip-grid-head">Time</div><div class="broker-scrip-grid-head">Status</div></div>';
+      rows.forEach(r => {
+        html += `<div class="broker-scrip-grid">
+          <div>${r.scrip}</div>
+          <div class="num">${fmt(r.qty)}</div>
+          <div class="num">\u20b9${r.buyPrice.toFixed(2)}</div>
+          <div class="num">\u20b9${r.sellPrice.toFixed(2)}</div>
+          <div class="broker-order-time">${r.executedTime || '\u2014'}</div>
+          <div><span class="broker-order-status-badge">Executed</span></div>
+        </div>`;
+      });
+      tableEl.innerHTML = html;
     }
 
-    if (importBtn) importBtn.disabled = false;
+    overlay.classList.remove('hidden');
+  }
 
-    const alreadyLogged = dailyTradeCountForDate(dateString) > 0;
+  function closeBrokerImportPanel() {
+    const overlay = document.getElementById('broker-import-panel-overlay');
+    if (overlay) overlay.classList.add('hidden');
+  }
 
-    // Order-history style — matches how a real broker's Order History tab
-    // shows things (Stock/Type/Qty/Price/Status), not a P&L statement.
-    // Confirmed with the trader: no charges, no Realized/Net P&L shown
-    // here — that calculation only matters once a day is actually
-    // imported into the Trade Log, not while just browsing what's there.
-    let html = '<div class="broker-scrip-grid"><div class="broker-scrip-grid-head">Scrip</div><div class="broker-scrip-grid-head num">Qty</div><div class="broker-scrip-grid-head num">Buy Price</div><div class="broker-scrip-grid-head num">Sell Price</div><div class="broker-scrip-grid-head">Time</div><div class="broker-scrip-grid-head">Status</div></div>';
-    rows.forEach(r => {
-      html += `<div class="broker-scrip-grid">
-        <div>${r.scrip}</div>
-        <div class="num">${fmt(r.qty)}</div>
-        <div class="num">\u20b9${r.buyPrice.toFixed(2)}</div>
-        <div class="num">\u20b9${r.sellPrice.toFixed(2)}</div>
-        <div class="broker-order-time">${r.executedTime || '\u2014'}</div>
-        <div><span class="broker-order-status-badge">Executed</span></div>
-      </div>`;
-    });
-    tableEl.innerHTML = html;
-
-    if (alreadyLogged) {
-      tableEl.insertAdjacentHTML('beforeend', '<p class="foot-note" style="margin-top:8px;">Heads up: this date already has trades in your Trade Log. Importing will add these as additional entries alongside them.</p>');
-    }
+  function closeBrokerImportPanelIfOutside(e) {
+    if (e.target === document.getElementById('broker-import-panel-overlay')) closeBrokerImportPanel();
   }
 
   function requestImportBrokerDay() {
@@ -1289,6 +1290,8 @@
   window.requestImportBrokerDay = requestImportBrokerDay;
   window.cancelImportBrokerDay = cancelImportBrokerDay;
   window.confirmImportBrokerDay = confirmImportBrokerDay;
+  window.closeBrokerImportPanel = closeBrokerImportPanel;
+  window.closeBrokerImportPanelIfOutside = closeBrokerImportPanelIfOutside;
 
   // Run once on load so the panel reflects "no trades yet" immediately.
   // resumeCooldownIfActive must run BEFORE resetTracker, since resetTracker
