@@ -27,9 +27,7 @@
     'swing-trader': 'Swing Trader',
   };
 
-  function fmt(n) {
-    return Math.round(n).toLocaleString('en-IN');
-  }
+  // fmt() now shared — see /src/app/shared/utils/formatters.js
 
   // Broker connect/disconnect UI lives in app-shell.js (see connectMockBroker,
   // disconnectMockBroker, renderBrokerArea) since it's shared between this

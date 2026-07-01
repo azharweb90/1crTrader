@@ -58,9 +58,7 @@
   let activeTradeId = null; // which trade's journal entry is currently open in the form
   let screenshotDataUrl = null; // base64 data URL of the currently attached setup screenshot, or null
 
-  function fmt(n) {
-    return Math.round(n).toLocaleString('en-IN');
-  }
+  // fmt() now shared — see /src/app/shared/utils/formatters.js
 
   function formatDate(isoDateString) {
     const d = new Date(isoDateString);

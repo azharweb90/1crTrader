@@ -45,8 +45,15 @@ src/
                           conversion (selectedTier/currentBalance become useState,
                           the risk functions become a useRiskEngine() hook) rather
                           than being worth the risk to do by hand now.
-      state/, mock-broker/, utils/   Reserved — same reasoning as above, still
+      state/, mock-broker/   Reserved — same reasoning as above, still
                           inline in app-shell.js pending the React conversion
+      utils/
+        formatters.js    fmt, todayDateString, getInitials — shared now.
+                          fmt() alone was duplicated identically in 6 files
+                          before this (app-shell.js + 5 feature files each
+                          had their own private copy); todayDateString() in
+                          2. All duplicates removed, every file now calls
+                          the one shared copy.
     styles/
       main.css           Entry point — @imports every file below in exact
                           original cascade order (base -> layout-shell ->

@@ -199,9 +199,8 @@
   // tierRulesMatrix per sub-tier — see the comment on tierRulesMatrix above
   // for why lot count and risk amount are no longer the same axis.)
 
-  function fmt(n) {
-    return Math.round(n).toLocaleString('en-IN');
-  }
+  // fmt() moved to /src/app/shared/utils/formatters.js (was duplicated
+  // identically in 6 other files — see that file's header comment).
 
   // ---------- Font size ----------
   // Scales the whole app via CSS `zoom` on #app-shell — confirmed as the
@@ -667,13 +666,7 @@
     btn.innerText = step >= SETUP_WIZARD_STEP_COUNT ? 'Continue to Dashboard' : 'Continue';
   }
 
-  function todayDateString() {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
+  // todayDateString() moved to /src/app/shared/utils/formatters.js.
 
   // ---------- Broker-first profile setup (PROTOTYPE ONLY) ----------
   // Lets a brand-new user connect a broker FIRST, then auto-fills capital,
@@ -1193,13 +1186,7 @@
   // Tier and trading styles now live on the Account page instead, where
   // they have room to be shown properly (chips, cards) rather than
   // squeezed into one line of header text.
-  function getInitials(name) {
-    if (!name) return '?';
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return '?';
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
+  // getInitials() moved to /src/app/shared/utils/formatters.js.
 
   function refreshHeaderBadge() {
     const avatarWrap = document.getElementById('header-avatar-wrap');
@@ -2492,7 +2479,6 @@
   window.switchTab = switchTab;
   window.toggleAccountMenu = toggleAccountMenu;
   window.handleLogout = handleLogout;
-  window.getInitials = getInitials;
   window.selectTier = selectTier;
   window.selectTraderType = selectTraderType;
   window.onCapitalAmountInput = onCapitalAmountInput;

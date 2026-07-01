@@ -19,7 +19,7 @@
     return rule ? rule.loss : 1750;
   }
 
-  function fmt(n) { return Math.round(n).toLocaleString('en-IN'); }
+  // fmt() now shared — see /src/app/shared/utils/formatters.js
   function getState()   { return (typeof window.getProfileState  === 'function') ? window.getProfileState()  : {}; }
   function getHistory() { return (typeof window.getTradeHistory  === 'function') ? window.getTradeHistory()  : []; }
 

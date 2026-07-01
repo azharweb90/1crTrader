@@ -9,9 +9,7 @@
 
 (function () {
 
-  function fmt(n) {
-    return Math.round(n).toLocaleString('en-IN');
-  }
+  // fmt() now shared — see /src/app/shared/utils/formatters.js
 
   function formatDateShort(isoDateString) {
     const d = new Date(isoDateString);

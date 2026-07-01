@@ -26,7 +26,7 @@
   let selectedRrRatio = null; // tracks which R:R pill was tapped
 
   // ── Helpers ────────────────────────────────────────────────
-  const fmt     = n => Math.round(n).toLocaleString('en-IN');
+  // fmt now shared — see /src/app/shared/utils/formatters.js
   const fmtPts  = n => (Math.round(n*100)/100).toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
   const fmtRs   = n => '₹' + fmt(n);
   const fmtPct  = n => (Math.round(n*10)/10).toFixed(1) + '%';

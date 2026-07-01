@@ -73,9 +73,7 @@
   let quickJournalDraftSlot = null; // which trade SLOT (1 or 2) the modal is drafting for, before that trade has a real id
   let journalDrafts = { 1: null, 2: null }; // { strategy, emotion } per slot, written before submit
 
-  function fmt(n) {
-    return Math.round(n).toLocaleString('en-IN');
-  }
+  // fmt() now shared — see /src/app/shared/utils/formatters.js
 
   function currentRule() {
     const key = document.getElementById('calc-tier').value;
@@ -714,16 +712,7 @@
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  // Local copy of app-shell.js's todayDateString() — kept self-contained
-  // rather than reaching into another component's closure. Used by the
-  // broker-sync functions below to find "today's" trades in history.
-  function todayDateString() {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
+  // todayDateString() now shared — see /src/app/shared/utils/formatters.js
 
   function renderCalculatorHistory() {
     const container = document.getElementById('calc-history-area');
