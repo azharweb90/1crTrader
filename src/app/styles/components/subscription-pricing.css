@@ -1,0 +1,140 @@
+/* Extracted from the original monolithic dashboard.css during the
+   Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
+   Original section markers preserved below. */
+
+/* ===========================================================
+   7. COMPONENT: subscription-pricing
+   =========================================================== */
+.pricing-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.pricing-card {
+  background: #ffffff;
+  border: 1px solid #E8EDF4;
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pricing-card:hover {
+  transform: translateY(-4px);
+  border-color: #2C6FD6;
+  box-shadow: 0 8px 24px rgba(46, 117, 182, 0.1);
+}
+
+.pricing-card.popular {
+  border: 2px solid #D4A828;
+  background: #fffdf7;
+}
+
+.pricing-card .badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #D4A828;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pricing-card .tier-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #14233D;
+  margin: 0 0 16px 0;
+}
+
+.pricing-card .price-block {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.pricing-card .monthly-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #14233D;
+}
+
+.pricing-card .monthly-price span {
+  font-size: 14px;
+  color: #5B6B82;
+  font-weight: 450;
+}
+
+.pricing-card .yearly-block {
+  background: #F7F9FC;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+
+.pricing-card.popular .yearly-block {
+  background: #EAF8F2;
+}
+
+.pricing-card .old-price {
+  font-size: 12px;
+  text-decoration: line-through;
+  color: #8A98AD;
+  margin-bottom: 2px;
+}
+
+.pricing-card .new-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #14233D;
+}
+
+.pricing-card.popular .new-price {
+  color: #8C6510;
+}
+
+.pricing-card .yearly-label {
+  font-size: 11px;
+  color: #5B6B82;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.pricing-card .action-btn {
+  width: 100%;
+  background: #14233D;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 16px;
+}
+
+.pricing-card .action-btn:hover {
+  background: #2C6FD6;
+}
+
+.pricing-card.popular .action-btn {
+  background: #B6890F;
+}
+
+.pricing-card.popular .action-btn:hover {
+  background: #8C6510;
+}
+/* === END COMPONENT: subscription-pricing === */

@@ -1,0 +1,113 @@
+/* Extracted from the original monolithic dashboard.css during the
+   Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
+   Original section markers preserved below. */
+
+   11. COMPONENT: education-books-shared
+   Shared styles for the Education and Books tabs (filter bar + card grid)
+   =========================================================== */
+.learn-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.learn-filter-btn {
+  background: #ffffff;
+  border: 1.5px solid #DCE3EC;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5B6B82;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.learn-filter-btn:hover {
+  border-color: #2C6FD6;
+  color: #2C6FD6;
+}
+
+.learn-filter-btn.active {
+  background: #14233D;
+  border-color: #14233D;
+  color: #ffffff;
+}
+
+.learn-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.learn-card {
+  display: flex;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid #E8EDF4;
+  border-radius: 12px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.learn-card:hover {
+  border-color: #2C6FD6;
+  box-shadow: 0 6px 16px rgba(46, 117, 182, 0.1);
+  transform: translateY(-2px);
+}
+
+.learn-card-placeholder {
+  background: #fafbfc;
+  border-style: dashed;
+}
+
+.learn-card-thumb {
+  font-size: 28px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F1F4F8;
+  border-radius: 10px;
+}
+
+.learn-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.learn-card-category-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #2C6FD6;
+  margin-bottom: 4px;
+}
+
+.learn-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #14233D;
+  margin-bottom: 3px;
+  line-height: 1.35;
+}
+
+.learn-card-creator {
+  font-size: 12.5px;
+  color: #5B6B82;
+}
+
+.learn-card-placeholder-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: #b5750a;
+  margin-top: 6px;
+}
+/* === END COMPONENT: education-books-shared === */

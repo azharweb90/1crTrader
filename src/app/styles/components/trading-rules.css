@@ -1,0 +1,11 @@
+/* Extracted from the original monolithic dashboard.css during the
+   Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
+   Original section markers preserved below. */
+
+/* ===========================================================
+   6. COMPONENT: trading-rules
+   =========================================================== */
+.grid-rules {
+  grid-template-columns: minmax(110px, 1fr) minmax(120px, 1.2fr) minmax(80px, 0.7fr) minmax(100px, 0.9fr) minmax(120px, 1.2fr);
+}
+/* === END COMPONENT: trading-rules === */

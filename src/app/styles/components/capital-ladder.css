@@ -1,0 +1,11 @@
+/* Extracted from the original monolithic dashboard.css during the
+   Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
+   Original section markers preserved below. */
+
+/* ===========================================================
+   5. COMPONENT: capital-ladder
+   =========================================================== */
+.grid-ladder {
+  grid-template-columns: minmax(100px, 0.8fr) repeat(3, minmax(120px, 1fr));
+}
+/* === END COMPONENT: capital-ladder === */

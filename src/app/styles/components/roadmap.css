@@ -1,0 +1,649 @@
+/* Extracted from the original monolithic dashboard.css during the
+   Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
+   Original section markers preserved below. */
+
+/* ===========================================================
+   9. COMPONENT: roadmap
+   =========================================================== */
+.roadmap-balance-card {
+  background: linear-gradient(135deg, #221C0E 0%, #B6890F 100%);
+  border-radius: 14px;
+  padding: 24px 28px;
+  color: #ffffff;
+  margin-bottom: 24px;
+}
+
+.roadmap-balance-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 6px;
+}
+
+.roadmap-balance-value {
+  font-size: 32px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.roadmap-balance-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 6px;
+}
+
+.roadmap-progress-track {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 28px 0;
+}
+
+.roadmap-stage {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+
+.roadmap-stage-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #DCE3EC;
+  border: 3px solid #ffffff;
+  margin: 0 auto 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.roadmap-stage.reached .roadmap-stage-dot {
+  background: #D4A828;
+}
+
+.roadmap-stage.current .roadmap-stage-dot {
+  background: #2C6FD6;
+  box-shadow: 0 0 0 4px rgba(46, 117, 182, 0.2);
+}
+
+.roadmap-stage-line {
+  position: absolute;
+  top: 8px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background: #DCE3EC;
+  z-index: 0;
+}
+
+.roadmap-stage.reached .roadmap-stage-line {
+  background: #D4A828;
+}
+
+.roadmap-stage:first-child .roadmap-stage-line {
+  display: none;
+}
+
+.roadmap-stage-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #14233D;
+}
+
+.roadmap-stage.current .roadmap-stage-name {
+  color: #2C6FD6;
+}
+
+.roadmap-stage-range {
+  font-size: 11px;
+  color: #8A98AD;
+  margin-top: 2px;
+}
+
+.roadmap-input-card {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.roadmap-input-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid #DCE3EC;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+  max-width: 280px;
+}
+
+.roadmap-input-row:focus-within {
+  border-color: #2C6FD6;
+}
+
+.roadmap-input-prefix {
+  padding: 10px 12px;
+  background: #F1F4F8;
+  color: #5B6B82;
+  font-size: 14px;
+  font-weight: 600;
+  border-right: 1px solid #DCE3EC;
+}
+
+.roadmap-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.roadmap-projection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.roadmap-stat {
+  background: #ffffff;
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.roadmap-stat-label {
+  font-size: 11.5px;
+  color: #5B6B82;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.roadmap-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #14233D;
+  font-variant-numeric: tabular-nums;
+}
+
+.roadmap-empty-state {
+  text-align: center;
+  padding: 30px 16px;
+  color: #8A98AD;
+  font-size: 13.5px;
+}
+
+/* Congratulations banner — shown when balance crosses into a new tier */
+.congrats-banner {
+  background: linear-gradient(135deg, #0E9F6E 0%, #28b487 100%);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.congrats-banner-icon {
+  font-size: 26px;
+}
+
+.congrats-banner-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.congrats-banner-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Daily trade log history table */
+.roadmap-history-wrap {
+  margin-top: 8px;
+}
+
+.roadmap-history-grid {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) minmax(120px, 1fr) minmax(130px, 1fr);
+  gap: 1px;
+  background: #DCE3EC;
+  border: 1px solid #DCE3EC;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.roadmap-history-cell {
+  background: #ffffff;
+  padding: 10px 14px;
+}
+
+.roadmap-history-cell.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.roadmap-history-head {
+  background: #F1F4F8;
+  font-weight: 600;
+  color: #5B6B82;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.roadmap-history-win {
+  color: #0E9F6E;
+  font-weight: 600;
+}
+
+.roadmap-history-loss {
+  color: #C53D22;
+  font-weight: 600;
+}
+
+/* Goal Tracker: amount selector grid + result card */
+.goal-tracker-wrap {
+  margin-top: 8px;
+}
+
+.goal-amount-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.goal-amount-btn {
+  background: #ffffff;
+  border: 1.5px solid #DCE3EC;
+  border-radius: 8px;
+  padding: 10px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #14233D;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.goal-amount-btn:hover {
+  border-color: #2C6FD6;
+  background: #EEF6FF;
+}
+
+.goal-amount-btn.selected {
+  background: #14233D;
+  border-color: #14233D;
+  color: #ffffff;
+}
+
+.goal-amount-btn-cr {
+  border-color: #D4A828;
+  color: #8C6510;
+}
+
+.goal-amount-btn-cr.selected {
+  background: linear-gradient(135deg, #D4A828 0%, #B6890F 100%);
+  border-color: #D4A828;
+  color: #ffffff;
+}
+
+.goal-result-card {
+  background: linear-gradient(135deg, #221C0E 0%, #B6890F 100%);
+  border-radius: 14px;
+  padding: 24px 28px;
+  color: #ffffff;
+}
+
+.goal-result-headline {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.goal-result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.goal-result-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 4px;
+}
+
+.goal-result-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-result-note {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+.goal-result-warning {
+  background: #FBE7E2;
+  border: 1px solid #f3bcb4;
+  border-radius: 10px;
+  padding: 14px 18px;
+  color: #b8281a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+/* === END COMPONENT: roadmap === */
+/* NOTE: in the original monolithic dashboard.css, this "Roadmap redesign"
+   block sat after the END COMPONENT marker above (i.e. technically outside
+   the roadmap section). It's entirely .rm-* classes and belongs here —
+   reattached during the Phase 3 CSS split. */
+/* ── Roadmap redesign: slider, simulator, challenge ────────── */
+.rm-step-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8A98AD;
+  margin-bottom: 8px;
+}
+
+/* Goal slider */
+.rm-goal-slider-wrap { display: flex; flex-direction: column; gap: 12px; }
+.rm-goal-slider-row  { display: flex; align-items: center; gap: 12px; }
+.rm-goal-slider-min, .rm-goal-slider-max { font-size: 12px; font-weight: 600; color: #8A98AD; white-space: nowrap; }
+.rm-goal-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #D4A828 0%, #D4A828 50%, #E3E9F1 50%);
+  outline: none;
+  cursor: pointer;
+}
+.rm-goal-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #D4A828;
+  border: 3px solid #ffffff;
+  box-shadow: 0 1px 6px rgba(212,168,40,0.45);
+  cursor: pointer;
+}
+.rm-goal-slider::-moz-range-thumb {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #D4A828;
+  border: 3px solid #ffffff;
+  box-shadow: 0 1px 6px rgba(212,168,40,0.45);
+  cursor: pointer;
+}
+.rm-goal-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rm-goal-custom-label { font-size: 13px; font-weight: 600; color: #5B6B82; }
+.rm-goal-custom-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #DCE3EC;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+.rm-goal-prefix {
+  padding: 8px 10px;
+  font-size: 14px;
+  color: #8A98AD;
+  background: #F7F9FC;
+  border-right: 1px solid #DCE3EC;
+}
+.rm-goal-custom-input {
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 130px;
+  color: #14233D;
+  outline: none;
+  background: transparent;
+  -moz-appearance: textfield;
+}
+.rm-goal-custom-input::-webkit-outer-spin-button,
+.rm-goal-custom-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.rm-goal-display {
+  font-size: 18px;
+  font-weight: 800;
+  color: #14233D;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status badges */
+.rm-status-badge {
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+.rm-status-warning {
+  background: rgba(197,61,34,0.08);
+  border: 1px solid rgba(197,61,34,0.22);
+  color: #b8281a;
+}
+.rm-status-ok {
+  background: rgba(14,159,110,0.08);
+  border: 1px solid rgba(14,159,110,0.22);
+  color: #0a7a52;
+}
+.rm-status-reached {
+  background: rgba(14,159,110,0.1);
+  border: 1px solid rgba(14,159,110,0.25);
+  color: #0a7a52;
+}
+
+/* Simulator sliders */
+.rm-sim-controls { margin: 14px 0 0; }
+.rm-sim-hint { font-size: 12.5px; color: #5B6B82; margin-bottom: 14px; }
+.rm-sim-slider-group { margin-bottom: 18px; }
+.rm-sim-slider-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.rm-sim-slider-label { font-size: 13px; font-weight: 600; color: #14233D; }
+.rm-sim-slider-value { font-size: 14px; font-weight: 700; color: #D4A828; }
+
+/* Avg win input wrap */
+.rm-avg-win-wrap { margin-bottom: 16px; }
+
+/* Goal metric cards */
+.rm-goal-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+.rm-metric-card {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.rm-metric-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8A98AD;
+  margin-bottom: 6px;
+}
+.rm-metric-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #14233D;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.rm-metric-warn { color: #C53D22; }
+.rm-metric-sub {
+  font-size: 10.5px;
+  color: #8A98AD;
+  margin-top: 4px;
+}
+
+/* Challenge card */
+.rm-challenge-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.rm-challenge-set-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #D4A828 0%, #B6890F 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.rm-challenge-empty {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0 4px;
+  color: #8A98AD;
+}
+.rm-challenge-empty-icon { font-size: 28px; flex-shrink: 0; }
+.rm-challenge-empty-text { font-size: 13px; line-height: 1.55; }
+.rm-challenge-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.rm-challenge-name { font-size: 15px; font-weight: 700; color: #14233D; }
+.rm-challenge-dates { font-size: 11.5px; color: #8A98AD; margin-top: 3px; }
+.rm-challenge-days-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+.rm-challenge-days-num { font-size: 22px; font-weight: 800; color: #D4A828; line-height: 1; }
+.rm-challenge-days-label { font-size: 10px; font-weight: 600; color: #8A98AD; text-transform: uppercase; }
+.rm-challenge-expired .rm-challenge-days-num { color: #8A98AD; }
+.rm-challenge-progress-wrap { margin-bottom: 16px; }
+.rm-challenge-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #8A98AD;
+  margin-bottom: 6px;
+}
+.rm-challenge-pct { font-weight: 700; color: #14233D; }
+.rm-challenge-progress-track {
+  height: 10px;
+  background: #E3E9F1;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.rm-challenge-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #D4A828 0%, #1d9e75 100%);
+  border-radius: 5px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+}
+.rm-challenge-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.rm-challenge-stat {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.rm-challenge-stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #8A98AD; margin-bottom: 4px; }
+.rm-challenge-stat-value { font-size: 15px; font-weight: 700; color: #14233D; font-variant-numeric: tabular-nums; }
+.rm-stat-positive { color: #1d9e75; }
+.rm-challenge-reset-row { display: flex; align-items: center; padding-top: 4px; }
+
+/* Modal */
+.rm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,17,21,0.6);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rm-modal-overlay.hidden { display: none; }
+.rm-modal {
+  background: #ffffff;
+  border-radius: 14px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 16px 40px rgba(13,30,60,0.2);
+  overflow: hidden;
+}
+.rm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #E3E9F1;
+}
+.rm-modal-title { font-size: 15px; font-weight: 700; color: #14233D; }
+.rm-modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #8A98AD;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+.rm-modal-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 16px; }
+.rm-modal-field { display: flex; flex-direction: column; }
+.rm-modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 22px 20px;
+  border-top: 1px solid #E3E9F1;
+}

@@ -1,0 +1,258 @@
+/* Extracted from the original monolithic dashboard.css during the
+   Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
+   Original section markers preserved below. */
+
+/* ===========================================================
+   2. LAYOUT SHELL
+   (sidebar, top bar, main content column, content section card)
+   =========================================================== */
+html, body {
+  height: 100%;
+}
+
+body {
+  padding: 0;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0D1E28 0%, #070A0F 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px 18px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar.hidden {
+  display: none;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 20px 6px 18px;
+  margin-bottom: 4px;
+  border-bottom: none;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.sidebar-brand:hover {
+  opacity: 0.85;
+}
+
+.sidebar-setup-mode .sidebar-brand {
+  cursor: not-allowed;
+}
+
+.sidebar-setup-mode .sidebar-brand:hover {
+  opacity: 1;
+}
+
+.sidebar-brand-mark {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.sidebar-brand-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.sidebar-brand-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: #D4A828;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.sidebar-menu-label {
+  padding: 6px 10px 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  color: rgba(212, 168, 40, 0.55);
+  text-transform: uppercase;
+}
+
+.sidebar-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav-group-bottom {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(212, 168, 40, 0.14);
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 9px 11px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #9B8E6E;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* During initial profile setup, the sidebar is visible (for visual
+   continuity with the rest of the app) but nav links are inert — there's
+   no profile/balance yet for those screens to render meaningfully. */
+.sidebar-setup-mode .sidebar-link {
+  color: rgba(155, 142, 110, 0.4);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.sidebar-setup-mode .sidebar-link:hover {
+  background: none;
+}
+
+.sidebar-link-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.sidebar-link-icon svg {
+  display: block;
+}
+
+.sidebar-link:hover {
+  background: rgba(212, 168, 40, 0.08);
+  color: #F4EFE3;
+}
+
+.sidebar-link.active {
+  background: #2A2210;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.sidebar-link.active .sidebar-link-icon {
+  opacity: 1;
+}
+
+/* ---------- Main column: top bar + content ---------- */
+.main-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  background: #ffffff;
+  border-bottom: 1px solid #E8EDF4;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.top-bar.hidden {
+  display: none;
+}
+
+.top-bar-page-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: #14233D;
+  margin: 0;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.content-area {
+  flex: 1;
+  padding: 28px 32px 48px;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.content-section {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid #E3E9F1;
+  box-shadow: 0 1px 3px rgba(13, 30, 60, 0.05);
+}
+
+/* Simple centered loading/error state shown while a component fetches */
+.component-loading,
+.component-error {
+  padding: 40px;
+  text-align: center;
+  font-size: 13.5px;
+  color: #8A98AD;
+}
+
+.component-error {
+  color: #b8281a;
+}
+

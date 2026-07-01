@@ -1,0 +1,31 @@
+/* ===========================================================
+   MAIN STYLESHEET ENTRY POINT
+   Replaces the old monolithic dashboard.css (kept alongside as
+   dashboard.css.bak for one review cycle — see docs/architecture/).
+
+   Import order matches the ORIGINAL file's cascade order exactly.
+   This matters: some rules rely on later-wins-on-equal-specificity
+   ordering — most importantly responsive-overrides.css, which must
+   stay last, exactly as "17. RESPONSIVE OVERRIDES" was last in the
+   original file.
+   =========================================================== */
+
+@import url("./base.css");
+@import url("./layout-shell.css");
+@import url("./shared.css");
+
+@import url("./components/tier-select.css");
+@import url("./components/capital-ladder.css");
+@import url("./components/trading-rules.css");
+@import url("./components/subscription-pricing.css");
+@import url("./components/daily-limits.css");
+@import url("./components/roadmap.css");
+@import url("./components/trading-journal.css");
+@import url("./components/education-books-shared.css");
+@import url("./components/dashboard-home.css");
+@import url("./components/settings.css");
+@import url("./components/strategies.css");
+@import url("./components/trade-manager.css");
+@import url("./components/suggestions.css");
+
+@import url("./responsive-overrides.css");

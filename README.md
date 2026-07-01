@@ -31,11 +31,21 @@ src/
     shared/             Reserved — risk-engine, state, mock-broker, utils will move here
                          out of app-shell.js in a later pass
     styles/
-      dashboard.css      All app styles (still one file — see docs/architecture for the
-                          planned split into styles/components/*.css)
+      main.css           Entry point — @imports every file below in exact
+                          original cascade order (base -> layout-shell ->
+                          shared -> each component -> responsive-overrides last)
+      base.css           Reset + typography
+      layout-shell.css   Sidebar + top bar + main content column chrome
+      shared.css         Cross-component styles (grid-table, demo-banner)
+      responsive-overrides.css   All @media overrides — kept last on purpose
+      dashboard.css.bak  The original monolith, kept for one review cycle
       themes/
         dark-theme.css   Dark mode overrides, scoped entirely under body.dark-mode
-      components/        Reserved — per-feature CSS files, extracted from dashboard.css
+      components/        Per-feature CSS, split out of dashboard.css along its
+                          original COMPONENT: markers (see docs/architecture/
+                          for the full decomposition plan, including two
+                          orphaned blocks — Roadmap redesign, Trade Manager
+                          metrics panel — that were reattached during the split)
     product-tour/
       product-tour.js/css   Spotlight tour engine
       tour-content.js       Per-tab tour step data

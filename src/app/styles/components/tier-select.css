@@ -1,0 +1,1110 @@
+/* Extracted from the original monolithic dashboard.css during the
+   Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
+   Original section markers preserved below. */
+
+   4. COMPONENT: tier-select
+   =========================================================== */
+
+/* Wizard chrome — header, stepper, per-step containers, footer nav.
+   Mirrors the Claude Design mockup's onboarding wizard; the underlying
+   step CONTENT below (broker picker, tier cards, trader-type cards,
+   instrument picker) is the app's existing logic, restructured into this
+   4-step shape per the trader's own direction. */
+.setup-wizard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.setup-wizard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid #E8EDF4;
+}
+
+.setup-wizard-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #8A98AD;
+  text-transform: uppercase;
+}
+
+.setup-wizard-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #14233D;
+  margin: 2px 0 0;
+}
+
+.setup-skip-btn {
+  border: 1px solid #DCE3EC;
+  background: #fff;
+  color: #5B6B82;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.setup-skip-btn:hover {
+  background: #F4F7FB;
+}
+
+.setup-stepper {
+  display: flex;
+  align-items: center;
+  max-width: 560px;
+  padding: 22px 32px 26px;
+  border-bottom: 1px solid #E8EDF4;
+}
+
+.setup-stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  width: 108px;
+}
+
+.setup-stepper-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  background: #fff;
+  color: #AEB9C8;
+  border: 2px solid #E0E6EE;
+}
+
+.setup-stepper-dot-active {
+  background: #FBF1DA;
+  color: #8C6510;
+  border-color: #D4A828;
+}
+
+.setup-stepper-dot-done {
+  background: #D4A828;
+  color: #fff;
+  border-color: #D4A828;
+}
+
+.setup-stepper-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #9AA7B8;
+  text-align: center;
+}
+
+.setup-stepper-label-active {
+  color: #14233D;
+}
+
+.setup-stepper-bar {
+  flex: 1;
+  height: 2px;
+  background: #E0E6EE;
+  margin: 0 -8px;
+  margin-bottom: 24px;
+}
+
+.setup-stepper-bar-done {
+  background: #D4A828;
+}
+
+.setup-wizard-step {
+  padding: 28px 32px 8px;
+}
+
+.setup-wizard-step.hidden {
+  display: none;
+}
+
+.setup-wizard-step-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #14233D;
+  margin: 0 0 4px;
+}
+
+.setup-wizard-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 14px 16px;
+  background: #EEF6FF;
+  border: 1px solid #D6E7FB;
+  border-radius: 10px;
+  max-width: 560px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #3A5170;
+}
+
+.setup-wizard-note svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.setup-confirm-summary {
+  background: #fff;
+  border: 1px solid #E3E9F1;
+  border-radius: 14px;
+  padding: 4px 22px;
+  max-width: 640px;
+}
+
+.setup-wizard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 32px;
+  border-top: 1px solid #E8EDF4;
+  margin-top: 20px;
+}
+
+.setup-wizard-step-indicator {
+  font-size: 12.5px;
+  color: #9AA7B8;
+}
+
+.setup-wizard-back-btn {
+  border: 1px solid #DCE3EC;
+  background: #fff;
+  color: #5B6B82;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.setup-wizard-back-btn:disabled {
+  color: #C3CEDD;
+  cursor: not-allowed;
+}
+
+.setup-wizard-back-btn:not(:disabled):hover {
+  background: #F4F7FB;
+}
+
+.select-step {
+  margin-bottom: 28px;
+}
+
+.select-step-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #5B6B82;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+
+/* Broker-first profile setup (prototype mock) */
+.setup-manual-link {
+  display: block;
+  background: none;
+  border: none;
+  color: #2C6FD6;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 14px;
+  padding: 0;
+}
+
+.setup-manual-link:hover {
+  text-decoration: underline;
+}
+
+.setup-broker-fetched-wrap.hidden {
+  display: none;
+}
+
+.setup-fetched-summary {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.setup-fetched-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 13.5px;
+}
+
+.setup-fetched-label {
+  color: #5B6B82;
+}
+
+.setup-fetched-value {
+  font-weight: 700;
+  color: #14233D;
+}
+
+.tier-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.tier-select-card {
+  background: #ffffff;
+  border: 2px solid #E8EDF4;
+  border-radius: 14px;
+  padding: 24px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tier-select-card:hover {
+  border-color: #2C6FD6;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(46, 117, 182, 0.12);
+}
+
+.tier-select-card.selected {
+  border-color: #D4A828;
+  background: #fffdf7;
+  box-shadow: 0 0 0 3px rgba(212, 168, 40, 0.14);
+}
+
+.tier-select-name {
+  font-size: 19px;
+  font-weight: 700;
+  color: #14233D;
+  margin-bottom: 8px;
+}
+
+.tier-select-card.selected .tier-select-name {
+  color: #8C6510;
+}
+
+.tier-select-range {
+  font-size: 13px;
+  color: #14233D;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.tier-select-desc {
+  font-size: 12px;
+  color: #8A98AD;
+}
+
+/* Capital amount input, shown beneath the tier grid once a tier is picked */
+.capital-amount-wrap {
+  margin-top: 18px;
+  padding: 16px 18px;
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 12px;
+}
+
+.capital-amount-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #5B6B82;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.capital-amount-input-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid #DCE3EC;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.capital-amount-input-row:focus-within {
+  border-color: #2C6FD6;
+}
+
+.capital-amount-prefix {
+  padding: 10px 12px;
+  background: #F1F4F8;
+  color: #5B6B82;
+  font-size: 14px;
+  font-weight: 600;
+  border-right: 1px solid #DCE3EC;
+}
+
+.capital-amount-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.capital-amount-hint {
+  font-size: 12px;
+  color: #8A98AD;
+  margin: 8px 2px 0;
+}
+
+.capital-amount-error {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #C53D22;
+  margin: 8px 2px 0;
+}
+
+.capital-amount-input-row.input-error {
+  border-color: #C53D22;
+}
+
+/* Trader-type cards (Option Buyer / Option Seller / Futures Trader / Hedged Seller) */
+.trader-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.trader-type-card {
+  background: #ffffff;
+  border: 2px solid #E8EDF4;
+  border-radius: 14px;
+  padding: 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.trader-type-card:hover {
+  border-color: #2C6FD6;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(46, 117, 182, 0.12);
+}
+
+.trader-type-card.selected {
+  border-color: #D4A828;
+  background: #fffdf7;
+  box-shadow: 0 0 0 3px rgba(212, 168, 40, 0.14);
+}
+
+.trader-type-name {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #14233D;
+  margin-bottom: 6px;
+}
+
+.trader-type-card.selected .trader-type-name {
+  color: #8C6510;
+}
+
+.trader-type-desc {
+  font-size: 12.5px;
+  color: #5B6B82;
+  line-height: 1.45;
+}
+
+/* Continue button, disabled until both tier + trader type are picked */
+.profile-continue-btn {
+  width: 100%;
+  background: #14233D;
+  color: #ffffff;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.profile-continue-btn:hover:not(:disabled) {
+  background: #8C6510;
+}
+
+.profile-continue-btn:disabled {
+  background: #DCE3EC;
+  color: #8A98AD;
+  cursor: not-allowed;
+}
+
+.setup-wizard-footer .profile-continue-btn {
+  width: auto;
+  padding: 11px 22px;
+}
+
+/* Header "Change Tier" button + active-tier indicator */
+.change-tier-btn {
+  background: #EEF6FF;
+  color: #2C6FD6;
+  border: 1px solid #D6E7FB;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.change-tier-btn:hover {
+  background: #dceaf6;
+}
+
+.change-tier-btn.hidden {
+  display: none;
+}
+
+/* Dark mode toggle — sun/moon icon button in the header. The actual
+   color overrides for dark mode itself live in the separate
+   /app/dark-theme.css file; this is just the toggle control's own
+   light-mode appearance. */
+.dark-mode-toggle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #DCE3EC;
+  background: #ffffff;
+  color: #5B6B82;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.dark-mode-toggle-btn:hover {
+  background: #F7F9FC;
+  border-color: #D4A828;
+  color: #8C6510;
+}
+
+/* Font-size control — A- / A / A+ trio in the header. Scales the whole
+   app via CSS zoom on #app-shell so every hardcoded px value in the
+   4800-line stylesheet scales proportionally without any CSS changes.
+   5 steps: 85%, 92%, 100%, 108%, 116%. Persisted to localStorage. */
+.font-size-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #ffffff;
+  border: 1px solid #DCE3EC;
+  border-radius: 8px;
+  padding: 2px 4px;
+  height: 38px;
+  box-sizing: border-box;
+}
+
+.font-size-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5B6B82;
+  padding: 4px 7px;
+  border-radius: 5px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.font-size-btn:hover {
+  background: #F1F4F8;
+  color: #14233D;
+}
+
+.font-size-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.font-size-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8A98AD;
+  min-width: 28px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Header identity: avatar button + account dropdown menu. Replaces the
+   old tier/trading-style badge, which had no natural width limit once
+   trading styles became a true multi-select — see the Account page
+   (COMPONENT: settings, now "Account") for where that detail now lives. */
+.header-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.header-avatar-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #473913 0%, #A47A16 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.header-avatar-initials {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.header-account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #E8EDF4;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(46, 117, 182, 0.14);
+  padding: 8px;
+  z-index: 20;
+}
+
+.header-account-menu.hidden {
+  display: none;
+}
+
+.header-account-menu-identity {
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid #E3E9F1;
+  margin-bottom: 6px;
+}
+
+.header-account-menu-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #14233D;
+}
+
+.header-account-menu-email {
+  font-size: 12px;
+  color: #5B6B82;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.header-account-menu-tier {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #8C6510;
+  background: #FBF1DA;
+  border-radius: 999px;
+  padding: 3px 10px;
+  display: inline-block;
+  margin: 2px 10px 8px;
+}
+
+.header-account-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #14233D;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.header-account-menu-item:hover {
+  background: #f4f6f8;
+}
+
+.header-account-menu-item-danger {
+  color: #C53D22;
+}
+
+.header-account-menu-item-danger:hover {
+  background: #FBE7E2;
+}
+
+/* Prominent running-balance pill in the header — intentionally distinct
+   from .sidebar-link.active so nav state and balance don't blend together */
+.header-balance-pill {
+  background: linear-gradient(135deg, #A47A16 0%, #8C6510 100%);
+  border-radius: 10px;
+  padding: 7px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  box-shadow: 0 4px 12px rgba(140, 101, 16, 0.3);
+}
+
+.header-balance-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  color: rgba(255, 255, 255, 0.78);
+  text-transform: uppercase;
+}
+
+.header-balance-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Floating toast notification, shown immediately on tier crossing
+   regardless of which tab is currently open */
+.header-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #0E9F6E 0%, #28b487 100%);
+  color: #ffffff;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+  max-width: 320px;
+}
+
+.header-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Highlight state applied to a matching ladder/rules row or pricing card
+   once a tier has been selected on the tier-select screen. */
+.grid-table .label.tier-highlight {
+  background: #FBF4DA !important;
+  color: #8C6510 !important;
+}
+
+.pricing-card.tier-highlight {
+  border-color: #D4A828;
+  box-shadow: 0 0 0 3px rgba(212, 168, 40, 0.14);
+}
+
+/* Instrument multi-select cards (Nifty / Bank Nifty / FinNifty / Sensex) */
+/* "Select All" toggle for the instrument multi-select */
+.select-all-btn {
+  background: #ffffff;
+  border: 1.5px solid #DCE3EC;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2C6FD6;
+  cursor: pointer;
+  margin-bottom: 12px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.select-all-btn:hover {
+  background: #EEF6FF;
+  border-color: #2C6FD6;
+}
+
+.select-all-btn.all-selected {
+  background: #D4A828;
+  border-color: #D4A828;
+  color: #ffffff;
+}
+
+.instrument-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.instrument-card {
+  background: #ffffff;
+  border: 2px solid #E8EDF4;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.instrument-card.selected {
+  border-color: #D4A828;
+}
+
+.instrument-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.instrument-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 2px solid #DCE3EC;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.instrument-card.selected .instrument-check {
+  background: #D4A828;
+  border-color: #D4A828;
+}
+
+.instrument-card.selected .instrument-check::after {
+  content: "\2713";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.instrument-name {
+  font-weight: 700;
+  color: #14233D;
+  font-size: 14.5px;
+  flex: 1;
+}
+
+.instrument-card.selected .instrument-name {
+  color: #8C6510;
+}
+
+.instrument-qty-label {
+  font-size: 11.5px;
+  color: #8A98AD;
+  font-weight: 500;
+}
+
+.instrument-lots-wrap {
+  padding: 0 16px 16px 16px;
+  border-top: 1px solid #F1F4F8;
+  padding-top: 12px;
+}
+
+.instrument-lots-wrap.hidden {
+  display: none;
+}
+
+/* Searchable, categorized instrument picker — replaces a flat grid once
+   the instrument list grows past a handful (a real broker's tradable
+   universe can run into the hundreds). Used by both the broker-fetched
+   and manual-fallback setup paths via the same render function. */
+.instrument-picker-search {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #DCE3EC;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: inherit;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+}
+
+.instrument-picker-search:focus {
+  outline: none;
+  border-color: #2C6FD6;
+}
+
+.instrument-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  min-height: 30px;
+}
+
+.instrument-picker-chips-empty {
+  font-size: 12.5px;
+  color: #8A98AD;
+  align-self: center;
+}
+
+.instrument-picker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #EEF6FF;
+  color: #14233D;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 6px 5px 12px;
+  border-radius: 16px;
+}
+
+.instrument-picker-chip-remove {
+  background: rgba(31, 58, 95, 0.12);
+  border: none;
+  color: #14233D;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instrument-picker-chip-remove:hover {
+  background: rgba(31, 58, 95, 0.24);
+}
+
+.instrument-picker-category {
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.instrument-picker-category-header-row {
+  display: flex;
+  align-items: center;
+  background: #F7F9FC;
+}
+
+.instrument-picker-category-header {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.instrument-picker-chevron {
+  font-size: 9px;
+  color: #8A98AD;
+  transition: transform 0.2s ease;
+}
+
+.instrument-picker-chevron-collapsed {
+  transform: rotate(-90deg);
+}
+
+.instrument-picker-category-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #14233D;
+}
+
+.instrument-picker-category-count {
+  font-size: 11.5px;
+  color: #5B6B82;
+  margin-left: auto;
+}
+
+.instrument-picker-select-all-btn {
+  background: none;
+  border: none;
+  color: #2C6FD6;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.instrument-picker-select-all-btn:hover {
+  text-decoration: underline;
+}
+
+.instrument-picker-rows {
+  display: flex;
+  flex-direction: column;
+  max-height: 600px;
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+}
+
+.instrument-picker-rows-collapsed {
+  max-height: 0;
+}
+
+.instrument-picker-row {
+  width: 100%;
+  background: #ffffff;
+  border: none;
+  border-top: 1px solid #F1F4F8;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.instrument-picker-row:hover {
+  background: #fafbfc;
+}
+
+.instrument-picker-row.selected .instrument-check {
+  background: #D4A828;
+  border-color: #D4A828;
+}
+
+.instrument-picker-row.selected .instrument-check::after {
+  content: "\2713";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.instrument-picker-row-name {
+  font-weight: 600;
+  color: #14233D;
+  font-size: 13.5px;
+  flex: 1;
+}
+
+.instrument-picker-row.selected .instrument-picker-row-name {
+  color: #8C6510;
+}
+
+.instrument-picker-row-qty {
+  font-size: 11.5px;
+  color: #8A98AD;
+  font-weight: 500;
+}
+
+.instrument-lots-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #DCE3EC;
+  border-radius: 6px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.instrument-lots-input:focus {
+  outline: none;
+  border-color: #2C6FD6;
+}
+
+/* Custom stocks free-text entry + chips */
+.custom-stocks-wrap {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #E3E9F1;
+}
+
+.custom-stock-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.custom-stock-input-row .journal-input {
+  flex: 1;
+}
+
+.custom-stock-add-btn {
+  background: #14233D;
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.custom-stock-add-btn:hover {
+  background: #2C6FD6;
+}
+
+.custom-stock-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.custom-stock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #EEF6FF;
+  color: #2C6FD6;
+  border: 1px solid #D6E7FB;
+  padding: 5px 6px 5px 12px;
+  border-radius: 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.custom-stock-chip-remove {
+  background: none;
+  border: none;
+  color: #2C6FD6;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+.custom-stock-chip-remove:hover {
+  background: rgba(46, 117, 182, 0.15);
+}
+/* === END COMPONENT: tier-select === */

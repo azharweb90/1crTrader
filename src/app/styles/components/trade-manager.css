@@ -1,0 +1,884 @@
+/* Extracted from the original monolithic dashboard.css during the
+   Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
+   Original section markers preserved below. */
+
+   15. COMPONENT: trade-manager
+   =========================================================== */
+
+/* ── Instrument type pills ────────────────────────────────── */
+.tm-type-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.tm-type-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+}
+
+.tm-type-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 16px;
+  background: #F7F9FC;
+  border: 1.5px solid #DCE3EC;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  min-width: 88px;
+}
+
+.tm-type-pill:hover {
+  border-color: #D4A828;
+  background: #FBF7EC;
+}
+
+.tm-type-pill.tm-type-pill-active {
+  border-color: #D4A828;
+  background: #FBF1DA;
+}
+
+.tm-type-pill-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #14233D;
+}
+
+.tm-type-pill-sub {
+  font-size: 10px;
+  color: #8A98AD;
+}
+
+/* ── Lots row ─────────────────────────────────────────────── */
+.tm-lots-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tm-lots-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tm-lots-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid #DCE3EC;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 120px;
+}
+
+.tm-lots-step-btn {
+  width: 34px;
+  flex: 0 0 34px;
+  border: none;
+  background: #F7F9FC;
+  color: #14233D;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tm-lots-step-btn:hover:not(:disabled) {
+  background: #E3E9F1;
+}
+
+.tm-lots-step-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.tm-lots-input {
+  border: none;
+  border-left: 1px solid #DCE3EC;
+  border-right: 1px solid #DCE3EC;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #14233D;
+  background: #fff;
+  height: 40px;
+  flex: 1 1 auto;
+  font-family: inherit;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.tm-lots-input::-webkit-outer-spin-button,
+.tm-lots-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.tm-lots-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  align-self: center;
+}
+
+.tm-lots-stat {
+  font-size: 12px;
+  color: #5B6B82;
+}
+
+.tm-lots-stat strong {
+  color: #14233D;
+  font-weight: 700;
+}
+
+.tm-lots-warning {
+  font-size: 11.5px;
+  color: #8C6510;
+  background: #FBF1DA;
+  border: 1px solid #E8CD8A;
+  border-radius: 7px;
+  padding: 6px 10px;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ── Position sizing summary ──────────────────────────────── */
+.tm-position-summary {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.tm-position-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tm-position-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 120px;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.tm-position-cell-risk {
+  background: rgba(217, 56, 30, 0.08);
+  border: 1px solid rgba(217, 56, 30, 0.18);
+}
+
+.tm-position-cell-reward {
+  background: rgba(29, 158, 117, 0.08);
+  border: 1px solid rgba(29, 158, 117, 0.18);
+}
+
+.tm-position-cell-margin {
+  background: rgba(44, 111, 214, 0.06);
+  border: 1px solid rgba(44, 111, 214, 0.14);
+}
+
+.tm-position-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8A98AD;
+}
+
+.tm-position-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: #14233D;
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-position-cell-risk .tm-position-value   { color: #d9381e; }
+.tm-position-cell-reward .tm-position-value { color: #1d9e75; }
+.tm-position-cell-margin .tm-position-value { color: #2C6FD6; }
+
+.tm-position-sub {
+  font-size: 10.5px;
+  color: #8A98AD;
+}
+
+/* ── Collapsed setup bar ──────────────────────────────────── */
+.tm-setup-collapsed .tm-setup-grid,
+.tm-setup-collapsed .tm-type-row,
+.tm-setup-collapsed .tm-lots-row,
+.tm-setup-collapsed #tm-rr-suggest-wrap,
+.tm-setup-collapsed #tm-position-summary,
+.tm-setup-collapsed #tm-setup-error,
+.tm-setup-collapsed #tm-start-btn,
+.tm-setup-collapsed .section-note {
+  display: none;
+}
+
+.tm-collapsed-setup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tm-collapsed-setup:hover {
+  background: #F1F4F8;
+}
+
+.tm-collapsed-setup-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1 1 auto;
+}
+
+.tm-collapsed-chip {
+  font-size: 11px;
+  font-weight: 600;
+  background: #ffffff;
+  border: 1px solid #DCE3EC;
+  border-radius: 999px;
+  padding: 3px 10px;
+  color: #5B6B82;
+  white-space: nowrap;
+}
+
+.tm-collapsed-chip.tm-collapsed-chip-long {
+  background: rgba(29, 158, 117, 0.1);
+  border-color: rgba(29, 158, 117, 0.3);
+  color: #1d9e75;
+}
+
+.tm-collapsed-chip.tm-collapsed-chip-short {
+  background: rgba(217, 56, 30, 0.1);
+  border-color: rgba(217, 56, 30, 0.3);
+  color: #d9381e;
+}
+
+.tm-collapsed-setup-chevron {
+  flex: 0 0 auto;
+  color: #8A98AD;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+/* Setup review panel (expanded from the collapsed bar) */
+.tm-setup-review {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 14px;
+}
+
+.tm-review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.tm-review-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tm-review-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8A98AD;
+}
+
+.tm-review-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #14233D;
+}
+
+.tm-review-risk   { color: #d9381e; }
+.tm-review-reward { color: #1d9e75; }
+
+/* ── Direction badge ──────────────────────────────────────── */
+.tm-direction-badge-wrap {
+  margin-bottom: 14px;
+}
+
+.tm-direction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-family: inherit;
+}
+
+.tm-direction-badge-long {
+  background: rgba(29, 158, 117, 0.12);
+  border: 1px solid rgba(29, 158, 117, 0.28);
+}
+
+.tm-direction-badge-short {
+  background: rgba(217, 56, 30, 0.1);
+  border: 1px solid rgba(217, 56, 30, 0.25);
+}
+
+.tm-direction-badge-icon {
+  font-size: 16px;
+}
+
+.tm-direction-badge-long .tm-direction-badge-icon { color: #1d9e75; }
+.tm-direction-badge-short .tm-direction-badge-icon { color: #d9381e; }
+
+.tm-direction-badge-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #14233D;
+  display: block;
+}
+
+.tm-direction-badge-note {
+  font-size: 11px;
+  color: #5B6B82;
+  display: block;
+  margin-top: 1px;
+}
+
+/* ── Right-side level pills on the chart ─────────────────── */
+.tm-level-pill {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  pointer-events: none;
+  min-width: 110px;
+}
+
+.tm-level-pill-price {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.tm-level-pill-rs {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.tm-level-pill-risk .tm-level-pill-price { color: #d9381e; }
+.tm-level-pill-risk .tm-level-pill-rs {
+  background: rgba(217, 56, 30, 0.12);
+  color: #d9381e;
+}
+
+.tm-level-pill-reward .tm-level-pill-price { color: #1d9e75; }
+.tm-level-pill-reward .tm-level-pill-rs {
+  background: rgba(29, 158, 117, 0.12);
+  color: #1d9e75;
+}
+
+.tm-level-pill-trail .tm-level-pill-price { color: #2C6FD6; }
+.tm-level-pill-trail .tm-level-pill-rs {
+  background: rgba(44, 111, 214, 0.12);
+  color: #2C6FD6;
+}
+
+/* ── R:R summary chips ────────────────────────────────────── */
+.tm-rr-chip-long {
+  color: #1d9e75;
+  background: rgba(29,158,117,0.1);
+  border-color: rgba(29,158,117,0.25) !important;
+}
+
+.tm-rr-chip-short {
+  color: #d9381e;
+  background: rgba(217,56,30,0.1);
+  border-color: rgba(217,56,30,0.25) !important;
+}
+
+.tm-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Setup fields grey out (not hide) once a trade starts — the form stays
+   on the page as a visible record of what was entered, per the trader's
+   own framing: one continuous page, not two screens to navigate between. */
+.tm-setup-grid .amount-input:disabled,
+#tm-instrument:disabled {
+  background: #f4f6f8;
+  color: #5B6B82;
+  cursor: not-allowed;
+  border-color: #E8EDF4;
+}
+
+#tm-start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Visual separation between the (now-disabled) setup form above and the
+   active trade section below it, once a trade starts — a plain rule
+   rather than a card boundary, since both sections genuinely belong to
+   the same page/flow now. */
+.tm-active-divider {
+  border-top: 1px solid #E3E9F1;
+  margin: 24px 0 20px;
+}
+
+/* Active-trade two-column layout: chart + price input on the left, the
+   result message (target hit / stopped out / still open) on the right,
+   so the status is always visible alongside the chart rather than
+   stacked below the price input. */
+.tm-active-columns {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .tm-active-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tm-active-col-right .tm-result-card {
+  margin-top: 0;
+}
+
+/* Risk:Reward target suggestions (1:1..1:10 buttons) — appear the moment
+   Entry + SL are both valid. Clicking one fills the Target price field.
+   Confirmed with the trader: choosing a target from a proven ratio, not
+   guessing, is what makes consistent profitability possible long term. */
+.tm-rr-suggest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tm-rr-suggest-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #ffffff;
+  border: 1px solid #DCE3EC;
+  border-radius: 10px;
+  padding: 8px 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.tm-rr-suggest-btn:hover {
+  border-color: #2C6FD6;
+  background: #eaf2fa;
+}
+
+.tm-rr-suggest-ratio {
+  font-size: 13px;
+  font-weight: 700;
+  color: #14233D;
+}
+
+.tm-rr-suggest-price {
+  font-size: 11px;
+  color: #5B6B82;
+}
+
+/* Extended 1:10..1:100 reference table (step 10) — same mini-ladder
+   collapsible pattern used elsewhere, 3 columns: Ratio | Target Price |
+   Points. Covers the long tail of swing-style setups without cluttering
+   the default view with 100 buttons. */
+.mini-ladder-grid-rr {
+  grid-template-columns: minmax(60px, 0.6fr) minmax(100px, 1fr) minmax(80px, 0.8fr);
+}
+
+.tm-rr-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tm-rr-chip {
+  background: #f4f6f8;
+  border: 1px solid #E8EDF4;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #14233D;
+}
+
+.tm-rr-chip strong {
+  color: #14233D;
+}
+
+/* Result state cards — same visual language as .profit-decision-card and
+   .cooldown-banner elsewhere in the app (centered text, big icon, soft
+   pastel background) so these read as the same family of "big moment"
+   messaging, not a new pattern bolted on. */
+.tm-result-card {
+  text-align: center;
+  border-radius: 14px;
+  padding: 22px 20px;
+  margin-top: 14px;
+}
+
+.tm-result-icon {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+
+.tm-result-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.tm-result-message {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+/* Numeric breakdown shown on closed-trade cards (points captured/lost,
+   realized R:R) — confirmed with the trader: this data feeds future
+   monthly risk-management reporting, not just in-the-moment feedback, so
+   it's kept as plain, separately-styled stats rather than buried in the
+   message prose. */
+.tm-result-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.tm-result-stat {
+  font-size: 12.5px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+.tm-result-stat strong {
+  font-weight: 700;
+}
+
+.tm-result-card.tm-result-target {
+  background: #EAF8F2;
+  border: 1px solid #b9e6d4;
+}
+
+.tm-result-card.tm-result-target .tm-result-title {
+  color: #0E9F6E;
+}
+
+.tm-result-card.tm-result-target .tm-result-message {
+  color: #0E9F6E;
+}
+
+/* Target-hit celebration: a brief confetti burst, plays once on render and
+   stops — restraint matters as much as the gesture itself, this isn't a
+   constant animation loop competing for attention every time the card
+   re-renders on a check-in. */
+.tm-result-card.tm-result-celebrate {
+  position: relative;
+  overflow: hidden;
+}
+
+.tm-confetti-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tm-confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: tmConfettiFall 1.1s ease-in forwards;
+}
+
+@keyframes tmConfettiFall {
+  0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(140px) rotate(220deg); }
+}
+
+/* Stopped out but with profit locked in by the trailing SL — this closes
+   the trade IN PROFIT, so it shares the same green family as a target hit
+   (confirmed with the trader: any trade that closes profitably should
+   read as a win visually, not as a muted "stopped" purple). */
+.tm-result-card.tm-result-stopped-locked {
+  background: #EAF8F2;
+  border: 1px solid #b9e6d4;
+}
+
+.tm-result-card.tm-result-stopped-locked .tm-result-title {
+  color: #0E9F6E;
+}
+
+.tm-result-card.tm-result-stopped-locked .tm-result-message {
+  color: #0E9F6E;
+}
+
+.tm-result-card.tm-result-stopped-neutral {
+  background: #FBE7E2;
+  border: 1px solid #f6c8c2;
+}
+
+.tm-result-card.tm-result-stopped-neutral .tm-result-title {
+  color: #C53D22;
+}
+
+.tm-result-card.tm-result-stopped-neutral .tm-result-message {
+  color: #993c1d;
+}
+
+.tm-result-card.tm-result-open {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+}
+
+.tm-result-card.tm-result-open .tm-result-title {
+  color: #14233D;
+}
+
+.tm-result-card.tm-result-open .tm-result-message {
+  color: #5B6B82;
+}
+
+/* Light blue: trade is still open, but the trailing SL has moved into
+   profit territory — genuinely risk-free right now, distinct from the
+   neutral grey "still some risk" state above and the green "closed in
+   profit" state below. Confirmed with the trader as its own visual step,
+   not just a a lighter version of the green. */
+.tm-result-card.tm-result-open-profit {
+  background: #eaf2fa;
+  border: 1px solid #cfe1f2;
+}
+
+.tm-result-card.tm-result-open-profit .tm-result-title {
+  color: #1f4e7a;
+}
+
+.tm-result-card.tm-result-open-profit .tm-result-message {
+  color: #2e5d8f;
+}
+
+/* === END COMPONENT: trade-manager === */
+/* NOTE: in the original monolithic dashboard.css, this block (two-column
+   layout, metrics panel, price hints, broker import strip, active-trade
+   header, end-trade button) sat after the END COMPONENT marker above —
+   i.e. technically outside the trade-manager section, and would have been
+   silently dropped by a naive marker-only extraction. It's entirely
+   .tm-* classes and belongs here — reattached during the Phase 3 CSS split. */
+/* ── TM two-column layout ───────────────────────────── */
+.tm-two-col-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .tm-two-col-layout { grid-template-columns: 1fr; }
+}
+
+.tm-inputs-col { display: flex; flex-direction: column; gap: 0; }
+
+.tm-metrics-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: 16px;
+}
+
+/* Metrics panel */
+.tm-metrics-panel {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 120px;
+}
+
+.tm-metrics-panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #AEB9C8;
+  font-size: 12px;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.tm-metrics-summary { display: flex; flex-direction: column; gap: 0; }
+
+.tm-metric-row {
+  padding: 14px 16px;
+  border-bottom: 1px solid #E3E9F1;
+}
+.tm-metric-row:last-child { border-bottom: none; }
+
+.tm-metric-heading {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8A98AD;
+  margin-bottom: 4px;
+}
+.tm-metric-amount {
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.tm-metric-detail { font-size: 11px; color: #8A98AD; margin-top: 3px; }
+.tm-metric-risk   .tm-metric-amount { color: #d9381e; }
+.tm-metric-reward .tm-metric-amount { color: #1d9e75; }
+.tm-metric-margin .tm-metric-amount { color: #2C6FD6; }
+
+.tm-start-btn {
+  width: 100%;
+  padding: 13px 16px;
+  font-size: 14px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* Price hints below SL/Target inputs */
+.tm-price-hint {
+  font-size: 11px;
+  color: #5B6B82;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Broker import strip */
+.tm-broker-import-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #F1F4F8;
+  border: 1px solid #E3E9F1;
+  border-radius: 8px;
+  padding: 9px 14px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.tm-broker-import-label { font-size: 12.5px; color: #5B6B82; }
+.tm-broker-mini-import-btn,
+.tm-broker-import-mini-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #14233D;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+/* Import modal grid */
+.tm-import-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 560px) { .tm-import-grid { grid-template-columns: 1fr; } }
+
+/* Active header row — direction badge + current price side by side */
+.tm-active-header-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.tm-inline-price-wrap { display: flex; flex-direction: column; flex: 0 0 auto; }
+.tm-inline-price-input { width: 140px; }
+
+/* R:R pill selected state */
+.tm-rr-suggest-btn-selected {
+  background: #14233D !important;
+  border-color: #14233D !important;
+  color: #ffffff !important;
+}
+.tm-rr-suggest-btn-selected .tm-rr-suggest-ratio,
+.tm-rr-suggest-btn-selected .tm-rr-suggest-price { color: #ffffff !important; }
+
+/* End trade button — styled secondary action, not a plain link */
+.tm-end-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #F1F4F8;
+  border: 1.5px solid #DCE3EC;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5B6B82;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.tm-end-btn:hover {
+  background: #FBE7E2;
+  border-color: #C53D22;
+  color: #C53D22;
+}

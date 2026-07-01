@@ -1,1 +1,0 @@
-Reserved for Phase 3: dashboard.css (currently at src/app/styles/dashboard.css) will be split into one file per feature here, using its existing COMPONENT: markers as cut points. See docs/architecture for the full decomposition plan.
