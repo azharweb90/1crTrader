@@ -2,6 +2,7 @@
    Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
    Original section markers preserved below. */
 
+/* ===========================================================
    16. COMPONENT: suggestions
    =========================================================== */
 .suggestions-category {
@@ -18,7 +19,7 @@
   gap: 9px;
   margin-bottom: 10px;
   padding-bottom: 9px;
-  border-bottom: 1px solid #E3E9F1;
+  border-bottom: 1px solid #e3e9f1;
 }
 
 .suggestions-category-icon {
@@ -29,15 +30,15 @@
 .suggestions-category-title {
   font-size: 15px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   letter-spacing: -0.1px;
 }
 
 .suggestions-category-count {
   font-size: 12px;
   font-weight: 600;
-  color: #8A98AD;
-  background: #F1F4F8;
+  color: #8a98ad;
+  background: #f1f4f8;
   border-radius: 999px;
   padding: 1px 8px;
   margin-left: 2px;
@@ -61,7 +62,7 @@
   width: 100%;
   background: none;
   border: none;
-  border-bottom: 1px solid #F1F4F8;
+  border-bottom: 1px solid #f1f4f8;
   padding: 9px 6px;
   text-align: left;
   cursor: pointer;
@@ -70,7 +71,7 @@
 }
 
 .suggestions-row:hover {
-  background: #FBF7EC;
+  background: #fbf7ec;
 }
 
 .suggestions-row:last-child {
@@ -80,14 +81,14 @@
 .suggestions-row-title {
   font-size: 14px;
   font-weight: 500;
-  color: #5B6B82;
+  color: #5b6b82;
   line-height: 1.5;
 }
 
 .suggestions-row-arrow {
   flex: 0 0 auto;
   font-size: 16px;
-  color: #C3CEDD;
+  color: #c3cedd;
   line-height: 1;
 }
 
@@ -117,8 +118,14 @@
 }
 
 @keyframes suggestionsPanelSlideIn {
-  from { transform: translateX(24px); opacity: 0.6; }
-  to   { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(24px);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .suggestions-panel-header {
@@ -126,18 +133,18 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px 22px;
-  border-bottom: 1px solid #E3E9F1;
+  border-bottom: 1px solid #e3e9f1;
   flex: 0 0 auto;
 }
 
 .suggestions-panel-category {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #8C6510;
-  background: #FBF1DA;
+  color: #8c6510;
+  background: #fbf1da;
   padding: 4px 10px;
   border-radius: 999px;
 }
@@ -147,13 +154,13 @@
   border: none;
   font-size: 22px;
   line-height: 1;
-  color: #8A98AD;
+  color: #8a98ad;
   cursor: pointer;
   padding: 2px 6px;
 }
 
 .suggestions-panel-close:hover {
-  color: #14233D;
+  color: #14233d;
 }
 
 .suggestions-panel-body {
@@ -165,14 +172,14 @@
 .suggestions-panel-title {
   font-size: 19px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   line-height: 1.4;
   margin: 0 0 14px;
 }
 
 .suggestions-panel-text {
   font-size: 15px;
-  color: #5B6B82;
+  color: #5b6b82;
   line-height: 1.75;
   margin: 0;
 }
@@ -183,35 +190,35 @@
   justify-content: space-between;
   gap: 10px;
   padding: 14px 22px;
-  border-top: 1px solid #E3E9F1;
+  border-top: 1px solid #e3e9f1;
   flex: 0 0 auto;
 }
 
 .suggestions-panel-nav-btn {
   background: #fff;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 8px;
   padding: 7px 14px;
   font-size: 12.5px;
   font-weight: 600;
-  color: #14233D;
+  color: #14233d;
   cursor: pointer;
   font-family: inherit;
 }
 
 .suggestions-panel-nav-btn:hover:not(:disabled) {
-  border-color: #D4A828;
-  background: #FBF7EC;
+  border-color: #d4a828;
+  background: #fbf7ec;
 }
 
 .suggestions-panel-nav-btn:disabled {
-  color: #C3CEDD;
+  color: #c3cedd;
   cursor: not-allowed;
 }
 
 .suggestions-panel-position {
   font-size: 11.5px;
-  color: #8A98AD;
+  color: #8a98ad;
   font-variant-numeric: tabular-nums;
 }
 
