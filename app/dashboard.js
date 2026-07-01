@@ -488,6 +488,17 @@
       ) {
         window.renderDashboardHome();
       }
+      // Start the per-tab tour the first time this tab is visited —
+      // delayed 300ms so the component's own render() calls (which
+      // populate the elements the tour needs to point at) complete
+      // before the engine tries to getBoundingClientRect() on them.
+      // Confirmed scope: every tab gets a tour, seen-state persisted
+      // via localStorage (see product-tour.js).
+      setTimeout(() => {
+        if (typeof window.startTabTourIfNeeded === "function") {
+          window.startTabTourIfNeeded(tabId);
+        }
+      }, 300);
     });
   }
 
