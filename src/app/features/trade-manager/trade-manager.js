@@ -291,6 +291,7 @@
     renderDirectionBadge();
     renderRrAnimation(0);
     renderResultArea(null);
+    renderRewardRiskFooter();
   }
 
   function generateCandleSeed() {
@@ -441,7 +442,13 @@
   function renderResultArea(state,extra) {
     const el = document.getElementById('tm-result-area');
     if (!el) return;
-    if (state===null) { el.innerHTML=''; return; }
+    if (state===null) {
+      el.innerHTML = `<div class="tm-live-card">
+        <div class="tm-live-card-label">At entry</div>
+        <div class="tm-live-card-value" style="color:#8A98AD;">Type current price to see live status</div>
+      </div>`;
+      return;
+    }
     const qty = lots*qtyPerLot;
     const rs = typeof window.getRiskSummary==='function'?window.getRiskSummary():null;
     const balance = rs?.currentBalance||null;
@@ -491,14 +498,53 @@
       const isRF=extra.trailingSlPoints>0;
       const curRs=extra.pointsInFavor*qty;
       const balPct=balance&&curRs!==0?fmtPct(Math.abs(curRs)/balance*100):null;
-      el.innerHTML=`<div class="tm-result-card ${isRF?'tm-result-open-profit':'tm-result-open'}">
-        <div class="tm-result-title">${fmtPts(extra.pointsInFavor)} pts in favor (${Math.round(pct)}% to target)${isRF?' · <strong>Risk-free</strong>':''}</div>
-        <div class="tm-result-message">
-          Unrealized: ${fmtRs(curRs)}${balPct?' ('+balPct+' of balance)':''}<br>
-          Trailing stop: ${fmtPts(priceFromPIF(extra.trailingSlPoints))} (${extra.trailingSlPoints>=0?'+':''}${fmtPts(extra.trailingSlPoints)} pts from entry)
+      const slRs = extra.trailingSlPoints*qty;
+      el.innerHTML=`
+        <div class="tm-live-card">
+          <div class="tm-live-card-label">Position</div>
+          <div class="tm-live-card-value">${fmtPts(extra.pointsInFavor)} pts in favor${isRF?' · <span class="tm-live-riskfree">Risk-free</span>':''}</div>
+          <div class="tm-live-card-sub">${Math.round(pct)}% to target${isRF?' · Risk-free':''}</div>
         </div>
-      </div>`;
+        <div class="tm-live-card">
+          <div class="tm-live-card-row">
+            <div class="tm-live-card-label">Unrealized P&amp;L</div>
+            <div class="tm-live-card-badge ${curRs>=0?'tm-live-badge-pos':'tm-live-badge-neg'}">${curRs>=0?'+':''}${fmtRs(curRs)}</div>
+          </div>
+          ${balPct?`<div class="tm-live-card-sub">${balPct} of balance</div>`:''}
+        </div>
+        <div class="tm-live-card">
+          <div class="tm-live-card-row">
+            <div class="tm-live-card-label">Trailing stop</div>
+            <div class="tm-live-card-badge ${slRs>=0?'tm-live-badge-pos':'tm-live-badge-neg'}">${slRs>=0?'+':''}${fmtRs(slRs)}</div>
+          </div>
+          <div class="tm-live-card-value" style="font-size:16px;">${fmtPts(priceFromPIF(extra.trailingSlPoints))}</div>
+          <div class="tm-live-card-sub">${extra.trailingSlPoints>=0?'+':''}${fmtPts(extra.trailingSlPoints)} pts from entry</div>
+        </div>
+      `;
     }
+  }
+
+  // Static Reward-at-target / Risk-at-stop summary — computed once when the
+  // trade starts, since it only depends on the setup (riskPoints/targetPoints/
+  // qty), not the live price. Matches the reference design's footer card.
+  function renderRewardRiskFooter() {
+    const el = document.getElementById('tm-reward-risk-footer');
+    if (!el || riskPoints===null || targetPoints===null) return;
+    const qty = lots*qtyPerLot;
+    const rewardRs = targetPoints*qty;
+    const riskRs = riskPoints*qty;
+    const rr = riskPoints>0 ? fmtPts(targetPoints/riskPoints) : '—';
+    el.innerHTML = `<div class="tm-live-card tm-live-rr-footer">
+      <div class="tm-live-card-row">
+        <div class="tm-live-card-label">Reward at target</div>
+        <div class="tm-live-card-badge tm-live-badge-pos">${fmtRs(rewardRs)}</div>
+      </div>
+      <div class="tm-live-card-row">
+        <div class="tm-live-card-label">Risk at stop</div>
+        <div class="tm-live-card-badge tm-live-badge-neg">${fmtRs(riskRs)}</div>
+      </div>
+      <div class="tm-live-card-sub" style="text-align:center;margin-top:2px;">Planned R:R 1:${rr}</div>
+    </div>`;
   }
 
   // ── Chart ──────────────────────────────────────────────────

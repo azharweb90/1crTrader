@@ -126,9 +126,6 @@
 
       <p class="foot-note" style="margin:8px 0 16px;">Type to preview. Press Enter or click away to confirm stop or target.</p>
 
-      <!-- Chart -->
-      <div id="tm-rr-animation-area"></div>
-
       <!-- Result card — always visible right column during tracking -->
       <div class="tm-active-columns">
         <div class="tm-active-col-left">
@@ -137,10 +134,12 @@
         </div>
         <div class="tm-active-col-right">
           <div id="tm-result-area">
-            <div class="tm-result-card tm-result-open" style="margin-top:0;">
-              <div class="tm-result-title" style="color:#8A98AD;">Type current price to see live status</div>
+            <div class="tm-live-card">
+              <div class="tm-live-card-label">At entry</div>
+              <div class="tm-live-card-value" style="color:#8A98AD;">Type current price to see live status</div>
             </div>
           </div>
+          <div id="tm-reward-risk-footer"></div>
         </div>
       </div>
 
@@ -158,7 +157,7 @@
 
 <!-- Right-side broker import panel for Trade Manager -->
 <div id="tm-import-panel-overlay" class="suggestions-panel-overlay hidden" onclick="closeTmImportPanelIfOutside(event)">
-  <div class="suggestions-panel" style="width:480px;">
+  <div class="suggestions-panel suggestions-panel-wide">
     <div class="suggestions-panel-header">
       <div>
         <div class="suggestions-panel-title" style="font-size:15px;margin-bottom:2px;">Import from Order History</div>

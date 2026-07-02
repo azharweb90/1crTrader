@@ -78,3 +78,20 @@
   margin-bottom: 20px;
 }
 /* === END Shared: demo-mode notice banner === */
+
+/* Shared: wide variant of .suggestions-panel (see suggestions.css), used
+   by the Daily Limits and Trade Manager broker-import drawers. Both show
+   a multi-column scrip table (Scrip/Qty/Buy/Sell/Time/Status) that needs
+   real room — the base 420px panel was clipping the Status column.
+   Kept separate from the base .suggestions-panel so the plain-text
+   Suggestions panel elsewhere in the app isn't affected. */
+.suggestions-panel-wide {
+  width: 680px;
+}
+
+@media (max-width: 760px) {
+  .suggestions-panel-wide {
+    width: 100%;
+    max-width: 100vw;
+  }
+}
