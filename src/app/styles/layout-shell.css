@@ -5,6 +5,8 @@
 /* ===========================================================
    2. LAYOUT SHELL
    (sidebar, top bar, main content column, content section card)
+   Colors here reference design tokens (styles/tokens.css) so this file
+   automatically follows the active theme — no per-theme overrides needed.
    =========================================================== */
 html, body {
   height: 100%;
@@ -23,7 +25,7 @@ body {
 .sidebar {
   width: 240px;
   flex-shrink: 0;
-  background: linear-gradient(180deg, #0D1E28 0%, #070A0F 100%);
+  background: linear-gradient(180deg, var(--sidebar-bg-top) 0%, var(--sidebar-bg-bottom) 100%);
   display: flex;
   flex-direction: column;
   padding: 0 12px 18px;
@@ -78,7 +80,7 @@ body {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.2px;
-  color: #ffffff;
+  color: var(--sidebar-text-bright);
   line-height: 1.3;
 }
 
@@ -86,7 +88,7 @@ body {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.7px;
-  color: #D4A828;
+  color: var(--color-accent);
   line-height: 1.3;
   text-transform: uppercase;
 }
@@ -97,7 +99,7 @@ body {
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 1.2px;
-  color: rgba(212, 168, 40, 0.55);
+  color: var(--sidebar-menu-label);
   text-transform: uppercase;
 }
 
@@ -110,7 +112,7 @@ body {
 .sidebar-nav-group-bottom {
   margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid rgba(212, 168, 40, 0.14);
+  border-top: 1px solid var(--sidebar-divider);
 }
 
 .sidebar-link {
@@ -124,7 +126,7 @@ body {
   border-radius: 9px;
   font-size: 13.5px;
   font-weight: 500;
-  color: #9B8E6E;
+  color: var(--sidebar-text);
   cursor: pointer;
   font-family: inherit;
   transition: background 0.15s ease, color 0.15s ease;
@@ -158,13 +160,13 @@ body {
 }
 
 .sidebar-link:hover {
-  background: rgba(212, 168, 40, 0.08);
-  color: #F4EFE3;
+  background: var(--sidebar-hover-bg);
+  color: var(--sidebar-text-hover);
 }
 
 .sidebar-link.active {
-  background: #2A2210;
-  color: #ffffff;
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-text-bright);
   font-weight: 600;
 }
 
@@ -181,8 +183,8 @@ body {
 }
 
 .top-bar {
-  background: #ffffff;
-  border-bottom: 1px solid #E8EDF4;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
   padding: 16px 32px;
   display: flex;
   align-items: center;
@@ -202,7 +204,7 @@ body {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.4px;
-  color: #14233D;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -236,10 +238,10 @@ body {
 }
 
 .content-section {
-  background: #ffffff;
+  background: var(--color-surface);
   padding: 32px;
   border-radius: 16px;
-  border: 1px solid #E3E9F1;
+  border: 1px solid var(--color-border);
   box-shadow: 0 1px 3px rgba(13, 30, 60, 0.05);
 }
 
@@ -249,10 +251,9 @@ body {
   padding: 40px;
   text-align: center;
   font-size: 13.5px;
-  color: #8A98AD;
+  color: var(--color-text-muted);
 }
 
 .component-error {
   color: #b8281a;
 }
-

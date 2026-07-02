@@ -55,15 +55,22 @@ src/
                           2. All duplicates removed, every file now calls
                           the one shared copy.
     styles/
-      main.css           Entry point — @imports every file below in exact
-                          original cascade order (base -> layout-shell ->
+      tokens.css         THE single source of truth for the app's theme (currently
+                          Midnight — no light/dark toggle). Every themeable color
+                          in the app is a CSS custom property defined here. Retune
+                          the whole app's palette by editing values in this ONE file.
+      main.css           Entry point — @imports base/layout/shared/component CSS
+                          in original cascade order (base -> layout-shell ->
                           shared -> each component -> responsive-overrides last)
-      base.css           Reset + typography
-      layout-shell.css   Sidebar + top bar + main content column chrome
+      base.css           Reset + typography (token-driven)
+      layout-shell.css   Sidebar + top bar + main content column chrome (token-driven)
       shared.css         Cross-component styles (grid-table, demo-banner)
       responsive-overrides.css   All @media overrides — kept last on purpose
       themes/
-        dark-theme.css   Dark mode overrides, scoped entirely under body.dark-mode
+        app-theme.css    Applies the token palette across all 12 feature pages —
+                          loaded last, after main.css, so it wins the cascade.
+                          This is the (recolored, always-on) successor to the old
+                          opt-in dark-theme.css; there's no toggle anymore.
       components/        Per-feature CSS, split out of dashboard.css along its
                           original COMPONENT: markers (see docs/architecture/
                           for the full decomposition plan, including two

@@ -245,36 +245,12 @@
     applyFontSize();
   }
 
-  // Whole-application dark theme, confirmed with the trader: covers every
-  // tab including the sidebar, persists across visits via localStorage.
-  // Implementation: a 'dark-mode' class on <body>, with all the actual
-  // color overrides living in the SEPARATE /app/dark-theme.css file
-  // (confirmed approach — keeps dashboard.css, the light theme, completely
-  // untouched and unrisked). This function only toggles the class and
-  // updates the sun/moon icon + saves the choice; it owns no colors itself.
-  const DARK_MODE_STORAGE_KEY = 'darkModeEnabled';
-
-  function applyDarkModePreference() {
-    const enabled = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
-    setDarkMode(enabled);
-  }
-
-  function toggleDarkMode() {
-    const isCurrentlyDark = document.body.classList.contains('dark-mode');
-    setDarkMode(!isCurrentlyDark);
-    localStorage.setItem(DARK_MODE_STORAGE_KEY, String(!isCurrentlyDark));
-  }
-
-  function setDarkMode(enabled) {
-    document.body.classList.toggle('dark-mode', enabled);
-    const sunIcon = document.getElementById('dark-mode-icon-sun');
-    const moonIcon = document.getElementById('dark-mode-icon-moon');
-    // Sun shown in dark mode (tap to go back to light); moon shown in
-    // light mode (tap to go dark) — the icon represents the destination,
-    // not the current state, matching the common toggle convention.
-    if (sunIcon) sunIcon.style.display = enabled ? '' : 'none';
-    if (moonIcon) moonIcon.style.display = enabled ? 'none' : '';
-  }
+  // Theme: the app now ships with a single, always-on theme (Midnight).
+  // The old opt-in dark/light toggle (a 'dark-mode' class on <body>,
+  // color overrides in a separate dark-theme.css) has been removed —
+  // colors are now controlled entirely by design tokens in
+  // styles/tokens.css, applied unconditionally via styles/themes/app-theme.css.
+  // See docs/architecture/ for the full theming plan.
 
   // computeTrailingSl moved to /src/app/shared/risk-engine/tier-rules.js
   // (Phase 2 JS split) — loaded before this file, exposed on window,
@@ -2505,8 +2481,6 @@
   window.applyReferenceSectionState = applyReferenceSectionState;
   window.getRiskSummary = getRiskSummary;
   window.confirmProfile = confirmProfile;
-  window.toggleDarkMode = toggleDarkMode;
-  window.applyDarkModePreference = applyDarkModePreference;
   window.adjustFontSize = adjustFontSize;
   window.applyFontSizePreference = applyFontSizePreference;
   window.showTierSelect = showTierSelect;
@@ -2564,11 +2538,8 @@
     const sidebar = document.getElementById('sidebar');
     const topBar = document.getElementById('top-bar');
 
-    // Apply any saved dark-mode preference immediately, before anything
-    // else renders — confirmed with the trader: the choice persists across
-    // visits via localStorage, applying it here (rather than only inside
-    // toggleDarkMode) avoids a flash of light mode on every reload.
-    applyDarkModePreference();
+    // Theme is now applied unconditionally via CSS (styles/tokens.css +
+    // styles/themes/app-theme.css) — nothing to apply here in JS anymore.
     applyFontSizePreference();
 
     if (sidebar) {

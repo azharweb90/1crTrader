@@ -1,0 +1,1158 @@
+/* ===========================================================
+   APP THEME — 1CrTrader (Midnight)
+   Loaded after every other stylesheet, applying unconditionally to the
+   whole app — there is no light/dark toggle anymore. This file used to
+   be an opt-in "dark-theme.css" gated behind a body.dark-mode class; that
+   gating has been removed so Midnight is simply the app's one theme.
+
+   Every color here is a design token from styles/tokens.css — that file
+   is the single source of truth for the palette. To retune the whole
+   app's colors, edit tokens.css; this file only maps components to the
+   right token, it doesn't define color values itself (a few one-off
+   decorative tints that only ever appear once or twice are the sole
+   exception, recolored directly rather than promoted to their own token).
+
+   Covers the whole application (every tab, the sidebar included). The
+   public marketing site (src/marketing/pages/landing/landing-page.html)
+   is intentionally NOT covered yet — confirmed as app-first, marketing
+   site later.
+   =========================================================== */
+
+/* ---------- Base page ---------- */
+body {
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text-primary);
+}
+
+.section-note {
+  color: var(--color-text-secondary);
+}
+
+.foot-note {
+  color: var(--color-text-muted);
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+}
+
+/* ---------- Sidebar ---------- */
+/* Gives the sidebar a slightly deeper, more neutral tone than the main
+   canvas so it doesn't read identically to the page behind it, and so
+   its border/divider lines stay visible. */
+.sidebar {
+  background: linear-gradient(180deg, var(--sidebar-bg-top) 0%, var(--sidebar-bg-bottom) 100%);
+}
+
+.sidebar-nav-group-bottom {
+  border-top-color: rgba(59, 158, 255, 0.1);
+}
+
+/* ---------- Top bar / header ---------- */
+.top-bar {
+  background: var(--color-surface);
+  border-bottom-color: var(--color-border-subtle);
+}
+
+.top-bar-page-title {
+  color: var(--color-text-primary);
+}
+
+.font-size-control {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+}
+
+.font-size-btn {
+  color: var(--color-text-secondary);
+}
+
+.font-size-btn:hover {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.font-size-label {
+  color: var(--color-text-muted);
+}
+
+.header-account-menu {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.header-account-menu-name {
+  color: var(--color-text-primary);
+}
+
+.header-account-menu-email {
+  color: var(--color-text-muted);
+}
+
+.header-account-menu-item {
+  color: var(--color-text-secondary);
+}
+
+.header-account-menu-item:hover {
+  background: var(--color-surface-inset);
+}
+
+/* ---------- Content shell ---------- */
+.content-section {
+  background: var(--color-canvas);
+  border-color: var(--color-border-subtle);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Generic text/border tokens used everywhere ---------- */
+.mini-ladder-title,
+.select-step-title,
+.dash-stat-label,
+.dash-quicklinks-title,
+.instrument-tier-summary-chip,
+.broker-order-time,
+.suggestions-row-title {
+  color: var(--color-text-secondary);
+}
+
+.mini-ladder-cell,
+.grid-table .cell,
+.broker-scrip-grid > div,
+.dash-stat-card,
+.dash-quicklink-card,
+.instrument-card,
+.tier-select-card,
+.trader-type-card,
+.pricing-card,
+.journal-stat-card,
+.journal-analysis-stat-card,
+.strategy-card,
+.suggestions-panel {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.mini-ladder-grid,
+.grid-table,
+.broker-scrip-grid {
+  background: var(--color-surface);
+  border-color: var(--color-surface);
+}
+
+.mini-ladder-cell.mini-ladder-head,
+.grid-table .head,
+.broker-scrip-grid-head {
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+}
+
+.mini-ladder-label,
+.grid-table .label,
+.tier-select-name,
+.trader-type-name,
+.dash-quicklink-title,
+.instrument-name,
+.suggestions-panel-title {
+  color: var(--color-text-primary);
+}
+
+.dash-stat-value,
+.header-balance-value {
+  color: var(--color-text-primary);
+}
+
+/* Tier-highlight rows (gold cream in light mode) — darker gold tint
+   keeps the same "this is your row" meaning without a jarring pale
+   patch on an otherwise dark table. */
+.mini-ladder-label.tier-highlight,
+.mini-ladder-cell.tier-highlight-row,
+.grid-table .label.tier-highlight {
+  background: rgba(59, 158, 255, 0.16) !important;
+  color: var(--color-accent-light) !important;
+}
+
+/* ---------- Inputs ---------- */
+input,
+select,
+textarea,
+.sl-lots-input,
+.capital-amount-input,
+.journal-input,
+.broker-day-picker-input {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-accent);
+}
+
+/* ---------- Buttons ---------- */
+.profile-continue-btn,
+.trade-submit-btn,
+.outcome-btn,
+.change-tier-btn,
+.account-edit-btn,
+.setup-wizard-back-btn,
+.setup-skip-btn,
+.journal-list-btn,
+.suggestions-panel-nav-btn,
+.broker-import-btn,
+.custom-stock-add-btn {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.outcome-btn:hover:not(:disabled),
+.suggestions-panel-nav-btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  background: rgba(59, 158, 255, 0.08);
+}
+
+.profile-continue-btn:not(:disabled) {
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+}
+
+.profile-continue-btn:hover:not(:disabled) {
+  background: var(--color-accent-strong);
+  color: var(--color-text-on-accent);
+}
+
+.broker-import-btn {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
+  border: none;
+  color: var(--color-text-on-accent);
+}
+
+/* ---------- Selected/active states (kept gold, brightened slightly) --- */
+.tier-select-card.selected,
+.trader-type-card.selected,
+.instrument-card.selected,
+.goal-amount-btn-cr {
+  border-color: var(--color-accent);
+  background: rgba(59, 158, 255, 0.07);
+}
+
+.sidebar-link.active {
+  background: var(--color-accent-soft);
+}
+
+.broker-range-pill-active {
+  background: rgba(91, 147, 232, 0.14);
+  border-color: var(--color-info);
+  color: var(--color-text-primary);
+}
+
+/* ---------- Sub-text / dropdown / dividers ---------- */
+.tier-select-range,
+.trader-type-desc,
+.instrument-picker-row-qty,
+.dash-quicklink-desc,
+.capital-amount-hint,
+.broker-range-label-pill {
+  color: var(--color-text-muted);
+}
+
+hr,
+.suggestions-category-header,
+.broker-day-detail-header,
+.suggestions-panel-header,
+.suggestions-panel-footer,
+.suggestions-row {
+  border-color: var(--color-surface);
+}
+
+.suggestions-row:hover {
+  background: rgba(59, 158, 255, 0.06);
+}
+
+/* ---------- Risk/info banners (blue, amber, etc.) ---------- */
+.lot-unlock-note {
+  background: rgba(91, 147, 232, 0.1);
+  border-color: rgba(91, 147, 232, 0.3);
+  color: var(--color-info-tint);
+}
+
+.lot-unlock-note-icon {
+  color: var(--color-info);
+}
+
+.lot-unlock-note.lot-cap-flash {
+  background: rgba(59, 158, 255, 0.12);
+  border-color: rgba(59, 158, 255, 0.35);
+  color: var(--color-accent-light);
+}
+
+.lot-unlock-note.lot-cap-flash .lot-unlock-note-icon {
+  color: var(--color-accent);
+}
+
+.sl-exceeds-warning {
+  background: rgba(59, 158, 255, 0.14);
+  border-color: rgba(59, 158, 255, 0.35);
+  color: var(--color-accent-light);
+}
+
+.broker-range-empty-state {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.suggestions-panel-category {
+  background: rgba(59, 158, 255, 0.16);
+  color: var(--color-accent-light);
+}
+
+.suggestions-category-count {
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Pale status-tint backgrounds (catch-all) ---------- */
+.broker-stat-icon-loss,
+.header-balance-pill {
+  background: linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-accent-strong) 100%);
+}
+
+.header-avatar-btn {
+  background: linear-gradient(135deg, var(--sidebar-active-bg) 0%, var(--color-accent-strong) 100%);
+}
+
+.dash-risk-card,
+.your-limit-callout,
+.roadmap-balance-card,
+.goal-result-card {
+  background: linear-gradient(140deg, var(--card-dark-bg-top) 0%, var(--card-dark-bg-bottom) 100%);
+}
+
+/* ---------- Trade Manager chart ---------- */
+/* The chart's own SVG colors (price line, candles, zone fills) are
+   rendered inline by trade-manager.js, not via these CSS classes, so they
+   already work reasonably against either background — only the
+   surrounding chrome (price labels, result cards) needs adjusting here. */
+.tm-rr-summary,
+.tm-result-card.tm-result-open {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+
+.tm-rr-chip {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Scrollable horizontal-overflow zones ---------- */
+.mini-ladder-wrap,
+.broker-multi-month-grid {
+  scrollbar-color: var(--color-border) var(--color-canvas);
+}
+
+/* ---------- Dashboard section cards dark mode ---------- */
+.dash-section-card {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+
+.dash-risk-wrap {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+
+/* Quicklink icon: use a warm dark gold tint in dark mode so it reads as
+   intentionally styled, not a leftover cream blob on a dark background. */
+.dash-quicklink-icon {
+  background: rgba(59, 158, 255, 0.15);
+  color: var(--color-accent);
+}
+
+.dash-quicklink-icon svg {
+  stroke: var(--color-accent);
+}
+
+/* ---------- Journal dark mode ---------- */
+.journal-analysis-wrap {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+
+.journal-list-grid {
+  background: var(--color-surface);
+  border-color: var(--color-surface);
+}
+
+.journal-list-cell {
+  background: var(--color-canvas);
+  color: var(--color-text-secondary);
+}
+
+.journal-list-head {
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+}
+
+.journal-list-btn {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+
+.tm-type-pill {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+}
+
+.tm-type-pill:hover {
+  background: rgba(59, 158, 255, 0.08);
+  border-color: var(--color-accent);
+}
+
+.tm-type-pill.tm-type-pill-active {
+  background: rgba(59, 158, 255, 0.14);
+  border-color: var(--color-accent);
+}
+
+.tm-type-pill-name { color: var(--color-text-primary); }
+.tm-type-pill-sub  { color: var(--color-text-muted); }
+
+.tm-lots-stepper {
+  border-color: var(--color-border);
+}
+
+.tm-lots-step-btn {
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+}
+
+.tm-lots-step-btn:hover:not(:disabled) {
+  background: var(--color-surface);
+}
+
+.tm-lots-input {
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.tm-lots-stat { color: var(--color-text-secondary); }
+.tm-lots-stat strong { color: var(--color-text-primary); }
+
+.tm-position-summary {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+
+.tm-position-cell-risk {
+  background: rgba(255, 107, 120, 0.14);
+  border-color: rgba(255, 107, 120, 0.25);
+}
+
+.tm-position-cell-reward {
+  background: rgba(47, 189, 133, 0.14);
+  border-color: rgba(47, 189, 133, 0.25);
+}
+
+.tm-position-cell-margin {
+  background: rgba(44, 123, 229, 0.12);
+  border-color: rgba(44, 123, 229, 0.22);
+}
+
+.tm-position-label { color: var(--color-text-muted); }
+.tm-position-sub   { color: var(--color-text-muted); }
+.tm-position-cell-risk .tm-position-value   { color: var(--color-loss); }
+.tm-position-cell-reward .tm-position-value { color: var(--color-profit); }
+.tm-position-cell-margin .tm-position-value { color: var(--color-info); }
+
+.tm-collapsed-setup {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+}
+
+.tm-collapsed-setup:hover {
+  background: var(--color-surface-inset);
+}
+
+.tm-collapsed-chip {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.tm-setup-review {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+
+.tm-review-label { color: var(--color-text-muted); }
+.tm-review-value { color: var(--color-text-primary); }
+
+.tm-direction-badge-long {
+  background: rgba(47, 189, 133, 0.14);
+  border-color: rgba(47, 189, 133, 0.3);
+}
+
+.tm-direction-badge-short {
+  background: rgba(255, 107, 120, 0.14);
+  border-color: rgba(255, 107, 120, 0.28);
+}
+
+.tm-direction-badge-label { color: var(--color-text-primary); }
+.tm-direction-badge-note  { color: var(--color-text-secondary); }
+
+/* ---------- Setup Wizard dark mode (comprehensive) ---------- */
+.setup-wizard-header,
+.setup-wizard-footer {
+  border-color: var(--color-surface);
+}
+
+.setup-wizard-eyebrow {
+  color: var(--color-text-muted);
+}
+
+.setup-wizard-title,
+.select-step-title {
+  color: var(--color-text-primary);
+}
+
+.setup-wizard-step-indicator {
+  color: var(--color-text-muted);
+}
+
+.setup-confirm-summary {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+}
+
+/* Broker tiles */
+.broker-option-btn {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.broker-option-btn:hover:not(:disabled) {
+  border-color: var(--color-info);
+}
+
+.broker-more-wrap {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+
+.broker-more-row {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.broker-more-row:hover {
+  border-color: var(--color-info);
+}
+
+/* Instrument picker — the "Indices" category box */
+.instrument-card {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+}
+
+.instrument-name {
+  color: var(--color-text-primary);
+}
+
+.instrument-check {
+  border-color: var(--color-border);
+}
+
+/* Fetched summary box */
+.setup-fetched-summary {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+}
+
+.setup-fetched-label {
+  color: var(--color-text-muted);
+}
+
+.setup-fetched-value {
+  color: var(--color-text-primary);
+}
+
+/* Security note (the blue "read-only connection" box) */
+.setup-wizard-note {
+  background: rgba(44, 123, 229, 0.1);
+  border-color: rgba(44, 123, 229, 0.25);
+  color: var(--color-info-tint);
+}
+
+/* Capital amount input wrapper */
+.capital-amount-wrap {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+}
+
+.capital-amount-label {
+  color: var(--color-text-secondary);
+}
+
+.capital-amount-input-row {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+}
+
+.capital-amount-prefix {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Daily Limits Tool dark mode (comprehensive) ---------- */
+/* Profit decision card ("Trade closed in profit — take it home?") */
+.profit-decision-card {
+  background: rgba(47, 189, 133, 0.12);
+  border-color: rgba(47, 189, 133, 0.28);
+}
+
+.profit-decision-message {
+  color: var(--color-profit-tint);
+}
+
+.profit-decision-secondary-btn {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.profit-decision-secondary-btn:hover {
+  border-color: var(--color-profit);
+  color: var(--color-profit);
+}
+
+/* Active outcome button states */
+.outcome-btn.active-profit {
+  background: rgba(47, 189, 133, 0.16);
+  border-color: var(--color-profit);
+  color: var(--color-profit);
+}
+
+.outcome-btn.active-loss {
+  background: rgba(255, 107, 120, 0.16);
+  border-color: var(--color-loss);
+  color: var(--color-loss);
+}
+
+/* Trade-submitted state */
+.trade-submit-btn:disabled {
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+  border-color: var(--color-surface);
+}
+
+/* Calc history table */
+.calc-history-wrap {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+  border-radius: 10px;
+}
+
+.calc-history-grid {
+  background: var(--color-surface);
+  border-color: var(--color-surface);
+}
+
+.calc-history-cell {
+  background: var(--color-canvas);
+  color: var(--color-text-secondary);
+}
+
+.calc-history-head {
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Roadmap dark mode (comprehensive) ---------- */
+.roadmap-input-card {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+
+.roadmap-input-row {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+}
+
+.roadmap-input-prefix {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.roadmap-input {
+  background: var(--color-surface-inset);
+  color: var(--color-text-primary);
+}
+
+.roadmap-stat {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+
+.roadmap-stat-label {
+  color: var(--color-text-muted);
+}
+
+.roadmap-stat-value {
+  color: var(--color-text-primary);
+}
+
+.roadmap-stage-name {
+  color: var(--color-text-secondary);
+}
+
+.roadmap-stage-range {
+  color: var(--color-text-muted);
+}
+
+.roadmap-stage-line {
+  background: var(--color-surface);
+}
+
+.roadmap-empty-state {
+  color: var(--color-text-muted);
+}
+
+/* Daily log history table on Roadmap */
+.roadmap-log-grid,
+[class*="roadmap-log"] {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Setup wizard stepper dots & bars ---------- */
+.setup-stepper {
+  border-bottom-color: var(--color-surface);
+}
+
+.setup-stepper-dot {
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.setup-stepper-dot-active {
+  background: rgba(59, 158, 255, 0.18);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.setup-stepper-dot-done {
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  border-color: var(--color-accent);
+}
+
+.setup-stepper-label {
+  color: var(--color-text-muted);
+}
+
+.setup-stepper-label-active {
+  color: var(--color-text-primary);
+}
+
+.setup-stepper-bar {
+  background: var(--color-surface);
+}
+
+.setup-stepper-bar-done {
+  background: var(--color-accent);
+}
+
+/* ---------- Roadmap goal-amount buttons (dark mode) ---------- */
+/* The white buttons were jarring — use a dark surface with a subtle
+   border, matching how the goal-amount grid looks in the rest of the
+   dark app. Selected state stays inverted (dark bg, white text). */
+.goal-amount-btn {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.goal-amount-btn:hover {
+  border-color: var(--color-info);
+  background: rgba(91, 147, 232, 0.1);
+  color: var(--color-text-primary);
+}
+
+.goal-amount-btn.selected {
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: var(--color-text-inverse);
+}
+
+.goal-amount-btn-cr {
+  border-color: var(--color-accent-strong);
+  color: var(--color-accent);
+}
+
+.goal-amount-btn-cr.selected {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
+  border-color: var(--color-accent);
+  color: var(--color-text-on-accent);
+}
+
+.goal-result-warning {
+  background: rgba(255, 107, 120, 0.14);
+  border-color: rgba(255, 107, 120, 0.3);
+  color: var(--color-loss-tint);
+}
+
+/* ---------- Daily Limits Tool dark mode (comprehensive) ---------- */
+.log-date-wrap {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+
+.log-date-input {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.broker-connected-row {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+
+.broker-connected-text {
+  color: var(--color-text-primary);
+}
+
+.broker-last-sync {
+  color: var(--color-text-muted);
+}
+
+.broker-disconnect-btn {
+  background: rgba(255, 107, 120, 0.15);
+  border-color: rgba(255, 107, 120, 0.3);
+  color: var(--color-loss);
+}
+
+/* ---------- Journal dark mode (comprehensive) ---------- */
+.journal-analysis-wrap {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+
+.journal-filter-row {
+  background: transparent;
+}
+
+.journal-filter-clear-btn {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.journal-form-wrap {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+
+.journal-section {
+  border-color: var(--color-surface);
+}
+
+.journal-section-title {
+  color: var(--color-text-primary);
+}
+
+.journal-screenshot-dropzone {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+}
+
+.journal-screenshot-empty {
+  color: var(--color-text-muted);
+}
+
+.journal-close-btn {
+  color: var(--color-text-muted);
+}
+
+.journal-close-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.journal-delete-btn {
+  background: rgba(255, 107, 120, 0.14);
+  border-color: rgba(255, 107, 120, 0.3);
+  color: var(--color-loss);
+}
+
+/* ---------- Roadmap redesign — slider, simulator, challenge, modal ---------- */
+.rm-step-label { color: var(--color-text-muted); }
+.rm-goal-slider-min,
+.rm-goal-slider-max { color: var(--color-text-muted); }
+.rm-goal-slider {
+  background: linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) 50%, var(--color-surface) 50%);
+}
+.rm-goal-slider::-webkit-slider-thumb { border-color: var(--color-canvas); }
+.rm-goal-custom-label { color: var(--color-text-secondary); }
+.rm-goal-custom-input-wrap { background: var(--color-surface-inset); border-color: var(--color-border); }
+.rm-goal-prefix { background: var(--color-canvas); border-color: var(--color-border); color: var(--color-text-muted); }
+.rm-goal-custom-input { color: var(--color-text-primary); }
+.rm-goal-display { color: var(--color-text-primary); }
+
+.rm-status-warning { background: rgba(255,107,120,0.13); border-color: rgba(255,107,120,0.3); color: var(--color-loss-tint); }
+.rm-status-ok { background: rgba(47,189,133,0.12); border-color: rgba(47,189,133,0.28); color: var(--color-profit); }
+.rm-status-reached { background: rgba(47,189,133,0.12); border-color: rgba(47,189,133,0.28); color: var(--color-profit); }
+
+.rm-sim-hint { color: var(--color-text-secondary); }
+.rm-sim-slider-label { color: var(--color-text-primary); }
+
+.rm-metric-card { background: var(--color-canvas); border-color: var(--color-surface); }
+.rm-metric-label { color: var(--color-text-muted); }
+.rm-metric-value { color: var(--color-text-primary); }
+.rm-metric-sub { color: var(--color-text-muted); }
+.rm-metric-warn { color: var(--color-loss); }
+
+.rm-challenge-card { }
+.rm-challenge-name { color: var(--color-text-primary); }
+.rm-challenge-empty { color: var(--color-text-muted); }
+.rm-challenge-pct { color: var(--color-text-primary); }
+.rm-challenge-progress-track { background: var(--color-surface); }
+.rm-challenge-stat { background: var(--color-canvas); border-color: var(--color-surface); }
+.rm-challenge-stat-value { color: var(--color-text-primary); }
+
+.rm-modal { background: var(--color-canvas); box-shadow: 0 16px 40px rgba(0,0,0,0.5); }
+.rm-modal-header { border-bottom-color: var(--color-surface); }
+.rm-modal-title { color: var(--color-text-primary); }
+.rm-modal-close { color: var(--color-text-muted); }
+.rm-modal-footer { border-top-color: var(--color-surface); }
+
+/* ---------- Trade Manager — new elements dark mode ---------- */
+.tm-broker-import-strip {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+}
+.tm-broker-import-label { color: var(--color-text-secondary); }
+.tm-broker-import-mini-btn,
+.tm-broker-mini-import-btn {
+  background: var(--color-text-primary);
+  color: var(--color-text-inverse);
+}
+
+.tm-metrics-panel {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+.tm-metrics-panel-empty { color: var(--color-text-muted); }
+.tm-metric-row { border-bottom-color: var(--color-surface); }
+.tm-metric-heading { color: var(--color-text-muted); }
+.tm-metric-detail { color: var(--color-text-muted); }
+.tm-metric-risk   .tm-metric-amount { color: var(--color-loss); }
+.tm-metric-reward .tm-metric-amount { color: var(--color-profit); }
+.tm-metric-margin .tm-metric-amount { color: var(--color-info); }
+.tm-price-hint { color: var(--color-text-secondary); }
+
+.tm-end-btn {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+.tm-end-btn:hover {
+  background: rgba(255,107,120,0.14);
+  border-color: rgba(255,107,120,0.35);
+  color: var(--color-loss);
+}
+
+.tm-rr-suggest-btn-selected {
+  background: var(--color-text-primary) !important;
+  border-color: var(--color-text-primary) !important;
+  color: var(--color-text-inverse) !important;
+}
+
+/* Trade closed overlay in dark mode */
+.tm-rr-animation-area [style*="rgba(248,250,252"] {
+  background: rgba(11, 15, 23,0.85) !important;
+}
+
+/* ---------- Daily Limits Tool — comprehensive dark mode fix ---------- */
+/* The trade log area, outcome buttons, and inner panel boxes
+   were still showing as white in dark mode. */
+.tool-layout,
+.input-panel,
+.right-panel,
+.calc-right-column {
+  background: transparent;
+}
+
+.form-group label,
+.trade-log-title {
+  color: var(--color-text-secondary);
+}
+
+.trade-log-container {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+  border-radius: 10px;
+}
+
+.broker-quick-connect-wrap {
+  background: var(--color-surface-inset);
+  border: 1px solid var(--color-surface);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.broker-synced-panel {
+  background: var(--color-surface-inset);
+  border: 1px solid var(--color-surface);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.broker-synced-title { color: var(--color-text-primary); }
+
+.broker-range-pill {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.broker-range-pill:hover {
+  border-color: var(--color-accent);
+}
+
+.broker-range-pill-active {
+  background: rgba(91,147,232,0.14);
+  border-color: var(--color-info);
+  color: var(--color-text-primary);
+}
+
+.broker-day-detail {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.broker-day-detail-title { color: var(--color-text-primary); }
+
+.profit-decision-card {
+  background: rgba(47,189,133,0.12);
+  border: 1px solid rgba(47,189,133,0.28);
+}
+.profit-decision-title { color: var(--color-profit); }
+.profit-decision-secondary-btn {
+  background: var(--color-canvas);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Comprehensive remaining dark mode fixes ---------- */
+
+/* Roadmap history table (white cells) */
+.roadmap-history-grid {
+  background: var(--color-surface);
+  border-color: var(--color-surface);
+}
+.roadmap-history-cell {
+  background: var(--color-canvas);
+  color: var(--color-text-secondary);
+}
+.roadmap-history-head {
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+}
+
+/* Trade Manager result cards — open/open-profit white backgrounds */
+.tm-result-card.tm-result-open {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+.tm-result-card.tm-result-open .tm-result-title { color: var(--color-text-primary); }
+.tm-result-card.tm-result-open .tm-result-message { color: var(--color-text-secondary); }
+
+.tm-result-card.tm-result-open-profit {
+  background: rgba(44, 123, 229, 0.1);
+  border-color: rgba(44, 123, 229, 0.25);
+}
+.tm-result-card.tm-result-open-profit .tm-result-title { color: var(--color-info); }
+.tm-result-card.tm-result-open-profit .tm-result-message { color: var(--color-info-tint); }
+
+/* Trade closed overlay */
+.tm-rr-animation-area .tm-closed-overlay {
+  background: rgba(11, 15, 23,0.85);
+}
+
+/* Setup instrument picker — white box in dark mode */
+.instrument-picker-wrap,
+.instrument-picker-category {
+  background: var(--color-surface-inset);
+  border-color: var(--color-surface);
+}
+.instrument-picker-category-header {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+.instrument-picker-row {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+.instrument-picker-search {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Roadmap metric cards */
+.rm-metric-card {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+
+/* Challenge stat cards */
+.rm-challenge-stat {
+  background: var(--color-canvas);
+  border-color: var(--color-surface);
+}
+
+/* Right-side panels (suggestions pattern reused) */
+.suggestions-panel {
+  background: var(--color-canvas);
+}
+.suggestions-panel-header {
+  border-bottom-color: var(--color-surface);
+}
+.suggestions-panel-footer {
+  border-top-color: var(--color-surface);
+}
+.suggestions-panel-title { color: var(--color-text-primary); }
+.suggestions-panel-text { color: var(--color-text-secondary); }
+
+/* broker-import-confirm inside dark panel */
+.broker-import-confirm-text { color: var(--color-text-secondary); }

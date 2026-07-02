@@ -1,0 +1,67 @@
+/* ===========================================================
+   DESIGN TOKENS — the single source of truth for the app's theme.
+
+   This is the ONE file that controls the entire application's look.
+   Every themeable color in the app (base chrome, all 12 feature pages)
+   references one of these custom properties instead of a hardcoded hex
+   value. Change a value here, and it updates everywhere that token is
+   used — nothing else needs to change. That's the whole point: growing
+   this app to more themes later, or re-tuning this one, is a values-only
+   edit in this single file.
+
+   Currently the whole app uses ONE theme (Midnight) — no toggle, no
+   light/dark switch. If a second theme is ever wanted, the pattern is:
+   duplicate this file's values under a scoped selector (e.g.
+   [data-theme="x"] { ... }), same as any standard CSS custom-property
+   theme system — but that's future work, not needed today.
+   =========================================================== */
+
+:root {
+  /* ---------- Canvas & surfaces ---------- */
+  --color-canvas: #0B0F17;           /* page background */
+  --color-surface: #161D2B;          /* cards, panels */
+  --color-surface-inset: #0E1420;    /* recessed areas inside a card */
+  --color-border: #242C3B;           /* card/panel borders */
+  --color-border-subtle: #1C2433;    /* lighter dividers */
+
+  /* ---------- Text ---------- */
+  --color-text-primary: #E6EDF6;
+  --color-text-secondary: #AEBAC9;
+  --color-text-muted: #7E8CA1;
+  --color-text-on-accent: #ffffff;   /* text sitting on a filled accent bg */
+  --color-text-inverse: #14233D;     /* dark text for use on a light/selected surface */
+
+  /* ---------- Sidebar ---------- */
+  --sidebar-bg-top: #0E1420;
+  --sidebar-bg-bottom: #080C13;
+  --sidebar-text: rgba(255, 255, 255, 0.64);
+  --sidebar-text-hover: #ffffff;
+  --sidebar-text-bright: #ffffff;
+  --sidebar-active-bg: rgba(255, 255, 255, 0.13);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-divider: rgba(255, 255, 255, 0.09);
+  --sidebar-menu-label: rgba(255, 255, 255, 0.38);
+
+  /* ---------- Brand / accent ---------- */
+  --color-accent: #3B9EFF;
+  --color-accent-strong: #2C7BE5;
+  --color-accent-light: #5CB0FF;
+  --color-accent-soft: #12243A;      /* tinted bg for banners, badges */
+  --color-accent-border: #264A6B;
+
+  /* ---------- Semantic ---------- */
+  --color-profit: #2FBD85;
+  --color-profit-tint: #A0C8B8;      /* muted green, for text on a profit-tinted bg */
+  --color-loss: #FF6B78;
+  --color-loss-tint: #F09080;        /* muted red, for text on a loss-tinted bg */
+  --color-warning: #F5821F;
+  --color-info: #5B93E8;             /* margin / neutral-info blue, distinct from brand accent */
+  --color-info-tint: #B9D2F7;
+
+  /* ---------- Dark inset cards (e.g. dashboard risk-rule tiles) ---------- */
+  --card-dark-bg-top: #0E1420;
+  --card-dark-bg-bottom: #080C13;
+  --card-dark-text: #ffffff;
+  --card-dark-text-muted: rgba(255, 255, 255, 0.55);
+  --card-dark-accent-bar: #3B9EFF;
+}
