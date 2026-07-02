@@ -21,15 +21,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 32px;
-  border-bottom: 1px solid #E8EDF4;
+  border-bottom: 1px solid #e8edf4;
 }
 
 .setup-wizard-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: #8A98AD;
+  color: #8a98ad;
   text-transform: uppercase;
 }
 
@@ -37,14 +37,14 @@
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.2px;
-  color: #14233D;
+  color: #14233d;
   margin: 2px 0 0;
 }
 
 .setup-skip-btn {
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   background: #fff;
-  color: #5B6B82;
+  color: #5b6b82;
   font-size: 13px;
   font-weight: 600;
   padding: 8px 14px;
@@ -54,7 +54,7 @@
 }
 
 .setup-skip-btn:hover {
-  background: #F4F7FB;
+  background: #f4f7fb;
 }
 
 .setup-stepper {
@@ -62,7 +62,7 @@
   align-items: center;
   max-width: 560px;
   padding: 22px 32px 26px;
-  border-bottom: 1px solid #E8EDF4;
+  border-bottom: 1px solid #e8edf4;
 }
 
 .setup-stepper-step {
@@ -84,43 +84,43 @@
   font-size: 13px;
   font-weight: 700;
   background: #fff;
-  color: #AEB9C8;
-  border: 2px solid #E0E6EE;
+  color: #aeb9c8;
+  border: 2px solid #e0e6ee;
 }
 
 .setup-stepper-dot-active {
-  background: #FBF1DA;
-  color: #8C6510;
-  border-color: #D4A828;
+  background: #fbf1da;
+  color: #8c6510;
+  border-color: #d4a828;
 }
 
 .setup-stepper-dot-done {
-  background: #D4A828;
+  background: #d4a828;
   color: #fff;
-  border-color: #D4A828;
+  border-color: #d4a828;
 }
 
 .setup-stepper-label {
   font-size: 11.5px;
   font-weight: 600;
-  color: #9AA7B8;
+  color: #9aa7b8;
   text-align: center;
 }
 
 .setup-stepper-label-active {
-  color: #14233D;
+  color: #14233d;
 }
 
 .setup-stepper-bar {
   flex: 1;
   height: 2px;
-  background: #E0E6EE;
+  background: #e0e6ee;
   margin: 0 -8px;
   margin-bottom: 24px;
 }
 
 .setup-stepper-bar-done {
-  background: #D4A828;
+  background: #d4a828;
 }
 
 .setup-wizard-step {
@@ -135,7 +135,7 @@
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  color: #14233D;
+  color: #14233d;
   margin: 0 0 4px;
 }
 
@@ -145,13 +145,13 @@
   gap: 10px;
   margin-top: 24px;
   padding: 14px 16px;
-  background: #EEF6FF;
-  border: 1px solid #D6E7FB;
+  background: #eef6ff;
+  border: 1px solid #d6e7fb;
   border-radius: 10px;
   max-width: 560px;
   font-size: 12.5px;
   line-height: 1.5;
-  color: #3A5170;
+  color: #3a5170;
 }
 
 .setup-wizard-note svg {
@@ -161,7 +161,7 @@
 
 .setup-confirm-summary {
   background: #fff;
-  border: 1px solid #E3E9F1;
+  border: 1px solid #e3e9f1;
   border-radius: 14px;
   padding: 4px 22px;
   max-width: 640px;
@@ -173,19 +173,19 @@
   justify-content: space-between;
   gap: 16px;
   padding: 18px 32px;
-  border-top: 1px solid #E8EDF4;
+  border-top: 1px solid #e8edf4;
   margin-top: 20px;
 }
 
 .setup-wizard-step-indicator {
   font-size: 12.5px;
-  color: #9AA7B8;
+  color: #9aa7b8;
 }
 
 .setup-wizard-back-btn {
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   background: #fff;
-  color: #5B6B82;
+  color: #5b6b82;
   font-size: 13px;
   font-weight: 600;
   padding: 10px 18px;
@@ -195,12 +195,12 @@
 }
 
 .setup-wizard-back-btn:disabled {
-  color: #C3CEDD;
+  color: #c3cedd;
   cursor: not-allowed;
 }
 
 .setup-wizard-back-btn:not(:disabled):hover {
-  background: #F4F7FB;
+  background: #f4f7fb;
 }
 
 .select-step {
@@ -210,7 +210,7 @@
 .select-step-title {
   font-size: 13px;
   font-weight: 700;
-  color: #5B6B82;
+  color: #5b6b82;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 12px;
@@ -221,7 +221,7 @@
   display: block;
   background: none;
   border: none;
-  color: #2C6FD6;
+  color: #2c6fd6;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -239,8 +239,8 @@
 }
 
 .setup-fetched-summary {
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 10px;
   padding: 14px 16px;
 }
@@ -254,12 +254,12 @@
 }
 
 .setup-fetched-label {
-  color: #5B6B82;
+  color: #5b6b82;
 }
 
 .setup-fetched-value {
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
 }
 
 .tier-select-grid {
@@ -270,7 +270,7 @@
 
 .tier-select-card {
   background: #ffffff;
-  border: 2px solid #E8EDF4;
+  border: 2px solid #e8edf4;
   border-radius: 14px;
   padding: 24px 20px;
   text-align: center;
@@ -280,13 +280,13 @@
 }
 
 .tier-select-card:hover {
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(46, 117, 182, 0.12);
 }
 
 .tier-select-card.selected {
-  border-color: #D4A828;
+  border-color: #d4a828;
   background: #fffdf7;
   box-shadow: 0 0 0 3px rgba(212, 168, 40, 0.14);
 }
@@ -294,32 +294,32 @@
 .tier-select-name {
   font-size: 19px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   margin-bottom: 8px;
 }
 
 .tier-select-card.selected .tier-select-name {
-  color: #8C6510;
+  color: #8c6510;
 }
 
 .tier-select-range {
   font-size: 13px;
-  color: #14233D;
+  color: #14233d;
   font-weight: 600;
   margin-bottom: 4px;
 }
 
 .tier-select-desc {
   font-size: 12px;
-  color: #8A98AD;
+  color: #8a98ad;
 }
 
 /* Capital amount input, shown beneath the tier grid once a tier is picked */
 .capital-amount-wrap {
   margin-top: 18px;
   padding: 16px 18px;
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 12px;
 }
 
@@ -327,7 +327,7 @@
   display: block;
   font-size: 12.5px;
   font-weight: 600;
-  color: #5B6B82;
+  color: #5b6b82;
   text-transform: uppercase;
   letter-spacing: 0.02em;
   margin-bottom: 8px;
@@ -336,23 +336,23 @@
 .capital-amount-input-row {
   display: flex;
   align-items: center;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 8px;
   background: #fff;
   overflow: hidden;
 }
 
 .capital-amount-input-row:focus-within {
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
 }
 
 .capital-amount-prefix {
   padding: 10px 12px;
-  background: #F1F4F8;
-  color: #5B6B82;
+  background: #f1f4f8;
+  color: #5b6b82;
   font-size: 14px;
   font-weight: 600;
-  border-right: 1px solid #DCE3EC;
+  border-right: 1px solid #dce3ec;
 }
 
 .capital-amount-input {
@@ -366,19 +366,19 @@
 
 .capital-amount-hint {
   font-size: 12px;
-  color: #8A98AD;
+  color: #8a98ad;
   margin: 8px 2px 0;
 }
 
 .capital-amount-error {
   font-size: 12.5px;
   font-weight: 600;
-  color: #C53D22;
+  color: #c53d22;
   margin: 8px 2px 0;
 }
 
 .capital-amount-input-row.input-error {
-  border-color: #C53D22;
+  border-color: #c53d22;
 }
 
 /* Trader-type cards (Option Buyer / Option Seller / Futures Trader / Hedged Seller) */
@@ -390,7 +390,7 @@
 
 .trader-type-card {
   background: #ffffff;
-  border: 2px solid #E8EDF4;
+  border: 2px solid #e8edf4;
   border-radius: 14px;
   padding: 20px;
   text-align: left;
@@ -400,13 +400,13 @@
 }
 
 .trader-type-card:hover {
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(46, 117, 182, 0.12);
 }
 
 .trader-type-card.selected {
-  border-color: #D4A828;
+  border-color: #d4a828;
   background: #fffdf7;
   box-shadow: 0 0 0 3px rgba(212, 168, 40, 0.14);
 }
@@ -414,24 +414,24 @@
 .trader-type-name {
   font-size: 15.5px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   margin-bottom: 6px;
 }
 
 .trader-type-card.selected .trader-type-name {
-  color: #8C6510;
+  color: #8c6510;
 }
 
 .trader-type-desc {
   font-size: 12.5px;
-  color: #5B6B82;
+  color: #5b6b82;
   line-height: 1.45;
 }
 
 /* Continue button, disabled until both tier + trader type are picked */
 .profile-continue-btn {
   width: 100%;
-  background: #14233D;
+  background: #14233d;
   color: #ffffff;
   border: none;
   padding: 11px 18px;
@@ -443,12 +443,12 @@
 }
 
 .profile-continue-btn:hover:not(:disabled) {
-  background: #8C6510;
+  background: #8c6510;
 }
 
 .profile-continue-btn:disabled {
-  background: #DCE3EC;
-  color: #8A98AD;
+  background: #dce3ec;
+  color: #8a98ad;
   cursor: not-allowed;
 }
 
@@ -459,9 +459,9 @@
 
 /* Header "Change Tier" button + active-tier indicator */
 .change-tier-btn {
-  background: #EEF6FF;
-  color: #2C6FD6;
-  border: 1px solid #D6E7FB;
+  background: #eef6ff;
+  color: #2c6fd6;
+  border: 1px solid #d6e7fb;
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 13px;
@@ -486,21 +486,23 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   background: #ffffff;
-  color: #5B6B82;
+  color: #5b6b82;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .dark-mode-toggle-btn:hover {
-  background: #F7F9FC;
-  border-color: #D4A828;
-  color: #8C6510;
+  background: #f7f9fc;
+  border-color: #d4a828;
+  color: #8c6510;
 }
 
 /* Font-size control — A- / A / A+ trio in the header. Scales the whole
@@ -512,7 +514,7 @@
   align-items: center;
   gap: 2px;
   background: #ffffff;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 8px;
   padding: 2px 4px;
   height: 38px;
@@ -526,7 +528,7 @@
   font-family: inherit;
   font-size: 13px;
   font-weight: 700;
-  color: #5B6B82;
+  color: #5b6b82;
   padding: 4px 7px;
   border-radius: 5px;
   line-height: 1;
@@ -535,8 +537,8 @@
 }
 
 .font-size-btn:hover {
-  background: #F1F4F8;
-  color: #14233D;
+  background: #f1f4f8;
+  color: #14233d;
 }
 
 .font-size-btn:disabled {
@@ -547,7 +549,7 @@
 .font-size-label {
   font-size: 13px;
   font-weight: 700;
-  color: #8A98AD;
+  color: #8a98ad;
   min-width: 28px;
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -569,7 +571,7 @@
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #473913 0%, #A47A16 100%);
+  background: linear-gradient(135deg, #473913 0%, #a47a16 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -589,7 +591,7 @@
   right: 0;
   min-width: 220px;
   background: #ffffff;
-  border: 1px solid #E8EDF4;
+  border: 1px solid #e8edf4;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(46, 117, 182, 0.14);
   padding: 8px;
@@ -602,19 +604,19 @@
 
 .header-account-menu-identity {
   padding: 8px 10px 10px;
-  border-bottom: 1px solid #E3E9F1;
+  border-bottom: 1px solid #e3e9f1;
   margin-bottom: 6px;
 }
 
 .header-account-menu-name {
   font-size: 14px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
 }
 
 .header-account-menu-email {
   font-size: 12px;
-  color: #5B6B82;
+  color: #5b6b82;
   margin-top: 2px;
   word-break: break-all;
 }
@@ -622,8 +624,8 @@
 .header-account-menu-tier {
   font-size: 11.5px;
   font-weight: 600;
-  color: #8C6510;
-  background: #FBF1DA;
+  color: #8c6510;
+  background: #fbf1da;
   border-radius: 999px;
   padding: 3px 10px;
   display: inline-block;
@@ -639,7 +641,7 @@
   font-family: inherit;
   font-size: 13.5px;
   font-weight: 600;
-  color: #14233D;
+  color: #14233d;
   padding: 9px 10px;
   border-radius: 8px;
   cursor: pointer;
@@ -650,17 +652,17 @@
 }
 
 .header-account-menu-item-danger {
-  color: #C53D22;
+  color: #c53d22;
 }
 
 .header-account-menu-item-danger:hover {
-  background: #FBE7E2;
+  background: #fbe7e2;
 }
 
 /* Prominent running-balance pill in the header — intentionally distinct
    from .sidebar-link.active so nav state and balance don't blend together */
 .header-balance-pill {
-  background: linear-gradient(135deg, #A47A16 0%, #8C6510 100%);
+  background: linear-gradient(135deg, #a47a16 0%, #8c6510 100%);
   border-radius: 10px;
   padding: 7px 16px;
   display: flex;
@@ -671,7 +673,7 @@
 }
 
 .header-balance-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 9.5px;
   font-weight: 500;
   letter-spacing: 1.2px;
@@ -692,7 +694,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #0E9F6E 0%, #28b487 100%);
+  background: linear-gradient(135deg, #0e9f6e 0%, #28b487 100%);
   color: #ffffff;
   padding: 14px 20px;
   border-radius: 10px;
@@ -702,7 +704,9 @@
   z-index: 1000;
   opacity: 0;
   transform: translateY(-10px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
   pointer-events: none;
   max-width: 320px;
 }
@@ -715,12 +719,12 @@
 /* Highlight state applied to a matching ladder/rules row or pricing card
    once a tier has been selected on the tier-select screen. */
 .grid-table .label.tier-highlight {
-  background: #FBF4DA !important;
-  color: #8C6510 !important;
+  background: #fbf4da !important;
+  color: #8c6510 !important;
 }
 
 .pricing-card.tier-highlight {
-  border-color: #D4A828;
+  border-color: #d4a828;
   box-shadow: 0 0 0 3px rgba(212, 168, 40, 0.14);
 }
 
@@ -728,12 +732,12 @@
 /* "Select All" toggle for the instrument multi-select */
 .select-all-btn {
   background: #ffffff;
-  border: 1.5px solid #DCE3EC;
+  border: 1.5px solid #dce3ec;
   border-radius: 8px;
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #2C6FD6;
+  color: #2c6fd6;
   cursor: pointer;
   margin-bottom: 12px;
   font-family: inherit;
@@ -741,13 +745,13 @@
 }
 
 .select-all-btn:hover {
-  background: #EEF6FF;
-  border-color: #2C6FD6;
+  background: #eef6ff;
+  border-color: #2c6fd6;
 }
 
 .select-all-btn.all-selected {
-  background: #D4A828;
-  border-color: #D4A828;
+  background: #d4a828;
+  border-color: #d4a828;
   color: #ffffff;
 }
 
@@ -759,14 +763,14 @@
 
 .instrument-card {
   background: #ffffff;
-  border: 2px solid #E8EDF4;
+  border: 2px solid #e8edf4;
   border-radius: 12px;
   overflow: hidden;
   transition: border-color 0.15s ease;
 }
 
 .instrument-card.selected {
-  border-color: #D4A828;
+  border-color: #d4a828;
 }
 
 .instrument-toggle {
@@ -786,15 +790,15 @@
   width: 18px;
   height: 18px;
   border-radius: 5px;
-  border: 2px solid #DCE3EC;
+  border: 2px solid #dce3ec;
   flex-shrink: 0;
   position: relative;
   transition: all 0.15s ease;
 }
 
 .instrument-card.selected .instrument-check {
-  background: #D4A828;
-  border-color: #D4A828;
+  background: #d4a828;
+  border-color: #d4a828;
 }
 
 .instrument-card.selected .instrument-check::after {
@@ -810,24 +814,24 @@
 
 .instrument-name {
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   font-size: 14.5px;
   flex: 1;
 }
 
 .instrument-card.selected .instrument-name {
-  color: #8C6510;
+  color: #8c6510;
 }
 
 .instrument-qty-label {
   font-size: 11.5px;
-  color: #8A98AD;
+  color: #8a98ad;
   font-weight: 500;
 }
 
 .instrument-lots-wrap {
   padding: 0 16px 16px 16px;
-  border-top: 1px solid #F1F4F8;
+  border-top: 1px solid #f1f4f8;
   padding-top: 12px;
 }
 
@@ -842,7 +846,7 @@
 .instrument-picker-search {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 8px;
   font-size: 13.5px;
   font-family: inherit;
@@ -852,7 +856,7 @@
 
 .instrument-picker-search:focus {
   outline: none;
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
 }
 
 .instrument-picker-chips {
@@ -865,7 +869,7 @@
 
 .instrument-picker-chips-empty {
   font-size: 12.5px;
-  color: #8A98AD;
+  color: #8a98ad;
   align-self: center;
 }
 
@@ -873,8 +877,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #EEF6FF;
-  color: #14233D;
+  background: #eef6ff;
+  color: #14233d;
   font-size: 12.5px;
   font-weight: 600;
   padding: 5px 6px 5px 12px;
@@ -884,7 +888,7 @@
 .instrument-picker-chip-remove {
   background: rgba(31, 58, 95, 0.12);
   border: none;
-  color: #14233D;
+  color: #14233d;
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -901,7 +905,7 @@
 }
 
 .instrument-picker-category {
-  border: 1px solid #E3E9F1;
+  border: 1px solid #e3e9f1;
   border-radius: 10px;
   margin-bottom: 10px;
   overflow: hidden;
@@ -910,7 +914,7 @@
 .instrument-picker-category-header-row {
   display: flex;
   align-items: center;
-  background: #F7F9FC;
+  background: #f7f9fc;
 }
 
 .instrument-picker-category-header {
@@ -928,7 +932,7 @@
 
 .instrument-picker-chevron {
   font-size: 9px;
-  color: #8A98AD;
+  color: #8a98ad;
   transition: transform 0.2s ease;
 }
 
@@ -939,19 +943,19 @@
 .instrument-picker-category-title {
   font-size: 13px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
 }
 
 .instrument-picker-category-count {
   font-size: 11.5px;
-  color: #5B6B82;
+  color: #5b6b82;
   margin-left: auto;
 }
 
 .instrument-picker-select-all-btn {
   background: none;
   border: none;
-  color: #2C6FD6;
+  color: #2c6fd6;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -980,7 +984,7 @@
   width: 100%;
   background: #ffffff;
   border: none;
-  border-top: 1px solid #F1F4F8;
+  border-top: 1px solid #f1f4f8;
   padding: 11px 14px;
   display: flex;
   align-items: center;
@@ -995,8 +999,8 @@
 }
 
 .instrument-picker-row.selected .instrument-check {
-  background: #D4A828;
-  border-color: #D4A828;
+  background: #d4a828;
+  border-color: #d4a828;
 }
 
 .instrument-picker-row.selected .instrument-check::after {
@@ -1012,25 +1016,25 @@
 
 .instrument-picker-row-name {
   font-weight: 600;
-  color: #14233D;
+  color: #14233d;
   font-size: 13.5px;
   flex: 1;
 }
 
 .instrument-picker-row.selected .instrument-picker-row-name {
-  color: #8C6510;
+  color: #8c6510;
 }
 
 .instrument-picker-row-qty {
   font-size: 11.5px;
-  color: #8A98AD;
+  color: #8a98ad;
   font-weight: 500;
 }
 
 .instrument-lots-input {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 6px;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
@@ -1038,14 +1042,14 @@
 
 .instrument-lots-input:focus {
   outline: none;
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
 }
 
 /* Custom stocks free-text entry + chips */
 .custom-stocks-wrap {
   margin-top: 18px;
   padding-top: 16px;
-  border-top: 1px solid #E3E9F1;
+  border-top: 1px solid #e3e9f1;
 }
 
 .custom-stock-input-row {
@@ -1058,7 +1062,7 @@
 }
 
 .custom-stock-add-btn {
-  background: #14233D;
+  background: #14233d;
   color: #ffffff;
   border: none;
   padding: 9px 18px;
@@ -1071,7 +1075,7 @@
 }
 
 .custom-stock-add-btn:hover {
-  background: #2C6FD6;
+  background: #2c6fd6;
 }
 
 .custom-stock-chips {
@@ -1085,9 +1089,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #EEF6FF;
-  color: #2C6FD6;
-  border: 1px solid #D6E7FB;
+  background: #eef6ff;
+  color: #2c6fd6;
+  border: 1px solid #d6e7fb;
   padding: 5px 6px 5px 12px;
   border-radius: 16px;
   font-size: 12.5px;
@@ -1097,7 +1101,7 @@
 .custom-stock-chip-remove {
   background: none;
   border: none;
-  color: #2C6FD6;
+  color: #2c6fd6;
   cursor: pointer;
   font-size: 15px;
   line-height: 1;

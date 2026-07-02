@@ -29,34 +29,36 @@
   justify-content: center;
   gap: 2px;
   padding: 8px 16px;
-  background: #F7F9FC;
-  border: 1.5px solid #DCE3EC;
+  background: #f7f9fc;
+  border: 1.5px solid #dce3ec;
   border-radius: 10px;
   cursor: pointer;
   font-family: inherit;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
   min-width: 88px;
 }
 
 .tm-type-pill:hover {
-  border-color: #D4A828;
-  background: #FBF7EC;
+  border-color: #d4a828;
+  background: #fbf7ec;
 }
 
 .tm-type-pill.tm-type-pill-active {
-  border-color: #D4A828;
-  background: #FBF1DA;
+  border-color: #d4a828;
+  background: #fbf1da;
 }
 
 .tm-type-pill-name {
   font-size: 13px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
 }
 
 .tm-type-pill-sub {
   font-size: 10px;
-  color: #8A98AD;
+  color: #8a98ad;
 }
 
 /* ── Lots row ─────────────────────────────────────────────── */
@@ -78,7 +80,7 @@
   display: flex;
   align-items: center;
   gap: 0;
-  border: 1.5px solid #DCE3EC;
+  border: 1.5px solid #dce3ec;
   border-radius: 8px;
   overflow: hidden;
   width: 120px;
@@ -88,8 +90,8 @@
   width: 34px;
   flex: 0 0 34px;
   border: none;
-  background: #F7F9FC;
-  color: #14233D;
+  background: #f7f9fc;
+  color: #14233d;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -102,7 +104,7 @@
 }
 
 .tm-lots-step-btn:hover:not(:disabled) {
-  background: #E3E9F1;
+  background: #e3e9f1;
 }
 
 .tm-lots-step-btn:disabled {
@@ -112,12 +114,12 @@
 
 .tm-lots-input {
   border: none;
-  border-left: 1px solid #DCE3EC;
-  border-right: 1px solid #DCE3EC;
+  border-left: 1px solid #dce3ec;
+  border-right: 1px solid #dce3ec;
   text-align: center;
   font-size: 15px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   background: #fff;
   height: 40px;
   flex: 1 1 auto;
@@ -127,7 +129,9 @@
 }
 
 .tm-lots-input::-webkit-outer-spin-button,
-.tm-lots-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.tm-lots-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
 
 .tm-lots-info {
   display: flex;
@@ -139,19 +143,19 @@
 
 .tm-lots-stat {
   font-size: 12px;
-  color: #5B6B82;
+  color: #5b6b82;
 }
 
 .tm-lots-stat strong {
-  color: #14233D;
+  color: #14233d;
   font-weight: 700;
 }
 
 .tm-lots-warning {
   font-size: 11.5px;
-  color: #8C6510;
-  background: #FBF1DA;
-  border: 1px solid #E8CD8A;
+  color: #8c6510;
+  background: #fbf1da;
+  border: 1px solid #e8cd8a;
   border-radius: 7px;
   padding: 6px 10px;
   margin-top: 4px;
@@ -160,8 +164,8 @@
 
 /* ── Position sizing summary ──────────────────────────────── */
 .tm-position-summary {
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 10px;
   padding: 14px 16px;
   margin-bottom: 16px;
@@ -202,23 +206,29 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #8A98AD;
+  color: #8a98ad;
 }
 
 .tm-position-value {
   font-size: 16px;
   font-weight: 800;
-  color: #14233D;
+  color: #14233d;
   font-variant-numeric: tabular-nums;
 }
 
-.tm-position-cell-risk .tm-position-value   { color: #d9381e; }
-.tm-position-cell-reward .tm-position-value { color: #1d9e75; }
-.tm-position-cell-margin .tm-position-value { color: #2C6FD6; }
+.tm-position-cell-risk .tm-position-value {
+  color: #d9381e;
+}
+.tm-position-cell-reward .tm-position-value {
+  color: #1d9e75;
+}
+.tm-position-cell-margin .tm-position-value {
+  color: #2c6fd6;
+}
 
 .tm-position-sub {
   font-size: 10.5px;
-  color: #8A98AD;
+  color: #8a98ad;
 }
 
 /* ── Collapsed setup bar ──────────────────────────────────── */
@@ -238,8 +248,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 10px;
   padding: 10px 14px;
   cursor: pointer;
@@ -247,7 +257,7 @@
 }
 
 .tm-collapsed-setup:hover {
-  background: #F1F4F8;
+  background: #f1f4f8;
 }
 
 .tm-collapsed-setup-text {
@@ -261,10 +271,10 @@
   font-size: 11px;
   font-weight: 600;
   background: #ffffff;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 999px;
   padding: 3px 10px;
-  color: #5B6B82;
+  color: #5b6b82;
   white-space: nowrap;
 }
 
@@ -282,7 +292,7 @@
 
 .tm-collapsed-setup-chevron {
   flex: 0 0 auto;
-  color: #8A98AD;
+  color: #8a98ad;
   display: flex;
   align-items: center;
   transition: transform 0.2s ease;
@@ -290,8 +300,8 @@
 
 /* Setup review panel (expanded from the collapsed bar) */
 .tm-setup-review {
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-top: none;
   border-radius: 0 0 10px 10px;
   padding: 14px;
@@ -314,17 +324,21 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #8A98AD;
+  color: #8a98ad;
 }
 
 .tm-review-value {
   font-size: 13px;
   font-weight: 600;
-  color: #14233D;
+  color: #14233d;
 }
 
-.tm-review-risk   { color: #d9381e; }
-.tm-review-reward { color: #1d9e75; }
+.tm-review-risk {
+  color: #d9381e;
+}
+.tm-review-reward {
+  color: #1d9e75;
+}
 
 /* ── Direction badge ──────────────────────────────────────── */
 .tm-direction-badge-wrap {
@@ -354,19 +368,23 @@
   font-size: 16px;
 }
 
-.tm-direction-badge-long .tm-direction-badge-icon { color: #1d9e75; }
-.tm-direction-badge-short .tm-direction-badge-icon { color: #d9381e; }
+.tm-direction-badge-long .tm-direction-badge-icon {
+  color: #1d9e75;
+}
+.tm-direction-badge-short .tm-direction-badge-icon {
+  color: #d9381e;
+}
 
 .tm-direction-badge-label {
   font-size: 13px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   display: block;
 }
 
 .tm-direction-badge-note {
   font-size: 11px;
-  color: #5B6B82;
+  color: #5b6b82;
   display: block;
   margin-top: 1px;
 }
@@ -399,35 +417,41 @@
   white-space: nowrap;
 }
 
-.tm-level-pill-risk .tm-level-pill-price { color: #d9381e; }
+.tm-level-pill-risk .tm-level-pill-price {
+  color: #d9381e;
+}
 .tm-level-pill-risk .tm-level-pill-rs {
   background: rgba(217, 56, 30, 0.12);
   color: #d9381e;
 }
 
-.tm-level-pill-reward .tm-level-pill-price { color: #1d9e75; }
+.tm-level-pill-reward .tm-level-pill-price {
+  color: #1d9e75;
+}
 .tm-level-pill-reward .tm-level-pill-rs {
   background: rgba(29, 158, 117, 0.12);
   color: #1d9e75;
 }
 
-.tm-level-pill-trail .tm-level-pill-price { color: #2C6FD6; }
+.tm-level-pill-trail .tm-level-pill-price {
+  color: #2c6fd6;
+}
 .tm-level-pill-trail .tm-level-pill-rs {
   background: rgba(44, 111, 214, 0.12);
-  color: #2C6FD6;
+  color: #2c6fd6;
 }
 
 /* ── R:R summary chips ────────────────────────────────────── */
 .tm-rr-chip-long {
   color: #1d9e75;
-  background: rgba(29,158,117,0.1);
-  border-color: rgba(29,158,117,0.25) !important;
+  background: rgba(29, 158, 117, 0.1);
+  border-color: rgba(29, 158, 117, 0.25) !important;
 }
 
 .tm-rr-chip-short {
   color: #d9381e;
-  background: rgba(217,56,30,0.1);
-  border-color: rgba(217,56,30,0.25) !important;
+  background: rgba(217, 56, 30, 0.1);
+  border-color: rgba(217, 56, 30, 0.25) !important;
 }
 
 .tm-setup-grid {
@@ -443,9 +467,9 @@
 .tm-setup-grid .amount-input:disabled,
 #tm-instrument:disabled {
   background: #f4f6f8;
-  color: #5B6B82;
+  color: #5b6b82;
   cursor: not-allowed;
-  border-color: #E8EDF4;
+  border-color: #e8edf4;
 }
 
 #tm-start-btn:disabled {
@@ -458,7 +482,7 @@
    rather than a card boundary, since both sections genuinely belong to
    the same page/flow now. */
 .tm-active-divider {
-  border-top: 1px solid #E3E9F1;
+  border-top: 1px solid #e3e9f1;
   margin: 24px 0 20px;
 }
 
@@ -500,7 +524,7 @@
   align-items: center;
   gap: 2px;
   background: #ffffff;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 10px;
   padding: 8px 6px;
   cursor: pointer;
@@ -508,19 +532,19 @@
 }
 
 .tm-rr-suggest-btn:hover {
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
   background: #eaf2fa;
 }
 
 .tm-rr-suggest-ratio {
   font-size: 13px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
 }
 
 .tm-rr-suggest-price {
   font-size: 11px;
-  color: #5B6B82;
+  color: #5b6b82;
 }
 
 /* Extended 1:10..1:100 reference table (step 10) — same mini-ladder
@@ -528,7 +552,10 @@
    Points. Covers the long tail of swing-style setups without cluttering
    the default view with 100 buttons. */
 .mini-ladder-grid-rr {
-  grid-template-columns: minmax(60px, 0.6fr) minmax(100px, 1fr) minmax(80px, 0.8fr);
+  grid-template-columns: minmax(60px, 0.6fr) minmax(100px, 1fr) minmax(
+      80px,
+      0.8fr
+    );
 }
 
 .tm-rr-summary {
@@ -540,16 +567,16 @@
 
 .tm-rr-chip {
   background: #f4f6f8;
-  border: 1px solid #E8EDF4;
+  border: 1px solid #e8edf4;
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 12.5px;
   font-weight: 600;
-  color: #14233D;
+  color: #14233d;
 }
 
 .tm-rr-chip strong {
-  color: #14233D;
+  color: #14233d;
 }
 
 /* Result state cards — same visual language as .profit-decision-card and
@@ -606,16 +633,16 @@
 }
 
 .tm-result-card.tm-result-target {
-  background: #EAF8F2;
+  background: #eaf8f2;
   border: 1px solid #b9e6d4;
 }
 
 .tm-result-card.tm-result-target .tm-result-title {
-  color: #0E9F6E;
+  color: #0e9f6e;
 }
 
 .tm-result-card.tm-result-target .tm-result-message {
-  color: #0E9F6E;
+  color: #0e9f6e;
 }
 
 /* Target-hit celebration: a brief confetti burst, plays once on render and
@@ -644,8 +671,14 @@
 }
 
 @keyframes tmConfettiFall {
-  0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
-  100% { opacity: 0; transform: translateY(140px) rotate(220deg); }
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(140px) rotate(220deg);
+  }
 }
 
 /* Stopped out but with profit locked in by the trailing SL — this closes
@@ -653,25 +686,25 @@
    (confirmed with the trader: any trade that closes profitably should
    read as a win visually, not as a muted "stopped" purple). */
 .tm-result-card.tm-result-stopped-locked {
-  background: #EAF8F2;
+  background: #eaf8f2;
   border: 1px solid #b9e6d4;
 }
 
 .tm-result-card.tm-result-stopped-locked .tm-result-title {
-  color: #0E9F6E;
+  color: #0e9f6e;
 }
 
 .tm-result-card.tm-result-stopped-locked .tm-result-message {
-  color: #0E9F6E;
+  color: #0e9f6e;
 }
 
 .tm-result-card.tm-result-stopped-neutral {
-  background: #FBE7E2;
+  background: #fbe7e2;
   border: 1px solid #f6c8c2;
 }
 
 .tm-result-card.tm-result-stopped-neutral .tm-result-title {
-  color: #C53D22;
+  color: #c53d22;
 }
 
 .tm-result-card.tm-result-stopped-neutral .tm-result-message {
@@ -679,16 +712,16 @@
 }
 
 .tm-result-card.tm-result-open {
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
 }
 
 .tm-result-card.tm-result-open .tm-result-title {
-  color: #14233D;
+  color: #14233d;
 }
 
 .tm-result-card.tm-result-open .tm-result-message {
-  color: #5B6B82;
+  color: #5b6b82;
 }
 
 /* Light blue: trade is still open, but the trailing SL has moved into
@@ -725,10 +758,16 @@
 }
 
 @media (max-width: 860px) {
-  .tm-two-col-layout { grid-template-columns: 1fr; }
+  .tm-two-col-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
-.tm-inputs-col { display: flex; flex-direction: column; gap: 0; }
+.tm-inputs-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 
 .tm-metrics-col {
   display: flex;
@@ -740,8 +779,8 @@
 
 /* Metrics panel */
 .tm-metrics-panel {
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 12px;
   overflow: hidden;
   min-height: 120px;
@@ -753,26 +792,32 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: #AEB9C8;
+  color: #aeb9c8;
   font-size: 12px;
   padding: 28px 16px;
   text-align: center;
 }
 
-.tm-metrics-summary { display: flex; flex-direction: column; gap: 0; }
+.tm-metrics-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 
 .tm-metric-row {
   padding: 14px 16px;
-  border-bottom: 1px solid #E3E9F1;
+  border-bottom: 1px solid #e3e9f1;
 }
-.tm-metric-row:last-child { border-bottom: none; }
+.tm-metric-row:last-child {
+  border-bottom: none;
+}
 
 .tm-metric-heading {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #8A98AD;
+  color: #8a98ad;
   margin-bottom: 4px;
 }
 .tm-metric-amount {
@@ -781,10 +826,20 @@
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
 }
-.tm-metric-detail { font-size: 11px; color: #8A98AD; margin-top: 3px; }
-.tm-metric-risk   .tm-metric-amount { color: #d9381e; }
-.tm-metric-reward .tm-metric-amount { color: #1d9e75; }
-.tm-metric-margin .tm-metric-amount { color: #2C6FD6; }
+.tm-metric-detail {
+  font-size: 11px;
+  color: #8a98ad;
+  margin-top: 3px;
+}
+.tm-metric-risk .tm-metric-amount {
+  color: #d9381e;
+}
+.tm-metric-reward .tm-metric-amount {
+  color: #1d9e75;
+}
+.tm-metric-margin .tm-metric-amount {
+  color: #2c6fd6;
+}
 
 .tm-start-btn {
   width: 100%;
@@ -797,7 +852,7 @@
 /* Price hints below SL/Target inputs */
 .tm-price-hint {
   font-size: 11px;
-  color: #5B6B82;
+  color: #5b6b82;
   margin-top: 4px;
   display: block;
 }
@@ -808,20 +863,23 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  background: #F1F4F8;
-  border: 1px solid #E3E9F1;
+  background: #f1f4f8;
+  border: 1px solid #e3e9f1;
   border-radius: 8px;
   padding: 9px 14px;
   margin-bottom: 18px;
   flex-wrap: wrap;
 }
-.tm-broker-import-label { font-size: 12.5px; color: #5B6B82; }
+.tm-broker-import-label {
+  font-size: 12.5px;
+  color: #5b6b82;
+}
 .tm-broker-mini-import-btn,
 .tm-broker-import-mini-btn {
   display: flex;
   align-items: center;
   gap: 5px;
-  background: #14233D;
+  background: #14233d;
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -839,7 +897,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-@media (max-width: 560px) { .tm-import-grid { grid-template-columns: 1fr; } }
+@media (max-width: 560px) {
+  .tm-import-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* Active header row — direction badge + current price side by side */
 .tm-active-header-row {
@@ -850,38 +912,46 @@
   flex-wrap: wrap;
 }
 
-.tm-inline-price-wrap { display: flex; flex-direction: column; flex: 0 0 auto; }
-.tm-inline-price-input { width: 140px; }
+.tm-inline-price-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+}
+.tm-inline-price-input {
+  width: 140px;
+}
 
 /* R:R pill selected state */
 .tm-rr-suggest-btn-selected {
-  background: #14233D !important;
-  border-color: #14233D !important;
+  background: #14233d !important;
+  border-color: #14233d !important;
   color: #ffffff !important;
 }
 .tm-rr-suggest-btn-selected .tm-rr-suggest-ratio,
-.tm-rr-suggest-btn-selected .tm-rr-suggest-price { color: #ffffff !important; }
+.tm-rr-suggest-btn-selected .tm-rr-suggest-price {
+  color: #ffffff !important;
+}
 
 /* End trade button — styled secondary action, not a plain link */
 .tm-end-btn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: #F1F4F8;
-  border: 1.5px solid #DCE3EC;
+  background: #f1f4f8;
+  border: 1.5px solid #dce3ec;
   border-radius: 8px;
   padding: 9px 18px;
   font-size: 13px;
   font-weight: 600;
-  color: #5B6B82;
+  color: #5b6b82;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s ease;
 }
 .tm-end-btn:hover {
-  background: #FBE7E2;
-  border-color: #C53D22;
-  color: #C53D22;
+  background: #fbe7e2;
+  border-color: #c53d22;
+  color: #c53d22;
 }
 
 /* ---------- Live tracking cards (right column, active trade) ----------

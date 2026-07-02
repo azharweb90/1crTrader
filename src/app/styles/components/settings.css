@@ -14,7 +14,7 @@
   align-items: center;
   gap: 18px;
   padding-bottom: 24px;
-  border-bottom: 1px solid #E3E9F1;
+  border-bottom: 1px solid #e3e9f1;
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
@@ -23,7 +23,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #473913 0%, #A47A16 100%);
+  background: linear-gradient(135deg, #473913 0%, #a47a16 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,12 +41,12 @@
 .account-profile-name {
   font-size: 19px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
 }
 
 .account-profile-email {
   font-size: 13.5px;
-  color: #5B6B82;
+  color: #5b6b82;
   margin-top: 2px;
 }
 
@@ -55,7 +55,7 @@
   gap: 12px;
   flex-wrap: wrap;
   font-size: 12px;
-  color: #8A98AD;
+  color: #8a98ad;
   margin-top: 6px;
 }
 
@@ -73,7 +73,7 @@
 .account-section-title {
   font-size: 13px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   margin-bottom: 10px;
 }
 
@@ -91,7 +91,7 @@
   display: inline-flex;
   align-items: center;
   background: #eaf2fa;
-  color: #14233D;
+  color: #14233d;
   border: 1px solid #cfe1f2;
   border-radius: 999px;
   padding: 6px 14px;
@@ -100,11 +100,11 @@
 }
 
 .account-pnl-positive {
-  color: #0E9F6E;
+  color: #0e9f6e;
 }
 
 .account-pnl-negative {
-  color: #C53D22;
+  color: #c53d22;
 }
 
 .settings-summary-grid {
@@ -114,8 +114,8 @@
 }
 
 .settings-stat {
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 10px;
   padding: 14px 16px;
 }
@@ -129,33 +129,33 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #5B6B82;
+  color: #5b6b82;
   margin-bottom: 6px;
 }
 
 .settings-stat-value {
   font-size: 17px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
 }
 
 .settings-stat-value-small {
   font-size: 13.5px;
   font-weight: 500;
-  color: #14233D;
+  color: #14233d;
   line-height: 1.5;
 }
 
 .settings-section {
   margin-top: 28px;
   padding-top: 20px;
-  border-top: 1px solid #E3E9F1;
+  border-top: 1px solid #e3e9f1;
 }
 
 .settings-section-title {
   font-size: 13px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
   margin-bottom: 8px;
 }
 
@@ -172,19 +172,19 @@
   align-items: center;
   gap: 10px;
   background: #fff;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 10px;
   padding: 12px 14px;
   font-size: 13.5px;
   font-weight: 600;
-  color: #14233D;
+  color: #14233d;
   cursor: pointer;
   font-family: inherit;
   transition: border-color 0.15s ease;
 }
 
 .broker-option-btn:hover:not(:disabled) {
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
 }
 
 .broker-option-btn:disabled {
@@ -205,13 +205,27 @@
   flex-shrink: 0;
 }
 
-.broker-chip-orange { background: #e2752a; }
-.broker-chip-red { background: #C53D22; }
-.broker-chip-purple { background: #6c4ec9; }
-.broker-chip-teal { background: #0d9488; }
-.broker-chip-blue { background: #2C6FD6; }
-.broker-chip-maroon { background: #9d2f4a; }
-.broker-chip-navy { background: #14233D; }
+.broker-chip-orange {
+  background: #e2752a;
+}
+.broker-chip-red {
+  background: #c53d22;
+}
+.broker-chip-purple {
+  background: #6c4ec9;
+}
+.broker-chip-teal {
+  background: #0d9488;
+}
+.broker-chip-blue {
+  background: #2c6fd6;
+}
+.broker-chip-maroon {
+  background: #9d2f4a;
+}
+.broker-chip-navy {
+  background: #14233d;
+}
 
 /* "More brokers" search + list — keeps the broker picker from becoming a
    wall of buttons as the list grows beyond the 3-4 most popular ones. */
@@ -219,7 +233,7 @@
   display: block;
   background: none;
   border: none;
-  color: #2C6FD6;
+  color: #2c6fd6;
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
@@ -238,8 +252,8 @@
 
 .broker-more-wrap {
   margin-top: 12px;
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 10px;
   padding: 12px;
 }
@@ -255,7 +269,7 @@
 .broker-more-row {
   width: 100%;
   background: #ffffff;
-  border: 1px solid #E3E9F1;
+  border: 1px solid #e3e9f1;
   border-radius: 8px;
   padding: 9px 12px;
   display: flex;
@@ -265,13 +279,13 @@
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  color: #14233D;
+  color: #14233d;
   text-align: left;
   margin-bottom: 4px;
 }
 
 .broker-more-row:hover {
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
 }
 
 .broker-more-row:disabled {
@@ -284,8 +298,8 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 10px;
   padding: 12px 16px;
   margin-top: 12px;
@@ -294,18 +308,18 @@
 .broker-connected-text {
   font-size: 13.5px;
   font-weight: 600;
-  color: #14233D;
+  color: #14233d;
 }
 
 .broker-last-sync {
   font-size: 12px;
-  color: #8A98AD;
+  color: #8a98ad;
   margin-left: auto;
 }
 
 .broker-disconnect-btn {
-  background: #FBE7E2;
-  color: #C53D22;
+  background: #fbe7e2;
+  color: #c53d22;
   border: 1px solid #f5c9c2;
   padding: 7px 14px;
   border-radius: 7px;

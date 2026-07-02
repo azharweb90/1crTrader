@@ -8,24 +8,31 @@
    =========================================================== */
 
 (function () {
-
   // fmt() now shared — see /src/app/shared/utils/formatters.js
 
   function formatDateShort(isoDateString) {
     const d = new Date(isoDateString);
-    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   }
 
   function getState() {
-    return (typeof window.getProfileState === 'function') ? window.getProfileState() : {};
+    return typeof window.getProfileState === "function"
+      ? window.getProfileState()
+      : {};
   }
 
   function getHistory() {
-    return (typeof window.getTradeHistory === 'function') ? window.getTradeHistory() : [];
+    return typeof window.getTradeHistory === "function"
+      ? window.getTradeHistory()
+      : [];
   }
 
   function renderStatCards() {
-    const grid = document.getElementById('dash-stat-grid');
+    const grid = document.getElementById("dash-stat-grid");
     if (!grid) return;
 
     const state = getState();
@@ -33,21 +40,26 @@
 
     const balance = state.currentBalance;
     const totalTrades = history.length;
-    const wins = history.filter(t => t.netResult > 0).length;
+    const wins = history.filter((t) => t.netResult > 0).length;
     const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : null;
     const netPnl = history.reduce((sum, t) => sum + t.netResult, 0);
 
-    const netPnlClass = netPnl > 0 ? 'dash-stat-positive' : (netPnl < 0 ? 'dash-stat-negative' : '');
-    const netPnlSign = netPnl > 0 ? '+' : (netPnl < 0 ? '-' : '');
+    const netPnlClass =
+      netPnl > 0
+        ? "dash-stat-positive"
+        : netPnl < 0
+          ? "dash-stat-negative"
+          : "";
+    const netPnlSign = netPnl > 0 ? "+" : netPnl < 0 ? "-" : "";
 
     grid.innerHTML = `
       <div class="dash-stat-card">
         <div class="dash-stat-label">Current Balance</div>
-        <div class="dash-stat-value">${balance !== null && balance !== undefined ? '₹' + fmt(balance) : '&mdash;'}</div>
+        <div class="dash-stat-value">${balance !== null && balance !== undefined ? "₹" + fmt(balance) : "&mdash;"}</div>
       </div>
       <div class="dash-stat-card">
         <div class="dash-stat-label">Win Rate</div>
-        <div class="dash-stat-value">${winRate !== null ? winRate.toFixed(0) + '%' : '&mdash;'}</div>
+        <div class="dash-stat-value">${winRate !== null ? winRate.toFixed(0) + "%" : "&mdash;"}</div>
       </div>
       <div class="dash-stat-card">
         <div class="dash-stat-label">Total Trades</div>
@@ -55,7 +67,7 @@
       </div>
       <div class="dash-stat-card">
         <div class="dash-stat-label">Net P&amp;L</div>
-        <div class="dash-stat-value ${netPnlClass}">${totalTrades > 0 ? netPnlSign + '₹' + fmt(Math.abs(netPnl)) : '&mdash;'}</div>
+        <div class="dash-stat-value ${netPnlClass}">${totalTrades > 0 ? netPnlSign + "₹" + fmt(Math.abs(netPnl)) : "&mdash;"}</div>
       </div>
     `;
   }
@@ -67,17 +79,20 @@
   // normally happen since the Dashboard is only reachable after setup, but
   // safe regardless).
   function renderRiskRules() {
-    const wrap = document.getElementById('dash-risk-wrap');
-    const grid = document.getElementById('dash-risk-grid');
-    const lotNote = document.getElementById('dash-risk-lot-note');
+    const wrap = document.getElementById("dash-risk-wrap");
+    const grid = document.getElementById("dash-risk-grid");
+    const lotNote = document.getElementById("dash-risk-lot-note");
     if (!wrap || !grid) return;
 
-    const summary = (typeof window.getRiskSummary === 'function') ? window.getRiskSummary() : null;
+    const summary =
+      typeof window.getRiskSummary === "function"
+        ? window.getRiskSummary()
+        : null;
     if (!summary || summary.maxLossRupees === null) {
-      wrap.classList.add('hidden');
+      wrap.classList.add("hidden");
       return;
     }
-    wrap.classList.remove('hidden');
+    wrap.classList.remove("hidden");
 
     grid.innerHTML = `
       <div class="dash-risk-card">
@@ -100,30 +115,36 @@
     `;
 
     if (lotNote) {
-      const progressRow = document.getElementById('dash-lot-progress-row');
-      const progressFill = document.getElementById('dash-lot-progress-fill');
+      const progressRow = document.getElementById("dash-lot-progress-row");
+      const progressFill = document.getElementById("dash-lot-progress-fill");
       if (summary.nextLotUnlock) {
         lotNote.innerHTML = `Reach ₹<strong>${fmt(summary.nextLotUnlock.requiredBalance)}</strong> to unlock ${summary.nextLotUnlock.nextLotCount} lots &mdash; ₹${fmt(summary.nextLotUnlock.remaining)} to go`;
         if (progressRow && progressFill) {
-          const profile = (typeof window.getProfileState === 'function') ? window.getProfileState() : null;
+          const profile =
+            typeof window.getProfileState === "function"
+              ? window.getProfileState()
+              : null;
           const currentBalance = profile ? profile.currentBalance : null;
           const requiredBalance = summary.nextLotUnlock.requiredBalance;
           let pct = 0;
           if (currentBalance !== null && requiredBalance > 0) {
-            pct = Math.max(0, Math.min(100, (currentBalance / requiredBalance) * 100));
+            pct = Math.max(
+              0,
+              Math.min(100, (currentBalance / requiredBalance) * 100),
+            );
           }
           progressFill.style.width = `${pct}%`;
-          progressRow.classList.remove('hidden');
+          progressRow.classList.remove("hidden");
         }
       } else {
         lotNote.innerText = `${summary.maxLots} lots is the highest currently configured for your account size.`;
-        if (progressRow) progressRow.classList.add('hidden');
+        if (progressRow) progressRow.classList.add("hidden");
       }
     }
   }
 
   function renderRecentActivity() {
-    const container = document.getElementById('dash-recent-area');
+    const container = document.getElementById("dash-recent-area");
     if (!container) return;
 
     const history = getHistory();
@@ -161,17 +182,21 @@
       <div class="calc-history-cell calc-history-head num">Net Result</div>
       <div class="calc-history-cell calc-history-head num">Balance After</div>
     `;
-    rows.forEach(entry => {
+    rows.forEach((entry) => {
       const isWin = entry.netResult > 0;
-      const sign = isWin ? '+' : (entry.netResult < 0 ? '-' : '');
-      const resultClass = isWin ? 'calc-history-win' : (entry.netResult < 0 ? 'calc-history-loss' : '');
+      const sign = isWin ? "+" : entry.netResult < 0 ? "-" : "";
+      const resultClass = isWin
+        ? "calc-history-win"
+        : entry.netResult < 0
+          ? "calc-history-loss"
+          : "";
       html += `
         <div class="calc-history-cell">${formatDateShort(entry.date)}</div>
         <div class="calc-history-cell num ${resultClass}">${sign}₹${fmt(Math.abs(entry.netResult))}</div>
         <div class="calc-history-cell num">₹${fmt(entry.balanceAfter)}</div>
       `;
     });
-    html += '</div>';
+    html += "</div>";
 
     container.innerHTML = html;
   }
@@ -185,6 +210,5 @@
   window.renderDashboardHome = render;
 
   render();
-
 })();
 /* === END COMPONENT: dashboard-home (logic) === */

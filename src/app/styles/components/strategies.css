@@ -11,7 +11,7 @@
   align-items: flex-start;
   gap: 6px;
   background: #ffffff;
-  border: 1px solid #E8EDF4;
+  border: 1px solid #e8edf4;
   border-radius: 12px;
   padding: 18px;
   text-align: left;
@@ -21,7 +21,7 @@
 }
 
 .strategy-card:hover {
-  border-color: #2C6FD6;
+  border-color: #2c6fd6;
   box-shadow: 0 6px 16px rgba(46, 117, 182, 0.1);
   transform: translateY(-2px);
 }
@@ -29,12 +29,12 @@
 .strategy-card-name {
   font-size: 15px;
   font-weight: 700;
-  color: #14233D;
+  color: #14233d;
 }
 
 .strategy-card-author {
   font-size: 12px;
-  color: #5B6B82;
+  color: #5b6b82;
   margin-bottom: 4px;
 }
 
@@ -47,16 +47,16 @@
 
 .strategy-card-stat {
   font-size: 12px;
-  color: #5B6B82;
+  color: #5b6b82;
 }
 
 .strategy-card-stat strong {
-  color: #2C6FD6;
+  color: #2c6fd6;
 }
 
 .strategy-card-desc {
   font-size: 12.5px;
-  color: #5B6B82;
+  color: #5b6b82;
   line-height: 1.45;
 }
 
