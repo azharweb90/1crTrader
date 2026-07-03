@@ -1,18 +1,22 @@
 /* ===========================================================
-   COMPONENT: trading-journal (logic)
+   COMPONENT: trading-journal (logic) — rebuilt July 2026
    Loaded lazily by app-shell.js the first time this tab opens.
 
-   Lists every submitted trade (from window.getTradeHistory) and lets the
-   user attach a structured journal entry to each one: Trade Details,
-   Execution & Management, Logic, Psychology & Reflection, plus a weighted
-   checklist that computes a letter grade for that trade's discipline.
-   Entries persist via window.saveJournalEntry / getJournalEntry, both
-   exposed by app-shell.js.
+   Rebuilt per the revamped UX design: an adherence hero (This Week / This
+   Month, trades-journaled progress, avg review score, avg letter grade),
+   a "Needs journaling" queue and a "Journaled entries" tab grouped by
+   week/month, a five-section entry form with a live report-card grade
+   meter, and a read-only view mode with a per-category breakdown.
+
+   Still backed by the real app state — window.getTradeHistory(),
+   window.saveJournalEntry() / getJournalEntry() / getAllJournalEntries() /
+   deleteJournalEntry() — this is a reskin + restructure of the screen,
+   not a switch to sample data.
    =========================================================== */
 
 (function () {
 
-  // ---------- Weighted review checklist (mirrors the reference "trade review" card) ----------
+  // ---------- Weighted review checklist (points match the design exactly) ----------
   const CHECKLIST = {
     "Setup": [
       { key: "clear_strategy", label: "Clearly defined strategy", weight: 3 },
@@ -22,7 +26,7 @@
       { key: "target_defined", label: "Target defined", weight: 2 },
       { key: "price_action_monitored", label: "Price action monitored beforehand", weight: 2 },
       { key: "level2_considered", label: "Order book / level 2 considered and supports the trade", weight: 1 },
-      { key: "sector_context", label: "Broader market/sector price action taken into consideration", weight: 1 },
+      { key: "sector_context", label: "Broader market / sector price action considered", weight: 1 },
     ],
     "Entry": [
       { key: "timing", label: "Timing", weight: 3 },
@@ -32,410 +36,437 @@
     "Management": [
       { key: "monitored_trade", label: "Monitored the trade (no switching away)", weight: 3 },
       { key: "exit_discipline", label: "Exited when setup stopped working (didn't just wait for SL)", weight: 3 },
-      { key: "target_exit", label: "Took partials/full exit at target appropriately", weight: 2 },
+      { key: "target_exit", label: "Took partials / full exit at target appropriately", weight: 2 },
       { key: "no_errors", label: "No execution errors (wrong qty, wrong order type, etc.)", weight: 3 },
     ],
     "Journaling": [
-      { key: "chart_captured", label: "Captured relevant chart/setup information", weight: 2 },
+      { key: "chart_captured", label: "Captured relevant chart / setup information", weight: 2 },
       { key: "setup_explainable", label: "Setup can be fully explained to someone else", weight: 1 },
       { key: "thought_process_written", label: "Wrote up the thought process", weight: 1 },
     ],
   };
 
-  const GRADE_BANDS = [
-    { min: 37, grade: "A+" }, { min: 34, grade: "A" }, { min: 32, grade: "A-" },
-    { min: 29, grade: "B+" }, { min: 27, grade: "B" }, { min: 25, grade: "B-" },
-    { min: 22, grade: "C+" }, { min: 19, grade: "C" }, { min: 16, grade: "C-" },
-    { min: 14, grade: "D+" }, { min: 11, grade: "D" }, { min: 9,  grade: "D-" },
-    { min: 7,  grade: "E+" }, { min: 6,  grade: "E-" },
-    { min: 4,  grade: "F+" }, { min: 2,  grade: "F"  }, { min: 0,  grade: "F-" },
-  ];
+  const TOTAL_OBTAINABLE = Object.values(CHECKLIST).flat().reduce((sum, item) => sum + item.weight, 0);
 
-  const TOTAL_OBTAINABLE = Object.values(CHECKLIST)
-    .flat()
-    .reduce((sum, item) => sum + item.weight, 0);
+  // Percentage-of-max grade bands (A/B/C/D/F, no E tier) — matches the design.
+  const GRADE_COLORS = {
+    A: { fg: "#15803D", bg: "#E7F6EC", bd: "#BFE6CB" },
+    B: { fg: "#2563EB", bg: "#EAF1FE", bd: "#CFE0FB" },
+    C: { fg: "#6D28D9", bg: "#F1EBFE", bd: "#DDD0FA" },
+    D: { fg: "#C2620E", bg: "#FDF0E3", bd: "#F4D9BE" },
+    F: { fg: "#C53D22", bg: "#FCEEE9", bd: "#F3D3C8" },
+  };
 
-  let activeTradeId = null; // which trade's journal entry is currently open in the form
-  let screenshotDataUrl = null; // base64 data URL of the currently attached setup screenshot, or null
+  function gradeFor(pts) {
+    const pct = TOTAL_OBTAINABLE ? (pts / TOTAL_OBTAINABLE) * 100 : 0;
+    let letter, base;
+    if (pct >= 97) { letter = "A+"; base = "A"; }
+    else if (pct >= 93) { letter = "A"; base = "A"; }
+    else if (pct >= 90) { letter = "A-"; base = "A"; }
+    else if (pct >= 87) { letter = "B+"; base = "B"; }
+    else if (pct >= 83) { letter = "B"; base = "B"; }
+    else if (pct >= 80) { letter = "B-"; base = "B"; }
+    else if (pct >= 77) { letter = "C+"; base = "C"; }
+    else if (pct >= 73) { letter = "C"; base = "C"; }
+    else if (pct >= 70) { letter = "C-"; base = "C"; }
+    else if (pct >= 67) { letter = "D+"; base = "D"; }
+    else if (pct >= 63) { letter = "D"; base = "D"; }
+    else if (pct >= 60) { letter = "D-"; base = "D"; }
+    else if (pct >= 50) { letter = "F+"; base = "F"; }
+    else { letter = "F-"; base = "F"; }
+    return { letter, base, ...GRADE_COLORS[base] };
+  }
 
-  // fmt() now shared — see /src/app/shared/utils/formatters.js
+  function ptsFor(checklist) {
+    if (!checklist) return 0;
+    let p = 0;
+    Object.values(CHECKLIST).flat().forEach(item => { if (checklist[item.key]) p += item.weight; });
+    return p;
+  }
 
+  // fmt() shared — see /src/app/shared/utils/formatters.js
   function formatDate(isoDateString) {
     const d = new Date(isoDateString);
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  function fmtShort(isoDateString) {
+    const d = new Date(isoDateString);
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  }
+  function signedInr(n) {
+    return (n >= 0 ? '+' : '-') + '₹' + fmt(Math.abs(Math.round(n)));
   }
 
   function getHistory() {
     return (typeof window.getTradeHistory === 'function') ? window.getTradeHistory() : [];
   }
-
-  function gradeForScore(score) {
-    for (const band of GRADE_BANDS) {
-      if (score >= band.min) return band.grade;
-    }
-    return "F-";
+  function getEntries() {
+    return (typeof window.getAllJournalEntries === 'function') ? window.getAllJournalEntries() : {};
   }
 
-  // ---------- Rule adherence analysis (week/month) ----------
-  // Reuses the ruleStatus already stamped onto every trade record (see
-  // app-shell.js recordCompletedDay / calculator.js evaluateBrokerTradeCompliance)
-  // — no new tracking needed, just aggregating what's already there for a
-  // chosen period. Only two ruleStatus labels are ever non-compliant today:
-  // "Overtrading — 3rd+ trade that day" and "Cooldown broken — traded too
-  // soon" — everything else (kill switch, soft block, profit, etc.) is a
-  // compliant OUTCOME even though it describes why the day ended.
-  let journalAnalysisRange = 'week'; // 'week' | 'month'
-
-  function ymdLocalJournal(d) {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  function weekBounds(d) {
+    const s = new Date(d); s.setHours(0, 0, 0, 0); s.setDate(d.getDate() - d.getDay());
+    const e = new Date(s); e.setDate(s.getDate() + 6);
+    return { s, e };
+  }
+  function parseYmd(iso) {
+    const p = iso.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]);
   }
 
-  function startOfWeekLocal(d) {
-    const date = new Date(d);
-    const day = date.getDay(); // 0 = Sunday
-    date.setDate(date.getDate() - day);
-    date.setHours(0, 0, 0, 0);
-    return date;
+  // ---------- Screen state ----------
+  let jMode = 'list';       // 'list' | 'entry' | 'view'
+  let jTab = 'todo';        // 'todo' | 'saved'
+  let jRange = 'week';      // adherence hero range
+  let jGroup = 'week';      // saved-list grouping
+  let activeTradeId = null; // trade being journaled (entry mode)
+  let viewTradeId = null;   // trade being viewed (view mode)
+  let screenshotDataUrl = null;
+  let activeInstrumentFilter = '';
+  let activeGradeFilter = '';
+  let activeDateFrom = '';
+  let activeDateTo = '';
+  let jfDirection = '';
+
+  function setMode(mode) {
+    jMode = mode;
+    document.getElementById('journal-mode-list').classList.toggle('hidden', mode !== 'list');
+    document.getElementById('journal-mode-entry').classList.toggle('hidden', mode !== 'entry');
+    document.getElementById('journal-mode-view').classList.toggle('hidden', mode !== 'view');
   }
 
-  function resolveJournalAnalysisRange(range) {
-    const today = new Date();
-    let from;
-    if (range === 'week') {
-      from = startOfWeekLocal(today);
-    } else {
-      from = new Date(today.getFullYear(), today.getMonth(), 1);
-    }
-    return { from, to: today };
-  }
-
-  function setJournalAnalysisRange(range) {
-    journalAnalysisRange = range;
-    renderJournalAnalysis();
-  }
-
-  function renderJournalAnalysis() {
-    const bodyEl = document.getElementById('journal-analysis-body');
-    const labelEl = document.getElementById('journal-analysis-range-label');
-    if (!bodyEl || !labelEl) return;
-
-    document.getElementById('journal-analysis-week-btn').classList.toggle('broker-range-pill-active', journalAnalysisRange === 'week');
-    document.getElementById('journal-analysis-month-btn').classList.toggle('broker-range-pill-active', journalAnalysisRange === 'month');
-
-    const { from, to } = resolveJournalAnalysisRange(journalAnalysisRange);
-    const fromStr = ymdLocalJournal(from);
-    const toStr = ymdLocalJournal(to);
-    const fmtLabel = (d) => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-    labelEl.innerText = `${fmtLabel(from)} - ${fmtLabel(to)}`;
-
-    const history = getHistory().filter(t => t.date >= fromStr && t.date <= toStr);
-    const entries = (typeof window.getAllJournalEntries === 'function') ? window.getAllJournalEntries() : {};
-
-    if (history.length === 0) {
-      bodyEl.innerHTML = `<div class="roadmap-empty-state">No trades logged ${journalAnalysisRange === 'week' ? 'this week' : 'this month'} yet.</div>`;
-      return;
-    }
-
-    const compliant = history.filter(t => !t.ruleStatus || t.ruleStatus.compliant);
-    const violations = history.filter(t => t.ruleStatus && !t.ruleStatus.compliant);
-    const adherencePct = Math.round((compliant.length / history.length) * 100);
-
-    const journaledTrades = history.filter(t => entries[t.id]);
-    const journaledPct = Math.round((journaledTrades.length / history.length) * 100);
-    const gradedTrades = journaledTrades.filter(t => typeof entries[t.id].score === 'number');
-    let avgScorePct = null;
-    if (gradedTrades.length > 0) {
-      const totalPct = gradedTrades.reduce((sum, t) => sum + (entries[t.id].score / TOTAL_OBTAINABLE) * 100, 0);
-      avgScorePct = Math.round(totalPct / gradedTrades.length);
-    }
-
-    // Group violations by their specific rule label, so the trader sees
-    // WHICH habit is slipping, not just a single number.
-    const violationCounts = {};
-    violations.forEach(t => {
-      const label = t.ruleStatus.label;
-      violationCounts[label] = (violationCounts[label] || 0) + 1;
-    });
-    const violationBreakdownHtml = Object.keys(violationCounts).length > 0
-      ? Object.entries(violationCounts).map(([label, count]) => `
-          <div class="journal-violation-row">
-            <span class="rule-status-badge rule-status-violation">\u26a0 ${label}</span>
-            <span class="journal-violation-count">${count} time${count === 1 ? '' : 's'}</span>
-          </div>
-        `).join('')
-      : '<div class="journal-violation-row journal-violation-none">No rule violations this period \u2014 every trade followed the daily-loss, soft-block, and cooldown rules.</div>';
-
-    bodyEl.innerHTML = `
-      <div class="journal-analysis-stats">
-        <div class="journal-analysis-stat-card">
-          <div class="journal-analysis-stat-value ${adherencePct === 100 ? 'calc-history-win' : (violations.length > 0 ? 'calc-history-loss' : '')}">${compliant.length} / ${history.length}</div>
-          <div class="journal-analysis-stat-label">Trades within rules (${adherencePct}%)</div>
-        </div>
-        <div class="journal-analysis-stat-card">
-          <div class="journal-analysis-stat-value">${journaledTrades.length} / ${history.length}</div>
-          <div class="journal-analysis-stat-label">Trades journaled (${journaledPct}%)</div>
-        </div>
-        <div class="journal-analysis-stat-card">
-          <div class="journal-analysis-stat-value">${avgScorePct !== null ? avgScorePct + '%' : '\u2014'}</div>
-          <div class="journal-analysis-stat-label">Avg. review score</div>
-        </div>
-      </div>
-      <div class="journal-violation-breakdown">
-        <div class="journal-violation-breakdown-title">Rule violations this period</div>
-        ${violationBreakdownHtml}
-      </div>
-    `;
-  }
-
-  let activeInstrumentFilter = ''; // '' = all instruments
-  let activeGradeFilter = '';      // '' = all, 'journaled' = any graded entry, 'not-journaled' = no entry
-  let activeDateFrom = '';         // '' = no lower bound, else 'YYYY-MM-DD'
-  let activeDateTo = '';           // '' = no upper bound, else 'YYYY-MM-DD'
-
-  // ---------- Summary stats bar ----------
-  function renderStatsBar(history) {
-    const bar = document.getElementById('journal-stats-bar');
-    if (!bar) return;
-
-    if (!history || history.length === 0) {
-      bar.innerHTML = '';
-      return;
-    }
-
-    const entries = (typeof window.getAllJournalEntries === 'function') ? window.getAllJournalEntries() : {};
-    const journaledTrades = history.filter(t => entries[t.id]);
-    const journaledPct = Math.round((journaledTrades.length / history.length) * 100);
-
-    let avgScorePct = null;
-    const gradedTrades = journaledTrades.filter(t => typeof entries[t.id].score === 'number');
-    if (gradedTrades.length > 0) {
-      const totalPct = gradedTrades.reduce((sum, t) => {
-        return sum + (entries[t.id].score / TOTAL_OBTAINABLE) * 100;
-      }, 0);
-      avgScorePct = Math.round(totalPct / gradedTrades.length);
-    }
-    const avgGrade = (avgScorePct !== null) ? gradeForScore(Math.round((avgScorePct / 100) * TOTAL_OBTAINABLE)) : '&mdash;';
-
-    bar.innerHTML = `
-      <div class="journal-stat-card">
-        <div class="journal-stat-value">${journaledTrades.length} / ${history.length}</div>
-        <div class="journal-stat-label">Trades Journaled (${journaledPct}%)</div>
-      </div>
-      <div class="journal-stat-card">
-        <div class="journal-stat-value">${avgScorePct !== null ? avgScorePct + '%' : '&mdash;'}</div>
-        <div class="journal-stat-label">Avg. Review Score</div>
-      </div>
-      <div class="journal-stat-card">
-        <div class="journal-stat-value">${avgGrade}</div>
-        <div class="journal-stat-label">Avg. Grade</div>
-      </div>
-    `;
-  }
-
-  // ---------- List of journalable trades ----------
-  function populateInstrumentFilter(history) {
-    const select = document.getElementById('journal-instrument-filter');
-    if (!select) return;
-
-    const instruments = Array.from(new Set(history.map(t => t.instrument).filter(Boolean))).sort();
-    const currentValue = select.value;
-
-    select.innerHTML = '<option value="">All instruments</option>' +
-      instruments.map(name => `<option value="${name}">${name}</option>`).join('');
-
-    // Preserve the user's filter choice across re-renders if it's still valid.
-    if (instruments.includes(currentValue)) {
-      select.value = currentValue;
-    } else {
-      select.value = '';
-      activeInstrumentFilter = '';
-    }
-  }
-
-  function onJournalInstrumentFilterChange() {
-    const select = document.getElementById('journal-instrument-filter');
-    activeInstrumentFilter = select ? select.value : '';
+  function jBackToList() {
+    setMode('list');
     renderList();
   }
 
-  function onJournalGradeFilterChange() {
-    const select = document.getElementById('journal-grade-filter');
-    activeGradeFilter = select ? select.value : '';
-    renderList();
+  function setJournalRange(range) {
+    jRange = range;
+    renderHero();
   }
 
-  function onJournalDateFilterChange() {
-    const fromEl = document.getElementById('journal-date-from');
-    const toEl = document.getElementById('journal-date-to');
-    activeDateFrom = fromEl ? fromEl.value : '';
-    activeDateTo = toEl ? toEl.value : '';
-    renderList();
+  function setJournalTab(tab) {
+    jTab = tab;
+    document.getElementById('journal-tab-todo-btn').classList.toggle('active', tab === 'todo');
+    document.getElementById('journal-tab-saved-btn').classList.toggle('active', tab === 'saved');
+    document.getElementById('journal-tab-todo').classList.toggle('hidden', tab !== 'todo');
+    document.getElementById('journal-tab-saved').classList.toggle('hidden', tab !== 'saved');
+    if (tab === 'todo') renderTodo(); else renderSaved();
   }
 
-  function clearJournalFilters() {
-    activeInstrumentFilter = '';
-    activeGradeFilter = '';
-    activeDateFrom = '';
-    activeDateTo = '';
-
-    const instrEl = document.getElementById('journal-instrument-filter');
-    const gradeEl = document.getElementById('journal-grade-filter');
-    const fromEl = document.getElementById('journal-date-from');
-    const toEl = document.getElementById('journal-date-to');
-    if (instrEl) instrEl.value = '';
-    if (gradeEl) gradeEl.value = '';
-    if (fromEl) fromEl.value = '';
-    if (toEl) toEl.value = '';
-
-    renderList();
+  function setJournalGroup(group) {
+    jGroup = group;
+    renderSaved();
   }
 
-  function renderList() {
-    const container = document.getElementById('journal-list-area');
-    if (!container) return;
+  // ---------- Adherence hero ----------
+  function renderHero() {
+    document.getElementById('journal-range-week-btn').classList.toggle('broker-range-pill-active', jRange === 'week');
+    document.getElementById('journal-range-month-btn').classList.toggle('broker-range-pill-active', jRange === 'month');
+
+    const now = new Date();
+    const wb = weekBounds(now);
+    const inRange = (d) => jRange === 'week'
+      ? (d >= wb.s && d <= new Date(wb.e.getFullYear(), wb.e.getMonth(), wb.e.getDate(), 23, 59, 59))
+      : (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear());
+
+    const chipEl = document.getElementById('journal-range-chip');
+    if (chipEl) {
+      chipEl.innerText = jRange === 'week'
+        ? `${formatDate(wb.s.toISOString().slice(0, 10))}  –  ${formatDate(now.toISOString().slice(0, 10))}`
+        : now.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+    }
 
     const history = getHistory();
-    populateInstrumentFilter(history);
-    renderStatsBar(history);
+    const entries = getEntries();
+    const rangeTrades = history.filter(t => inRange(parseYmd(t.date)));
+    const journaledInRange = rangeTrades.filter(t => entries[t.id]);
+    const total = rangeTrades.length;
+    const done = journaledInRange.length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
 
-    if (!history || history.length === 0) {
-      container.innerHTML = '<div class="roadmap-empty-state">No trades submitted yet. Log a trade on the Daily Limits Tool, then come back here to journal it.</div>';
-      return;
+    const doneEl = document.getElementById('journal-hero-done');
+    const pctEl = document.getElementById('journal-hero-pct');
+    const barEl = document.getElementById('journal-hero-bar');
+    if (doneEl) doneEl.innerText = `${done} / ${total}`;
+    if (pctEl) pctEl.innerText = total ? `(${pct}%)` : '—';
+    if (barEl) barEl.style.width = (total ? pct : 0) + '%';
+
+    const scored = journaledInRange.filter(t => typeof entries[t.id].score === 'number');
+    const avgPts = scored.length ? scored.reduce((a, t) => a + entries[t.id].score, 0) / scored.length : null;
+    const avgScoreEl = document.getElementById('journal-hero-avg-score');
+    if (avgScoreEl) avgScoreEl.innerText = avgPts != null ? `${Math.round(avgPts * 10) / 10} / ${TOTAL_OBTAINABLE}` : '—';
+
+    const avgGradeEl = document.getElementById('journal-hero-avg-grade');
+    if (avgGradeEl) {
+      if (avgPts != null) {
+        const g = gradeFor(avgPts);
+        avgGradeEl.innerHTML = `<span class="journal-grade-pill" style="color:${g.fg}; background:${g.bg}; border:1px solid ${g.bd};">${g.letter}</span>`;
+      } else {
+        avgGradeEl.innerHTML = `<span class="journal-grade-pill-empty">—</span>`;
+      }
     }
+  }
 
-    // Sort by date (newest first), preserving submission order within a
-    // date — same fix as the Daily Limits Tool's Trade Log, since insertion
-    // order can diverge from date order once broker days are imported out
-    // of chronological sequence.
-    let rows = history.slice().sort((a, b) => {
+  // ---------- Needs-journaling tab ----------
+  function renderTodo() {
+    const history = getHistory();
+    const entries = getEntries();
+    const todo = history.filter(t => !entries[t.id]).slice().sort((a, b) => {
       if (a.date !== b.date) return a.date < b.date ? 1 : -1;
       return (a.submittedAt || 0) < (b.submittedAt || 0) ? 1 : -1;
     });
 
-    if (activeInstrumentFilter) {
-      rows = rows.filter(t => t.instrument === activeInstrumentFilter);
-    }
-    if (activeGradeFilter === 'journaled') {
-      rows = rows.filter(t => !!((typeof window.getJournalEntry === 'function') && window.getJournalEntry(t.id)));
-    } else if (activeGradeFilter === 'not-journaled') {
-      rows = rows.filter(t => !((typeof window.getJournalEntry === 'function') && window.getJournalEntry(t.id)));
-    }
-    if (activeDateFrom) {
-      rows = rows.filter(t => t.date >= activeDateFrom);
-    }
-    if (activeDateTo) {
-      rows = rows.filter(t => t.date <= activeDateTo);
-    }
+    document.getElementById('journal-todo-count').innerText = todo.length;
+    document.getElementById('journal-saved-count').innerText = history.filter(t => entries[t.id]).length;
 
-    if (rows.length === 0) {
-      container.innerHTML = '<div class="roadmap-empty-state">No trades match the current filters.</div>';
+    const rowsEl = document.getElementById('journal-todo-rows');
+    if (!rowsEl) return;
+
+    if (todo.length === 0) {
+      rowsEl.innerHTML = `
+        <div class="journal-empty" style="grid-column:1/-1;">
+          <div class="journal-empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="journal-empty-text">All caught up — every trade has been journaled. New trades from the Daily Limits Tool will appear here.</div>
+        </div>
+      `;
       return;
     }
 
-    let html = '<div class="journal-list-grid journal-list-grid-5col">';
-    html += `
-      <div class="journal-list-cell journal-list-head">Date</div>
-      <div class="journal-list-cell journal-list-head">Instrument</div>
-      <div class="journal-list-cell journal-list-head num">Result</div>
-      <div class="journal-list-cell journal-list-head">Journal Status</div>
-      <div class="journal-list-cell journal-list-head"></div>
-    `;
-
-    rows.forEach(trade => {
-      const entry = (typeof window.getJournalEntry === 'function') ? window.getJournalEntry(trade.id) : null;
-      const isWin = trade.netResult > 0;
-      const sign = isWin ? '+' : (trade.netResult < 0 ? '-' : '');
-      const resultClass = isWin ? 'calc-history-win' : (trade.netResult < 0 ? 'calc-history-loss' : '');
-
-      const statusHtml = entry
-        ? `<span class="journal-status-badge journal-status-done">Journaled${entry.grade ? ' &middot; ' + entry.grade : ''}</span>${entry.screenshot ? '<span class="journal-list-thumb" title="Has a screenshot">📷</span>' : ''}`
-        : `<span class="journal-status-badge journal-status-pending">Not journaled</span>`;
-
-      html += `
-        <div class="journal-list-cell">${formatDate(trade.date)}</div>
-        <div class="journal-list-cell">${trade.instrument || '&mdash;'}</div>
-        <div class="journal-list-cell num ${resultClass}">${sign}₹${fmt(Math.abs(trade.netResult))}</div>
-        <div class="journal-list-cell">${statusHtml}</div>
-        <div class="journal-list-cell">
-          <button type="button" class="journal-list-btn" onclick="openJournalForm('${trade.id}')">${entry ? 'Edit' : 'Write Entry'}</button>
+    rowsEl.innerHTML = todo.map(t => {
+      const isWin = t.netResult > 0;
+      const color = isWin ? 'var(--color-profit)' : (t.netResult < 0 ? '#C53D22' : '#5B6B82');
+      return `
+        <div class="journal-todo-row" style="display:contents;">
+          <div class="journal-todo-cell">${formatDate(t.date)}</div>
+          <div class="journal-todo-cell">${t.instrument || '—'}</div>
+          <div class="journal-todo-cell num" style="color:${color};">${signedInr(t.netResult)}</div>
+          <div class="journal-todo-cell"><span class="journal-todo-status">Not journaled</span></div>
+          <div class="journal-todo-cell" style="justify-content:flex-end;"><button type="button" class="journal-write-btn" onclick="openJournalForm('${t.id}')">Write entry</button></div>
         </div>
       `;
-    });
-
-    html += '</div>';
-    container.innerHTML = html;
+    }).join('');
   }
 
-  // ---------- Checklist rendering ----------
+  // ---------- Journaled-entries tab (grouped by week/month) ----------
+  function populateInstrumentFilter(history) {
+    const select = document.getElementById('journal-instrument-filter');
+    if (!select) return;
+    const instruments = Array.from(new Set(history.map(t => t.instrument).filter(Boolean))).sort();
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">All instruments</option>' + instruments.map(name => `<option value="${name}">${name}</option>`).join('');
+    select.value = instruments.includes(currentValue) ? currentValue : '';
+  }
+
+  function onJournalInstrumentFilterChange() {
+    activeInstrumentFilter = document.getElementById('journal-instrument-filter').value;
+    renderSaved();
+  }
+  function onJournalGradeFilterChange() {
+    activeGradeFilter = document.getElementById('journal-grade-filter').value;
+    renderSaved();
+  }
+  function onJournalDateFilterChange() {
+    activeDateFrom = document.getElementById('journal-date-from').value;
+    activeDateTo = document.getElementById('journal-date-to').value;
+    renderSaved();
+  }
+  function clearJournalFilters() {
+    activeInstrumentFilter = ''; activeGradeFilter = ''; activeDateFrom = ''; activeDateTo = '';
+    document.getElementById('journal-instrument-filter').value = '';
+    document.getElementById('journal-grade-filter').value = '';
+    document.getElementById('journal-date-from').value = '';
+    document.getElementById('journal-date-to').value = '';
+    renderSaved();
+  }
+
+  function renderSaved() {
+    document.getElementById('journal-group-week-btn').classList.toggle('active', jGroup === 'week');
+    document.getElementById('journal-group-month-btn').classList.toggle('active', jGroup === 'month');
+
+    const history = getHistory();
+    populateInstrumentFilter(history);
+    const entries = getEntries();
+
+    let journaled = history.filter(t => entries[t.id]);
+    if (activeInstrumentFilter) journaled = journaled.filter(t => t.instrument === activeInstrumentFilter);
+    if (activeGradeFilter) journaled = journaled.filter(t => gradeFor(ptsFor(entries[t.id].checklist)).base === activeGradeFilter);
+    if (activeDateFrom) journaled = journaled.filter(t => t.date >= activeDateFrom);
+    if (activeDateTo) journaled = journaled.filter(t => t.date <= activeDateTo);
+    journaled.sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    const area = document.getElementById('journal-groups-area');
+    if (!area) return;
+
+    if (journaled.length === 0) {
+      area.innerHTML = `
+        <div class="journal-empty" style="background:#fff; border:1px solid #E3E9F1; border-radius:14px;">
+          <div class="journal-empty-icon neutral"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#AEB9C8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 0-2 2z"/><path d="M4 21a2 2 0 0 1 2-2h12"/></svg></div>
+          <div class="journal-empty-text">No entries match these filters. Try clearing them, or journal a trade from the Needs journaling tab.</div>
+        </div>
+      `;
+      return;
+    }
+
+    const now = new Date();
+    const groupsMap = [];
+    const keyFor = (d) => jGroup === 'week' ? (() => { const b = weekBounds(d); return b.s.getFullYear() + '-w-' + b.s.getMonth() + '-' + b.s.getDate(); })() : (d.getFullYear() + '-m-' + d.getMonth());
+
+    journaled.forEach(t => {
+      const d = parseYmd(t.date);
+      const k = keyFor(d);
+      let g = groupsMap.find(x => x.k === k);
+      if (!g) {
+        let title, sub;
+        if (jGroup === 'week') {
+          const b = weekBounds(d);
+          const thisB = weekBounds(now);
+          const lastB = weekBounds(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7));
+          title = b.s.getTime() === thisB.s.getTime() ? 'This week' : (b.s.getTime() === lastB.s.getTime() ? 'Last week' : 'Week of ' + fmtShort(b.s.toISOString().slice(0, 10)));
+          sub = fmtShort(b.s.toISOString().slice(0, 10)) + ' – ' + formatDate(b.e.toISOString().slice(0, 10));
+        } else {
+          const sameMonth = d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          title = sameMonth ? 'This month' : d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+          sub = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+        }
+        g = { k, title, sub, items: [], _net: 0, _pts: 0 };
+        groupsMap.push(g);
+      }
+      const entry = entries[t.id];
+      const pts = ptsFor(entry.checklist);
+      const gr = gradeFor(pts);
+      g._net += t.netResult; g._pts += pts;
+      g.items.push({ t, entry, pts, gr });
+    });
+
+    area.innerHTML = groupsMap.map(g => {
+      const avg = g.items.length ? g._pts / g.items.length : 0;
+      const avgGr = gradeFor(avg);
+      const itemsHtml = g.items.map(({ t, entry, pts, gr }) => {
+        const isWin = t.netResult > 0;
+        const resultColor = isWin ? 'var(--color-profit)' : (t.netResult < 0 ? '#C53D22' : '#5B6B82');
+        const dirLabel = entry.direction === 'short' ? 'Short' : (entry.direction === 'long' ? 'Long' : '');
+        const dirColor = entry.direction === 'short' ? '#C53D22' : 'var(--color-profit)';
+        const barW = Math.round((pts / TOTAL_OBTAINABLE) * 100) + '%';
+        return `
+          <div class="journal-entry-card" onclick="openJournalView('${t.id}')">
+            <div class="journal-entry-badge" style="color:${gr.fg}; background:${gr.bg}; border:1px solid ${gr.bd};">${gr.letter}</div>
+            <div class="journal-entry-main">
+              <div class="journal-entry-title-row">
+                <span class="journal-entry-instrument">${entry.instrument || t.instrument || '—'}</span>
+                ${dirLabel ? `<span class="journal-entry-dir" style="color:${dirColor};">${dirLabel}</span>` : ''}
+              </div>
+              <div class="journal-entry-snippet">${(entry.setupReason || 'No setup notes written.')}</div>
+            </div>
+            <div class="journal-entry-result-col">
+              <div class="journal-entry-result" style="color:${resultColor};">${signedInr(t.netResult)}</div>
+              <div class="journal-entry-date">${formatDate(t.date)}</div>
+            </div>
+            <div class="journal-entry-score-col">
+              <div class="journal-entry-score-row"><span>Score</span><b>${pts}/${TOTAL_OBTAINABLE}</b></div>
+              <div class="journal-entry-score-track"><div class="journal-entry-score-fill" style="width:${barW}; background:${gr.fg};"></div></div>
+            </div>
+            <svg class="journal-entry-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+        `;
+      }).join('');
+      return `
+        <div class="journal-group">
+          <div class="journal-group-header">
+            <div class="journal-group-title-row"><span class="journal-group-title">${g.title}</span><span class="journal-group-sub">${g.sub}</span></div>
+            <div class="journal-group-meta">
+              <span>${g.items.length} ${g.items.length === 1 ? 'entry' : 'entries'}</span>
+              <span>avg <span class="journal-group-avg-grade" style="color:${avgGr.fg}; background:${avgGr.bg}; border:1px solid ${avgGr.bd};">${avgGr.letter}</span></span>
+              <span>net <b style="color:${g._net >= 0 ? 'var(--color-profit)' : '#C53D22'};">${signedInr(g._net)}</b></span>
+            </div>
+          </div>
+          <div class="journal-group-items">${itemsHtml}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderList() {
+    renderHero();
+    setJournalTab(jTab);
+  }
+
+  // ---------- Checklist rendering (entry form) ----------
   function renderChecklist(savedChecklist) {
     const container = document.getElementById('journal-checklist-area');
     if (!container) return;
-
     const checked = savedChecklist || {};
     let html = '';
-
     Object.keys(CHECKLIST).forEach(category => {
       html += `<div class="journal-checklist-category">${category}</div>`;
       CHECKLIST[category].forEach(item => {
         const isChecked = !!checked[item.key];
         html += `
-          <label class="journal-checklist-item">
-            <input type="checkbox" data-checklist-key="${item.key}" data-weight="${item.weight}"
-                   ${isChecked ? 'checked' : ''} onchange="onChecklistToggle()">
-            <span>${item.label}</span>
+          <label class="journal-checklist-item ${isChecked ? 'checked' : ''}" data-key="${item.key}">
+            <input type="checkbox" data-checklist-key="${item.key}" data-weight="${item.weight}" ${isChecked ? 'checked' : ''} onchange="onChecklistToggle(this)">
+            <span class="journal-checklist-box">${isChecked ? '✓' : ''}</span>
+            <span class="journal-checklist-label">${item.label}</span>
             <span class="journal-checklist-weight">+${item.weight}</span>
           </label>
         `;
       });
     });
-
     container.innerHTML = html;
-    updateGradeDisplay();
+    updateLiveGrade();
   }
 
-  function onChecklistToggle() {
-    updateGradeDisplay();
+  function onChecklistToggle(checkboxEl) {
+    const label = checkboxEl.closest('.journal-checklist-item');
+    const box = label.querySelector('.journal-checklist-box');
+    const isChecked = checkboxEl.checked;
+    label.classList.toggle('checked', isChecked);
+    box.innerText = isChecked ? '✓' : '';
+    updateLiveGrade();
   }
 
-  function computeScore() {
+  function computeFormScore() {
     const inputs = document.querySelectorAll('#journal-checklist-area input[type="checkbox"]');
     let score = 0;
-    inputs.forEach(input => {
-      if (input.checked) score += parseInt(input.dataset.weight, 10);
-    });
+    inputs.forEach(input => { if (input.checked) score += parseInt(input.dataset.weight, 10); });
     return score;
   }
 
-  function updateGradeDisplay() {
-    const resultEl = document.getElementById('journal-grade-result');
-    if (!resultEl) return;
-    const score = computeScore();
-    const grade = gradeForScore(score);
-    resultEl.innerHTML = `
-      <span class="journal-grade-score">${score} / ${TOTAL_OBTAINABLE} points</span>
-      <span class="journal-grade-letter">${grade}</span>
-    `;
+  function updateLiveGrade() {
+    const score = computeFormScore();
+    const g = gradeFor(score);
+    const gradeEl = document.getElementById('journal-live-grade');
+    const ptsEl = document.getElementById('journal-live-pts');
+    const barEl = document.getElementById('journal-live-bar');
+    if (gradeEl) {
+      gradeEl.innerText = g.letter;
+      gradeEl.style.color = g.fg; gradeEl.style.background = g.bg; gradeEl.style.borderColor = g.bd; gradeEl.style.border = `1px solid ${g.bd}`;
+    }
+    if (ptsEl) ptsEl.innerHTML = `${score} / ${TOTAL_OBTAINABLE} points`;
+    if (barEl) { barEl.style.width = Math.round((score / TOTAL_OBTAINABLE) * 100) + '%'; barEl.style.background = g.fg; }
+  }
+
+  function setJfDirection(dir) {
+    jfDirection = dir;
+    document.getElementById('jf-dir-long').classList.toggle('active', dir === 'long');
+    document.getElementById('jf-dir-short').classList.toggle('active', dir === 'short');
   }
 
   // ---------- Open / close the entry form ----------
   function openJournalForm(tradeId) {
     activeTradeId = tradeId;
-    const history = getHistory();
-    const trade = history.find(t => t.id === tradeId);
+    const trade = getHistory().find(t => t.id === tradeId);
     if (!trade) return;
 
-    const formWrap = document.getElementById('journal-form-wrap');
-    const metaEl = document.getElementById('journal-form-trade-meta');
+    const metaEl = document.getElementById('journal-form-meta');
     if (metaEl) {
       const isWin = trade.netResult > 0;
-      const sign = isWin ? '+' : (trade.netResult < 0 ? '-' : '');
-      metaEl.innerText = `${formatDate(trade.date)} \u00b7 ${sign}₹${fmt(Math.abs(trade.netResult))} \u00b7 Balance after: ₹${fmt(trade.balanceAfter)}`;
+      const color = isWin ? 'var(--color-profit)' : (trade.netResult < 0 ? '#C53D22' : '#5B6B82');
+      metaEl.innerHTML = `${formatDate(trade.date)} · <b style="color:${color};">${signedInr(trade.netResult)}</b> · Balance after: ₹${fmt(trade.balanceAfter)}`;
     }
 
     const existing = (typeof window.getJournalEntry === 'function') ? window.getJournalEntry(tradeId) : null;
 
-    document.getElementById('jf-instrument').value = existing ? (existing.instrument || '') : '';
-    document.getElementById('jf-direction').value = existing ? (existing.direction || '') : '';
+    document.getElementById('jf-instrument').value = existing ? (existing.instrument || trade.instrument || '') : (trade.instrument || '');
+    setJfDirection(existing ? (existing.direction || '') : '');
     document.getElementById('jf-entry-price').value = existing ? (existing.entryPrice || '') : '';
     document.getElementById('jf-exit-price').value = existing ? (existing.exitPrice || '') : '';
     document.getElementById('jf-stop-loss').value = existing ? (existing.stopLoss || '') : '';
@@ -449,104 +480,136 @@
     renderChecklist(existing ? existing.checklist : {});
     setScreenshot(existing ? (existing.screenshot || null) : null);
 
-    const deleteBtn = document.getElementById('journal-delete-btn');
-    if (deleteBtn) deleteBtn.classList.toggle('hidden', !existing);
-
+    document.getElementById('journal-delete-btn').classList.toggle('hidden', !existing);
     const statusEl = document.getElementById('journal-save-status');
     if (statusEl) statusEl.innerText = existing ? 'Editing a saved entry — changes overwrite it on save.' : '';
 
-    if (formWrap) {
-      formWrap.classList.remove('hidden');
-      formWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setMode('entry');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ---------- View mode ----------
+  function openJournalView(tradeId) {
+    viewTradeId = tradeId;
+    const trade = getHistory().find(t => t.id === tradeId);
+    const entry = (typeof window.getJournalEntry === 'function') ? window.getJournalEntry(tradeId) : null;
+    if (!trade || !entry) return;
+
+    const pts = ptsFor(entry.checklist);
+    const g = gradeFor(pts);
+    const isWin = trade.netResult > 0;
+    const resultColor = isWin ? 'var(--color-profit)' : (trade.netResult < 0 ? '#C53D22' : '#5B6B82');
+    const dirLabel = entry.direction === 'short' ? 'Short' : (entry.direction === 'long' ? 'Long' : '');
+    const dirColor = entry.direction === 'short' ? '#C53D22' : 'var(--color-profit)';
+
+    const gradeEl = document.getElementById('journal-view-grade');
+    gradeEl.innerText = g.letter;
+    gradeEl.style.color = g.fg; gradeEl.style.background = g.bg; gradeEl.style.border = `1px solid ${g.bd}`;
+
+    document.getElementById('journal-view-instrument').innerText = entry.instrument || trade.instrument || '—';
+    const dirEl = document.getElementById('journal-view-dir');
+    dirEl.innerText = dirLabel; dirEl.style.color = dirColor;
+    document.getElementById('journal-view-date').innerText = formatDate(trade.date);
+    document.getElementById('journal-view-bar').style.width = Math.round((pts / TOTAL_OBTAINABLE) * 100) + '%';
+    document.getElementById('journal-view-bar').style.background = g.fg;
+    document.getElementById('journal-view-pts').innerText = `${pts} / ${TOTAL_OBTAINABLE} points`;
+    const resultEl = document.getElementById('journal-view-result');
+    resultEl.innerText = signedInr(trade.netResult); resultEl.style.color = resultColor;
+
+    document.getElementById('journal-view-entry').innerText = entry.entryPrice || '—';
+    document.getElementById('journal-view-exit').innerText = entry.exitPrice || '—';
+    document.getElementById('journal-view-sl').innerText = entry.stopLoss || '—';
+    document.getElementById('journal-view-target').innerText = entry.target || '—';
+    document.getElementById('journal-view-rr').innerText = entry.rrRatio || '—';
+
+    document.getElementById('journal-view-setup').innerText = entry.setupReason || '—';
+    document.getElementById('journal-view-market').innerText = entry.marketConditions || '—';
+    document.getElementById('journal-view-emotion').innerText = entry.emotion || '—';
+    document.getElementById('journal-view-mistakes').innerText = entry.mistakes || '—';
+
+    const shotWrap = document.getElementById('journal-view-screenshot-wrap');
+    if (entry.screenshot) {
+      shotWrap.classList.remove('hidden');
+      document.getElementById('journal-view-screenshot').src = entry.screenshot;
+    } else {
+      shotWrap.classList.add('hidden');
     }
+
+    const breakdownEl = document.getElementById('journal-view-breakdown');
+    const checked = entry.checklist || {};
+    breakdownEl.innerHTML = Object.keys(CHECKLIST).map(category => {
+      const items = CHECKLIST[category].filter(it => checked[it.key]);
+      if (items.length === 0) return '';
+      return `
+        <div class="journal-view-breakdown-group">
+          <div class="journal-view-breakdown-header">
+            <span class="journal-view-breakdown-title">${category}</span>
+            <span class="journal-view-breakdown-count">${items.length}/${CHECKLIST[category].length} checked</span>
+          </div>
+          ${items.map(it => `
+            <div class="journal-view-breakdown-row">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;"><path d="M20 6L9 17l-5-5"/></svg>
+              <span class="journal-view-breakdown-label">${it.label}</span>
+              <span class="journal-view-breakdown-pts">+${it.weight}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }).join('') || '<p class="section-note">No checklist items were checked for this entry.</p>';
+
+    setMode('view');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function closeJournalForm() {
-    activeTradeId = null;
-    const formWrap = document.getElementById('journal-form-wrap');
-    if (formWrap) formWrap.classList.add('hidden');
+  function editCurrentJournalEntry() {
+    if (viewTradeId) openJournalForm(viewTradeId);
   }
 
-  // ---------- Setup screenshot: upload + paste ----------
+  // ---------- Setup screenshot: upload + paste (unchanged behaviour) ----------
   function triggerScreenshotPicker() {
     const input = document.getElementById('jf-screenshot-input');
     if (input) input.click();
   }
-
   function onScreenshotFileSelected(event) {
     const file = event.target.files && event.target.files[0];
-    if (file) {
-      loadImageFile(file);
-    }
-    event.target.value = ''; // allow re-selecting the same file later
+    if (file) loadImageFile(file);
+    event.target.value = '';
   }
-
   function onScreenshotPaste(event) {
     const items = event.clipboardData && event.clipboardData.items;
     if (!items) return;
-
     for (let i = 0; i < items.length; i++) {
       if (items[i].type.indexOf('image') !== -1) {
         const file = items[i].getAsFile();
-        if (file) {
-          loadImageFile(file);
-          event.preventDefault();
-        }
+        if (file) { loadImageFile(file); event.preventDefault(); }
         return;
       }
     }
-
     const errorEl = document.getElementById('jf-screenshot-error');
-    if (errorEl) {
-      errorEl.classList.remove('hidden');
-      errorEl.innerText = 'No image found on the clipboard. Copy a screenshot first, then paste here.';
-    }
+    if (errorEl) { errorEl.classList.remove('hidden'); errorEl.innerText = 'No image found on the clipboard. Copy a screenshot first, then paste here.'; }
   }
-
   function loadImageFile(file) {
     const errorEl = document.getElementById('jf-screenshot-error');
-    if (errorEl) {
-      errorEl.classList.add('hidden');
-      errorEl.innerText = '';
-    }
-
+    if (errorEl) { errorEl.classList.add('hidden'); errorEl.innerText = ''; }
     if (!file.type.startsWith('image/')) {
-      if (errorEl) {
-        errorEl.classList.remove('hidden');
-        errorEl.innerText = 'Please select an image file.';
-      }
+      if (errorEl) { errorEl.classList.remove('hidden'); errorEl.innerText = 'Please select an image file.'; }
       return;
     }
-
-    // Keep entries reasonably sized since everything lives in memory for
-    // this session — warn rather than silently failing on huge files.
-    const MAX_BYTES = 5 * 1024 * 1024; // 5MB
+    const MAX_BYTES = 5 * 1024 * 1024;
     if (file.size > MAX_BYTES) {
-      if (errorEl) {
-        errorEl.classList.remove('hidden');
-        errorEl.innerText = 'Image is too large (max 5MB). Try a smaller screenshot or crop it first.';
-      }
+      if (errorEl) { errorEl.classList.remove('hidden'); errorEl.innerText = 'Image is too large (max 5MB). Try a smaller screenshot or crop it first.'; }
       return;
     }
-
     const reader = new FileReader();
     reader.onload = () => setScreenshot(reader.result);
-    reader.onerror = () => {
-      if (errorEl) {
-        errorEl.classList.remove('hidden');
-        errorEl.innerText = 'Could not read that image. Try a different file.';
-      }
-    };
+    reader.onerror = () => { if (errorEl) { errorEl.classList.remove('hidden'); errorEl.innerText = 'Could not read that image. Try a different file.'; } };
     reader.readAsDataURL(file);
   }
-
   function setScreenshot(dataUrl) {
     screenshotDataUrl = dataUrl || null;
-
     const emptyEl = document.getElementById('jf-screenshot-empty');
     const previewWrap = document.getElementById('jf-screenshot-preview-wrap');
     const previewImg = document.getElementById('jf-screenshot-preview');
-
     if (screenshotDataUrl) {
       if (previewImg) previewImg.src = screenshotDataUrl;
       if (emptyEl) emptyEl.classList.add('hidden');
@@ -556,26 +619,23 @@
       if (previewWrap) previewWrap.classList.add('hidden');
     }
   }
-
   function removeScreenshot(event) {
-    if (event) event.stopPropagation(); // don't let the click bubble to the dropzone and reopen the picker
+    if (event) event.stopPropagation();
     setScreenshot(null);
   }
 
   function saveCurrentJournalEntry() {
     if (!activeTradeId) return;
-
     const checklistState = {};
     document.querySelectorAll('#journal-checklist-area input[type="checkbox"]').forEach(input => {
       checklistState[input.dataset.checklistKey] = input.checked;
     });
-
-    const score = computeScore();
-    const grade = gradeForScore(score);
+    const score = computeFormScore();
+    const g = gradeFor(score);
 
     const entryData = {
       instrument: document.getElementById('jf-instrument').value.trim(),
-      direction: document.getElementById('jf-direction').value,
+      direction: jfDirection,
       entryPrice: document.getElementById('jf-entry-price').value,
       exitPrice: document.getElementById('jf-exit-price').value,
       stopLoss: document.getElementById('jf-stop-loss').value,
@@ -587,7 +647,7 @@
       mistakes: document.getElementById('jf-mistakes').value.trim(),
       checklist: checklistState,
       score: score,
-      grade: grade,
+      grade: g.letter,
       screenshot: screenshotDataUrl,
     };
 
@@ -595,37 +655,33 @@
       window.saveJournalEntry(activeTradeId, entryData);
     }
 
-    const statusEl = document.getElementById('journal-save-status');
-    if (statusEl) statusEl.innerText = `Saved — scored ${score}/${TOTAL_OBTAINABLE} (${grade}).`;
-
-    const deleteBtn = document.getElementById('journal-delete-btn');
-    if (deleteBtn) deleteBtn.classList.remove('hidden');
-
+    setMode('list');
+    jTab = 'saved';
     renderList();
-    renderJournalAnalysis();
   }
 
   function confirmDeleteJournalEntry() {
     if (!activeTradeId) return;
     const ok = window.confirm('Delete this journal entry? This cannot be undone, and the underlying trade will stay in your history as "Not journaled".');
     if (!ok) return;
-
-    if (typeof window.deleteJournalEntry === 'function') {
-      window.deleteJournalEntry(activeTradeId);
-    }
-
-    closeJournalForm();
+    if (typeof window.deleteJournalEntry === 'function') window.deleteJournalEntry(activeTradeId);
+    setMode('list');
     renderList();
-    renderJournalAnalysis();
   }
 
   // Expose handlers for inline onclick/onchange attributes
+  window.jBackToList = jBackToList;
+  window.setJournalRange = setJournalRange;
+  window.setJournalTab = setJournalTab;
+  window.setJournalGroup = setJournalGroup;
   window.openJournalForm = openJournalForm;
+  window.openJournalView = openJournalView;
+  window.editCurrentJournalEntry = editCurrentJournalEntry;
+  window.setJfDirection = setJfDirection;
   window.onJournalInstrumentFilterChange = onJournalInstrumentFilterChange;
   window.onJournalGradeFilterChange = onJournalGradeFilterChange;
   window.onJournalDateFilterChange = onJournalDateFilterChange;
   window.clearJournalFilters = clearJournalFilters;
-  window.closeJournalForm = closeJournalForm;
   window.saveCurrentJournalEntry = saveCurrentJournalEntry;
   window.confirmDeleteJournalEntry = confirmDeleteJournalEntry;
   window.onChecklistToggle = onChecklistToggle;
@@ -633,12 +689,11 @@
   window.onScreenshotFileSelected = onScreenshotFileSelected;
   window.onScreenshotPaste = onScreenshotPaste;
   window.removeScreenshot = removeScreenshot;
-  window.renderJournalList = renderList; // app-shell.js can call this to refresh on new trades
-  window.setJournalAnalysisRange = setJournalAnalysisRange;
-  window.renderJournalAnalysis = renderJournalAnalysis; // app-shell.js can call this to refresh on new trades too
+  window.renderJournalList = renderList; // app-shell.js calls this to refresh on new trades
+  window.renderJournalAnalysis = renderHero; // kept for app-shell.js's existing call sites
 
+  setMode('list');
   renderList();
-  renderJournalAnalysis();
 
 })();
 /* === END COMPONENT: trading-journal (logic) === */

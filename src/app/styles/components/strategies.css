@@ -21,7 +21,7 @@
 }
 
 .strategy-card:hover {
-  border-color: #2c6fd6;
+  border-color: #2563EB;
   box-shadow: 0 6px 16px rgba(46, 117, 182, 0.1);
   transform: translateY(-2px);
 }
@@ -29,11 +29,11 @@
 .strategy-card-name {
   font-size: 15px;
   font-weight: 700;
-  color: #14233d;
+  color: #1E293B;
 }
 
 .strategy-card-author {
-  font-size: 12px;
+  font-size: 13.5px;
   color: #5b6b82;
   margin-bottom: 4px;
 }
@@ -46,16 +46,16 @@
 }
 
 .strategy-card-stat {
-  font-size: 12px;
+  font-size: 13.5px;
   color: #5b6b82;
 }
 
 .strategy-card-stat strong {
-  color: #2c6fd6;
+  color: #2563EB;
 }
 
 .strategy-card-desc {
-  font-size: 12.5px;
+  font-size: 14px;
   color: #5b6b82;
   line-height: 1.45;
 }
@@ -65,5 +65,19 @@
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 14px;
   margin-top: 16px;
+}
+
+#strategies-list-area {
+  margin-bottom: 28px;
+}
+
+/* "Share a strategy" form — previously an unstyled block of labels and
+   inputs floating directly on the page; given its own card so it reads
+   as a distinct action, matching the rest of the app's card language. */
+.market-post-wrap {
+  background: #ffffff;
+  border: 1px solid #E3E9F1;
+  border-radius: 16px;
+  padding: 22px 24px;
 }
 /* === END COMPONENT: strategies === */

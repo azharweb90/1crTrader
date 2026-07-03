@@ -23,7 +23,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #473913 0%, #a47a16 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,7 +41,7 @@
 .account-profile-name {
   font-size: 19px;
   font-weight: 700;
-  color: #14233d;
+  color: #1E293B;
 }
 
 .account-profile-email {
@@ -73,7 +73,7 @@
 .account-section-title {
   font-size: 13px;
   font-weight: 700;
-  color: #14233d;
+  color: #1E293B;
   margin-bottom: 10px;
 }
 
@@ -91,7 +91,7 @@
   display: inline-flex;
   align-items: center;
   background: #eaf2fa;
-  color: #14233d;
+  color: #1E293B;
   border: 1px solid #cfe1f2;
   border-radius: 999px;
   padding: 6px 14px;
@@ -100,7 +100,7 @@
 }
 
 .account-pnl-positive {
-  color: #0e9f6e;
+  color: #16A34A;
 }
 
 .account-pnl-negative {
@@ -135,14 +135,14 @@
 
 .settings-stat-value {
   font-size: 17px;
-  font-weight: 700;
-  color: #14233d;
+  font-weight: 800;
+  color: #1E293B;
 }
 
 .settings-stat-value-small {
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 500;
-  color: #14233d;
+  color: #1E293B;
   line-height: 1.5;
 }
 
@@ -153,9 +153,9 @@
 }
 
 .settings-section-title {
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
-  color: #14233d;
+  color: #1E293B;
   margin-bottom: 8px;
 }
 
@@ -175,16 +175,16 @@
   border: 1px solid #dce3ec;
   border-radius: 10px;
   padding: 12px 14px;
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 600;
-  color: #14233d;
+  color: #1E293B;
   cursor: pointer;
   font-family: inherit;
   transition: border-color 0.15s ease;
 }
 
 .broker-option-btn:hover:not(:disabled) {
-  border-color: #2c6fd6;
+  border-color: #2563EB;
 }
 
 .broker-option-btn:disabled {
@@ -218,13 +218,13 @@
   background: #0d9488;
 }
 .broker-chip-blue {
-  background: #2c6fd6;
+  background: #2563EB;
 }
 .broker-chip-maroon {
   background: #9d2f4a;
 }
 .broker-chip-navy {
-  background: #14233d;
+  background: #1E293B;
 }
 
 /* "More brokers" search + list — keeps the broker picker from becoming a
@@ -233,8 +233,8 @@
   display: block;
   background: none;
   border: none;
-  color: #2c6fd6;
-  font-size: 12.5px;
+  color: #2563EB;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
@@ -277,15 +277,15 @@
   gap: 10px;
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
-  color: #14233d;
+  color: #1E293B;
   text-align: left;
   margin-bottom: 4px;
 }
 
 .broker-more-row:hover {
-  border-color: #2c6fd6;
+  border-color: #2563EB;
 }
 
 .broker-more-row:disabled {
@@ -306,13 +306,13 @@
 }
 
 .broker-connected-text {
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 600;
-  color: #14233d;
+  color: #1E293B;
 }
 
 .broker-last-sync {
-  font-size: 12px;
+  font-size: 13.5px;
   color: #8a98ad;
   margin-left: auto;
 }
@@ -323,7 +323,7 @@
   border: 1px solid #f5c9c2;
   padding: 7px 14px;
   border-radius: 7px;
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
@@ -333,3 +333,133 @@
   background: #fbdedb;
 }
 /* === END COMPONENT: settings === */
+
+/* ---------- Plan & Billing (merged in from Subscription Pricing) ---------- */
+.account-plan-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  background: linear-gradient(135deg, #EAF1FE, #fff);
+  border: 1px solid #E3E9F1;
+  border-radius: 14px 14px 0 0;
+}
+
+.account-plan-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: #2563EB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-plan-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-plan-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.account-plan-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1E293B;
+}
+
+.account-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #E7F6EC;
+  border: 1px solid #BFE6CB;
+  color: #15803D;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.account-plan-sub {
+  font-size: 12.5px;
+  color: #5B6B82;
+  margin-top: 3px;
+}
+
+.account-plan-manage-btn {
+  flex: 0 0 auto;
+  text-decoration: none;
+  border: none;
+  background: #2563EB;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.24);
+  transition: filter 0.15s ease;
+}
+
+.account-plan-manage-btn:hover {
+  filter: brightness(1.05);
+}
+
+.account-plan-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #F1F4F8;
+  border: 1px solid #E3E9F1;
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  overflow: hidden;
+}
+
+.account-plan-detail {
+  background: #fff;
+  padding: 15px 22px;
+}
+
+.account-plan-detail-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.8px;
+  color: #8A98AD;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.account-plan-detail-value {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.account-plan-link {
+  color: #2563EB;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.account-plan-link:hover {
+  text-decoration: underline;
+}
+
+.account-plan-compare {
+  margin-top: 18px;
+}
+
+.account-plan-compare.hidden {
+  display: none;
+}

@@ -18,7 +18,7 @@
   border: 1.5px solid #dce3ec;
   border-radius: 20px;
   padding: 7px 16px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   color: #5b6b82;
   cursor: pointer;
@@ -27,13 +27,13 @@
 }
 
 .learn-filter-btn:hover {
-  border-color: #2c6fd6;
-  color: #2c6fd6;
+  border-color: #2563EB;
+  color: #2563EB;
 }
 
 .learn-filter-btn.active {
-  background: #14233d;
-  border-color: #14233d;
+  background: #1E293B;
+  border-color: #1E293B;
   color: #ffffff;
 }
 
@@ -56,7 +56,7 @@
 }
 
 .learn-card:hover {
-  border-color: #2c6fd6;
+  border-color: #2563EB;
   box-shadow: 0 6px 16px rgba(46, 117, 182, 0.1);
   transform: translateY(-2px);
 }
@@ -88,27 +88,27 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #2c6fd6;
+  color: #2563EB;
   margin-bottom: 4px;
 }
 
 .learn-card-title {
-  font-size: 14px;
+  font-size: 15.5px;
   font-weight: 600;
-  color: #14233d;
+  color: #1E293B;
   margin-bottom: 3px;
   line-height: 1.35;
 }
 
 .learn-card-creator {
-  font-size: 12.5px;
+  font-size: 14px;
   color: #5b6b82;
 }
 
 .learn-card-placeholder-tag {
   font-size: 11px;
   font-weight: 600;
-  color: #b5750a;
+  color: #2563EB;
   margin-top: 6px;
 }
 /* === END COMPONENT: education-books-shared === */

@@ -30,9 +30,9 @@
 
 .tour-spotlight-box {
   position: fixed;
-  border: 2px solid #d4a828;
+  border: 2px solid #2563EB;
   border-radius: 10px;
-  box-shadow: 0 0 0 4px rgba(212, 168, 40, 0.18);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
   pointer-events: none;
   transition:
     top 0.2s ease,
@@ -61,7 +61,7 @@
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8c6510;
+  color: #2563EB;
   margin-bottom: 6px;
 }
 
@@ -120,12 +120,12 @@
 }
 
 .tour-btn-next {
-  background: #d4a828;
+  background: #2563EB;
   color: #ffffff;
 }
 
 .tour-btn-next:hover {
-  background: #b6890f;
+  background: #1D4ED8;
 }
 
 .tour-skip-link {
@@ -161,14 +161,14 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #d4a828 0%, #b6890f 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   border: none;
   color: #ffffff;
   font-size: 20px;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(212, 168, 40, 0.45);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,7 +179,7 @@
 
 .resource-hub-fab:hover {
   transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(212, 168, 40, 0.55);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.55);
 }
 
 .resource-hub-panel {
@@ -187,7 +187,7 @@
   bottom: 76px;
   right: 24px;
   z-index: 400;
-  width: 270px;
+  width: 310px;
   background: #ffffff;
   border: 1px solid #e3e9f1;
   border-radius: 14px;
@@ -220,7 +220,7 @@
 }
 
 .resource-hub-panel-title {
-  font-size: 12.5px;
+  font-size: 14.5px;
   font-weight: 700;
   color: #14233d;
   display: flex;
@@ -253,7 +253,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  background: #fbf7ec;
+  background: #EAF1FE;
   border: none;
   border-bottom: 1px solid #e3e9f1;
   padding: 11px 16px;
@@ -264,7 +264,7 @@
 }
 
 .resource-hub-replay-btn:hover {
-  background: #f5edd4;
+  background: #DCE9FD;
 }
 
 .resource-hub-replay-icon {
@@ -273,29 +273,29 @@
 }
 
 .resource-hub-replay-text {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  color: #8c6510;
+  color: #1D4ED8;
   line-height: 1.3;
 }
 
 .resource-hub-replay-sub {
-  font-size: 10.5px;
+  font-size: 12.5px;
   font-weight: 400;
-  color: #b6890f;
+  color: #2563EB;
   display: block;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 /* "Browse all tours" section — a list of every tab */
 .resource-hub-section-label {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 9.5px;
+  font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #8a98ad;
-  padding: 9px 16px 5px;
+  padding: 11px 16px 6px;
 }
 
 .resource-hub-tour-list {
@@ -309,7 +309,7 @@
   width: 100%;
   background: none;
   border: none;
-  padding: 7px 16px;
+  padding: 10px 16px;
   text-align: left;
   cursor: pointer;
   font-family: inherit;
@@ -321,13 +321,13 @@
 }
 
 .resource-hub-tour-item-name {
-  font-size: 12px;
+  font-size: 14.5px;
   color: #14233d;
   font-weight: 500;
 }
 
 .resource-hub-tour-item-arrow {
-  font-size: 14px;
+  font-size: 16px;
   color: #c3cedd;
 }
 

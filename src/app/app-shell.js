@@ -43,28 +43,17 @@
       html: "/src/app/features/trading-journal/trading-journal.html",
       js: "/src/app/features/trading-journal/trading-journal.js",
     },
-    "tab-education": {
-      html: "/src/app/features/education/education.html",
-      js: "/src/app/features/education/education.js",
-    },
-    "tab-books": {
-      html: "/src/app/features/books/books.html",
-      js: "/src/app/features/books/books.js",
+    "tab-learn": {
+      html: "/src/app/features/learn/learn.html",
+      js: "/src/app/features/learn/learn.js",
     },
     "tab-strategies": {
       html: "/src/app/features/strategies/strategies.html",
       js: "/src/app/features/strategies/strategies.js",
     },
-    "tab-suggestions": {
-      html: "/src/app/features/suggestions/suggestions.html",
-      js: "/src/app/features/suggestions/suggestions.js",
-    },
     "tab-settings": {
       html: "/src/app/features/settings/settings.html",
       js: "/src/app/features/settings/settings.js",
-    },
-    "tab-subs": {
-      html: "/src/app/features/pricing/pricing.html",
     },
   };
 
@@ -77,12 +66,9 @@
     "tab-trade-manager": "Trade Manager",
     "tab-roadmap": "Roadmap",
     "tab-journal": "Trading Journal",
-    "tab-education": "Education",
-    "tab-books": "Books",
+    "tab-learn": "Knowledge Area",
     "tab-strategies": "Strategies",
-    "tab-suggestions": "Suggestions",
     "tab-settings": "Account",
-    "tab-subs": "Subscription Pricing",
   };
 
   // First sub-level key used to pre-select the calculator dropdown per tier.
@@ -422,86 +408,124 @@
   }
 
   // ---------- Profile selection flow (tier + capital + trader type) ----------
-  function selectTier(tier) {
-    selectedTier = tier;
+  // Tier is never manually picked on the setup screen — it's always
+  // derived from starting capital via tierForBalance() (same helper used
+  // elsewhere to detect tier crossings on the running balance), whether
+  // that capital came from a connected broker or was typed in manually.
+  // setupManualActive tracks which of the 3 mutually-exclusive broker-
+  // section states is showing: unconnected picker (neither flag set),
+  // connected (connectedBrokerName set), or manual (this flag set).
+  let setupManualActive = false;
 
-    document.querySelectorAll('.tier-select-card').forEach(card => {
-      card.classList.toggle('selected', card.dataset.tier === tier);
-    });
+  function onSetupCapitalInput() {
+    const input = document.getElementById('setup-capital-input');
+    const errorEl = document.getElementById('setup-capital-error');
+    if (!input) return;
 
-    // Reveal the capital-amount field now that a tier is chosen, and
-    // show its valid range as a hint. Re-validate any amount already typed.
-    const wrap = document.getElementById('capital-amount-wrap');
-    const hint = document.getElementById('capital-amount-hint');
-    if (wrap) wrap.classList.remove('hidden');
-    if (hint) {
-      const range = TIER_RANGES[tier];
-      hint.innerText = `Enter an amount between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[tier]} tier.`;
+    const digits = input.value.replace(/[^0-9]/g, '');
+    if (!digits) {
+      input.value = '';
+      startingCapital = null;
+      currentBalance = null;
+      selectedTier = null;
+      if (errorEl) errorEl.classList.add('hidden');
+      updateContinueButtonState();
+      return;
     }
-    validateCapitalAmount();
+
+    const amount = parseInt(digits, 10);
+    // Reformat with Indian comma grouping live, as the trader types —
+    // matches the design's own fmt()-on-input behavior.
+    input.value = fmt(amount);
+
+    if (!amount || amount <= 0) {
+      startingCapital = null;
+      currentBalance = null;
+      selectedTier = null;
+      if (errorEl) {
+        errorEl.classList.remove('hidden');
+        errorEl.innerText = 'Enter a valid positive amount.';
+      }
+      updateContinueButtonState();
+      return;
+    }
+
+    if (errorEl) errorEl.classList.add('hidden');
+    startingCapital = amount;
+    // Whenever the trader (re-)enters starting capital — first setup or a
+    // later edit via "Edit Profile" — treat it as the new source of truth
+    // for the running balance too, not just on the very first entry.
+    currentBalance = amount;
+    selectedTier = tierForBalance(amount);
+    lastTierForBalance = selectedTier;
 
     if (profileConfirmed) {
       refreshHeaderBadge();
       Object.keys(COMPONENTS).forEach(applyTierHighlight);
     }
-  }
-
-  function onCapitalAmountInput() {
-    validateCapitalAmount();
-    if (profileConfirmed && startingCapital !== null) {
-      refreshHeaderBadge();
-    }
-  }
-
-  function validateCapitalAmount() {
-    const input = document.getElementById('capital-amount-input');
-    const row = input ? input.closest('.capital-amount-input-row') : null;
-    const errorEl = document.getElementById('capital-amount-error');
-    if (!input || !errorEl) return false;
-
-    const raw = input.value.trim();
-    if (raw === '') {
-      startingCapital = null;
-      row.classList.remove('input-error');
-      errorEl.classList.add('hidden');
-      errorEl.innerText = '';
-      updateContinueButtonState();
-      return false;
-    }
-
-    const amount = parseFloat(raw);
-    const range = selectedTier ? TIER_RANGES[selectedTier] : null;
-
-    if (isNaN(amount) || amount <= 0) {
-      startingCapital = null;
-      row.classList.add('input-error');
-      errorEl.classList.remove('hidden');
-      errorEl.innerText = 'Enter a valid positive amount.';
-      updateContinueButtonState();
-      return false;
-    }
-
-    if (range && (amount < range.min || amount > range.max)) {
-      startingCapital = null;
-      row.classList.add('input-error');
-      errorEl.classList.remove('hidden');
-      errorEl.innerText = `Amount must be between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[selectedTier]} tier.`;
-      updateContinueButtonState();
-      return false;
-    }
-
-    // Valid amount.
-    startingCapital = amount;
-    // Whenever the user (re-)enters their starting capital — whether on first
-    // setup or via "Change Tier" later — treat it as the new source of truth
-    // for their running balance too, not just on the very first entry.
-    currentBalance = amount;
-    lastTierForBalance = tierForBalance(currentBalance);
-    row.classList.remove('input-error');
-    errorEl.classList.add('hidden');
-    errorEl.innerText = '';
     updateContinueButtonState();
-    return true;
+  }
+
+  // Switches the broker section into the manual fallback path — capital
+  // is typed directly, no tier cards, tier auto-derives from the amount.
+  function setupGoManual() {
+    disconnectBroker();
+    setupManualActive = true;
+    selectedTier = null;
+    startingCapital = null;
+    currentBalance = null;
+
+    const connectWrap = document.getElementById('setup-broker-connect-wrap');
+    const fetchedWrap = document.getElementById('setup-broker-fetched-wrap');
+    const manualWrap = document.getElementById('setup-manual-wrap');
+    if (connectWrap) connectWrap.classList.add('hidden');
+    if (fetchedWrap) fetchedWrap.classList.add('hidden');
+    if (manualWrap) manualWrap.classList.remove('hidden');
+
+    const input = document.getElementById('setup-capital-input');
+    if (input) input.value = '';
+    const errorEl = document.getElementById('setup-capital-error');
+    if (errorEl) errorEl.classList.add('hidden');
+
+    refreshSetupInstrumentVisibility();
+    updateContinueButtonState();
+  }
+
+  // Returns to the broker picker from either the "connected" or "manual"
+  // state — reused by both the connected card's "Change" link and the
+  // manual card's "Connect a broker instead" link (same as the design's
+  // single shared changeBroker() handler).
+  function setupChangeBroker() {
+    disconnectBroker();
+    setupManualActive = false;
+    selectedTier = null;
+    startingCapital = null;
+    currentBalance = null;
+
+    const connectWrap = document.getElementById('setup-broker-connect-wrap');
+    const fetchedWrap = document.getElementById('setup-broker-fetched-wrap');
+    const manualWrap = document.getElementById('setup-manual-wrap');
+    if (connectWrap) connectWrap.classList.remove('hidden');
+    if (fetchedWrap) fetchedWrap.classList.add('hidden');
+    if (manualWrap) manualWrap.classList.add('hidden');
+
+    refreshSetupInstrumentVisibility();
+    updateContinueButtonState();
+  }
+
+  // Shows whichever instrument picker matches the active setup path — both
+  // wrappers exist in the DOM at all times; only one is unhidden.
+  function refreshSetupInstrumentVisibility() {
+    const isBrokerPath = !!connectedBrokerName;
+    const fetchedWrap = document.getElementById('setup-fetched-instrument-step-wrap');
+    const manualWrap = document.getElementById('setup-manual-instrument-wrap');
+    if (fetchedWrap) fetchedWrap.classList.toggle('hidden', !isBrokerPath);
+    if (manualWrap) manualWrap.classList.toggle('hidden', isBrokerPath);
+    if (isBrokerPath) {
+      renderInstrumentPicker('setup-fetched-instrument-picker', getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
+    } else {
+      renderManualInstrumentGrid();
+    }
   }
 
   function selectTraderType(traderType) {
@@ -629,17 +653,48 @@
     `).join('');
   }
 
+  // Keeps the persistent "Your profile" summary rail and the Continue CTA
+  // in sync with current setup state — called after every action that
+  // changes broker/style/instrument/capital selections. All 3 sections
+  // are visible on this screen at once (no step gating), so this is the
+  // single source of truth for whether the trader is done, replacing the
+  // old per-step wizard validation.
   function updateContinueButtonState() {
-    const btn = document.getElementById('profile-continue-btn');
-    if (!btn) return;
-    // Validates only the CURRENT step now, not the whole flow at once —
-    // each step's own requirement gates moving past IT, via
-    // setupWizardStepIsValid() above. setupWizardCurrentStep may not exist
-    // yet on first script parse (function hoisting is fine, but guard
-    // anyway in case this is ever called before the wizard initializes).
-    const step = typeof setupWizardCurrentStep !== 'undefined' ? setupWizardCurrentStep : 1;
-    btn.disabled = !setupWizardStepIsValid(step);
-    btn.innerText = step >= SETUP_WIZARD_STEP_COUNT ? 'Continue to Dashboard' : 'Continue';
+    const ctaBtn = document.getElementById('setup-cta-btn');
+    if (!ctaBtn) return; // setup component not currently mounted
+
+    const methodEl = document.getElementById('setup-summary-method');
+    const styleEl = document.getElementById('setup-summary-style');
+    const tierEl = document.getElementById('setup-summary-tier');
+    const instEl = document.getElementById('setup-summary-instruments');
+    const capitalEl = document.getElementById('setup-summary-capital');
+    const hintEl = document.getElementById('setup-cta-hint');
+
+    if (methodEl) {
+      methodEl.innerText = setupManualActive
+        ? 'Manual entry'
+        : (connectedBrokerName ? `Connected to ${connectedBrokerName}` : 'Not set');
+    }
+    if (styleEl) {
+      const styleNames = Array.from(selectedTraderTypes).map(t => TRADER_TYPE_LABELS[t]).join(', ');
+      styleEl.innerText = styleNames || 'None selected';
+    }
+    if (tierEl) tierEl.innerText = selectedTier ? TIER_LABELS[selectedTier] : '—';
+
+    const instrumentCount = Object.keys(selectedInstruments).length;
+    if (instEl) instEl.innerText = `${instrumentCount} selected`;
+    if (capitalEl) capitalEl.innerText = startingCapital !== null ? `₹${fmt(startingCapital)}` : '—';
+
+    const ready = !!(connectedBrokerName || (setupManualActive && startingCapital !== null)) &&
+      selectedTraderTypes.size > 0 &&
+      instrumentCount > 0;
+
+    ctaBtn.disabled = !ready;
+    if (hintEl) {
+      hintEl.innerText = ready
+        ? 'You can change any of this later from Account.'
+        : 'Connect a broker, pick a style and an instrument to continue.';
+    }
   }
 
   // todayDateString() moved to /src/app/shared/utils/formatters.js.
@@ -651,116 +706,6 @@
   // Trading style still has to be asked directly — a broker can tell us
   // balance and trade history, but never the trader's stated intent.
   let setupFetchedInstrumentKeys = []; // which mock-fetched instruments the user has multi-selected during setup
-
-  // ---------- Profile setup wizard (4 steps: Broker, Trading Style,
-  // Instruments, Confirm) — added for the Claude Design visual restyle.
-  // The mockup's own shape (Broker/Style/Capital) didn't fit this app's
-  // real logic (broker-fetch sets tier+capital+instruments together;
-  // manual fallback needs tier+capital as one step, not split; the
-  // instrument picker has enough of its own UI to deserve a dedicated
-  // step) — confirmed with the trader to restructure into this 4-step
-  // shape instead. Capital is a READ-ONLY confirmation on step 4 for BOTH
-  // paths; it is never an editable re-entry field, since broker-fetched
-  // balance should never ask the trader to retype what was already
-  // fetched. setupWizardCurrentStep is reset to 1 every time this
-  // component is freshly loaded (see showTierSelect()); applyTierHighlight
-  // jumps it back to step 1 too when re-opened for editing, since an
-  // existing profile should land on a sensible step, not always step 1
-  // — see the tab-select branch of applyTierHighlight for that logic.
-  let setupWizardCurrentStep = 1;
-  const SETUP_WIZARD_STEP_COUNT = 4;
-
-  function setupWizardStepIsValid(step) {
-    if (step === 1) {
-      // Either a broker is connected (tier+capital fetched), or the
-      // manual path has both a tier AND a valid capital amount.
-      return !!connectedBrokerName || (selectedTier !== null && startingCapital !== null);
-    }
-    if (step === 2) {
-      return selectedTraderTypes.size > 0;
-    }
-    if (step === 3) {
-      return Object.keys(selectedInstruments).length > 0 || customStocks.length > 0;
-    }
-    return true; // step 4 (confirm) has nothing further to validate
-  }
-
-  function setupWizardGoToStep(step) {
-    setupWizardCurrentStep = Math.max(1, Math.min(SETUP_WIZARD_STEP_COUNT, step));
-
-    for (let i = 1; i <= SETUP_WIZARD_STEP_COUNT; i++) {
-      const stepEl = document.getElementById(`setup-wizard-step-${i}`);
-      if (stepEl) stepEl.classList.toggle('hidden', i !== setupWizardCurrentStep);
-
-      const dot = document.getElementById(`setup-stepper-dot-${i}`);
-      const label = document.getElementById(`setup-stepper-label-${i}`);
-      const bar = document.getElementById(`setup-stepper-bar-${i}`);
-      if (dot) {
-        const isDone = i < setupWizardCurrentStep;
-        const isActive = i === setupWizardCurrentStep;
-        dot.classList.toggle('setup-stepper-dot-active', isActive);
-        dot.classList.toggle('setup-stepper-dot-done', isDone);
-        dot.innerHTML = isDone ? '&#10003;' : String(i);
-      }
-      if (label) label.classList.toggle('setup-stepper-label-active', i <= setupWizardCurrentStep);
-      if (bar) bar.classList.toggle('setup-stepper-bar-done', i < setupWizardCurrentStep);
-    }
-
-    // Step 3 shows whichever instrument picker matches the active path —
-    // both wrappers exist in the DOM at all times; only one is unhidden.
-    if (setupWizardCurrentStep === 3) {
-      const fetchedWrap = document.getElementById('setup-fetched-instrument-step-wrap');
-      const manualWrap = document.getElementById('setup-manual-instrument-step');
-      const isBrokerPath = !!connectedBrokerName;
-      if (fetchedWrap) fetchedWrap.classList.toggle('hidden', !isBrokerPath);
-      if (manualWrap) manualWrap.classList.toggle('hidden', isBrokerPath);
-      if (isBrokerPath && document.getElementById('setup-fetched-instrument-picker')) {
-        renderInstrumentPicker('setup-fetched-instrument-picker', getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
-      } else if (document.getElementById('manual-instrument-picker')) {
-        renderManualInstrumentGrid();
-      }
-    }
-
-    if (setupWizardCurrentStep === 4) {
-      renderSetupWizardConfirmSummary();
-    }
-
-    const backBtn = document.getElementById('setup-wizard-back-btn');
-    if (backBtn) backBtn.disabled = setupWizardCurrentStep === 1;
-
-    const indicator = document.getElementById('setup-wizard-step-indicator');
-    if (indicator) indicator.innerText = `Step ${setupWizardCurrentStep} of ${SETUP_WIZARD_STEP_COUNT}`;
-
-    updateContinueButtonState();
-  }
-
-  function setupWizardNext() {
-    if (!setupWizardStepIsValid(setupWizardCurrentStep)) return;
-    if (setupWizardCurrentStep === SETUP_WIZARD_STEP_COUNT) {
-      confirmProfile();
-      return;
-    }
-    setupWizardGoToStep(setupWizardCurrentStep + 1);
-  }
-
-  function setupWizardBack() {
-    setupWizardGoToStep(setupWizardCurrentStep - 1);
-  }
-
-  function renderSetupWizardConfirmSummary() {
-    const methodEl = document.getElementById('setup-confirm-method');
-    const styleEl = document.getElementById('setup-confirm-style');
-    const tierEl = document.getElementById('setup-confirm-tier');
-    const capitalEl = document.getElementById('setup-confirm-capital');
-
-    if (methodEl) methodEl.innerText = connectedBrokerName ? `Connected to ${connectedBrokerName}` : 'Manual setup';
-    if (styleEl) {
-      const styleNames = Array.from(selectedTraderTypes).map(t => TRADER_TYPE_LABELS[t]).join(', ');
-      styleEl.innerText = styleNames || '\u2014';
-    }
-    if (tierEl) tierEl.innerText = selectedTier ? `${TIER_LABELS[selectedTier]} Tier` : '\u2014';
-    if (capitalEl) capitalEl.innerText = startingCapital !== null ? `₹${fmt(startingCapital)}` : '\u2014';
-  }
 
   function generateMockFetchedBalance() {
     // A plausible-looking account balance spanning roughly the Small
@@ -787,6 +732,18 @@
   let setupBrokerPickerExpanded = false;
   let setupBrokerPickerSearchTerm = '';
 
+  // Short descriptor shown under each featured broker's name on the setup
+  // screen only — matches the Claude Design mockup's brokerData tags.
+  // Purely decorative copy, not used by the post-setup broker widgets
+  // elsewhere (Settings / Daily Limits Tool), so it's kept local here
+  // rather than added to the shared BROKERS array.
+  const SETUP_BROKER_TAGS = {
+    'Zerodha': 'India’s #1 broker',
+    'Groww': 'Fast onboarding',
+    'Angel One': 'Full-service',
+    'Upstox': 'Low brokerage',
+  };
+
   function renderSetupBrokerPicker() {
     const container = document.getElementById('setup-broker-picker');
     if (!container) return;
@@ -798,8 +755,11 @@
       container.dataset.shellInitialized = 'true';
       container.innerHTML = `
         <div class="broker-grid" id="setup-broker-featured"></div>
+        <div class="setup-broker-links">
+          ${more.length > 0 ? `<button type="button" class="setup-more-toggle" id="setup-broker-more-toggle" onclick="toggleSetupMoreBrokers()"></button><span class="setup-broker-links-sep">&middot;</span>` : ''}
+          <button type="button" class="setup-manual-link" onclick="setupGoManual()">Set up manually instead</button>
+        </div>
         ${more.length > 0 ? `
-          <button type="button" class="broker-more-toggle" id="setup-broker-more-toggle" onclick="toggleSetupMoreBrokers()"></button>
           <div class="broker-more-wrap hidden" id="setup-broker-more-wrap">
             <input type="text" class="instrument-picker-search" id="setup-broker-search"
                    placeholder="Search brokers..." oninput="onSetupBrokerPickerSearch(this.value)">
@@ -816,16 +776,19 @@
     const featuredEl = document.getElementById('setup-broker-featured');
     if (featuredEl) {
       featuredEl.innerHTML = featured.map(b => `
-        <button type="button" class="broker-option-btn setup-broker-option-btn" onclick="startSetupBrokerConnect('${b.name}')">
-          <span class="broker-chip ${b.colorClass}">${b.initial}</span>
-          <span>${b.name}</span>
+        <button type="button" class="setup-broker-card setup-broker-option-btn" onclick="startSetupBrokerConnect('${b.name}')">
+          <span class="setup-broker-icon ${b.colorClass}">${b.initial}</span>
+          <span style="min-width:0;">
+            <div class="setup-broker-card-name">${b.name}</div>
+            <div class="setup-broker-card-tag">${SETUP_BROKER_TAGS[b.name] || 'Supported broker'}</div>
+          </span>
         </button>
       `).join('');
     }
 
     const toggleBtn = document.getElementById('setup-broker-more-toggle');
     if (toggleBtn) {
-      toggleBtn.innerText = setupBrokerPickerExpanded ? 'Hide other brokers' : `More brokers (${more.length})`;
+      toggleBtn.innerText = setupBrokerPickerExpanded ? 'Hide other brokers' : `+ More brokers (${more.length})`;
     }
 
     const moreWrap = document.getElementById('setup-broker-more-wrap');
@@ -881,9 +844,11 @@
       .filter(i => i.category === 'index')
       .map(i => i.value);
 
+    setupManualActive = false;
     selectedTier = derivedTier;
     startingCapital = fetchedBalance;
     currentBalance = fetchedBalance;
+    lastTierForBalance = derivedTier;
     selectedInstruments = {};
     setupFetchedInstrumentKeys.forEach(key => {
       selectedInstruments[key] = { lots: 1 };
@@ -891,14 +856,24 @@
 
     renderSetupFetchedProfile(brokerName, fetchedBalance, derivedTier, fetchedInstruments);
     regenerateBrokerPnlForCurrentInstruments();
+    refreshSetupInstrumentVisibility();
     updateContinueButtonState();
   }
 
   function renderSetupFetchedProfile(brokerName, fetchedBalance, derivedTier, fetchedInstruments) {
     const connectWrap = document.getElementById('setup-broker-connect-wrap');
     const fetchedWrap = document.getElementById('setup-broker-fetched-wrap');
+    const manualWrap = document.getElementById('setup-manual-wrap');
     if (connectWrap) connectWrap.classList.add('hidden');
     if (fetchedWrap) fetchedWrap.classList.remove('hidden');
+    if (manualWrap) manualWrap.classList.add('hidden');
+
+    const iconEl = document.getElementById('setup-fetched-icon');
+    if (iconEl) {
+      const broker = BROKERS.find(b => b.name === brokerName);
+      iconEl.className = 'setup-broker-icon' + (broker ? ` ${broker.colorClass}` : '');
+      iconEl.innerText = broker ? broker.initial : '?';
+    }
 
     const nameEl = document.getElementById('setup-fetched-broker-name');
     if (nameEl) nameEl.innerText = brokerName;
@@ -950,8 +925,11 @@
       container.dataset.pickerInitialized = 'true';
       container.innerHTML = `
         <div class="instrument-picker-chips" id="${containerId}-chips"></div>
-        <input type="text" class="instrument-picker-search" id="${containerId}-search"
-               placeholder="Search instruments..." oninput="onInstrumentPickerSearch('${containerId}')">
+        <div class="setup-instrument-search-row">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8A98AD" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input type="text" class="setup-instrument-search" id="${containerId}-search"
+                 placeholder="Search instruments…" oninput="onInstrumentPickerSearch('${containerId}')">
+        </div>
         <div class="instrument-picker-categories" id="${containerId}-categories"></div>
       `;
     }
@@ -1071,37 +1049,9 @@
     renderInstrumentPicker('manual-instrument-picker', getMockBrokerTradableInstruments(), toggleInstrument);
   }
 
-  function showManualProfileSetup() {
-    disconnectBroker();
-    selectedTier = null;
-    startingCapital = null;
-    currentBalance = null;
-    selectedInstruments = {};
-    setupFetchedInstrumentKeys = [];
-
-    const brokerStepWrap = document.getElementById('setup-broker-step');
-    if (brokerStepWrap) brokerStepWrap.classList.add('hidden');
-    const manualStepsWrap = document.getElementById('setup-manual-steps');
-    if (manualStepsWrap) manualStepsWrap.classList.remove('hidden');
-    const manualInstrumentStep = document.getElementById('setup-manual-instrument-step');
-    if (manualInstrumentStep) manualInstrumentStep.classList.remove('hidden');
-    const fetchedInstrumentStepWrap = document.getElementById('setup-fetched-instrument-step-wrap');
-    if (fetchedInstrumentStepWrap) fetchedInstrumentStepWrap.classList.add('hidden');
-
-    renderManualInstrumentGrid();
-    updateContinueButtonState();
-  }
-
-  // Reverse of showManualProfileSetup — goes back to the broker picker.
-  function showBrokerSetup() {
-    selectedTier = null;
-    startingCapital = null;
-    const manualStepsWrap = document.getElementById('setup-manual-steps');
-    if (manualStepsWrap) manualStepsWrap.classList.add('hidden');
-    const brokerStepWrap = document.getElementById('setup-broker-step');
-    if (brokerStepWrap) brokerStepWrap.classList.remove('hidden');
-    updateContinueButtonState();
-  }
+  // (Superseded by setupGoManual() / setupChangeBroker() further up, which
+  // handle the single-page — no step wizard — layout's 3-way broker
+  // section toggle: unconnected picker / connected / manual.)
 
 
   function confirmProfile() {
@@ -2343,65 +2293,54 @@
       renderSetupBrokerPicker();
 
       // Every fresh load of this component (first-time setup, OR
-      // re-opening via "Change Tier" / "Edit Profile") starts the wizard
-      // back at step 1 — the step-gating logic below will correctly
-      // re-populate whichever step the trader had already completed, but
-      // landing on step 1 gives a consistent, predictable re-entry point
-      // rather than guessing which step to resume on.
-      setupWizardGoToStep(1);
+      // re-opening via "Edit Profile" from Account) re-derives which of
+      // the 3 mutually-exclusive broker-section states to show, rather
+      // than always landing back on the unconnected picker.
+      const connectWrap = document.getElementById('setup-broker-connect-wrap');
+      const fetchedWrap = document.getElementById('setup-broker-fetched-wrap');
+      const manualWrap = document.getElementById('setup-manual-wrap');
 
-      if (selectedTier) {
-        container.querySelectorAll('.tier-select-card').forEach(card => {
-          card.classList.toggle('selected', card.dataset.tier === selectedTier);
-        });
-        const wrap = document.getElementById('capital-amount-wrap');
-        const hint = document.getElementById('capital-amount-hint');
-        const input = document.getElementById('capital-amount-input');
-        if (wrap) wrap.classList.remove('hidden');
-        if (hint) {
-          const range = TIER_RANGES[selectedTier];
-          hint.innerText = `Enter an amount between ₹${fmt(range.min)} and ₹${fmt(range.max)} for the ${TIER_LABELS[selectedTier]} tier.`;
+      if (brokerConnected && connectedBrokerName) {
+        setupManualActive = false;
+        renderSetupFetchedProfile(
+          connectedBrokerName,
+          startingCapital !== null ? startingCapital : 0,
+          selectedTier || tierForBalance(startingCapital || 0),
+          getMockBrokerTradableInstruments()
+        );
+      } else if (selectedTier || startingCapital !== null) {
+        // Reaching this screen with a tier/capital already set and no
+        // broker connected (e.g. via "Edit Profile" after an original
+        // manual-path setup) means we're editing an existing manual-path
+        // profile — reveal the manual card directly rather than asking
+        // someone editing their profile to reconnect a broker.
+        setupManualActive = true;
+        if (connectWrap) connectWrap.classList.add('hidden');
+        if (fetchedWrap) fetchedWrap.classList.add('hidden');
+        if (manualWrap) manualWrap.classList.remove('hidden');
+        const input = document.getElementById('setup-capital-input');
+        if (input && startingCapital !== null) {
+          input.value = fmt(startingCapital);
         }
-        if (input && startingCapital !== null && input.value === '') {
-          input.value = startingCapital;
-        }
-
-        // Reaching this screen with a tier already set AND no broker
-        // connected (e.g. via "Change Tier" after an original manual-path
-        // setup) means we're editing an existing manual-path profile —
-        // reveal the manual steps directly and skip straight past the
-        // broker-connect prompt, rather than asking someone editing their
-        // profile to reconnect a broker. If a broker IS connected, leave
-        // the broker-step/fetched-wrap visibility as connectBroker() left
-        // it (don't fight that state here).
-        if (!brokerConnected) {
-          const brokerStepWrap = document.getElementById('setup-broker-step');
-          if (brokerStepWrap) brokerStepWrap.classList.add('hidden');
-          const manualStepsWrap = document.getElementById('setup-manual-steps');
-          if (manualStepsWrap) manualStepsWrap.classList.remove('hidden');
-          const manualInstrumentStep = document.getElementById('setup-manual-instrument-step');
-          if (manualInstrumentStep) manualInstrumentStep.classList.remove('hidden');
-          const fetchedInstrumentStepWrap = document.getElementById('setup-fetched-instrument-step-wrap');
-          if (fetchedInstrumentStepWrap) fetchedInstrumentStepWrap.classList.add('hidden');
-        }
+      } else {
+        // Brand-new setup — nothing chosen yet, show the broker picker.
+        setupManualActive = false;
+        if (connectWrap) connectWrap.classList.remove('hidden');
+        if (fetchedWrap) fetchedWrap.classList.add('hidden');
+        if (manualWrap) manualWrap.classList.add('hidden');
       }
+
       if (selectedTraderTypes.size > 0) {
         container.querySelectorAll('.trader-type-card').forEach(card => {
           card.classList.toggle('selected', selectedTraderTypes.has(card.dataset.traderType));
         });
       }
-      // Re-render (rather than patch) the instrument picker so it reflects
-      // whichever instruments are currently selected — covers both the
-      // manual path (re-opened via "Change Tier") and, if ever reached with
-      // a broker already connected, the fetched path too. Both pickers are
-      // safe to pre-render even while step 3 is hidden — setupWizardGoToStep
-      // re-renders again once the trader actually reaches that step.
-      if (document.getElementById('manual-instrument-picker')) {
-        renderManualInstrumentGrid();
-      }
-      if (brokerConnected && document.getElementById('setup-fetched-instrument-picker')) {
-        renderInstrumentPicker('setup-fetched-instrument-picker', getMockBrokerTradableInstruments(), toggleSetupFetchedInstrument);
-      }
+
+      // Re-render (rather than patch) whichever instrument picker matches
+      // the active path, so it reflects whatever's currently selected —
+      // covers both the manual path (re-opened via "Edit Profile") and the
+      // broker-fetched path.
+      refreshSetupInstrumentVisibility();
       renderCustomStockChips();
       updateContinueButtonState();
       return;
@@ -2409,14 +2348,15 @@
 
     if (!selectedTier) return;
 
-    if (tabId === 'tab-subs') {
+    if (tabId === 'tab-settings') {
       const targetLabel = TIER_LABELS[selectedTier];
       container.querySelectorAll('.pricing-card').forEach(card => {
         const nameEl = card.querySelector('.tier-name');
         const matches = nameEl && nameEl.textContent.trim() === targetLabel;
         card.classList.toggle('tier-highlight', !!matches);
       });
-      return;
+      // fall through — tab-settings also needs the generic render below
+      // handled by window.renderSettings(), not returned early here.
     }
 
     if (tabId === 'tab-calculator') {
@@ -2455,9 +2395,8 @@
   window.switchTab = switchTab;
   window.toggleAccountMenu = toggleAccountMenu;
   window.handleLogout = handleLogout;
-  window.selectTier = selectTier;
   window.selectTraderType = selectTraderType;
-  window.onCapitalAmountInput = onCapitalAmountInput;
+  window.onSetupCapitalInput = onSetupCapitalInput;
   window.toggleInstrument = toggleInstrument;
   window.toggleSelectAllInManualCategory = toggleSelectAllInManualCategory;
   window.toggleSelectAllInFetchedCategory = toggleSelectAllInFetchedCategory;
@@ -2501,10 +2440,8 @@
   window.toggleSetupMoreBrokers = toggleSetupMoreBrokers;
   window.onSetupBrokerPickerSearch = onSetupBrokerPickerSearch;
   window.toggleSetupFetchedInstrument = toggleSetupFetchedInstrument;
-  window.showManualProfileSetup = showManualProfileSetup;
-  window.showBrokerSetup = showBrokerSetup;
-  window.setupWizardNext = setupWizardNext;
-  window.setupWizardBack = setupWizardBack;
+  window.setupGoManual = setupGoManual;
+  window.setupChangeBroker = setupChangeBroker;
   window.disconnectMockBroker = disconnectMockBroker;
   window.renderBrokerArea = renderBrokerArea;
   window.getBrokerPnlHistory = getBrokerPnlHistory;

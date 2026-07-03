@@ -39,12 +39,28 @@
     return 'small';
   }
 
+  // Keeps a range input's filled-vs-track color split in sync with its
+  // actual value (blue up to the thumb, light gray the rest of the way)
+  // — .rm-goal-slider's CSS only paints a static background, so this
+  // has to run any time a slider's value changes, including when it's
+  // set programmatically (custom-amount input, manual avg-win input).
+  function updateSliderFill(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const min = parseFloat(el.min) || 0;
+    const max = parseFloat(el.max) || 100;
+    const val = parseFloat(el.value);
+    const pct = max > min ? Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100)) : 0;
+    el.style.background = `linear-gradient(to right, #2563EB 0%, #2563EB ${pct}%, #E3E9F1 ${pct}%)`;
+  }
+
   // ── Goal Slider ────────────────────────────────────────────────────────
   function onRoadmapSliderInput(value) {
     selectedGoalAmount = parseInt(value, 10);
     const customInput = document.getElementById('rm-goal-custom-input');
     if (customInput) customInput.value = selectedGoalAmount;
     updateGoalDisplay();
+    updateSliderFill('rm-goal-slider');
     resetSimulator();
     renderSimulatorSection();
   }
@@ -60,6 +76,7 @@
       slider.value = clamped;
     }
     updateGoalDisplay();
+    updateSliderFill('rm-goal-slider');
     resetSimulator();
     renderSimulatorSection();
   }
@@ -80,6 +97,7 @@
       if (simSlider) {
         simSlider.value = Math.min(20000, Math.max(500, avgWinManualValue));
         document.getElementById('rm-sim-avgwin-val').innerText = `₹${fmt(avgWinManualValue)}`;
+        updateSliderFill('rm-sim-avgwin');
       }
     }
     resetSimulator();
@@ -100,6 +118,8 @@
 
     if (wrVal) wrVal.innerText = `${(simWinRateOverride * 100).toFixed(0)}%`;
     if (awVal) awVal.innerText = `₹${fmt(simAvgWinOverride)}`;
+    updateSliderFill('rm-sim-winrate');
+    updateSliderFill('rm-sim-avgwin');
     renderGoalResult();
   }
 
@@ -497,6 +517,9 @@
     updateGoalDisplay();
     const customInput = document.getElementById('rm-goal-custom-input');
     if (customInput && !customInput.value) customInput.value = selectedGoalAmount;
+    updateSliderFill('rm-goal-slider');
+    updateSliderFill('rm-sim-winrate');
+    updateSliderFill('rm-sim-avgwin');
 
     renderSimulatorSection();
     renderChallenge();

@@ -25,7 +25,8 @@ body {
 .sidebar {
   width: 240px;
   flex-shrink: 0;
-  background: linear-gradient(180deg, var(--sidebar-bg-top) 0%, var(--sidebar-bg-bottom) 100%);
+  background: var(--sidebar-bg-top);
+  border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
   padding: 0 12px 18px;
@@ -136,7 +137,7 @@ body {
    continuity with the rest of the app) but nav links are inert — there's
    no profile/balance yet for those screens to render meaningfully. */
 .sidebar-setup-mode .sidebar-link {
-  color: rgba(155, 142, 110, 0.4);
+  color: #C7D0DC;
   cursor: not-allowed;
   pointer-events: none;
 }

@@ -1,9 +1,10 @@
 /* ===========================================================
-   APP THEME — 1CrTrader (Midnight)
+   APP THEME — 1CrTrader (revamped light theme, July 2026)
    Loaded after every other stylesheet, applying unconditionally to the
-   whole app — there is no light/dark toggle anymore. This file used to
-   be an opt-in "dark-theme.css" gated behind a body.dark-mode class; that
-   gating has been removed so Midnight is simply the app's one theme.
+   whole app — there is no light/dark toggle. Re-themed from the previous
+   dark "Midnight" palette to the new light theme per the revamped UX
+   design; the token names below are unchanged (only their values moved
+   from tokens.css), so this file's mappings didn't need to change shape.
 
    Every color here is a design token from styles/tokens.css — that file
    is the single source of truth for the palette. To retune the whole
@@ -44,15 +45,14 @@ h3 {
 }
 
 /* ---------- Sidebar ---------- */
-/* Gives the sidebar a slightly deeper, more neutral tone than the main
-   canvas so it doesn't read identically to the page behind it, and so
-   its border/divider lines stay visible. */
+/* Flat white sidebar, bordered off from the canvas (see layout-shell.css) —
+   no gradient in the light theme. */
 .sidebar {
-  background: linear-gradient(180deg, var(--sidebar-bg-top) 0%, var(--sidebar-bg-bottom) 100%);
+  background: var(--sidebar-bg-top);
 }
 
 .sidebar-nav-group-bottom {
-  border-top-color: rgba(59, 158, 255, 0.1);
+  border-top-color: var(--sidebar-divider);
 }
 
 /* ---------- Top bar / header ---------- */
@@ -84,9 +84,9 @@ h3 {
 }
 
 .header-account-menu {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   border-color: var(--color-border);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 16px 40px rgba(20,35,61,.16);
 }
 
 .header-account-menu-name {
@@ -106,10 +106,18 @@ h3 {
 }
 
 /* ---------- Content shell ---------- */
+/* .content-section's own definition (layout-shell.css) is the big white
+   page card wrapping most tabs (Settings, Pricing, Suggestions, Learn,
+   Strategies, the Setup page, etc.) — background:#fff with a shadow. This
+   was routing it to --color-canvas (the PAGE background behind it),
+   which silently flattened every one of those tabs' outer card into the
+   same gray as the page, then made every nested "white" card look faint
+   or invisible against it (canvas-on-canvas). Routed to --color-surface,
+   matching the component's own value. */
 .content-section {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   border-color: var(--color-border-subtle);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(20,35,61,.06);
 }
 
 /* ---------- Generic text/border tokens used everywhere ---------- */
@@ -136,16 +144,25 @@ h3 {
 .journal-analysis-stat-card,
 .strategy-card,
 .suggestions-panel {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  /* These are all white cards/cells in their own component CSS (see
+     e.g. dashboard-home.css .dash-stat-card, subscription-pricing.css
+     .pricing-card, tier-select.css .trader-type-card — every one of
+     them sets background:#fff on its own). This mapping used to route
+     them to --color-canvas, which is the PAGE background (#F5F6FA) —
+     a leftover from before the re-theme that made every one of these
+     "white" cards render the same gray as the canvas behind them
+     (looked like a transparent/see-through card). Routed to
+     --color-surface (the actual white-card token) instead. */
+  background: var(--color-surface);
+  border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
 
 .mini-ladder-grid,
 .grid-table,
 .broker-scrip-grid {
-  background: var(--color-surface);
-  border-color: var(--color-surface);
+  background: var(--color-border);
+  border-color: var(--color-border);
 }
 
 .mini-ladder-cell.mini-ladder-head,
@@ -165,10 +182,11 @@ h3 {
   color: var(--color-text-primary);
 }
 
-.dash-stat-value,
-.header-balance-value {
+.dash-stat-value {
   color: var(--color-text-primary);
 }
+/* .header-balance-value is kept green (its own component CSS) rather
+   than the generic dark-text mapping other stat values use. */
 
 /* Tier-highlight rows (gold cream in light mode) — darker gold tint
    keeps the same "this is your row" meaning without a jarring pale
@@ -176,7 +194,7 @@ h3 {
 .mini-ladder-label.tier-highlight,
 .mini-ladder-cell.tier-highlight-row,
 .grid-table .label.tier-highlight {
-  background: rgba(59, 158, 255, 0.16) !important;
+  background: rgba(37, 99, 235, 0.16) !important;
   color: var(--color-accent-light) !important;
 }
 
@@ -186,9 +204,20 @@ select,
 textarea,
 .sl-lots-input,
 .capital-amount-input,
-.journal-input,
 .broker-day-picker-input {
   background: var(--color-surface-inset);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* .journal-input's own component CSS (trading-journal.css) sets
+   background:#fff — it's used for the "real" text fields on top of
+   white cards (Journal entry form, the setup page's custom-stock
+   input), not a recessed/inset field, so it's kept out of the shared
+   surface-inset mapping above (that mapping was making it the same
+   gray tint as the page canvas instead of a clean white box). */
+.journal-input {
+  background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-primary);
 }
@@ -205,32 +234,23 @@ textarea:focus {
 }
 
 /* ---------- Buttons ---------- */
-.profile-continue-btn,
-.trade-submit-btn,
-.outcome-btn,
-.change-tier-btn,
-.account-edit-btn,
-.setup-wizard-back-btn,
-.setup-skip-btn,
-.journal-list-btn,
-.suggestions-panel-nav-btn,
-.broker-import-btn,
-.custom-stock-add-btn {
-  background: var(--color-canvas);
-  border-color: var(--color-border);
-  color: var(--color-text-secondary);
-}
+/* Removed the old generic reset that used to force every one of these
+   buttons (profile-continue-btn, trade-submit-btn, outcome-btn,
+   change-tier-btn, setup-skip-btn, suggestions-panel-nav-btn, etc.) to a
+   flat --color-canvas background + secondary-gray text. Every one of
+   them already fully defines its own background/color/border in its own
+   component CSS (navy solid, white, light-blue tint, blue gradient) —
+   this override, loaded last, was silently replacing all of that with
+   plain gray (e.g. the "Continue to dashboard" / "Edit Profile" buttons,
+   the Daily Limits outcome toggle, the Change Tier pill, and the Skip
+   button all rendered gray instead of their intended color). */
 
 .outcome-btn:hover:not(:disabled),
 .suggestions-panel-nav-btn:hover:not(:disabled) {
   border-color: var(--color-accent);
-  background: rgba(59, 158, 255, 0.08);
+  background: rgba(37, 99, 235, 0.08);
 }
 
-.profile-continue-btn:not(:disabled) {
-  background: var(--color-canvas);
-  color: var(--color-text-primary);
-}
 
 .profile-continue-btn:hover:not(:disabled) {
   background: var(--color-accent-strong);
@@ -243,13 +263,17 @@ textarea:focus {
   color: var(--color-text-on-accent);
 }
 
-/* ---------- Selected/active states (kept gold, brightened slightly) --- */
-.tier-select-card.selected,
-.trader-type-card.selected,
-.instrument-card.selected,
+/* ---------- Selected/active states ---------- */
+/* trader-type-card / instrument-card / tier-select-card selection is
+   shown with a blue border + filled checkmark badge only — no
+   background tint — so selected cards stay pure white like every
+   other card (see tier-select.css .trader-type-card.selected, which
+   already sets background:#fff; this override used to fight that with
+   a translucent blue wash that never went away). goal-amount-btn-cr
+   keeps its own light "at rest" tint, unrelated to that bug. */
 .goal-amount-btn-cr {
   border-color: var(--color-accent);
-  background: rgba(59, 158, 255, 0.07);
+  background: rgba(37, 99, 235, 0.07);
 }
 
 .sidebar-link.active {
@@ -257,7 +281,7 @@ textarea:focus {
 }
 
 .broker-range-pill-active {
-  background: rgba(91, 147, 232, 0.14);
+  background: rgba(37, 99, 235, 0.14);
   border-color: var(--color-info);
   color: var(--color-text-primary);
 }
@@ -278,18 +302,22 @@ hr,
 .suggestions-panel-header,
 .suggestions-panel-footer,
 .suggestions-row {
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .suggestions-row:hover {
-  background: rgba(59, 158, 255, 0.06);
+  background: rgba(37, 99, 235, 0.06);
 }
 
 /* ---------- Risk/info banners (blue, amber, etc.) ---------- */
 .lot-unlock-note {
-  background: rgba(91, 147, 232, 0.1);
-  border-color: rgba(91, 147, 232, 0.3);
-  color: var(--color-info-tint);
+  /* --color-info-tint (#CFE0FB) is a light blue meant for backgrounds/
+     borders, not text — using it as the text color here made this
+     banner's copy nearly invisible against its own light-blue
+     background (light-on-light). Same fix as .setup-wizard-note below. */
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.3);
+  color: #3A5170;
 }
 
 .lot-unlock-note-icon {
@@ -297,8 +325,8 @@ hr,
 }
 
 .lot-unlock-note.lot-cap-flash {
-  background: rgba(59, 158, 255, 0.12);
-  border-color: rgba(59, 158, 255, 0.35);
+  background: rgba(37, 99, 235, 0.12);
+  border-color: rgba(37, 99, 235, 0.35);
   color: var(--color-accent-light);
 }
 
@@ -307,43 +335,43 @@ hr,
 }
 
 .sl-exceeds-warning {
-  background: rgba(59, 158, 255, 0.14);
-  border-color: rgba(59, 158, 255, 0.35);
+  background: rgba(37, 99, 235, 0.14);
+  border-color: rgba(37, 99, 235, 0.35);
   color: var(--color-accent-light);
 }
 
 .broker-range-empty-state {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   border-color: var(--color-border);
   color: var(--color-text-muted);
 }
 
 .suggestions-panel-category {
-  background: rgba(59, 158, 255, 0.16);
+  background: rgba(37, 99, 235, 0.16);
   color: var(--color-accent-light);
 }
 
 .suggestions-category-count {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   color: var(--color-text-muted);
 }
 
 /* ---------- Pale status-tint backgrounds (catch-all) ---------- */
-.broker-stat-icon-loss,
-.header-balance-pill {
+.broker-stat-icon-loss {
   background: linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-accent-strong) 100%);
 }
 
-.header-avatar-btn {
-  background: linear-gradient(135deg, var(--sidebar-active-bg) 0%, var(--color-accent-strong) 100%);
-}
+/* .header-avatar-btn's own definition (tier-select.css) is a solid
+   neutral gray — this was overriding it to a blue gradient. */
 
-.dash-risk-card,
-.your-limit-callout,
-.roadmap-balance-card,
-.goal-result-card {
-  background: linear-gradient(140deg, var(--card-dark-bg-top) 0%, var(--card-dark-bg-bottom) 100%);
-}
+/* .header-balance-pill, .dash-risk-card, .your-limit-callout and
+   .roadmap-balance-card are plain white/light cards with dark text per
+   the reference design (claude.ai/design 1CrTrader App) — their own
+   component CSS now sets that directly. This dark-navy-gradient mapping
+   was leftover dark-mode logic and was silently re-overriding all four
+   back to a dark card with near-invisible pale text. .goal-result-card
+   is dead CSS (the live Roadmap goal-projection cards use
+   .rm-metric-card instead), left untouched. */
 
 /* ---------- Trade Manager chart ---------- */
 /* The chart's own SVG colors (price line, candles, zone fills) are
@@ -352,12 +380,12 @@ hr,
    surrounding chrome (price labels, result cards) needs adjusting here. */
 .tm-rr-summary,
 .tm-result-card.tm-result-open {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .tm-rr-chip {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
@@ -368,21 +396,21 @@ hr,
   scrollbar-color: var(--color-border) var(--color-canvas);
 }
 
-/* ---------- Dashboard section cards dark mode ---------- */
+/* ---------- Dashboard section cards ---------- */
 .dash-section-card {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .dash-risk-wrap {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 /* Quicklink icon: use a warm dark gold tint in dark mode so it reads as
    intentionally styled, not a leftover cream blob on a dark background. */
 .dash-quicklink-icon {
-  background: rgba(59, 158, 255, 0.15);
+  background: rgba(37, 99, 235, 0.15);
   color: var(--color-accent);
 }
 
@@ -419,17 +447,17 @@ hr,
 
 
 .tm-type-pill {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   border-color: var(--color-border);
 }
 
 .tm-type-pill:hover {
-  background: rgba(59, 158, 255, 0.08);
+  background: rgba(37, 99, 235, 0.08);
   border-color: var(--color-accent);
 }
 
 .tm-type-pill.tm-type-pill-active {
-  background: rgba(59, 158, 255, 0.14);
+  background: rgba(37, 99, 235, 0.14);
   border-color: var(--color-accent);
 }
 
@@ -441,7 +469,7 @@ hr,
 }
 
 .tm-lots-step-btn {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   color: var(--color-text-primary);
 }
 
@@ -450,7 +478,7 @@ hr,
 }
 
 .tm-lots-input {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   color: var(--color-text-primary);
   border-color: var(--color-border);
 }
@@ -460,7 +488,7 @@ hr,
 
 .tm-position-summary {
   background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .tm-position-cell-risk {
@@ -485,7 +513,7 @@ hr,
 .tm-position-cell-margin .tm-position-value { color: var(--color-info); }
 
 .tm-collapsed-setup {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   border-color: var(--color-border);
 }
 
@@ -494,14 +522,14 @@ hr,
 }
 
 .tm-collapsed-chip {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
 
 .tm-setup-review {
   background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .tm-review-label { color: var(--color-text-muted); }
@@ -546,7 +574,7 @@ hr,
 
 /* Broker tiles */
 .broker-option-btn {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-primary);
 }
@@ -557,11 +585,11 @@ hr,
 
 .broker-more-wrap {
   background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .broker-more-row {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-primary);
 }
@@ -598,11 +626,12 @@ hr,
   color: var(--color-text-primary);
 }
 
-/* Security note (the blue "read-only connection" box) */
+/* Security note (the blue "read-only connection" box) — same
+   light-on-light text bug as .lot-unlock-note above. */
 .setup-wizard-note {
   background: rgba(44, 123, 229, 0.1);
   border-color: rgba(44, 123, 229, 0.25);
-  color: var(--color-info-tint);
+  color: #3A5170;
 }
 
 /* Capital amount input wrapper */
@@ -638,7 +667,7 @@ hr,
 }
 
 .profit-decision-secondary-btn {
-  background: var(--color-canvas);
+  background: none;
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
@@ -676,12 +705,12 @@ hr,
 }
 
 .calc-history-grid {
-  background: var(--color-surface);
-  border-color: var(--color-surface);
+  background: var(--color-border);
+  border-color: var(--color-border);
 }
 
 .calc-history-cell {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   color: var(--color-text-secondary);
 }
 
@@ -693,7 +722,7 @@ hr,
 /* ---------- Roadmap dark mode (comprehensive) ---------- */
 .roadmap-input-card {
   background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .roadmap-input-row {
@@ -702,7 +731,7 @@ hr,
 }
 
 .roadmap-input-prefix {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
@@ -713,8 +742,8 @@ hr,
 }
 
 .roadmap-stat {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .roadmap-stat-label {
@@ -744,8 +773,8 @@ hr,
 /* Daily log history table on Roadmap */
 .roadmap-log-grid,
 [class*="roadmap-log"] {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
 
@@ -761,7 +790,7 @@ hr,
 }
 
 .setup-stepper-dot-active {
-  background: rgba(59, 158, 255, 0.18);
+  background: rgba(37, 99, 235, 0.18);
   color: var(--color-accent);
   border-color: var(--color-accent);
 }
@@ -788,19 +817,20 @@ hr,
   background: var(--color-accent);
 }
 
-/* ---------- Roadmap goal-amount buttons (dark mode) ---------- */
-/* The white buttons were jarring — use a dark surface with a subtle
-   border, matching how the goal-amount grid looks in the rest of the
-   dark app. Selected state stays inverted (dark bg, white text). */
+/* ---------- Roadmap goal-amount buttons ---------- */
+/* Own component CSS (roadmap.css) sets background:#fff — this dark-mode
+   -era comment/override ("white buttons were jarring") no longer applies
+   in the light theme and was making these buttons render gray instead of
+   white. Selected state stays inverted (dark bg, white text). */
 .goal-amount-btn {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
 
 .goal-amount-btn:hover {
   border-color: var(--color-info);
-  background: rgba(91, 147, 232, 0.1);
+  background: rgba(37, 99, 235, 0.1);
   color: var(--color-text-primary);
 }
 
@@ -830,7 +860,7 @@ hr,
 /* ---------- Daily Limits Tool dark mode (comprehensive) ---------- */
 .log-date-wrap {
   background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .log-date-input {
@@ -841,7 +871,7 @@ hr,
 
 .broker-connected-row {
   background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .broker-connected-text {
@@ -858,29 +888,34 @@ hr,
   color: var(--color-loss);
 }
 
-/* ---------- Journal dark mode (comprehensive) ---------- */
-.journal-analysis-wrap {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
-}
+/* ---------- Journal ---------- */
+/* .journal-analysis-wrap is already mapped to --color-surface-inset
+   above — this duplicate rule (loaded later) was silently re-breaking
+   that fix back to --color-canvas, since equal-specificity rules
+   resolve by source order. Removed the duplicate entirely. */
 
 .journal-filter-row {
   background: transparent;
 }
 
 .journal-filter-clear-btn {
-  background: var(--color-canvas);
+  background: none;
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
 
 .journal-form-wrap {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 
+/* .journal-section's own border (trading-journal.css) is a visible
+   light gray (#E3E9F1) — this was overriding it to --color-surface
+   (white), making every one of the form's 5 card sections render with
+   an invisible white-on-white edge (looked like weak/undefined boxes
+   floating with no boundary against the page). */
 .journal-section {
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .journal-section-title {
@@ -914,24 +949,28 @@ hr,
 .rm-step-label { color: var(--color-text-muted); }
 .rm-goal-slider-min,
 .rm-goal-slider-max { color: var(--color-text-muted); }
-.rm-goal-slider {
-  background: linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) 50%, var(--color-surface) 50%);
-}
+/* .rm-goal-slider's own definition (roadmap.css) already uses a visible
+   light gray (#E3E9F1) for the unfilled portion of the track — this was
+   overriding it to --color-surface (white), which blends into the
+   white card the slider sits on and reads as "no track at all" beyond
+   the thumb. Removed so the correct gray track shows through; the
+   fill position itself is kept in sync with the actual value via JS
+   (see updateSliderFill() in roadmap.js). */
 .rm-goal-slider::-webkit-slider-thumb { border-color: var(--color-canvas); }
 .rm-goal-custom-label { color: var(--color-text-secondary); }
 .rm-goal-custom-input-wrap { background: var(--color-surface-inset); border-color: var(--color-border); }
-.rm-goal-prefix { background: var(--color-canvas); border-color: var(--color-border); color: var(--color-text-muted); }
+.rm-goal-prefix { background: var(--color-surface-inset); border-color: var(--color-border); color: var(--color-text-muted); }
 .rm-goal-custom-input { color: var(--color-text-primary); }
 .rm-goal-display { color: var(--color-text-primary); }
 
-.rm-status-warning { background: rgba(255,107,120,0.13); border-color: rgba(255,107,120,0.3); color: var(--color-loss-tint); }
+.rm-status-warning { background: rgba(255,107,120,0.13); border-color: rgba(255,107,120,0.3); color: var(--color-loss); }
 .rm-status-ok { background: rgba(47,189,133,0.12); border-color: rgba(47,189,133,0.28); color: var(--color-profit); }
 .rm-status-reached { background: rgba(47,189,133,0.12); border-color: rgba(47,189,133,0.28); color: var(--color-profit); }
 
 .rm-sim-hint { color: var(--color-text-secondary); }
 .rm-sim-slider-label { color: var(--color-text-primary); }
 
-.rm-metric-card { background: var(--color-canvas); border-color: var(--color-surface); }
+.rm-metric-card { background: var(--color-surface-inset); border-color: var(--color-border); }
 .rm-metric-label { color: var(--color-text-muted); }
 .rm-metric-value { color: var(--color-text-primary); }
 .rm-metric-sub { color: var(--color-text-muted); }
@@ -942,30 +981,33 @@ hr,
 .rm-challenge-empty { color: var(--color-text-muted); }
 .rm-challenge-pct { color: var(--color-text-primary); }
 .rm-challenge-progress-track { background: var(--color-surface); }
-.rm-challenge-stat { background: var(--color-canvas); border-color: var(--color-surface); }
+.rm-challenge-stat { background: var(--color-surface-inset); border-color: var(--color-border); }
 .rm-challenge-stat-value { color: var(--color-text-primary); }
 
-.rm-modal { background: var(--color-canvas); box-shadow: 0 16px 40px rgba(0,0,0,0.5); }
-.rm-modal-header { border-bottom-color: var(--color-surface); }
 .rm-modal-title { color: var(--color-text-primary); }
 .rm-modal-close { color: var(--color-text-muted); }
-.rm-modal-footer { border-top-color: var(--color-surface); }
+/* .rm-modal / .rm-modal-header / .rm-modal-footer's own background,
+   box-shadow and border colors (roadmap.css) are correct for the
+   right-side drawer treatment now used here — this used to override
+   the border colors to --color-surface (white-on-white, an invisible
+   border) and the box-shadow to a centered-modal drop shadow that
+   fought the drawer's left-edge shadow. Removed both overrides. */
 
-/* ---------- Trade Manager — new elements dark mode ---------- */
+/* ---------- Trade Manager — new elements ---------- */
 .tm-broker-import-strip {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   border-color: var(--color-border);
 }
 .tm-broker-import-label { color: var(--color-text-secondary); }
-.tm-broker-import-mini-btn,
-.tm-broker-mini-import-btn {
-  background: var(--color-text-primary);
-  color: var(--color-text-inverse);
-}
+/* .tm-broker-import-mini-btn / .tm-broker-mini-import-btn already set
+   their own blue gradient in trade-manager.css — this used to force
+   them to --color-text-primary (near-black navy), which read as a
+   plain black button. Removed so the component's own blue gradient
+   shows through. */
 
 .tm-metrics-panel {
   background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 .tm-metrics-panel-empty { color: var(--color-text-muted); }
 .tm-metric-row { border-bottom-color: var(--color-surface); }
@@ -977,7 +1019,7 @@ hr,
 .tm-price-hint { color: var(--color-text-secondary); }
 
 .tm-end-btn {
-  background: var(--color-canvas);
+  background: var(--color-surface-inset);
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
@@ -1015,7 +1057,7 @@ hr,
 
 .trade-log-container {
   background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  border-color: var(--color-border);
   border-radius: 10px;
 }
 
@@ -1036,7 +1078,7 @@ hr,
 .broker-synced-title { color: var(--color-text-primary); }
 
 .broker-range-pill {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
@@ -1046,14 +1088,14 @@ hr,
 }
 
 .broker-range-pill-active {
-  background: rgba(91,147,232,0.14);
+  background: rgba(37,99,235,0.14);
   border-color: var(--color-info);
   color: var(--color-text-primary);
 }
 
 .broker-day-detail {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
   border-radius: 10px;
   padding: 14px 16px;
 }
@@ -1066,7 +1108,7 @@ hr,
 }
 .profit-decision-title { color: var(--color-profit); }
 .profit-decision-secondary-btn {
-  background: var(--color-canvas);
+  background: none;
   border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
@@ -1075,11 +1117,11 @@ hr,
 
 /* Roadmap history table (white cells) */
 .roadmap-history-grid {
-  background: var(--color-surface);
-  border-color: var(--color-surface);
+  background: var(--color-border);
+  border-color: var(--color-border);
 }
 .roadmap-history-cell {
-  background: var(--color-canvas);
+  background: var(--color-surface);
   color: var(--color-text-secondary);
 }
 .roadmap-history-head {
@@ -1089,8 +1131,8 @@ hr,
 
 /* Trade Manager result cards — open/open-profit white backgrounds */
 .tm-result-card.tm-result-open {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 .tm-result-card.tm-result-open .tm-result-title { color: var(--color-text-primary); }
 .tm-result-card.tm-result-open .tm-result-message { color: var(--color-text-secondary); }
@@ -1100,51 +1142,55 @@ hr,
   border-color: rgba(44, 123, 229, 0.25);
 }
 .tm-result-card.tm-result-open-profit .tm-result-title { color: var(--color-info); }
-.tm-result-card.tm-result-open-profit .tm-result-message { color: var(--color-info-tint); }
+.tm-result-card.tm-result-open-profit .tm-result-message { color: #3A5170; }
 
 /* Trade closed overlay */
 .tm-rr-animation-area .tm-closed-overlay {
   background: rgba(11, 15, 23,0.85);
 }
 
-/* Setup instrument picker — white box in dark mode */
+/* Setup instrument picker — matches tier-select.css's own values exactly
+   (category box: transparent/white with a border; rows: white; header
+   button: transparent). This used to route rows to --color-canvas
+   (the page background), which made every instrument row blend into
+   the page instead of reading as a white list — the same bug as the
+   card-background fix above. */
 .instrument-picker-wrap,
 .instrument-picker-category {
-  background: var(--color-surface-inset);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border);
 }
 .instrument-picker-category-header {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: none;
+  border-color: var(--color-border);
   color: var(--color-text-secondary);
 }
 .instrument-picker-row {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface);
+  border-color: var(--color-border-subtle);
   color: var(--color-text-secondary);
 }
 .instrument-picker-search {
-  background: var(--color-surface-inset);
+  background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text-primary);
 }
 
 /* Roadmap metric cards */
 .rm-metric-card {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
 }
 
 /* Challenge stat cards */
 .rm-challenge-stat {
-  background: var(--color-canvas);
-  border-color: var(--color-surface);
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
 }
 
-/* Right-side panels (suggestions pattern reused) */
-.suggestions-panel {
-  background: var(--color-canvas);
-}
+/* .suggestions-panel is already mapped to --color-surface above — this
+   duplicate rule (loaded later) was silently re-breaking that fix back
+   to --color-canvas. Removed the duplicate entirely. */
 .suggestions-panel-header {
   border-bottom-color: var(--color-surface);
 }

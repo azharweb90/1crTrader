@@ -52,9 +52,9 @@
   padding: 10px 12px;
   border: 1px solid #DCE3EC;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15.5px;
   background: #fff;
-  color: #14233D;
+  color: #1E293B;
 }
 
 .trade-log-container {
@@ -66,9 +66,9 @@
 }
 
 .trade-log-title {
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
-  color: #14233D;
+  color: #1E293B;
   margin-bottom: 10px;
 }
 
@@ -77,7 +77,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #2C6FD6;
+  color: #2563EB;
   background: #EEF6FF;
   padding: 2px 7px;
   border-radius: 5px;
@@ -87,9 +87,9 @@
 
 .trade-submit-btn {
   width: 100%;
-  background: #14233D;
+  background: #1E293B;
   color: #ffffff;
-  border-color: #14233D;
+  border-color: #1E293B;
 }
 
 .trade-submit-btn:disabled {
@@ -122,13 +122,13 @@
 
 .cooldown-title {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   color: #4a4ea3;
   margin-bottom: 8px;
 }
 
 .cooldown-message {
-  font-size: 13.5px;
+  font-size: 15px;
   color: #3f4257;
   line-height: 1.55;
   margin: 0 0 14px;
@@ -136,7 +136,7 @@
 
 .cooldown-message strong {
   font-variant-numeric: tabular-nums;
-  color: #14233D;
+  color: #1E293B;
 }
 
 .cooldown-progress-track {
@@ -177,13 +177,13 @@
 
 .profit-decision-title {
   font-size: 16px;
-  font-weight: 700;
-  color: #0E9F6E;
+  font-weight: 800;
+  color: #16A34A;
   margin-bottom: 8px;
 }
 
 .profit-decision-message {
-  font-size: 13.5px;
+  font-size: 15px;
   color: #1b3d33;
   line-height: 1.55;
   margin: 0 0 16px;
@@ -203,15 +203,15 @@
   color: #5B6B82;
   padding: 10px 16px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
 }
 
 .profit-decision-secondary-btn:hover {
-  border-color: #0E9F6E;
-  color: #0E9F6E;
+  border-color: #16A34A;
+  color: #16A34A;
 }
 
 .btn-group {
@@ -225,15 +225,15 @@
   border: 1px solid #DCE3EC;
   border-radius: 8px;
   background: #fff;
-  color: #14233D;
-  font-size: 13px;
+  color: #1E293B;
+  font-size: 14.5px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .outcome-btn:hover:not(:disabled) {
-  border-color: #2C6FD6;
+  border-color: #2563EB;
 }
 
 .outcome-btn:disabled {
@@ -243,8 +243,8 @@
 
 .outcome-btn.active-profit {
   background: #EAF8F2;
-  border-color: #0E9F6E;
-  color: #0E9F6E;
+  border-color: #16A34A;
+  color: #16A34A;
 }
 
 .outcome-btn.active-loss {
@@ -267,7 +267,7 @@
 }
 
 .amount-label {
-  font-size: 11.5px;
+  font-size: 13px;
   color: #5B6B82;
   text-transform: none;
   font-weight: 500;
@@ -279,13 +279,13 @@
   padding: 10px 12px;
   border: 1px solid #DCE3EC;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15.5px;
   font-variant-numeric: tabular-nums;
 }
 
 .amount-input:focus {
   outline: none;
-  border-color: #2C6FD6;
+  border-color: #2563EB;
 }
 
 .amount-input.input-error {
@@ -306,13 +306,13 @@
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: 14.5px;
   color: #5B6B82;
 }
 
 .stat-value {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15.5px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
@@ -343,18 +343,18 @@
 }
 
 .alert-title {
-  font-size: 13.5px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
-.alert-banner.success .alert-title { color: #2C6FD6; }
-.alert-banner.warning .alert-title { color: #b5750a; }
+.alert-banner.success .alert-title { color: #2563EB; }
+.alert-banner.warning .alert-title { color: #1D4ED8; }
 .alert-banner.danger  .alert-title { color: #b8281a; }
 .alert-banner.cooldown .alert-title { color: #4a4ea3; }
 
 .alert-desc {
-  font-size: 13px;
+  font-size: 14.5px;
   color: #444c54;
   margin: 0;
 }
@@ -370,11 +370,11 @@
   gap: 10px;
   background: #EEF6FF;
   border: 1px solid #BBDAFB;
-  border-left: 4px solid #2C6FD6;
+  border-left: 4px solid #2563EB;
   border-radius: 8px;
   padding: 12px 16px;
   margin-top: 10px;
-  font-size: 13.5px;
+  font-size: 15px;
   color: #1A3A63;
   line-height: 1.55;
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
@@ -384,19 +384,19 @@
   flex: 0 0 auto;
   font-size: 17px;
   line-height: 1.3;
-  color: #2C6FD6;
+  color: #2563EB;
 }
 
 .lot-unlock-note.lot-cap-flash {
   background: #FFF3DC;
   border-color: #F0C97A;
-  border-left-color: #C5841A;
+  border-left-color: #1D4ED8;
   color: #6B4A0E;
   font-weight: 600;
 }
 
 .lot-unlock-note.lot-cap-flash .lot-unlock-note-icon {
-  color: #C5841A;
+  color: #1D4ED8;
 }
 
 .mini-ladder-title {
@@ -429,7 +429,7 @@
 }
 
 .mini-ladder-toggle-header:hover .mini-ladder-title {
-  color: #14233D;
+  color: #1E293B;
 }
 
 .mini-ladder-chevron {
@@ -471,7 +471,7 @@
   border: 1px solid #DCE3EC;
   border-radius: 10px;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 .mini-ladder-grid-4col {
@@ -503,14 +503,14 @@
   padding: 6px 14px;
   font-size: 12.5px;
   font-weight: 600;
-  color: #14233D;
+  color: #1E293B;
 }
 
 .instrument-sl-grid {
   grid-template-columns: minmax(100px, 1fr) minmax(70px, 0.6fr) minmax(60px, 0.5fr) minmax(80px, 0.6fr) minmax(90px, 0.8fr) minmax(90px, 0.8fr) minmax(110px, 0.9fr);
 }
 
-/* Over-allowance warning shown under the Loss If Hit amount — gold/amber
+/* Over-allowance warning shown under the Loss If Hit amount — blue
    warning chip with icon (not red — red is reserved for the loss amount
    itself, this is a separate "heads up" signal). */
 .sl-exceeds-warning {
@@ -519,12 +519,12 @@
   gap: 4px;
   margin-top: 4px;
   padding: 3px 8px;
-  background: #FBF1DA;
-  border: 1px solid #E8CD8A;
+  background: #EAF1FE;
+  border: 1px solid #B9D4FA;
   border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
-  color: #8C6510;
+  color: #1D4ED8;
   white-space: normal;
   line-height: 1.4;
 }
@@ -536,7 +536,7 @@
 
 .mini-ladder-cell.num {
   text-align: right;
-  color: #14233D;
+  color: #1E293B;
   font-variant-numeric: tabular-nums;
 }
 
@@ -551,13 +551,13 @@
 
 .mini-ladder-label {
   font-weight: 600;
-  color: #14233D;
+  color: #1E293B;
   background: #F7F9FC;
 }
 
 .mini-ladder-label.tier-highlight {
-  background: #FBF4DA !important;
-  color: #8C6510 !important;
+  background: rgba(37, 99, 235, 0.12) !important;
+  color: #1D4ED8 !important;
 }
 
 .sl-lots-input {
@@ -565,34 +565,35 @@
   padding: 5px 6px;
   border: 1px solid #DCE3EC;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 14.5px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
 .sl-lots-input:focus {
   outline: none;
-  border-color: #2C6FD6;
+  border-color: #2563EB;
 }
 
 .mini-ladder-cell.tier-highlight-row {
-  background: #FBF4DA !important;
+  background: rgba(37, 99, 235, 0.12) !important;
   position: relative;
 }
 
 .mini-ladder-grid .mini-ladder-label.tier-highlight::before {
   content: "\25B8";
   margin-right: 6px;
-  color: #8C6510;
+  color: #1D4ED8;
 }
 
 /* Prominent "your limit today" callout next to the trade log */
 .your-limit-callout {
-  background: linear-gradient(135deg, #221C0E 0%, #B6890F 100%);
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
   border-radius: 10px;
   padding: 14px 18px;
   margin-bottom: 16px;
-  color: #ffffff;
+  color: #1E293B;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -605,12 +606,13 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: rgba(255, 255, 255, 0.8);
+  color: #8A98AD;
 }
 
 .your-limit-callout-value {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
+  color: #1E293B;
   font-variant-numeric: tabular-nums;
 }
 
@@ -628,13 +630,13 @@
   padding: 10px 12px;
   border: 1px solid #DCE3EC;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15.5px;
   margin-top: 6px;
 }
 
 .log-date-input:focus {
   outline: none;
-  border-color: #2C6FD6;
+  border-color: #2563EB;
 }
 
 .log-date-input.input-error {
@@ -655,7 +657,7 @@
   border: 1px solid #DCE3EC;
   border-radius: 10px;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 14.5px;
   margin-top: 10px;
 }
 
@@ -683,7 +685,7 @@
 }
 
 .calc-history-win {
-  color: #0E9F6E;
+  color: #16A34A;
   font-weight: 600;
 }
 
@@ -703,7 +705,7 @@
 
 .rule-status-ok {
   background: #EAF8F2;
-  color: #0E9F6E;
+  color: #16A34A;
 }
 
 .rule-status-violation {
@@ -721,14 +723,14 @@
 }
 
 .rule-violation-banner-title {
-  font-size: 13.5px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   color: #a32d2d;
   margin-bottom: 4px;
 }
 
 .rule-violation-banner-msg {
-  font-size: 12.5px;
+  font-size: 14px;
   color: #5B6B82;
   line-height: 1.5;
   margin: 0;
@@ -792,11 +794,11 @@
 .broker-synced-title {
   font-size: 15px;
   font-weight: 700;
-  color: #14233D;
+  color: #1E293B;
 }
 
 .broker-synced-title span {
-  color: #2C6FD6;
+  color: #2563EB;
 }
 
 /* Stat cards: Realized P&L / Total Charges / Net Realized P&L */
@@ -838,20 +840,20 @@
 
 .broker-stat-icon-neutral {
   background: #EEF6FF;
-  color: #2C6FD6;
+  color: #2563EB;
 }
 
 .broker-stat-label {
-  font-size: 11.5px;
+  font-size: 13px;
   color: #5B6B82;
   margin-bottom: 3px;
 }
 
 .broker-stat-value {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: #14233D;
+  color: #1E293B;
 }
 
 /* Range selection pills */
@@ -893,13 +895,13 @@
 }
 
 .broker-range-pill:hover {
-  border-color: #2C6FD6;
+  border-color: #2563EB;
 }
 
 .broker-range-pill-active {
   background: #EEF6FF;
-  border-color: #2C6FD6;
-  color: #14233D;
+  border-color: #2563EB;
+  color: #1E293B;
 }
 
 .broker-range-label-pill {
@@ -926,15 +928,15 @@
   border: 1px solid #DCE3EC;
   border-radius: 8px;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-family: inherit;
-  color: #14233D;
+  color: #1E293B;
   width: 100%;
 }
 
 .broker-day-picker-input:focus {
   outline: none;
-  border-color: #2C6FD6;
+  border-color: #2563EB;
 }
 
 /* Shown before the trader has picked any range — the calendar no longer
@@ -957,7 +959,7 @@
    underneath — mirrors a real broker's yearly P&L overview. */
 .broker-multi-month-grid {
   display: flex;
-  gap: 28px;
+  gap: 64px;
   overflow-x: auto;
   padding-bottom: 6px;
   justify-content: flex-start;
@@ -966,23 +968,22 @@
 
 .broker-month-block {
   flex: 0 0 auto;
-  width: 196px;
+  width: 210px;
 }
 
 .broker-month-block-label {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
-  color: #14233D;
+  color: #1E293B;
   padding-bottom: 6px;
-  border-bottom: 2px solid #C53D22;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .broker-month-weekday-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 6px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .broker-month-weekday {
@@ -996,20 +997,20 @@
 .broker-month-dots {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 
 .broker-month-dot {
   aspect-ratio: 1 / 1;
   width: 100%;
-  border-radius: 6px;
+  border-radius: 10px;
   border: none;
   padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: #5B6B82;
@@ -1024,34 +1025,34 @@
 }
 
 .broker-month-dot-gray {
-  background: #E3E9F1;
-  color: #8A98AD;
+  background: #E7E9F5;
+  color: #8891A8;
 }
 
 .broker-month-dot-green {
-  background: rgba(14, 159, 110, 0.22);
-  color: #0E6B45;
+  background: #D9F2E3;
+  color: #167C46;
 }
 
 .broker-month-dot-red {
-  background: rgba(197, 61, 34, 0.18);
-  color: #A02E1A;
+  background: #FBDDD3;
+  color: #B23A22;
 }
 
 .broker-month-dot-selected {
-  outline: 2.5px solid #14233D;
+  outline: 2.5px solid #1E293B;
   outline-offset: 1.5px;
   font-weight: 800;
 }
 
 .broker-month-column-total {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
-  padding-top: 12px;
+  padding-top: 14px;
   font-variant-numeric: tabular-nums;
 }
 
-.broker-legend-green { background: #0E9F6E; }
+.broker-legend-green { background: #16A34A; }
 .broker-legend-red { background: #C53D22; }
 .broker-legend-gray { background: #DCE3EC; }
 
@@ -1089,9 +1090,9 @@
 }
 
 .broker-day-detail-title {
-  font-size: 14px;
+  font-size: 15.5px;
   font-weight: 700;
-  color: #14233D;
+  color: #1E293B;
 }
 
 /* Dedicated class instead of reusing .outcome-btn (which has flex:1 and
@@ -1099,12 +1100,12 @@
    — that's why this button used to look oversized and plain white). */
 .broker-import-btn {
   flex: 0 0 auto;
-  background: linear-gradient(135deg, #D4A828 0%, #B6890F 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   color: #ffffff;
   border: none;
   padding: 9px 18px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
@@ -1130,7 +1131,7 @@
   border: 1px solid #DCE3EC;
   border-radius: 8px;
   overflow: hidden;
-  font-size: 12.5px;
+  font-size: 14px;
   margin-bottom: 1px;
 }
 
@@ -1157,7 +1158,7 @@
 }
 
 .broker-order-time {
-  font-size: 11.5px;
+  font-size: 13px;
   color: #5B6B82;
   font-variant-numeric: tabular-nums;
 }
@@ -1165,7 +1166,7 @@
 .broker-order-status-badge {
   display: inline-block;
   background: #E1F5EE;
-  color: #0E6B45;
+  color: #15803D;
   font-size: 10.5px;
   font-weight: 700;
   padding: 3px 10px;
@@ -1174,18 +1175,34 @@
 
 .broker-import-confirm {
   margin-top: 14px;
-  background: #fff7e6;
-  border: 1px solid #f0d9a8;
+  background: #EAF1FE;
+  border: 1px solid #B9D4FA;
   border-radius: 10px;
   padding: 14px 16px;
 }
+
+.broker-import-confirm-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.broker-import-confirm-actions .broker-import-btn {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 9px 20px;
+}
+
+/* The Cancel button here uses the shared .journal-list-btn class (see
+   shared.css) rather than a bespoke class — same "Cancel" pattern used
+   in a few other panels across the app. */
 
 .broker-import-confirm.hidden {
   display: none;
 }
 
 .broker-import-confirm-text {
-  font-size: 13px;
+  font-size: 14.5px;
   color: #5B6B82;
   line-height: 1.5;
   margin: 0 0 10px;
@@ -1205,9 +1222,9 @@
 }
 
 .broker-quick-connect-title {
-  font-size: 14px;
+  font-size: 15.5px;
   font-weight: 700;
-  color: #14233D;
+  color: #1E293B;
 }
 
 #manual-entry-panel.hidden {

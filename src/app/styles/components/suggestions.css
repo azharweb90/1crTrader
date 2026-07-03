@@ -29,8 +29,8 @@
 
 .suggestions-category-title {
   font-size: 15px;
-  font-weight: 700;
-  color: #14233d;
+  font-weight: 800;
+  color: #1E293B;
   letter-spacing: -0.1px;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .suggestions-row:hover {
-  background: #fbf7ec;
+  background: #EAF1FE;
 }
 
 .suggestions-row:last-child {
@@ -79,8 +79,8 @@
 }
 
 .suggestions-row-title {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15.5px;
+  font-weight: 600;
   color: #5b6b82;
   line-height: 1.5;
 }
@@ -143,8 +143,8 @@
   font-weight: 500;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #8c6510;
-  background: #fbf1da;
+  color: #1D4ED8;
+  background: #EAF1FE;
   padding: 4px 10px;
   border-radius: 999px;
 }
@@ -160,7 +160,7 @@
 }
 
 .suggestions-panel-close:hover {
-  color: #14233d;
+  color: #1E293B;
 }
 
 .suggestions-panel-body {
@@ -171,8 +171,8 @@
 
 .suggestions-panel-title {
   font-size: 19px;
-  font-weight: 700;
-  color: #14233d;
+  font-weight: 800;
+  color: #1E293B;
   line-height: 1.4;
   margin: 0 0 14px;
 }
@@ -199,16 +199,16 @@
   border: 1px solid #dce3ec;
   border-radius: 8px;
   padding: 7px 14px;
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
-  color: #14233d;
+  color: #1E293B;
   cursor: pointer;
   font-family: inherit;
 }
 
 .suggestions-panel-nav-btn:hover:not(:disabled) {
-  border-color: #d4a828;
-  background: #fbf7ec;
+  border-color: #2563EB;
+  background: #EAF1FE;
 }
 
 .suggestions-panel-nav-btn:disabled {
@@ -217,7 +217,7 @@
 }
 
 .suggestions-panel-position {
-  font-size: 11.5px;
+  font-size: 13px;
   color: #8a98ad;
   font-variant-numeric: tabular-nums;
 }

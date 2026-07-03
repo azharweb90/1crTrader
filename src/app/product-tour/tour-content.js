@@ -112,31 +112,17 @@ window.TOUR_CONTENT = {
     },
   ],
 
-  "tab-education": [
+  "tab-learn": [
     {
-      eyebrow: "Education",
-      title: "Go deeper, on your own time",
-      text: "Structured lessons on the concepts this app enforces day to day — for whenever you want more than just the rule.",
+      eyebrow: "Knowledge Area",
+      title: "Everything to sharpen your edge, in one place",
+      text: "Videos, books, and behavioral suggestions — three sub-tabs instead of three separate pages.",
     },
     {
-      eyebrow: "Education",
-      title: "Browse by topic",
-      text: "Filter lessons to whatever you're focused on right now.",
-      target: "#education-filter-bar",
-    },
-  ],
-
-  "tab-books": [
-    {
-      eyebrow: "Books",
-      title: "A curated reading list",
-      text: "Trading and psychology books worth your time — filtered by what you're trying to improve.",
-    },
-    {
-      eyebrow: "Books",
-      title: "Filter by topic",
-      text: "Narrow the list down to what's actually relevant to where you are right now.",
-      target: "#books-filter-bar",
+      eyebrow: "Knowledge Area",
+      title: "Browse by category",
+      text: "Filter each sub-tab to whatever you're focused on right now.",
+      target: ".learn-tab-bar",
     },
   ],
 
@@ -154,20 +140,6 @@ window.TOUR_CONTENT = {
     },
   ],
 
-  "tab-suggestions": [
-    {
-      eyebrow: "Suggestions",
-      title: "The mistakes that quietly cost traders money",
-      text: "Not trade signals — behavioral and risk-discipline guidance grouped by category. Tap any title to read the full reasoning.",
-    },
-    {
-      eyebrow: "Suggestions",
-      title: "Browse by category",
-      text: "Psychology, Risk Management, and Options-Specific. Tap any title to open the full explanation in a side panel.",
-      target: "#suggestions-list-area",
-    },
-  ],
-
   "tab-settings": [
     {
       eyebrow: "Account",
@@ -180,14 +152,11 @@ window.TOUR_CONTENT = {
       text: "The exact same numbers shown on Dashboard and Daily Limits Tool — tier, max loss, and lots, computed live from your current balance.",
       target: "#account-risk-grid",
     },
-  ],
-
-  "tab-subs": [
     {
-      eyebrow: "Subscription Pricing",
-      title: "Plans for wherever you are",
-      text: "Your current tier's matching plan is highlighted so it's always clear which one applies to you.",
-      target: ".pricing-card.popular",
+      eyebrow: "Account",
+      title: "Plan & billing, right here",
+      text: "Your subscription plan now lives on this page too — no separate tab to hunt for it in.",
+      target: "#account-plan-billing",
     },
   ],
 };

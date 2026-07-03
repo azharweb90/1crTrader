@@ -1,433 +1,703 @@
 /* Extracted from the original monolithic dashboard.css during the
    Phase 3 CSS decomposition (see docs/architecture/ for the strategy doc).
-   Original section markers preserved below. */
+   Rebuilt (July 2026) per the revamped UX design — adherence hero,
+   needs-journaling / journaled-entries tabs, weekly/monthly grouped saved
+   view, graded entry form, read-only view mode. */
 
 /* ===========================================================
    10. COMPONENT: trading-journal
    =========================================================== */
-.journal-list-grid {
-  display: grid;
-  grid-template-columns: minmax(90px, 0.8fr) minmax(90px, 0.8fr) minmax(120px, 1fr) minmax(90px, 0.7fr);
-  gap: 1px;
-  background: #DCE3EC;
-  border: 1px solid #DCE3EC;
-  border-radius: 10px;
-  overflow: hidden;
-  font-size: 13px;
-}
 
-.journal-list-grid-5col {
-  grid-template-columns: minmax(85px, 0.7fr) minmax(90px, 0.7fr) minmax(85px, 0.7fr) minmax(120px, 1fr) minmax(90px, 0.7fr);
-}
-
-/* Rule adherence analysis (week/month) — separate from the all-time
-   journal-stats-bar below it. Reuses .broker-range-pill /
-   .broker-range-pill-active / .broker-range-label-pill from the Daily
-   Limits Tool's broker P&L browser for the same week/month pill pattern. */
-.journal-analysis-wrap {
+/* ---------- Adherence hero ---------- */
+.journal-hero {
   background: #fff;
   border: 1px solid #E3E9F1;
-  border-radius: 12px;
-  padding: 18px 20px;
-  margin-bottom: 20px;
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 22px;
 }
 
-.journal-analysis-header {
+.journal-hero-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 10px;
+}
+
+.journal-hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  color: #8A98AD;
+  text-transform: uppercase;
   margin-bottom: 10px;
 }
 
-.journal-analysis-pills {
+.journal-range-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: #EAF1FE;
+  border: 1px solid #CFE0FB;
+  color: #2563EB;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.journal-hero-toggle {
   display: flex;
   gap: 8px;
 }
 
-.journal-analysis-stats {
+.journal-hero-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 14px 0 16px;
+  grid-template-columns: 1.7fr 1fr 1fr;
+  gap: 16px;
 }
 
-.journal-analysis-stat-card {
-  background: #fafbfc;
+.journal-hero-stat {
+  background: #F7F9FC;
   border: 1px solid #E3E9F1;
-  border-radius: 10px;
-  padding: 12px 14px;
+  border-radius: 13px;
+  padding: 16px 18px;
 }
 
-.journal-analysis-stat-value {
-  font-size: 19px;
-  font-weight: 700;
-  color: #14233D;
-  font-variant-numeric: tabular-nums;
-}
-
-.journal-analysis-stat-label {
-  font-size: 11px;
-  color: #5B6B82;
-  margin-top: 4px;
-}
-
-.journal-violation-breakdown-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #5B6B82;
+.journal-hero-stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.8px;
+  color: #8A98AD;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 8px;
+  margin-bottom: 9px;
 }
 
-.journal-violation-row {
+.journal-hero-stat-main {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #F1F4F8;
-  font-size: 13px;
+  align-items: baseline;
+  gap: 9px;
 }
 
-.journal-violation-row:last-child {
-  border-bottom: none;
+.journal-hero-stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.5px;
 }
 
-.journal-violation-count {
-  font-weight: 700;
-  color: #a32d2d;
-  font-variant-numeric: tabular-nums;
-}
-
-.journal-violation-none {
-  color: #0E9F6E;
+.journal-hero-stat-sub {
+  font-size: 14.5px;
   font-weight: 600;
-  justify-content: flex-start;
+  color: #8A98AD;
 }
 
-.journal-stats-bar {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+.journal-hero-bar-track {
+  height: 7px;
+  background: #EAEFF5;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 11px;
+}
+
+.journal-hero-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563EB, #1D4ED8);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.journal-grade-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 11px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.journal-grade-pill-empty {
+  font-size: 24px;
+  font-weight: 800;
+  color: #CBD5E3;
+}
+
+/* ---------- Tabs ---------- */
+.journal-tabs {
+  display: flex;
+  gap: 9px;
   margin-bottom: 18px;
 }
 
-.journal-stat-card {
-  background: #ffffff;
+.journal-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   border: 1px solid #E3E9F1;
-  border-radius: 12px;
-  padding: 14px 16px;
-}
-
-.journal-stat-value {
-  font-size: 20px;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 15px;
   font-weight: 700;
-  color: #14233D;
-  font-variant-numeric: tabular-nums;
-}
-
-.journal-stat-label {
-  font-size: 11.5px;
+  cursor: pointer;
+  font-family: inherit;
+  background: #fff;
   color: #5B6B82;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-top: 4px;
+  transition: all 0.15s ease;
 }
 
+.journal-tab-btn.active {
+  background: #1E293B;
+  border-color: #1E293B;
+  color: #fff;
+}
+
+.journal-tab-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(125, 140, 160, 0.22);
+}
+
+/* ---------- Needs-journaling table ---------- */
+.journal-todo-wrap {
+  background: #fff;
+  border: 1px solid #E3E9F1;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.journal-todo-grid {
+  display: grid;
+  grid-template-columns: 170px 1fr 1fr 150px 150px;
+}
+
+.journal-todo-head {
+  background: #F7F9FC;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  color: #8A98AD;
+  text-transform: uppercase;
+  padding: 13px 20px;
+}
+
+.journal-todo-head.num {
+  text-align: right;
+}
+
+.journal-todo-row {
+  display: contents;
+}
+
+.journal-todo-cell {
+  padding: 15px 20px;
+  font-size: 15px;
+  color: #1E293B;
+  border-top: 1px solid #F1F4F8;
+  display: flex;
+  align-items: center;
+}
+
+.journal-todo-cell.num {
+  justify-content: flex-end;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+}
+
+.journal-todo-status {
+  display: inline-flex;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: #F1F4F8;
+  color: #8A98AD;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.journal-write-btn {
+  border: none;
+  background: #2563EB;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+}
+
+.journal-write-btn:hover {
+  filter: brightness(1.05);
+}
+
+/* ---------- Generic empty state ---------- */
+.journal-empty {
+  padding: 44px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.journal-empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #E7F6EC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.journal-empty-icon.neutral {
+  background: #F1F4F8;
+}
+
+.journal-empty-text {
+  font-size: 15.5px;
+  color: #5B6B82;
+  max-width: 340px;
+  line-height: 1.5;
+}
+
+/* ---------- Saved tab: filter row ---------- */
 .journal-filter-row {
+  background: #fff;
+  border: 1px solid #E3E9F1;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 22px;
   display: flex;
   align-items: flex-end;
+  gap: 14px;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 14px;
+}
+
+.journal-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.journal-filter-field label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.7px;
+  color: #8A98AD;
+  text-transform: uppercase;
 }
 
 .journal-filter-select {
   min-width: 150px;
 }
 
+.journal-group-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.journal-group-btn {
+  border: 1px solid #E3E9F1;
+  border-radius: 8px;
+  padding: 6px 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  background: #fff;
+  color: #8A98AD;
+}
+
+.journal-group-btn.active {
+  background: #EAF1FE;
+  border-color: #CFE0FB;
+  color: #2563EB;
+}
+
 .journal-filter-clear-btn {
   background: none;
   border: 1px solid #DCE3EC;
   color: #5B6B82;
-  padding: 9px 14px;
-  border-radius: 8px;
-  font-size: 12.5px;
+  padding: 10px 15px;
+  border-radius: 9px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  height: 41px;
 }
 
 .journal-filter-clear-btn:hover {
-  border-color: #8A98AD;
-  color: #14233D;
+  border-color: #2563EB;
+  color: #2563EB;
 }
 
-.journal-list-cell {
-  background: #ffffff;
-  padding: 10px 14px;
+/* ---------- Saved tab: grouped entry cards ---------- */
+.journal-group {
+  margin-bottom: 24px;
+}
+
+.journal-group-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
-.journal-list-cell.num {
-  justify-content: flex-end;
-  font-variant-numeric: tabular-nums;
+.journal-group-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
 }
 
-.journal-list-head {
-  background: #F1F4F8;
-  font-weight: 600;
-  color: #5B6B82;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.journal-group-title {
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.2px;
 }
 
-.journal-status-badge {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 12px;
-}
-
-.journal-status-done {
-  background: #EAF8F2;
-  color: #0E9F6E;
-}
-
-.journal-status-pending {
-  background: #F1F4F8;
+.journal-group-sub {
+  font-size: 13.5px;
   color: #8A98AD;
 }
 
-.journal-list-btn {
-  background: #EEF6FF;
-  color: #2C6FD6;
-  border: 1px solid #D6E7FB;
-  padding: 6px 12px;
-  border-radius: 7px;
+.journal-group-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  color: #8A98AD;
+}
+
+.journal-group-avg-grade {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
   font-size: 12.5px;
+  font-weight: 800;
+}
+
+.journal-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.journal-entry-card {
+  background: #fff;
+  border: 1px solid #E3E9F1;
+  border-radius: 13px;
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.journal-entry-card:hover {
+  border-color: #2563EB;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.10);
+}
+
+.journal-entry-badge {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.journal-entry-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.journal-entry-title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 4px;
+}
+
+.journal-entry-instrument {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.journal-entry-dir {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.journal-entry-snippet {
+  font-size: 14px;
+  color: #8A98AD;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.journal-entry-result-col {
+  width: 96px;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.journal-entry-result {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.journal-entry-date {
+  font-size: 12.5px;
+  color: #AEB9C8;
+  margin-top: 2px;
+}
+
+.journal-entry-score-col {
+  width: 118px;
+  flex: 0 0 auto;
+}
+
+.journal-entry-score-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: #8A98AD;
+  margin-bottom: 5px;
+}
+
+.journal-entry-score-row b {
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.journal-entry-score-track {
+  height: 6px;
+  background: #EAEFF5;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.journal-entry-score-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.journal-entry-chevron {
+  flex: 0 0 auto;
+  color: #CBD5E3;
+}
+
+/* ---------- Journal entry form ---------- */
+.journal-form-wrap {
+  max-width: 1120px;
+}
+
+.journal-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: transparent;
+  color: #5B6B82;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+  padding: 4px 0;
+  margin-bottom: 12px;
 }
 
-.journal-list-btn:hover {
-  background: #dceaf6;
-}
-
-/* Journal entry form */
-.journal-form-wrap {
-  margin-top: 24px;
-  padding: 22px;
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
-  border-radius: 14px;
-}
-
-.journal-form-wrap.hidden {
-  display: none;
-}
-
-.journal-form-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 18px;
+.journal-back-btn:hover {
+  color: #2563EB;
 }
 
 .journal-form-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: #14233D;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.4px;
+  margin: 0;
 }
 
 .journal-form-meta {
-  font-size: 12.5px;
-  color: #5B6B82;
-  margin-top: 3px;
-}
-
-.journal-close-btn {
-  background: none;
-  border: none;
-  font-size: 22px;
-  line-height: 1;
+  font-size: 14.5px;
   color: #8A98AD;
-  cursor: pointer;
-  padding: 0 4px;
-}
-
-.journal-close-btn:hover {
-  color: #14233D;
+  margin-top: 4px;
 }
 
 .journal-section {
-  margin-bottom: 22px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid #E3E9F1;
+  background: #fff;
+  border: 1px solid #E3E9F1;
+  border-radius: 16px;
+  padding: 18px 22px;
+  margin-bottom: 14px;
 }
 
-.journal-section:last-of-type {
-  border-bottom: none;
+.journal-section-header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 14px;
+}
+
+.journal-section-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #EAF1FE;
+  color: #2563EB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14.5px;
+  font-weight: 800;
+  font-family: 'IBM Plex Mono', monospace;
+  flex: 0 0 auto;
 }
 
 .journal-section-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #14233D;
-  margin-bottom: 12px;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #1E293B;
 }
 
 .journal-field-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px;
+  gap: 18px;
+}
+
+.journal-field-grid-5 {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+/* Matches .amount-label (Daily Limits / Trade Manager / Setup) rather
+   than its own tiny all-caps monospace eyebrow style — the journal form
+   was the one place in the app using a much smaller, harder-to-read
+   label treatment than every other form. */
+.journal-field-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #5B6B82;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-bottom: 6px;
 }
 
 .journal-input {
   width: 100%;
-  padding: 9px 11px;
+  padding: 11px 13px;
   border: 1px solid #DCE3EC;
-  border-radius: 7px;
-  font-size: 13.5px;
-  font-variant-numeric: tabular-nums;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #1E293B;
+  background: #fff;
+}
+
+.journal-input.mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14.5px;
 }
 
 .journal-input:focus {
   outline: none;
-  border-color: #2C6FD6;
+  border-color: #2563EB;
 }
 
 .journal-textarea {
   width: 100%;
-  min-height: 80px;
-  padding: 10px 12px;
+  min-height: 70px;
+  padding: 12px 14px;
   border: 1px solid #DCE3EC;
-  border-radius: 8px;
-  font-size: 13.5px;
+  border-radius: 10px;
+  font-size: 15px;
+  line-height: 1.5;
   font-family: inherit;
+  color: #1E293B;
+  background: #fff;
   resize: vertical;
+  margin-bottom: 16px;
+}
+
+.journal-textarea:last-child {
+  margin-bottom: 0;
 }
 
 .journal-textarea:focus {
   outline: none;
-  border-color: #2C6FD6;
+  border-color: #2563EB;
 }
 
-/* Weighted review checklist */
-.journal-checklist-category {
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: #2C6FD6;
-  margin: 14px 0 6px;
-}
-
-.journal-checklist-category:first-child {
-  margin-top: 0;
-}
-
-.journal-checklist-item {
+.journal-dir-row {
   display: flex;
-  align-items: center;
   gap: 10px;
-  padding: 7px 0;
-  font-size: 13.5px;
-  color: #14233D;
-  cursor: pointer;
 }
 
-.journal-checklist-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  accent-color: #0E9F6E;
-}
-
-.journal-checklist-item span:first-of-type {
+.journal-dir-btn {
   flex: 1;
-}
-
-.journal-checklist-weight {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #8A98AD;
-  flex-shrink: 0;
-}
-
-.journal-grade-result {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  border: 1px solid #E3E9F1;
+  border: 1px solid #DCE3EC;
   border-radius: 10px;
-  padding: 14px 18px;
-  margin-top: 14px;
-}
-
-.journal-grade-score {
-  font-size: 13.5px;
-  font-weight: 600;
+  padding: 11px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  background: #fff;
   color: #5B6B82;
 }
 
-.journal-grade-letter {
-  font-size: 22px;
-  font-weight: 700;
-  color: #14233D;
+.journal-dir-btn.long.active {
+  background: #E7F6EC;
+  border-color: #16A34A;
+  color: #15803D;
 }
 
-.journal-form-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.journal-form-actions .journal-save-btn {
-  flex: 1;
-}
-
-.journal-delete-btn {
-  background: #FBE7E2;
+.journal-dir-btn.short.active {
+  background: #FCEEE9;
+  border-color: #C53D22;
   color: #C53D22;
-  border: 1px solid #f5c9c2;
-  padding: 0 18px;
-  border-radius: 8px;
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.journal-delete-btn:hover {
-  background: #fbdedb;
-}
-
-.journal-delete-btn.hidden {
-  display: none;
 }
 
 /* Setup screenshot upload/paste zone */
 .journal-screenshot-dropzone {
-  border: 2px dashed #DCE3EC;
-  border-radius: 10px;
-  background: #ffffff;
-  padding: 20px;
+  border: 1.5px dashed #CFD9E6;
+  border-radius: 12px;
+  background: #F7F9FC;
+  padding: 26px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color 0.15s ease;
   outline: none;
+  text-align: center;
 }
 
 .journal-screenshot-dropzone:hover,
 .journal-screenshot-dropzone:focus {
-  border-color: #2C6FD6;
-  background: #F7F9FC;
+  border-color: #2563EB;
 }
 
 .journal-screenshot-empty {
@@ -435,22 +705,13 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  text-align: center;
-  color: #5B6B82;
-  font-size: 13px;
-}
-
-.journal-screenshot-icon {
-  font-size: 28px;
+  color: #8A98AD;
+  font-size: 14px;
 }
 
 .journal-screenshot-preview-wrap.hidden,
 .journal-screenshot-empty.hidden {
   display: none;
-}
-
-.journal-screenshot-preview-wrap {
-  text-align: center;
 }
 
 .journal-screenshot-preview {
@@ -468,7 +729,7 @@
   border: 1px solid #f3bcb4;
   padding: 6px 14px;
   border-radius: 7px;
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
@@ -478,8 +739,439 @@
   background: #f9d9d5;
 }
 
-.journal-list-thumb {
+/* Weighted review checklist */
+.journal-checklist-category {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.8px;
+  color: #2563EB;
+  text-transform: uppercase;
+  margin: 16px 0 4px;
+}
+
+.journal-checklist-category:first-child {
+  margin-top: 0;
+}
+
+/* Two-column layout — halves the vertical height of what used to be
+   the longest section in the form (17 checklist rows stacked
+   single-file). Category headers span both columns. */
+#journal-checklist-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 14px;
+}
+
+@media (max-width: 720px) {
+  #journal-checklist-area {
+    grid-template-columns: 1fr;
+  }
+}
+
+.journal-checklist-category {
+  grid-column: 1 / -1;
+}
+
+.journal-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.journal-checklist-item.checked {
+  border-color: #CFE0FB;
+  background: #EAF1FE;
+}
+
+.journal-checklist-box {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  border-radius: 6px;
+  border: 2px solid #CBD5E3;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.journal-checklist-item.checked .journal-checklist-box {
+  border-color: #2563EB;
+  background: #2563EB;
+}
+
+.journal-checklist-item input[type="checkbox"] {
+  display: none;
+}
+
+.journal-checklist-label {
+  flex: 1;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #5B6B82;
+  line-height: 1.35;
+}
+
+/* Grade-scale legend — explains what each letter grade means, shown
+   once above the checklist so an "F-" isn't a mystery. */
+.journal-grade-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+}
+
+.journal-grade-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 13px;
-  margin-left: 4px;
+  font-weight: 500;
+  color: #5B6B82;
+}
+
+.journal-grade-legend-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+.journal-grade-legend-pill.grade-a { color: #15803D; background: #E7F6EC; }
+.journal-grade-legend-pill.grade-b { color: #2563EB; background: #EAF1FE; }
+.journal-grade-legend-pill.grade-c { color: #6D28D9; background: #F1EBFE; }
+.journal-grade-legend-pill.grade-d { color: #C2620E; background: #FDF0E3; }
+.journal-grade-legend-pill.grade-f { color: #C53D22; background: #FCEEE9; }
+
+.journal-checklist-item.checked .journal-checklist-label {
+  color: #1E293B;
+}
+
+.journal-checklist-weight {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #AEB9C8;
+}
+
+.journal-checklist-item.checked .journal-checklist-weight {
+  color: #2563EB;
+}
+
+/* Live grade meter */
+.journal-live-meter {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #F1F4F8;
+}
+
+.journal-live-meter-bar-wrap {
+  flex: 1;
+}
+
+.journal-live-meter-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  color: #8A98AD;
+  margin-bottom: 6px;
+}
+
+.journal-live-meter-row b {
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.journal-live-meter-track {
+  height: 8px;
+  background: #EAEFF5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.journal-live-meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.2s ease;
+}
+
+.journal-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.journal-save-btn {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  background: #2563EB;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+}
+
+.journal-save-btn:hover {
+  filter: brightness(1.05);
+}
+
+.journal-cancel-btn {
+  border: 1px solid #DCE3EC;
+  background: #fff;
+  color: #5B6B82;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 15px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.journal-delete-btn {
+  background: #FBE7E2;
+  color: #C53D22;
+  border: 1px solid #f5c9c2;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.journal-delete-btn:hover {
+  background: #fbdedb;
+}
+
+.journal-delete-btn.hidden {
+  display: none;
+}
+
+/* ---------- Read-only view mode ---------- */
+.journal-view-header {
+  background: #fff;
+  border: 1px solid #E3E9F1;
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin: 12px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.journal-view-grade {
+  width: 60px;
+  height: 60px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.journal-view-main {
+  flex: 1;
+}
+
+.journal-view-title-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.journal-view-instrument {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.3px;
+}
+
+.journal-view-dir {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.journal-view-date {
+  font-size: 14.5px;
+  color: #8A98AD;
+  margin-top: 4px;
+}
+
+.journal-view-bar-track {
+  height: 7px;
+  background: #EAEFF5;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 12px;
+  max-width: 280px;
+}
+
+.journal-view-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.journal-view-pts {
+  font-size: 13px;
+  color: #8A98AD;
+  margin-top: 6px;
+}
+
+.journal-view-result-col {
+  text-align: right;
+}
+
+.journal-view-result-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.7px;
+  color: #8A98AD;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.journal-view-result {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.journal-view-execution-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.journal-view-stat {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 11px;
+  padding: 13px 14px;
+}
+
+.journal-view-stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  color: #8A98AD;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.journal-view-stat-value {
+  font-size: 15px;
+  font-weight: 800;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #1E293B;
+}
+
+.journal-view-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.journal-view-card-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #2563EB;
+  margin-bottom: 6px;
+}
+
+.journal-view-card-text {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #3A4759;
+}
+
+.journal-view-card-text:last-child {
+  margin-bottom: 0;
+}
+
+.journal-view-breakdown-group {
+  margin-bottom: 16px;
+}
+
+.journal-view-breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.journal-view-breakdown-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.8px;
+  color: #2563EB;
+  text-transform: uppercase;
+}
+
+.journal-view-breakdown-count {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #8A98AD;
+}
+
+.journal-view-breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 6px 0;
+}
+
+.journal-view-breakdown-label {
+  flex: 1;
+  font-size: 14.5px;
+  color: #3A4759;
+}
+
+.journal-view-breakdown-pts {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #15803D;
+}
+
+.journal-view-screenshot {
+  max-width: 100%;
+  border-radius: 10px;
+  border: 1px solid #E3E9F1;
+  margin-top: 6px;
+}
+
+@media (max-width: 1100px) {
+  .journal-hero-stats { grid-template-columns: 1fr; }
+  .journal-todo-grid { grid-template-columns: 1fr; }
+  .journal-view-execution-grid { grid-template-columns: repeat(2, 1fr); }
+  .journal-field-grid-5 { grid-template-columns: repeat(2, 1fr); }
+  .journal-view-two-col { grid-template-columns: 1fr; }
 }
 /* === END COMPONENT: trading-journal === */

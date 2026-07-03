@@ -1,254 +1,216 @@
 <!-- COMPONENT: tier-select -->
-<!-- Restyled as a 4-step wizard (Broker, Trading Style, Instruments,
-     Confirm) per the Claude Design mockup — but the mockup's own 3-step
-     shape (Broker/Style/Capital) didn't match this app's real logic
-     (broker-fetch sets tier+capital+instruments all at once; manual
-     fallback needs tier+capital together, not split across steps; the
-     instrument picker has enough of its own UI — search, categories,
-     custom stocks — to deserve a dedicated step). Confirmed with the
-     trader: Capital becomes a READ-ONLY summary step (step 4) for BOTH
-     paths, never a re-entry field — broker-fetched balance should never
-     ask the trader to type in what was already fetched. Every existing
-     id/function/branch below is unchanged from the original single-page
-     flow; only the step container/navigation wrapping is new. -->
+<!-- Restyled as a single-page layout (no step wizard) per the Claude
+     Design "Set Up Your Profile" mockup: all 3 sections (broker,
+     trading style, instruments) are visible at once in a scrolling left
+     column, with a persistent live-updating "Your profile" summary rail
+     on the right. Tier is never manually picked here — it's always
+     derived from starting capital (fetched from a broker, or typed in
+     manually) via tierForBalance() in app-shell.js, the same helper
+     already used elsewhere to detect tier crossings on the running
+     balance. Every existing id/function still used below (broker
+     connect, instrument picker, custom stocks) is the app's real logic;
+     only the step container/stepper chrome from the previous wizard
+     shape has been removed. -->
 <section class="content-section setup-wizard">
 
-  <div class="setup-wizard-header">
-    <div>
-      <div class="setup-wizard-eyebrow">Getting Started</div>
-      <h1 class="setup-wizard-title">Set up your profile</h1>
-    </div>
-    <button type="button" class="setup-skip-btn" onclick="confirmProfile()">Skip for now</button>
-  </div>
+  <!-- No header bar here at all anymore — the topbar (app-shell.html)
+       already shows "Set Up Your Profile" as this tab's page title, and
+       Skip now lives inline with "Your profile" in the fixed right rail
+       instead of its own slim strip taking up top space. -->
+  <div class="setup-body">
+    <!-- ============ LEFT: scrolling form ============ -->
+    <div class="setup-body-main">
+      <p class="setup-intro">Everything in one place. Connect your broker so we can pull your balance and tier, tell us how you trade, and pick the instruments you'll be logging — then jump straight into your dashboard.</p>
 
-  <div class="setup-stepper">
-    <div class="setup-stepper-step">
-      <div id="setup-stepper-dot-1" class="setup-stepper-dot setup-stepper-dot-active">1</div>
-      <div id="setup-stepper-label-1" class="setup-stepper-label setup-stepper-label-active">Broker</div>
-    </div>
-    <div id="setup-stepper-bar-1" class="setup-stepper-bar"></div>
-    <div class="setup-stepper-step">
-      <div id="setup-stepper-dot-2" class="setup-stepper-dot">2</div>
-      <div id="setup-stepper-label-2" class="setup-stepper-label">Trading style</div>
-    </div>
-    <div id="setup-stepper-bar-2" class="setup-stepper-bar"></div>
-    <div class="setup-stepper-step">
-      <div id="setup-stepper-dot-3" class="setup-stepper-dot">3</div>
-      <div id="setup-stepper-label-3" class="setup-stepper-label">Instruments</div>
-    </div>
-    <div id="setup-stepper-bar-3" class="setup-stepper-bar"></div>
-    <div class="setup-stepper-step">
-      <div id="setup-stepper-dot-4" class="setup-stepper-dot">4</div>
-      <div id="setup-stepper-label-4" class="setup-stepper-label">Confirm</div>
-    </div>
-  </div>
+      <!-- SECTION 1 — BROKER -->
+      <div class="setup-section-head setup-section-head-first">
+        <div class="setup-section-num">1</div>
+        <h3 class="setup-section-title">Connect your broker</h3>
+      </div>
+      <p class="setup-section-desc">We'll fetch your account balance, tier and tradable instruments automatically — so your dashboard is accurate from day one.</p>
 
-  <!-- ============ STEP 1: BROKER (or manual tier+capital) ============ -->
-  <div id="setup-wizard-step-1" class="setup-wizard-step">
-    <h2 class="setup-wizard-step-title">Connect your broker</h2>
-    <p class="section-note">We'll fetch your account balance, tier and tradable instruments automatically — so your dashboard is accurate from day one. Trading style still needs your input — that's not something a broker can tell us.</p>
+      <div class="setup-section-body">
+        <div id="setup-broker-connect-wrap">
+          <div id="setup-broker-picker"></div>
+          <p id="setup-broker-status" class="foot-note" style="margin-top:8px;"></p>
+        </div>
 
-    <div id="setup-broker-step" class="select-step">
-      <div id="setup-broker-connect-wrap">
-        <div id="setup-broker-picker"></div>
-        <p id="setup-broker-status" class="foot-note" style="margin-top:8px;"></p>
-        <button type="button" class="setup-manual-link" onclick="showManualProfileSetup()">Set up manually instead, without a broker</button>
+        <!-- Shown once a broker "connects" — replaces the connect buttons
+             above with what was "fetched": balance and derived tier. -->
+        <div id="setup-broker-fetched-wrap" class="setup-broker-fetched-wrap hidden">
+          <div class="setup-connected-card">
+            <div class="setup-connected-head">
+              <span id="setup-fetched-icon" class="setup-broker-icon">&mdash;</span>
+              <div class="setup-connected-body">
+                <div class="setup-connected-name-row">
+                  <span class="setup-connected-name">Connected to <span id="setup-fetched-broker-name">&mdash;</span></span>
+                  <span class="setup-connected-live-pill">&#9679; Live</span>
+                </div>
+                <div class="setup-connected-sub">Read-only &middot; balance and positions synced</div>
+              </div>
+              <button type="button" class="setup-connected-change-link" onclick="setupChangeBroker()">Change</button>
+            </div>
+            <div class="setup-connected-details">
+              <div class="setup-connected-detail">
+                <div class="setup-connected-detail-label">Fetched balance</div>
+                <div id="setup-fetched-balance" class="setup-connected-detail-value">&mdash;</div>
+              </div>
+              <div class="setup-connected-detail">
+                <div class="setup-connected-detail-label">Tier (auto-derived)</div>
+                <div id="setup-fetched-tier" class="setup-connected-detail-value-accent">&mdash;</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manual fallback path -->
+        <div id="setup-manual-wrap" class="hidden">
+          <div class="setup-manual-card">
+            <div class="setup-manual-head">
+              <span class="setup-manual-head-label">Manual setup</span>
+              <button type="button" class="setup-connected-change-link" onclick="setupChangeBroker()">Connect a broker instead</button>
+            </div>
+            <label class="setup-capital-label" for="setup-capital-input">Starting capital (&#8377;)</label>
+            <div class="setup-capital-input-row">
+              <span class="setup-capital-prefix">&#8377;</span>
+              <input
+                type="text"
+                id="setup-capital-input"
+                class="setup-capital-input"
+                inputmode="numeric"
+                placeholder="5,00,000"
+                oninput="onSetupCapitalInput()"
+              >
+            </div>
+            <p id="setup-capital-error" class="capital-amount-error hidden"></p>
+          </div>
+        </div>
+
+        <div class="setup-wizard-note">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <div>Read-only connection. We never place trades or move funds &mdash; 1CrTrader only reads balances and positions.</div>
+        </div>
       </div>
 
-      <!-- Shown once the mock broker "connects" — replaces the connect
-           buttons above with what was "fetched": balance and derived
-           tier. Instruments now live on their own step (3) instead of
-           inline here. -->
-      <div id="setup-broker-fetched-wrap" class="setup-broker-fetched-wrap hidden">
-        <div class="setup-fetched-summary">
-          <div class="setup-fetched-row">
-            <span class="setup-fetched-label">Connected to</span>
-            <span id="setup-fetched-broker-name" class="setup-fetched-value">&mdash;</span>
-          </div>
-          <div class="setup-fetched-row">
-            <span class="setup-fetched-label">Fetched account balance</span>
-            <span id="setup-fetched-balance" class="setup-fetched-value">&mdash;</span>
-          </div>
-          <div class="setup-fetched-row">
-            <span class="setup-fetched-label">Tier (auto-derived from balance)</span>
-            <span id="setup-fetched-tier" class="setup-fetched-value">&mdash;</span>
+      <!-- SECTION 2 — TRADING STYLE -->
+      <div class="setup-section-head">
+        <div class="setup-section-num">2</div>
+        <h3 class="setup-section-title">What's your trading style?</h3>
+      </div>
+      <p class="setup-section-desc">This sets the rules we enforce &mdash; a broker can't tell us this. Pick all that apply.</p>
+
+      <div class="setup-section-body">
+        <div class="trader-type-grid">
+          <button type="button" class="trader-type-card" data-trader-type="option-buyer" onclick="selectTraderType('option-buyer')">
+            <div class="trader-type-name">Option Buyer</div>
+            <div class="trader-type-desc">Buys call/put options. Capital required is the option premium.</div>
+          </button>
+
+          <button type="button" class="trader-type-card" data-trader-type="option-seller" onclick="selectTraderType('option-seller')">
+            <div class="trader-type-name">Option Seller</div>
+            <div class="trader-type-desc">Writes (sells) call/put options. Requires margin, similar to futures.</div>
+          </button>
+
+          <button type="button" class="trader-type-card" data-trader-type="futures-trader" onclick="selectTraderType('futures-trader')">
+            <div class="trader-type-name">Futures Trader</div>
+            <div class="trader-type-desc">Trades futures contracts directly. Requires the highest margin.</div>
+          </button>
+
+          <button type="button" class="trader-type-card" data-trader-type="hedged-seller" onclick="selectTraderType('hedged-seller')">
+            <div class="trader-type-name">Hedged Seller</div>
+            <div class="trader-type-desc">Sells futures and buys an option for hedging to limit downside.</div>
+          </button>
+
+          <button type="button" class="trader-type-card" data-trader-type="equity-trader" onclick="selectTraderType('equity-trader')">
+            <div class="trader-type-name">Equity / Cash Trader</div>
+            <div class="trader-type-desc">Buys and sells stocks directly, no derivatives. Full share value.</div>
+          </button>
+
+          <button type="button" class="trader-type-card" data-trader-type="spread-trader" onclick="selectTraderType('spread-trader')">
+            <div class="trader-type-name">Spread Trader</div>
+            <div class="trader-type-desc">Combines option legs (verticals, iron condors) for defined, capped risk.</div>
+          </button>
+
+          <button type="button" class="trader-type-card" data-trader-type="scalper" onclick="selectTraderType('scalper')">
+            <div class="trader-type-name">Scalper</div>
+            <div class="trader-type-desc">Very short holding periods &mdash; seconds to minutes, small frequent gains.</div>
+          </button>
+
+          <button type="button" class="trader-type-card" data-trader-type="swing-trader" onclick="selectTraderType('swing-trader')">
+            <div class="trader-type-name">Swing Trader</div>
+            <div class="trader-type-desc">Holds positions for days to weeks, riding a broader move.</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- SECTION 3 — INSTRUMENTS -->
+      <div class="setup-section-head">
+        <div class="setup-section-num">3</div>
+        <h3 class="setup-section-title">Instruments you trade</h3>
+      </div>
+      <p class="setup-section-desc">Search or browse by category. You'll set lots and see the exact points stop-loss for each on the Daily Limits Tool.</p>
+
+      <div class="setup-section-body">
+        <!-- Broker path: fetched instrument grid -->
+        <div id="setup-fetched-instrument-step-wrap" class="hidden">
+          <div id="setup-fetched-instrument-picker"></div>
+        </div>
+
+        <!-- Manual path: search/category picker + custom stock entry -->
+        <div id="setup-manual-instrument-wrap">
+          <div id="manual-instrument-picker"></div>
+          <p id="instrument-error" class="capital-amount-error hidden"></p>
+
+          <div class="custom-stocks-wrap">
+            <label class="amount-label" for="custom-stock-input">Also Trade Stock Options? Add Your Own</label>
+            <div class="custom-stock-input-row">
+              <input type="text" id="custom-stock-input" class="journal-input" placeholder="e.g. Reliance, TCS, HDFC Bank" onkeydown="onCustomStockKeydown(event)">
+              <button type="button" class="custom-stock-add-btn" onclick="addCustomStock()">Add</button>
+            </div>
+            <div id="custom-stock-chips" class="custom-stock-chips"></div>
+            <p class="foot-note" style="margin-top:6px;">Type a stock name and press Enter or click Add. These appear alongside Nifty/Bank Nifty/etc. when picking an instrument while logging a trade.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Manual fallback path: hidden by default, shown only via "Set up
-         manually instead" above. Tier cards + capital input live HERE
-         (step 1) for both paths — confirmed with the trader — never split
-         across steps. -->
-    <div id="setup-manual-steps" class="hidden">
-      <button type="button" class="setup-manual-link" style="margin-bottom:16px; color:#8A98AD; font-size:12px; display:flex; align-items:center; gap:5px;" onclick="showBrokerSetup()">
-        ← Back to broker selection
-      </button>
-      <div class="select-step">
-        <div class="select-step-title">Capital Tier</div>
-        <div class="tier-select-grid">
-          <button type="button" class="tier-select-card" data-tier="small" onclick="selectTier('small')">
-            <div class="tier-select-name">Small</div>
-            <div class="tier-select-range">₹25,000 &ndash; ₹75,000</div>
-            <div class="tier-select-desc">Entry-level capital range</div>
-          </button>
+    <!-- ============ RIGHT: live summary rail ============ -->
+    <aside class="setup-summary-rail">
+      <div class="setup-summary-head">
+        <div class="setup-summary-eyebrow">Your profile</div>
+        <button type="button" class="setup-skip-btn" onclick="confirmProfile()">Skip for now</button>
+      </div>
 
-          <button type="button" class="tier-select-card" data-tier="medium" onclick="selectTier('medium')">
-            <div class="tier-select-name">Medium</div>
-            <div class="tier-select-range">₹1,00,000 &ndash; ₹5,00,000</div>
-            <div class="tier-select-desc">Growing capital range</div>
-          </button>
-
-          <button type="button" class="tier-select-card" data-tier="large" onclick="selectTier('large')">
-            <div class="tier-select-name">Large</div>
-            <div class="tier-select-range">₹5,00,000 &ndash; ₹10,00,000</div>
-            <div class="tier-select-desc">High capital range</div>
-          </button>
-
-          <button type="button" class="tier-select-card" data-tier="pro" onclick="selectTier('pro')">
-            <div class="tier-select-name">Pro</div>
-            <div class="tier-select-range">₹10,00,000 &ndash; ₹20,00,000</div>
-            <div class="tier-select-desc">Professional capital range</div>
-          </button>
+      <div class="setup-summary-tiles">
+        <div class="setup-summary-tile">
+          <div class="setup-summary-label">SETUP METHOD</div>
+          <div id="setup-summary-method" class="setup-summary-value">Not set</div>
         </div>
-
-        <div id="capital-amount-wrap" class="capital-amount-wrap hidden">
-          <label class="capital-amount-label" for="capital-amount-input">Enter your starting capital</label>
-          <div class="capital-amount-input-row">
-            <span class="capital-amount-prefix">₹</span>
-            <input
-              type="number"
-              id="capital-amount-input"
-              class="capital-amount-input"
-              min="0"
-              step="1"
-              placeholder="e.g. 150000"
-              oninput="onCapitalAmountInput()"
-            >
+        <div class="setup-summary-tile">
+          <div class="setup-summary-label">TRADING STYLE</div>
+          <div id="setup-summary-style" class="setup-summary-value">None selected</div>
+        </div>
+        <div class="setup-summary-tile-row">
+          <div class="setup-summary-tile">
+            <div class="setup-summary-label">TIER</div>
+            <div id="setup-summary-tier" class="setup-summary-value-accent">&mdash;</div>
           </div>
-          <p id="capital-amount-hint" class="capital-amount-hint"></p>
-          <p id="capital-amount-error" class="capital-amount-error hidden"></p>
+          <div class="setup-summary-tile">
+            <div class="setup-summary-label">INSTRUMENTS</div>
+            <div id="setup-summary-instruments" class="setup-summary-value">0 selected</div>
+          </div>
+        </div>
+        <div class="setup-summary-tile setup-summary-tile-capital">
+          <div class="setup-summary-label">STARTING CAPITAL</div>
+          <div id="setup-summary-capital" class="setup-summary-value-capital">&mdash;</div>
         </div>
       </div>
-    </div>
 
-    <div class="setup-wizard-note">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2C6FD6" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-      <div>Read-only connection. We never place trades or move funds — 1CrTrader only reads balances and positions.</div>
-    </div>
+      <div class="setup-summary-spacer"></div>
+
+      <button type="button" id="setup-cta-btn" class="setup-cta-btn" disabled onclick="confirmProfile()">Continue to dashboard</button>
+      <div id="setup-cta-hint" class="setup-cta-hint">Connect a broker, pick a style and an instrument to continue.</div>
+    </aside>
   </div>
-
-  <!-- ============ STEP 2: TRADING STYLE (always shown — not fetchable from a broker) ============ -->
-  <div id="setup-wizard-step-2" class="setup-wizard-step hidden">
-    <h2 class="setup-wizard-step-title">What's your trading style?</h2>
-    <p class="section-note">This sets the rules we enforce. A broker can't tell us this — pick the one that fits you best.</p>
-
-    <div class="select-step">
-      <div class="trader-type-grid">
-        <button type="button" class="trader-type-card" data-trader-type="option-buyer" onclick="selectTraderType('option-buyer')">
-          <div class="trader-type-name">Option Buyer</div>
-          <div class="trader-type-desc">Buys call/put options. Capital required is the option premium.</div>
-        </button>
-
-        <button type="button" class="trader-type-card" data-trader-type="option-seller" onclick="selectTraderType('option-seller')">
-          <div class="trader-type-name">Option Seller</div>
-          <div class="trader-type-desc">Writes (sells) call/put options. Requires margin, similar to futures.</div>
-        </button>
-
-        <button type="button" class="trader-type-card" data-trader-type="futures-trader" onclick="selectTraderType('futures-trader')">
-          <div class="trader-type-name">Futures Trader</div>
-          <div class="trader-type-desc">Trades futures contracts directly. Requires the highest margin.</div>
-        </button>
-
-        <button type="button" class="trader-type-card" data-trader-type="hedged-seller" onclick="selectTraderType('hedged-seller')">
-          <div class="trader-type-name">Hedged Seller</div>
-          <div class="trader-type-desc">Sells futures and buys an option for hedging to limit downside.</div>
-        </button>
-
-        <button type="button" class="trader-type-card" data-trader-type="equity-trader" onclick="selectTraderType('equity-trader')">
-          <div class="trader-type-name">Equity / Cash Trader</div>
-          <div class="trader-type-desc">Buys and sells stocks directly, no derivatives. Capital required is the full share value.</div>
-        </button>
-
-        <button type="button" class="trader-type-card" data-trader-type="spread-trader" onclick="selectTraderType('spread-trader')">
-          <div class="trader-type-name">Spread Trader</div>
-          <div class="trader-type-desc">Combines multiple option legs (verticals, iron condors) for defined, capped risk.</div>
-        </button>
-
-        <button type="button" class="trader-type-card" data-trader-type="scalper" onclick="selectTraderType('scalper')">
-          <div class="trader-type-name">Scalper</div>
-          <div class="trader-type-desc">Very short holding periods &mdash; seconds to minutes, aiming for small, frequent gains.</div>
-        </button>
-
-        <button type="button" class="trader-type-card" data-trader-type="swing-trader" onclick="selectTraderType('swing-trader')">
-          <div class="trader-type-name">Swing Trader</div>
-          <div class="trader-type-desc">Holds positions for days to weeks, riding a broader move rather than the same-day swing.</div>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============ STEP 3: INSTRUMENTS (its own step regardless of path) ============ -->
-  <div id="setup-wizard-step-3" class="setup-wizard-step hidden">
-    <h2 class="setup-wizard-step-title">Instruments you trade</h2>
-    <p class="section-note" id="setup-instruments-step-note">Search or browse by category. You'll set lots and see the exact points stop-loss for each on the Daily Limits Tool.</p>
-
-    <!-- Broker path: fetched instrument grid (was inline on step 1, now here). -->
-    <div id="setup-fetched-instrument-step-wrap" class="hidden">
-      <div id="setup-fetched-instrument-picker"></div>
-    </div>
-
-    <!-- Manual path: search/category picker + custom stock entry. -->
-    <div id="setup-manual-instrument-step" class="hidden">
-      <div id="manual-instrument-picker"></div>
-      <p id="instrument-error" class="capital-amount-error hidden"></p>
-
-      <div class="custom-stocks-wrap">
-        <label class="amount-label" for="custom-stock-input">Also Trade Stock Options? Add Your Own</label>
-        <div class="custom-stock-input-row">
-          <input type="text" id="custom-stock-input" class="journal-input" placeholder="e.g. Reliance, TCS, HDFC Bank" onkeydown="onCustomStockKeydown(event)">
-          <button type="button" class="custom-stock-add-btn" onclick="addCustomStock()">Add</button>
-        </div>
-        <div id="custom-stock-chips" class="custom-stock-chips"></div>
-        <p class="foot-note" style="margin-top:6px;">Type a stock name and press Enter or click Add. These appear alongside Nifty/Bank Nifty/etc. when picking an instrument while logging a trade.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============ STEP 4: CONFIRM (read-only summary, both paths) ============ -->
-  <div id="setup-wizard-step-4" class="setup-wizard-step hidden">
-    <h2 class="setup-wizard-step-title">Confirm your profile</h2>
-    <p class="section-note">Review what we've set up. You can change any of this later from Account.</p>
-
-    <div class="setup-confirm-summary">
-      <div class="setup-fetched-row">
-        <span class="setup-fetched-label">Setup method</span>
-        <span id="setup-confirm-method" class="setup-fetched-value">&mdash;</span>
-      </div>
-      <div class="setup-fetched-row">
-        <span class="setup-fetched-label">Trading style</span>
-        <span id="setup-confirm-style" class="setup-fetched-value">&mdash;</span>
-      </div>
-      <div class="setup-fetched-row">
-        <span class="setup-fetched-label">Capital tier</span>
-        <span id="setup-confirm-tier" class="setup-fetched-value">&mdash;</span>
-      </div>
-      <div class="setup-fetched-row">
-        <span class="setup-fetched-label">Starting capital</span>
-        <span id="setup-confirm-capital" class="setup-fetched-value">&mdash;</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="setup-wizard-footer">
-    <button type="button" id="setup-wizard-back-btn" class="setup-wizard-back-btn" onclick="setupWizardBack()" disabled>Back</button>
-    <span id="setup-wizard-step-indicator" class="setup-wizard-step-indicator">Step 1 of 4</span>
-    <button type="button" id="profile-continue-btn" class="profile-continue-btn" onclick="setupWizardNext()" disabled>
-      Continue
-    </button>
-  </div>
-
-  <p class="foot-note" style="padding: 16px 32px 20px;">Your tier highlights matching rows and cards across the Capital Ladder, Daily Trading Rules, and Subscription Pricing tabs, and pre-selects your tier in the Daily Limits Tool. Your starting capital becomes the baseline for tracking your running balance as trades are logged. Instruments selected here appear on the Daily Limits Tool, where you'll set lots and see each one's points stop-loss.</p>
 </section>
 <!-- END COMPONENT: tier-select -->

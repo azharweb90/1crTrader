@@ -1,121 +1,158 @@
-<!-- COMPONENT: trading-journal -->
+<!-- COMPONENT: trading-journal (rebuilt, July 2026 — adherence hero,
+     needs-journaling / journaled-entries tabs, weekly/monthly grouped
+     saved view, graded entry form, read-only view mode) -->
 <div class="dash-home-wrap">
 
-  <!-- Rule adherence analysis -->
-  <div class="journal-analysis-wrap dash-section-card" style="padding:20px 22px;">
-    <div class="journal-analysis-header">
-      <div class="mini-ladder-title" style="margin-bottom:0;">Rule Adherence Analysis</div>
-      <div class="journal-analysis-pills">
-        <button type="button" id="journal-analysis-week-btn" class="broker-range-pill" onclick="setJournalAnalysisRange('week')">This Week</button>
-        <button type="button" id="journal-analysis-month-btn" class="broker-range-pill" onclick="setJournalAnalysisRange('month')">This Month</button>
+  <!-- ===== LIST MODE ===== -->
+  <div id="journal-mode-list">
+    <p class="section-note" style="margin:0 0 22px; max-width:720px;">Turn every trade into a lesson. Log your reasoning, emotion and execution — each entry is scored like a report card, so your discipline becomes something you can actually see and improve.</p>
+
+    <!-- Adherence hero -->
+    <div class="journal-hero">
+      <div class="journal-hero-header">
+        <div>
+          <div class="journal-hero-eyebrow">Rule adherence analysis</div>
+          <span id="journal-range-chip" class="journal-range-chip">&mdash;</span>
+        </div>
+        <div class="journal-hero-toggle">
+          <button type="button" id="journal-range-week-btn" class="broker-range-pill" onclick="setJournalRange('week')">This Week</button>
+          <button type="button" id="journal-range-month-btn" class="broker-range-pill" onclick="setJournalRange('month')">This Month</button>
+        </div>
+      </div>
+      <div class="journal-hero-stats">
+        <div class="journal-hero-stat">
+          <div class="journal-hero-stat-label">Trades journaled</div>
+          <div class="journal-hero-stat-main">
+            <span id="journal-hero-done" class="journal-hero-stat-value">0 / 0</span>
+            <span id="journal-hero-pct" class="journal-hero-stat-sub">&mdash;</span>
+          </div>
+          <div class="journal-hero-bar-track"><div id="journal-hero-bar" class="journal-hero-bar-fill" style="width:0%;"></div></div>
+        </div>
+        <div class="journal-hero-stat">
+          <div class="journal-hero-stat-label">Avg review score</div>
+          <div id="journal-hero-avg-score" class="journal-hero-stat-value">&mdash;</div>
+        </div>
+        <div class="journal-hero-stat">
+          <div class="journal-hero-stat-label">Avg grade</div>
+          <div id="journal-hero-avg-grade"><span class="journal-grade-pill-empty">&mdash;</span></div>
+        </div>
       </div>
     </div>
-    <div id="journal-analysis-range-label" class="broker-range-label-pill">&mdash;</div>
-    <div id="journal-analysis-body"></div>
-  </div>
 
-  <!-- Stats bar -->
-  <div id="journal-stats-bar" class="journal-stats-bar"></div>
+    <!-- Tabs -->
+    <div class="journal-tabs">
+      <button type="button" id="journal-tab-todo-btn" class="journal-tab-btn" onclick="setJournalTab('todo')">Needs journaling <span id="journal-todo-count" class="journal-tab-count">0</span></button>
+      <button type="button" id="journal-tab-saved-btn" class="journal-tab-btn" onclick="setJournalTab('saved')">Journaled entries <span id="journal-saved-count" class="journal-tab-count">0</span></button>
+    </div>
 
-  <!-- Filter row -->
-  <div class="dash-section-card" style="padding:16px 22px;">
-    <div class="journal-filter-row">
-      <div>
-        <label class="amount-label" for="journal-instrument-filter" style="margin-bottom:0;">Instrument</label>
-        <select id="journal-instrument-filter" class="select-input journal-filter-select" onchange="onJournalInstrumentFilterChange()">
-          <option value="">All instruments</option>
-        </select>
+    <!-- Needs-journaling tab -->
+    <div id="journal-tab-todo">
+      <div class="journal-todo-wrap">
+        <div class="journal-todo-grid">
+          <div class="journal-todo-row" style="display:contents;">
+            <div class="journal-todo-head">Date</div>
+            <div class="journal-todo-head">Instrument</div>
+            <div class="journal-todo-head num">Result</div>
+            <div class="journal-todo-head">Status</div>
+            <div class="journal-todo-head"></div>
+          </div>
+          <div id="journal-todo-rows" style="display:contents;"></div>
+        </div>
       </div>
-      <div>
-        <label class="amount-label" for="journal-grade-filter" style="margin-bottom:0;">Grade</label>
-        <select id="journal-grade-filter" class="select-input journal-filter-select" onchange="onJournalGradeFilterChange()">
-          <option value="">All grades</option>
-          <option value="journaled">Journaled (any grade)</option>
-          <option value="not-journaled">Not journaled</option>
-        </select>
+    </div>
+
+    <!-- Journaled-entries tab -->
+    <div id="journal-tab-saved" class="hidden">
+      <div class="journal-filter-row">
+        <div class="journal-filter-field">
+          <label for="journal-instrument-filter">Instrument</label>
+          <select id="journal-instrument-filter" class="select-input journal-filter-select" onchange="onJournalInstrumentFilterChange()">
+            <option value="">All instruments</option>
+          </select>
+        </div>
+        <div class="journal-filter-field">
+          <label for="journal-grade-filter">Grade</label>
+          <select id="journal-grade-filter" class="select-input journal-filter-select" onchange="onJournalGradeFilterChange()">
+            <option value="">All grades</option>
+            <option value="A">A grades</option>
+            <option value="B">B grades</option>
+            <option value="C">C grades</option>
+            <option value="D">D grades</option>
+            <option value="F">F grades</option>
+          </select>
+        </div>
+        <div class="journal-filter-field">
+          <label for="journal-date-from">From</label>
+          <input type="date" id="journal-date-from" class="select-input journal-filter-select" onchange="onJournalDateFilterChange()">
+        </div>
+        <div class="journal-filter-field">
+          <label for="journal-date-to">To</label>
+          <input type="date" id="journal-date-to" class="select-input journal-filter-select" onchange="onJournalDateFilterChange()">
+        </div>
+        <button type="button" class="journal-filter-clear-btn" onclick="clearJournalFilters()">Clear filters</button>
+        <div style="flex:1; min-width:20px;"></div>
+        <div class="journal-filter-field">
+          <label>Group by</label>
+          <div class="journal-group-toggle">
+            <button type="button" id="journal-group-week-btn" class="journal-group-btn" onclick="setJournalGroup('week')">Week</button>
+            <button type="button" id="journal-group-month-btn" class="journal-group-btn" onclick="setJournalGroup('month')">Month</button>
+          </div>
+        </div>
       </div>
-      <div>
-        <label class="amount-label" for="journal-date-from" style="margin-bottom:0;">From</label>
-        <input type="date" id="journal-date-from" class="select-input journal-filter-select" onchange="onJournalDateFilterChange()">
-      </div>
-      <div>
-        <label class="amount-label" for="journal-date-to" style="margin-bottom:0;">To</label>
-        <input type="date" id="journal-date-to" class="select-input journal-filter-select" onchange="onJournalDateFilterChange()">
-      </div>
-      <button type="button" id="journal-filter-clear-btn" class="journal-filter-clear-btn" onclick="clearJournalFilters()">Clear filters</button>
+
+      <div id="journal-groups-area"></div>
     </div>
   </div>
 
-  <!-- Trade list -->
-  <div class="dash-section-card" style="padding:0; overflow:hidden;">
-    <div id="journal-list-area"></div>
-  </div>
-
-  <!-- Entry form -->
-  <div id="journal-form-wrap" class="journal-form-wrap dash-section-card hidden">
-    <div class="journal-form-header">
-      <div>
-        <div class="journal-form-title">Journal Entry</div>
-        <div id="journal-form-trade-meta" class="journal-form-meta"></div>
-      </div>
-      <button type="button" class="journal-close-btn" onclick="closeJournalForm()">&times;</button>
+  <!-- ===== ENTRY MODE ===== -->
+  <div id="journal-mode-entry" class="journal-form-wrap hidden">
+    <button type="button" class="journal-back-btn" onclick="jBackToList()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back to journal
+    </button>
+    <div style="margin:12px 0 20px;">
+      <h2 class="journal-form-title">Write journal entry</h2>
+      <div id="journal-form-meta" class="journal-form-meta"></div>
     </div>
 
     <div class="journal-section">
-      <div class="journal-section-title">1. Trade Details</div>
+      <div class="journal-section-header"><div class="journal-section-num">1</div><span class="journal-section-title">Trade details</span></div>
       <div class="journal-field-grid">
         <div>
-          <label class="amount-label">Instrument</label>
+          <div class="journal-field-label">Instrument</div>
           <input type="text" id="jf-instrument" class="journal-input" placeholder="e.g. Nifty, Bank Nifty">
         </div>
         <div>
-          <label class="amount-label">Direction</label>
-          <select id="jf-direction" class="select-input">
-            <option value="">Select</option>
-            <option value="long">Long / Buy</option>
-            <option value="short">Short / Sell</option>
-          </select>
+          <div class="journal-field-label">Direction</div>
+          <div class="journal-dir-row">
+            <button type="button" id="jf-dir-long" class="journal-dir-btn long" onclick="setJfDirection('long')">Long</button>
+            <button type="button" id="jf-dir-short" class="journal-dir-btn short" onclick="setJfDirection('short')">Short</button>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="journal-section">
-      <div class="journal-section-title">2. Execution &amp; Management</div>
-      <div class="journal-field-grid">
-        <div>
-          <label class="amount-label">Entry Price</label>
-          <input type="number" id="jf-entry-price" class="journal-input" placeholder="e.g. 22150">
-        </div>
-        <div>
-          <label class="amount-label">Exit Price</label>
-          <input type="number" id="jf-exit-price" class="journal-input" placeholder="e.g. 22220">
-        </div>
-        <div>
-          <label class="amount-label">Stop Loss</label>
-          <input type="number" id="jf-stop-loss" class="journal-input" placeholder="e.g. 22100">
-        </div>
-        <div>
-          <label class="amount-label">Target</label>
-          <input type="number" id="jf-target" class="journal-input" placeholder="e.g. 22250">
-        </div>
-        <div>
-          <label class="amount-label">Risk:Reward Ratio</label>
-          <input type="text" id="jf-rr-ratio" class="journal-input" placeholder="e.g. 1:2">
-        </div>
+      <div class="journal-section-header"><div class="journal-section-num">2</div><span class="journal-section-title">Execution &amp; management</span></div>
+      <div class="journal-field-grid journal-field-grid-5">
+        <div><div class="journal-field-label">Entry price</div><input type="number" id="jf-entry-price" class="journal-input mono" placeholder="22150"></div>
+        <div><div class="journal-field-label">Exit price</div><input type="number" id="jf-exit-price" class="journal-input mono" placeholder="22220"></div>
+        <div><div class="journal-field-label">Stop loss</div><input type="number" id="jf-stop-loss" class="journal-input mono" placeholder="22100"></div>
+        <div><div class="journal-field-label">Target</div><input type="number" id="jf-target" class="journal-input mono" placeholder="22250"></div>
+        <div><div class="journal-field-label">Risk : reward</div><input type="text" id="jf-rr-ratio" class="journal-input mono" placeholder="1:2"></div>
       </div>
     </div>
 
     <div class="journal-section">
-      <div class="journal-section-title">3. Logic</div>
-      <label class="amount-label">Setup / Entry Reason</label>
+      <div class="journal-section-header"><div class="journal-section-num">3</div><span class="journal-section-title">Logic</span></div>
+      <div class="journal-field-label">Setup / entry reason</div>
       <textarea id="jf-setup-reason" class="journal-textarea" placeholder="Why did you take this trade? What setup or signal triggered the entry?"></textarea>
-      <label class="amount-label" style="margin-top:12px;">Market Conditions</label>
-      <textarea id="jf-market-conditions" class="journal-textarea" placeholder="What was the broader market/sector doing at the time?"></textarea>
-      <label class="amount-label" style="margin-top:12px;">Setup Screenshot</label>
+      <div class="journal-field-label">Market conditions</div>
+      <textarea id="jf-market-conditions" class="journal-textarea" placeholder="What was the broader market / sector doing at the time?"></textarea>
+      <div class="journal-field-label">Setup screenshot</div>
       <div id="jf-screenshot-dropzone" class="journal-screenshot-dropzone" tabindex="0"
            onclick="triggerScreenshotPicker()" onpaste="onScreenshotPaste(event)">
         <div id="jf-screenshot-empty" class="journal-screenshot-empty">
-          <div class="journal-screenshot-icon">🖼️</div>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#AEB9C8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
           <div>Click to upload, or click here and press <strong>Ctrl+V</strong> to paste a screenshot</div>
         </div>
         <div id="jf-screenshot-preview-wrap" class="journal-screenshot-preview-wrap hidden">
@@ -128,25 +165,106 @@
     </div>
 
     <div class="journal-section">
-      <div class="journal-section-title">4. Psychology &amp; Reflection</div>
-      <label class="amount-label">Emotion During The Trade</label>
+      <div class="journal-section-header"><div class="journal-section-num">4</div><span class="journal-section-title">Psychology &amp; reflection</span></div>
+      <div class="journal-field-label">Emotion during the trade</div>
       <textarea id="jf-emotion" class="journal-textarea" placeholder="How were you feeling — confident, anxious, FOMO, calm? Be honest."></textarea>
-      <label class="amount-label" style="margin-top:12px;">Mistakes / What You'd Do Differently</label>
-      <textarea id="jf-mistakes" class="journal-textarea" placeholder="Anything you'd change next time? Rule broken? Good discipline shown?"></textarea>
+      <div class="journal-field-label">Mistakes / what you'd do differently</div>
+      <textarea id="jf-mistakes" class="journal-textarea" placeholder="Anything you'd change next time? Rule broken? Good discipline shown?" style="margin-bottom:0;"></textarea>
     </div>
 
     <div class="journal-section">
-      <div class="journal-section-title">5. Trade Review Score</div>
-      <p class="section-note" style="margin-bottom:10px;">Check what applied to this trade. Each item is weighted — the total maps to a letter grade, like a report card for your own discipline.</p>
+      <div class="journal-section-header"><div class="journal-section-num">5</div><span class="journal-section-title">Trade review score</span></div>
+      <p class="section-note" style="margin:0 0 10px;">Check what applied to this trade. Each item is weighted — the total maps to a letter grade, like a report card for your discipline.</p>
+      <div class="journal-grade-legend">
+        <span class="journal-grade-legend-item"><b class="journal-grade-legend-pill grade-a">A</b>90%+</span>
+        <span class="journal-grade-legend-item"><b class="journal-grade-legend-pill grade-b">B</b>80–89%</span>
+        <span class="journal-grade-legend-item"><b class="journal-grade-legend-pill grade-c">C</b>70–79%</span>
+        <span class="journal-grade-legend-item"><b class="journal-grade-legend-pill grade-d">D</b>60–69%</span>
+        <span class="journal-grade-legend-item"><b class="journal-grade-legend-pill grade-f">F</b>below 60%</span>
+      </div>
       <div id="journal-checklist-area"></div>
-      <div id="journal-grade-result" class="journal-grade-result"></div>
+      <div class="journal-live-meter">
+        <span id="journal-live-grade" class="journal-grade-pill">&mdash;</span>
+        <div class="journal-live-meter-bar-wrap">
+          <div class="journal-live-meter-row"><span>Discipline score</span><b id="journal-live-pts">0 / 39 points</b></div>
+          <div class="journal-live-meter-track"><div id="journal-live-bar" class="journal-live-meter-fill" style="width:0%;"></div></div>
+        </div>
+      </div>
     </div>
 
     <div class="journal-form-actions">
-      <button type="button" id="journal-save-btn" class="trade-submit-btn outcome-btn journal-save-btn" onclick="saveCurrentJournalEntry()">Save Journal Entry</button>
-      <button type="button" id="journal-delete-btn" class="journal-delete-btn hidden" onclick="confirmDeleteJournalEntry()">Delete Entry</button>
+      <button type="button" id="journal-save-btn" class="journal-save-btn" onclick="saveCurrentJournalEntry()">Save journal entry</button>
+      <button type="button" class="journal-cancel-btn" onclick="jBackToList()">Cancel</button>
+      <button type="button" id="journal-delete-btn" class="journal-delete-btn hidden" onclick="confirmDeleteJournalEntry()">Delete</button>
     </div>
-    <p id="journal-save-status" class="foot-note" style="margin-top:8px;"></p>
+    <p id="journal-save-status" class="foot-note" style="margin-top:-12px;"></p>
   </div>
+
+  <!-- ===== VIEW MODE (read-only) ===== -->
+  <div id="journal-mode-view" class="journal-form-wrap hidden">
+    <button type="button" class="journal-back-btn" onclick="jBackToList()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back to journal
+    </button>
+
+    <div class="journal-view-header">
+      <div id="journal-view-grade" class="journal-view-grade">&mdash;</div>
+      <div class="journal-view-main">
+        <div class="journal-view-title-row">
+          <span id="journal-view-instrument" class="journal-view-instrument"></span>
+          <span id="journal-view-dir" class="journal-view-dir"></span>
+        </div>
+        <div id="journal-view-date" class="journal-view-date"></div>
+        <div class="journal-view-bar-track"><div id="journal-view-bar" class="journal-view-bar-fill" style="width:0%;"></div></div>
+        <div id="journal-view-pts" class="journal-view-pts"></div>
+      </div>
+      <div class="journal-view-result-col">
+        <div class="journal-view-result-label">Result</div>
+        <div id="journal-view-result" class="journal-view-result"></div>
+      </div>
+    </div>
+
+    <div class="journal-section">
+      <div class="journal-hero-eyebrow" style="margin-bottom:14px;">Execution</div>
+      <div class="journal-view-execution-grid">
+        <div class="journal-view-stat"><div class="journal-view-stat-label">Entry</div><div id="journal-view-entry" class="journal-view-stat-value"></div></div>
+        <div class="journal-view-stat"><div class="journal-view-stat-label">Exit</div><div id="journal-view-exit" class="journal-view-stat-value"></div></div>
+        <div class="journal-view-stat"><div class="journal-view-stat-label">Stop loss</div><div id="journal-view-sl" class="journal-view-stat-value"></div></div>
+        <div class="journal-view-stat"><div class="journal-view-stat-label">Target</div><div id="journal-view-target" class="journal-view-stat-value"></div></div>
+        <div class="journal-view-stat"><div class="journal-view-stat-label">Risk : reward</div><div id="journal-view-rr" class="journal-view-stat-value"></div></div>
+      </div>
+    </div>
+
+    <div class="journal-view-two-col">
+      <div class="journal-section" style="margin-bottom:0;">
+        <div class="journal-hero-eyebrow" style="margin-bottom:14px;">Logic</div>
+        <div class="journal-view-card-label">Setup / entry reason</div>
+        <p id="journal-view-setup" class="journal-view-card-text"></p>
+        <div class="journal-view-card-label">Market conditions</div>
+        <p id="journal-view-market" class="journal-view-card-text"></p>
+      </div>
+      <div class="journal-section" style="margin-bottom:0;">
+        <div class="journal-hero-eyebrow" style="margin-bottom:14px;">Psychology &amp; reflection</div>
+        <div class="journal-view-card-label">Emotion during the trade</div>
+        <p id="journal-view-emotion" class="journal-view-card-text"></p>
+        <div class="journal-view-card-label">Mistakes / what you'd do differently</div>
+        <p id="journal-view-mistakes" class="journal-view-card-text"></p>
+      </div>
+    </div>
+
+    <div id="journal-view-screenshot-wrap" class="journal-section hidden">
+      <div class="journal-hero-eyebrow" style="margin-bottom:10px;">Setup screenshot</div>
+      <img id="journal-view-screenshot" class="journal-view-screenshot" alt="Setup screenshot">
+    </div>
+
+    <div class="journal-section">
+      <div class="journal-hero-eyebrow" style="margin-bottom:16px;">Trade review breakdown</div>
+      <div id="journal-view-breakdown"></div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+      <button type="button" class="journal-cancel-btn" onclick="editCurrentJournalEntry()">Edit this entry</button>
+    </div>
+  </div>
+
 </div>
 <!-- END COMPONENT: trading-journal -->

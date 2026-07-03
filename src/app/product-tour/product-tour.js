@@ -262,12 +262,9 @@
     "tab-trade-manager": "Trade Manager",
     "tab-roadmap": "Roadmap",
     "tab-journal": "Trading Journal",
-    "tab-education": "Education",
-    "tab-books": "Books",
+    "tab-learn": "Knowledge Area",
     "tab-strategies": "Strategies",
-    "tab-suggestions": "Suggestions",
     "tab-settings": "Account",
-    "tab-subs": "Subscription Pricing",
   };
 
   function getCurrentTabId() {

@@ -35,14 +35,50 @@
 
 .grid-table .label {
   font-weight: 600;
-  color: #14233D;
+  color: #1E293B;
   background: #F7F9FC;
+}
+
+/* ===========================================================
+   Shared secondary "Cancel / Close" button — used by several
+   different feature panels (Daily Limits broker-import drawer,
+   Trade Manager import panel, Roadmap challenge modal, the quick
+   Journal-note buttons on Daily Limits). Previously these classes had
+   no CSS of their own and relied entirely on a generic button-reset
+   rule in app-theme.css; once that rule was removed (it was silently
+   breaking several *other* buttons' own colors), these were left
+   completely unstyled — plain, borderless text. Giving them a real,
+   permanent definition here instead.
+   =========================================================== */
+.setup-wizard-back-btn,
+.journal-list-btn {
+  background: #ffffff;
+  border: 1px solid #DCE3EC;
+  color: #5B6B82;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.setup-wizard-back-btn:hover,
+.journal-list-btn:hover {
+  border-color: #2563EB;
+  color: #2563EB;
+}
+
+.journal-list-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .grid-table .num {
   justify-content: flex-end;
   text-align: right;
-  color: #14233D;
+  color: #1E293B;
   font-variant-numeric: tabular-nums;
 }
 
@@ -53,7 +89,7 @@
 .grid-table .cap {
   background: #EEF6FF !important;
   font-weight: 600;
-  color: #2C6FD6 !important;
+  color: #2563EB !important;
 }
 
 .grid-table .span-3 {
@@ -69,12 +105,12 @@
    backend yet (e.g. strategies). Not tied to any one component.
    =========================================================== */
 .demo-banner {
-  background: #fdf3e3;
-  border: 1px solid #f3d9a4;
+  background: #EAF1FE;
+  border: 1px solid #B9D4FA;
   border-radius: 10px;
   padding: 12px 16px;
-  font-size: 13px;
-  color: #6b5217;
+  font-size: 13.5px;
+  color: #1D4ED8;
   margin-bottom: 20px;
 }
 /* === END Shared: demo-mode notice banner === */
@@ -82,11 +118,22 @@
 /* Shared: wide variant of .suggestions-panel (see suggestions.css), used
    by the Daily Limits and Trade Manager broker-import drawers. Both show
    a multi-column scrip table (Scrip/Qty/Buy/Sell/Time/Status) that needs
-   real room — the base 420px panel was clipping the Status column.
-   Kept separate from the base .suggestions-panel so the plain-text
-   Suggestions panel elsewhere in the app isn't affected. */
+   real room — the base 420px panel was clipping the Status column, and
+   680px was still tight once a day has 3+ rows with long option names
+   (e.g. "BANKNIFTY 2026-05-30 CE 51000") — widened further, and the
+   table itself now scrolls horizontally as a fallback so a long scrip
+   name or a narrow viewport can never visually clip a column. */
 .suggestions-panel-wide {
-  width: 680px;
+  width: 760px;
+  max-width: 94vw;
+}
+
+.suggestions-panel-wide #broker-day-scrip-table {
+  overflow-x: auto;
+}
+
+.suggestions-panel-wide .broker-scrip-grid {
+  min-width: 620px;
 }
 
 @media (max-width: 760px) {

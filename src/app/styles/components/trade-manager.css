@@ -41,19 +41,19 @@
 }
 
 .tm-type-pill:hover {
-  border-color: #d4a828;
-  background: #fbf7ec;
+  border-color: #2563EB;
+  background: #EAF1FE;
 }
 
 .tm-type-pill.tm-type-pill-active {
-  border-color: #d4a828;
-  background: #fbf1da;
+  border-color: #2563EB;
+  background: #EAF1FE;
 }
 
 .tm-type-pill-name {
   font-size: 13px;
   font-weight: 700;
-  color: #14233d;
+  color: #1E293B;
 }
 
 .tm-type-pill-sub {
@@ -91,7 +91,7 @@
   flex: 0 0 34px;
   border: none;
   background: #f7f9fc;
-  color: #14233d;
+  color: #1E293B;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -119,7 +119,7 @@
   text-align: center;
   font-size: 15px;
   font-weight: 700;
-  color: #14233d;
+  color: #1E293B;
   background: #fff;
   height: 40px;
   flex: 1 1 auto;
@@ -142,20 +142,20 @@
 }
 
 .tm-lots-stat {
-  font-size: 12px;
+  font-size: 13.5px;
   color: #5b6b82;
 }
 
 .tm-lots-stat strong {
-  color: #14233d;
+  color: #1E293B;
   font-weight: 700;
 }
 
 .tm-lots-warning {
-  font-size: 11.5px;
-  color: #8c6510;
-  background: #fbf1da;
-  border: 1px solid #e8cd8a;
+  font-size: 13px;
+  color: #1D4ED8;
+  background: #EAF1FE;
+  border: 1px solid #B9D4FA;
   border-radius: 7px;
   padding: 6px 10px;
   margin-top: 4px;
@@ -212,7 +212,7 @@
 .tm-position-value {
   font-size: 16px;
   font-weight: 800;
-  color: #14233d;
+  color: #1E293B;
   font-variant-numeric: tabular-nums;
 }
 
@@ -220,10 +220,10 @@
   color: #d9381e;
 }
 .tm-position-cell-reward .tm-position-value {
-  color: #1d9e75;
+  color: #16A34A;
 }
 .tm-position-cell-margin .tm-position-value {
-  color: #2c6fd6;
+  color: #2563EB;
 }
 
 .tm-position-sub {
@@ -232,13 +232,20 @@
 }
 
 /* ── Collapsed setup bar ──────────────────────────────────── */
-.tm-setup-collapsed .tm-setup-grid,
-.tm-setup-collapsed .tm-type-row,
-.tm-setup-collapsed .tm-lots-row,
-.tm-setup-collapsed #tm-rr-suggest-wrap,
-.tm-setup-collapsed #tm-position-summary,
-.tm-setup-collapsed #tm-setup-error,
-.tm-setup-collapsed #tm-start-btn,
+/* Once a trade is being tracked, this whole setup panel should shrink
+   down to just the "Import from broker" strip — no CE/PE toggle, no
+   input grid, and no now-pointless empty metrics box sitting there
+   with nothing in it. Previous selectors here (.tm-type-row,
+   .tm-setup-grid, #tm-position-summary, #tm-start-btn, ...) targeted
+   classes/ids that don't fully cover the actual markup (the type
+   toggle is .tm-type-pills, and the whole right-hand metrics column
+   including its "Fill in prices..." placeholder box was never hidden
+   at all), so the CE/PE pills and the blank box kept showing through
+   during an active trade. Hiding the two real top-level wrappers
+   (.tm-type-pills and .tm-two-col-layout) removes everything except
+   the import strip in one shot. */
+.tm-setup-collapsed .tm-type-pills,
+.tm-setup-collapsed .tm-two-col-layout,
 .tm-setup-collapsed .section-note {
   display: none;
 }
@@ -281,7 +288,7 @@
 .tm-collapsed-chip.tm-collapsed-chip-long {
   background: rgba(29, 158, 117, 0.1);
   border-color: rgba(29, 158, 117, 0.3);
-  color: #1d9e75;
+  color: #16A34A;
 }
 
 .tm-collapsed-chip.tm-collapsed-chip-short {
@@ -328,16 +335,16 @@
 }
 
 .tm-review-value {
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
-  color: #14233d;
+  color: #1E293B;
 }
 
 .tm-review-risk {
   color: #d9381e;
 }
 .tm-review-reward {
-  color: #1d9e75;
+  color: #16A34A;
 }
 
 /* ── Direction badge ──────────────────────────────────────── */
@@ -369,7 +376,7 @@
 }
 
 .tm-direction-badge-long .tm-direction-badge-icon {
-  color: #1d9e75;
+  color: #16A34A;
 }
 .tm-direction-badge-short .tm-direction-badge-icon {
   color: #d9381e;
@@ -378,7 +385,7 @@
 .tm-direction-badge-label {
   font-size: 13px;
   font-weight: 700;
-  color: #14233d;
+  color: #1E293B;
   display: block;
 }
 
@@ -426,24 +433,24 @@
 }
 
 .tm-level-pill-reward .tm-level-pill-price {
-  color: #1d9e75;
+  color: #16A34A;
 }
 .tm-level-pill-reward .tm-level-pill-rs {
   background: rgba(29, 158, 117, 0.12);
-  color: #1d9e75;
+  color: #16A34A;
 }
 
 .tm-level-pill-trail .tm-level-pill-price {
-  color: #2c6fd6;
+  color: #2563EB;
 }
 .tm-level-pill-trail .tm-level-pill-rs {
   background: rgba(44, 111, 214, 0.12);
-  color: #2c6fd6;
+  color: #2563EB;
 }
 
 /* ── R:R summary chips ────────────────────────────────────── */
 .tm-rr-chip-long {
-  color: #1d9e75;
+  color: #16A34A;
   background: rgba(29, 158, 117, 0.1);
   border-color: rgba(29, 158, 117, 0.25) !important;
 }
@@ -532,18 +539,18 @@
 }
 
 .tm-rr-suggest-btn:hover {
-  border-color: #2c6fd6;
+  border-color: #2563EB;
   background: #eaf2fa;
 }
 
 .tm-rr-suggest-ratio {
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
-  color: #14233d;
+  color: #1E293B;
 }
 
 .tm-rr-suggest-price {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #5b6b82;
 }
 
@@ -572,11 +579,11 @@
   padding: 6px 14px;
   font-size: 12.5px;
   font-weight: 600;
-  color: #14233d;
+  color: #1E293B;
 }
 
 .tm-rr-chip strong {
-  color: #14233d;
+  color: #1E293B;
 }
 
 /* Result state cards — same visual language as .profit-decision-card and
@@ -597,12 +604,12 @@
 
 .tm-result-title {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 6px;
 }
 
 .tm-result-message {
-  font-size: 13.5px;
+  font-size: 15px;
   line-height: 1.5;
 }
 
@@ -622,7 +629,7 @@
 }
 
 .tm-result-stat {
-  font-size: 12.5px;
+  font-size: 14px;
   background: rgba(255, 255, 255, 0.55);
   border-radius: 999px;
   padding: 5px 12px;
@@ -638,11 +645,11 @@
 }
 
 .tm-result-card.tm-result-target .tm-result-title {
-  color: #0e9f6e;
+  color: #16A34A;
 }
 
 .tm-result-card.tm-result-target .tm-result-message {
-  color: #0e9f6e;
+  color: #16A34A;
 }
 
 /* Target-hit celebration: a brief confetti burst, plays once on render and
@@ -691,11 +698,11 @@
 }
 
 .tm-result-card.tm-result-stopped-locked .tm-result-title {
-  color: #0e9f6e;
+  color: #16A34A;
 }
 
 .tm-result-card.tm-result-stopped-locked .tm-result-message {
-  color: #0e9f6e;
+  color: #16A34A;
 }
 
 .tm-result-card.tm-result-stopped-neutral {
@@ -717,7 +724,7 @@
 }
 
 .tm-result-card.tm-result-open .tm-result-title {
-  color: #14233d;
+  color: #1E293B;
 }
 
 .tm-result-card.tm-result-open .tm-result-message {
@@ -793,7 +800,7 @@
   justify-content: center;
   gap: 8px;
   color: #aeb9c8;
-  font-size: 12px;
+  font-size: 13.5px;
   padding: 28px 16px;
   text-align: center;
 }
@@ -827,7 +834,7 @@
   line-height: 1.2;
 }
 .tm-metric-detail {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #8a98ad;
   margin-top: 3px;
 }
@@ -835,23 +842,23 @@
   color: #d9381e;
 }
 .tm-metric-reward .tm-metric-amount {
-  color: #1d9e75;
+  color: #16A34A;
 }
 .tm-metric-margin .tm-metric-amount {
-  color: #2c6fd6;
+  color: #2563EB;
 }
 
 .tm-start-btn {
   width: 100%;
   padding: 13px 16px;
-  font-size: 14px;
+  font-size: 15.5px;
   border-radius: 10px;
   text-align: center;
 }
 
 /* Price hints below SL/Target inputs */
 .tm-price-hint {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #5b6b82;
   margin-top: 4px;
   display: block;
@@ -871,7 +878,7 @@
   flex-wrap: wrap;
 }
 .tm-broker-import-label {
-  font-size: 12.5px;
+  font-size: 14px;
   color: #5b6b82;
 }
 .tm-broker-mini-import-btn,
@@ -879,16 +886,22 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  background: #14233d;
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   color: #ffffff;
   border: none;
   border-radius: 6px;
   padding: 6px 12px;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.tm-broker-mini-import-btn:hover,
+.tm-broker-import-mini-btn:hover {
+  opacity: 0.88;
 }
 
 /* Import modal grid */
@@ -923,8 +936,8 @@
 
 /* R:R pill selected state */
 .tm-rr-suggest-btn-selected {
-  background: #14233d !important;
-  border-color: #14233d !important;
+  background: #1E293B !important;
+  border-color: #1E293B !important;
   color: #ffffff !important;
 }
 .tm-rr-suggest-btn-selected .tm-rr-suggest-ratio,
@@ -941,7 +954,7 @@
   border: 1.5px solid #dce3ec;
   border-radius: 8px;
   padding: 9px 18px;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   color: #5b6b82;
   cursor: pointer;
@@ -991,12 +1004,12 @@
 
 .tm-live-card-value {
   font-size: 18px;
-  font-weight: 700;
-  color: #14233D;
+  font-weight: 800;
+  color: #1E293B;
 }
 
 .tm-live-card-sub {
-  font-size: 12px;
+  font-size: 13.5px;
   color: #8A98AD;
   margin-top: 4px;
 }
@@ -1007,11 +1020,11 @@
   font-variant-numeric: tabular-nums;
 }
 
-.tm-live-badge-pos { color: #0E6B45; }
+.tm-live-badge-pos { color: #15803D; }
 .tm-live-badge-neg { color: #C53D22; }
 
 .tm-live-riskfree {
-  color: #0E6B45;
+  color: #15803D;
   font-weight: 700;
 }
 
