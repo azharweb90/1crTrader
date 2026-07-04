@@ -34,8 +34,8 @@
     flex-shrink: 0;
   }
 
-  .sidebar-brand-subtitle {
-    display: none;
+  .sidebar-brand-logo {
+    height: 28px;
   }
 
   .sidebar-nav-group {

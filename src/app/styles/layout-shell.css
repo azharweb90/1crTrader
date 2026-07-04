@@ -44,7 +44,10 @@ body {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 20px 6px 18px;
+  height: 68px; /* matches .top-bar's own height (16px+16px padding + 20px/800 title) so the
+                   logo row and the page-title row line up on the same horizontal line */
+  padding: 0 6px;
+  box-sizing: border-box;
   margin-bottom: 4px;
   border-bottom: none;
   background: none;
@@ -70,28 +73,13 @@ body {
   opacity: 1;
 }
 
-.sidebar-brand-mark {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
+/* Existing horizontal lockup (icon + "1CrTraders" + "Reward Above Risk"
+   baked into one file, assets/images/logos/1crtraders-logo-horizontal.png)
+   used as-is — no separate text/mark markup needed. */
+.sidebar-brand-logo {
+  height: 42px;
+  width: auto;
   display: block;
-}
-
-.sidebar-brand-title {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-  color: var(--sidebar-text-bright);
-  line-height: 1.3;
-}
-
-.sidebar-brand-subtitle {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.7px;
-  color: var(--color-accent);
-  line-height: 1.3;
-  text-transform: uppercase;
 }
 
 .sidebar-menu-label {
@@ -186,7 +174,9 @@ body {
 .top-bar {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border-subtle);
-  padding: 16px 32px;
+  height: 68px; /* matches .sidebar-brand's height so the logo lines up with the page title */
+  box-sizing: border-box;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
