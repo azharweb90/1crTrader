@@ -21,7 +21,7 @@
    instead (see .setup-summary-head below). The whole component is
    height-bound to the viewport so ONLY .setup-body-main scrolls
    internally; the topbar and the summary rail never move. */
-.setup-wizard {
+.content-section.setup-wizard {
   padding: 0;
   overflow: hidden;
   display: flex;
@@ -33,7 +33,14 @@
      with only the individual pieces (broker tiles, connected-broker card,
      trader-type cards, the right-hand rail) as their own white cards. So
      override the shared .content-section chrome this component inherits
-     from its class list. */
+     from its class list.
+     Selector is `.content-section.setup-wizard` (not just `.setup-wizard`)
+     on purpose: app-theme.css's `.content-section` rule (single class,
+     same specificity) is loaded AFTER this file in main.css, so on a
+     specificity tie the later stylesheet silently won and re-whited this
+     page's background despite this override. Compounding the selector to
+     two classes (0,2,0) beats `.content-section` alone (0,1,0) regardless
+     of load order. */
   background: transparent;
   border: none;
   box-shadow: none;
