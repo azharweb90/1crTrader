@@ -12,14 +12,22 @@
 (function () {
 
   const VIDEOS = [
-    { title: "Building a Rules-Based Trading Plan", author: "1Cr Academy", cat: "Foundations", len: "18 min", level: "Beginner", tag: "Start here", hue: 214, watched: true },
-    { title: "Position Sizing & Risk per Trade", author: "Anish Mehta", cat: "Risk", len: "24 min", level: "Beginner", tag: "", hue: 150, watched: true },
-    { title: "Reading Market Structure Live", author: "1Cr Academy", cat: "Technicals", len: "32 min", level: "Intermediate", tag: "", hue: 262, watched: false },
-    { title: "The Psychology of Cutting Losses", author: "Dr. Reena Kapoor", cat: "Psychology", len: "21 min", level: "All levels", tag: "Popular", hue: 24, watched: false },
-    { title: "Opening Range Breakout, Step by Step", author: "Anish Mehta", cat: "Strategies", len: "27 min", level: "Intermediate", tag: "", hue: 200, watched: false },
-    { title: "Journaling Trades That Actually Improves You", author: "1Cr Academy", cat: "Discipline", len: "15 min", level: "All levels", tag: "New", hue: 340, watched: false },
-    { title: "VWAP & Volume Profile for Intraday", author: "Karthik R.", cat: "Technicals", len: "29 min", level: "Advanced", tag: "", hue: 262, watched: false },
-    { title: "Recovering After a Losing Streak", author: "Dr. Reena Kapoor", cat: "Psychology", len: "19 min", level: "All levels", tag: "", hue: 24, watched: false },
+    { title: "Building a Rules-Based Trading Plan", author: "1Cr Academy", cat: "Foundations", len: "18 min", level: "Beginner", tag: "Start here", hue: 214, watched: true,
+      desc: "A 18 min beginner lesson from 1Cr Academy on foundations. Walk through the setup step by step with real chart examples, then see exactly how to apply it to your own trading without breaking your risk rules." },
+    { title: "Position Sizing & Risk per Trade", author: "Anish Mehta", cat: "Risk", len: "24 min", level: "Beginner", tag: "", hue: 150, watched: true,
+      desc: "How much to risk per trade, and why it matters more than your entry. A practical walkthrough of sizing positions off your stop distance and daily loss limit, not off how confident you feel." },
+    { title: "Reading Market Structure Live", author: "1Cr Academy", cat: "Technicals", len: "32 min", level: "Intermediate", tag: "", hue: 262, watched: false,
+      desc: "Live chart annotation of higher highs/lows, ranges and breaks of structure — the vocabulary you need before any strategy makes sense on a real chart." },
+    { title: "The Psychology of Cutting Losses", author: "Dr. Reena Kapoor", cat: "Psychology", len: "21 min", level: "All levels", tag: "Popular", hue: 24, watched: false,
+      desc: "Why traders hold losers too long and cut winners too early, and the mental reframes that make honouring a stop-loss automatic instead of a fight every time." },
+    { title: "Opening Range Breakout, Step by Step", author: "Anish Mehta", cat: "Strategies", len: "27 min", level: "Intermediate", tag: "", hue: 200, watched: false,
+      desc: "A full breakdown of the ORB setup used on the Strategies page — how the range forms, what a valid breakout looks like, and where the stop and target sit." },
+    { title: "Journaling Trades That Actually Improves You", author: "1Cr Academy", cat: "Discipline", len: "15 min", level: "All levels", tag: "New", hue: 340, watched: false,
+      desc: "Most journals just log P&L. This one shows what to actually write down after each trade so review sessions change your next decision, not just your spreadsheet." },
+    { title: "VWAP & Volume Profile for Intraday", author: "Karthik R.", cat: "Technicals", len: "29 min", level: "Advanced", tag: "", hue: 262, watched: false,
+      desc: "Using VWAP and volume profile together to read where real intraday interest sits, and how to avoid mistaking a quiet, low-volume move for a genuine trend." },
+    { title: "Recovering After a Losing Streak", author: "Dr. Reena Kapoor", cat: "Psychology", len: "19 min", level: "All levels", tag: "", hue: 24, watched: false,
+      desc: "A calm, practical guide to resetting after a string of losses — sizing back down, rebuilding confidence with process, and knowing when to step away for the day." },
   ];
 
   const BOOKS = [
@@ -113,7 +121,7 @@
   function renderVideos() {
     const items = VIDEOS.filter(v => activeCat === "all" || v.cat === activeCat);
     return `<div class="learn-video-grid">${items.map(v => `
-      <div class="learn-video-card">
+      <div class="learn-video-card" onclick="openVideoPlayer(${VIDEOS.indexOf(v)})">
         <div class="learn-video-thumb" style="background:linear-gradient(135deg, hsl(${v.hue},62%,58%), hsl(${(v.hue + 40) % 360},58%,42%));">
           <div class="learn-video-thumb-play"><span><svg width="18" height="18" viewBox="0 0 24 24" fill="#1C2A3F"><path d="M8 5v14l11-7z"/></svg></span></div>
           <span class="learn-video-len">${v.len}</span>
@@ -213,10 +221,192 @@
     if (overlay) overlay.classList.add("hidden");
   }
 
+  /* ---------- Large video player modal (YouTube-style) ---------- */
+  let playerState = { index: -1, playing: false, currentSec: 0, timer: null };
+
+  function stageGradient(v) {
+    return `linear-gradient(135deg, hsl(${v.hue},62%,52%), hsl(${(v.hue + 40) % 360},58%,34%))`;
+  }
+
+  function lenToSeconds(len) {
+    const n = parseInt(len, 10);
+    return isNaN(n) ? 0 : n * 60;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${String(s).padStart(2, "0")}`;
+  }
+
+  function playIconSvg(size) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+  }
+
+  function pauseIconSvg(size) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`;
+  }
+
+  function updatePlayIcons() {
+    const playing = playerState.playing;
+    const bigBtn = document.getElementById("video-player-playbtn");
+    const smallIcon = document.getElementById("video-transport-play-icon");
+    if (bigBtn) bigBtn.innerHTML = `<span style="color:#1C2A3F;">${playing ? pauseIconSvg(22) : playIconSvg(26)}</span>`;
+    if (smallIcon && smallIcon.parentElement) {
+      smallIcon.parentElement.innerHTML = `<span id="video-transport-play-icon" style="color:#fff; display:flex;">${playing ? pauseIconSvg(16) : playIconSvg(16)}</span>`;
+    }
+  }
+
+  function updateTransport(currentSec, totalSec) {
+    const fill = document.getElementById("video-transport-fill");
+    const time = document.getElementById("video-transport-time");
+    if (fill) fill.style.width = totalSec ? `${Math.min(100, (currentSec / totalSec) * 100)}%` : "0%";
+    if (time) time.innerText = `${formatTime(currentSec)} / ${formatTime(totalSec)}`;
+  }
+
+  function stopVideoTimer() {
+    if (playerState.timer) {
+      clearInterval(playerState.timer);
+      playerState.timer = null;
+    }
+  }
+
+  function startVideoTimer() {
+    stopVideoTimer();
+    const v = VIDEOS[playerState.index];
+    if (!v) return;
+    const totalSec = lenToSeconds(v.len);
+    playerState.timer = setInterval(() => {
+      playerState.currentSec += 1;
+      if (playerState.currentSec >= totalSec) {
+        playerState.currentSec = totalSec;
+        playerState.playing = false;
+        stopVideoTimer();
+        updatePlayIcons();
+      }
+      updateTransport(playerState.currentSec, totalSec);
+    }, 1000);
+  }
+
+  function toggleVideoPlayback() {
+    if (playerState.index < 0) return;
+    playerState.playing = !playerState.playing;
+    updatePlayIcons();
+    if (playerState.playing) startVideoTimer();
+    else stopVideoTimer();
+  }
+
+  function seekVideo(event) {
+    const v = VIDEOS[playerState.index];
+    if (!v) return;
+    const track = document.getElementById("video-transport-track");
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    const totalSec = lenToSeconds(v.len);
+    playerState.currentSec = Math.floor(ratio * totalSec);
+    updateTransport(playerState.currentSec, totalSec);
+  }
+
+  function renderSaveButton() {
+    const v = VIDEOS[playerState.index];
+    const btn = document.getElementById("video-player-save-btn");
+    if (!btn || !v) return;
+    btn.classList.toggle("active", !!v.saved);
+    btn.innerHTML = v.saved
+      ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-4-6 4z"/></svg> Saved`
+      : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg> Save`;
+  }
+
+  function toggleSaveVideo() {
+    const v = VIDEOS[playerState.index];
+    if (!v) return;
+    v.saved = !v.saved;
+    renderSaveButton();
+  }
+
+  function renderVideoPlayer() {
+    const v = VIDEOS[playerState.index];
+    if (!v) return;
+    const totalSec = lenToSeconds(v.len);
+
+    const stage = document.getElementById("video-player-stage");
+    if (stage) stage.style.background = stageGradient(v);
+
+    const chip = document.getElementById("video-player-chip");
+    if (chip) chip.innerHTML = `<span class="video-player-chip-dot"></span>${v.cat}`;
+
+    const titleEl = document.getElementById("video-player-title");
+    if (titleEl) titleEl.innerText = v.title;
+
+    const descEl = document.getElementById("video-player-desc");
+    if (descEl) descEl.innerText = v.desc || "";
+
+    const metaEl = document.getElementById("video-player-meta");
+    if (metaEl) {
+      metaEl.innerHTML = `
+        <span>${v.author}</span><span class="video-player-meta-dot">&middot;</span>
+        <span>${v.level}</span><span class="video-player-meta-dot">&middot;</span>
+        <span>${v.len}</span>
+        ${v.watched ? `<span class="video-player-meta-dot">&middot;</span><span class="video-player-watched"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Watched</span>` : ""}
+      `;
+    }
+
+    renderSaveButton();
+    updatePlayIcons();
+    updateTransport(playerState.currentSec, totalSec);
+
+    const upNextList = document.getElementById("video-player-upnext-list");
+    if (upNextList) {
+      const nextIdx = (playerState.index + 1) % VIDEOS.length;
+      const nv = VIDEOS[nextIdx];
+      upNextList.innerHTML = `
+        <div class="video-upnext-row" onclick="openVideoPlayer(${nextIdx})">
+          <div class="video-upnext-thumb" style="background:${stageGradient(nv)};">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <div>
+            <div class="video-upnext-title">${nv.title}</div>
+            <div class="video-upnext-sub">${nv.author} &middot; ${nv.len}</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  function openVideoPlayer(index) {
+    const v = VIDEOS[index];
+    if (!v) return;
+    stopVideoTimer();
+    playerState = { index, playing: false, currentSec: 0, timer: null };
+    renderVideoPlayer();
+    const overlay = document.getElementById("video-player-overlay");
+    if (overlay) overlay.classList.remove("hidden");
+    v.watched = true;
+  }
+
+  function closeVideoPlayer() {
+    stopVideoTimer();
+    const overlay = document.getElementById("video-player-overlay");
+    if (overlay) overlay.classList.add("hidden");
+    render();
+  }
+
+  function closeVideoPlayerIfOutside(event) {
+    if (event && event.target.id === "video-player-overlay") closeVideoPlayer();
+  }
+
   window.setLearnTab = setLearnTab;
   window.setLearnCat = setLearnCat;
   window.openSuggestionPanel = openSuggestionPanel;
   window.closeSuggestionPanel = closeSuggestionPanel;
+  window.openVideoPlayer = openVideoPlayer;
+  window.closeVideoPlayer = closeVideoPlayer;
+  window.closeVideoPlayerIfOutside = closeVideoPlayerIfOutside;
+  window.toggleVideoPlayback = toggleVideoPlayback;
+  window.seekVideo = seekVideo;
+  window.toggleSaveVideo = toggleSaveVideo;
 
   render();
 

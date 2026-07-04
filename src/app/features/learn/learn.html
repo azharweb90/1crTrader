@@ -37,4 +37,56 @@
     </div>
   </div>
 </div>
+
+<!-- Large cinematic video player modal — matches the Claude Design
+     reference exactly: 16:9 gradient poster stage with big play button,
+     category chip, close button, and a dark transport bar (play/pause,
+     timeline, time counter, volume/fullscreen). Below: title + Save,
+     meta row, description, and an "Up Next" row. Posters/timings are
+     placeholders — swap the gradient stage for a real <video>/embed and
+     wire actual duration/progress when real video files exist. -->
+<div id="video-player-overlay" class="video-player-overlay hidden" onclick="closeVideoPlayerIfOutside(event)">
+  <div class="video-player-modal" onclick="event.stopPropagation()">
+    <div class="video-player-stage" id="video-player-stage">
+      <span id="video-player-chip" class="video-player-chip"><span class="video-player-chip-dot"></span></span>
+      <button type="button" class="video-player-close" onclick="closeVideoPlayer()" aria-label="Close">&times;</button>
+      <button type="button" class="video-player-playbtn" id="video-player-playbtn" onclick="toggleVideoPlayback()" aria-label="Play">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#1C2A3F"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+
+    <div class="video-player-transport">
+      <button type="button" class="video-transport-btn" onclick="toggleVideoPlayback()" aria-label="Play/Pause">
+        <svg id="video-transport-play-icon" width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <div class="video-transport-track" id="video-transport-track" onclick="seekVideo(event)">
+        <div class="video-transport-fill" id="video-transport-fill"></div>
+      </div>
+      <span class="video-transport-time" id="video-transport-time">0:00 / 0:00</span>
+      <button type="button" class="video-transport-icon-btn" aria-label="Volume">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+      </button>
+      <button type="button" class="video-transport-icon-btn" aria-label="Fullscreen">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg>
+      </button>
+    </div>
+
+    <div class="video-player-body">
+      <div class="video-player-title-row">
+        <h3 id="video-player-title" class="video-player-title">&mdash;</h3>
+        <button type="button" class="video-player-save-btn" id="video-player-save-btn" onclick="toggleSaveVideo()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+          Save
+        </button>
+      </div>
+      <div id="video-player-meta" class="video-player-meta"></div>
+      <p id="video-player-desc" class="video-player-desc"></p>
+
+      <div class="video-player-upnext">
+        <div class="video-player-upnext-label">Up Next</div>
+        <div id="video-player-upnext-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- END COMPONENT: learn -->

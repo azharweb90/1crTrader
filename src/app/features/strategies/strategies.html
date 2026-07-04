@@ -1,80 +1,209 @@
 <!-- COMPONENT: strategies -->
-<section class="content-section">
-  <p class="section-note">Backtested strategies shared by successful traders, each with its own setup-validity checklist you can check off live against your own trade idea. This is a working demo — strategies added here exist only in this browser session.</p>
+<!-- Rebuilt to match the Claude Design "Strategies" mockup: a filterable
+     card library, a rich read-only detail page, and a tier-gated
+     "Create your own strategy" editor. See strategies.js for the data
+     model and all rendering logic — this file is just static shell +
+     containers the JS fills in. -->
+<section class="content-section strategies-wrap">
 
-  <div class="demo-banner">
-    🚧 <strong>Demo mode:</strong> strategies are not shared between users yet. This is a working model of the interaction, ready for a real backend later.
+  <!-- ============ GRID (list) VIEW ============ -->
+  <div id="strategies-grid-wrap">
+    <div class="strategies-toolbar">
+      <p class="section-note strategies-intro">A library of clean, rules-based setups — each one a playbook, not a signal. Know the conditions it works in, where your stop goes, and what usually goes wrong before you ever take it live.</p>
+      <div class="strategies-toolbar-actions">
+        <div class="strat-density-toggle">
+          <button type="button" class="strat-density-btn strat-density-active" onclick="setViewDensity('small', this)">Small</button>
+          <button type="button" class="strat-density-btn" onclick="setViewDensity('large', this)">Large</button>
+        </div>
+        <button type="button" id="strategies-create-btn" class="strat-create-btn" onclick="openStrategyEditor()">+ Create strategy</button>
+      </div>
+    </div>
+    <div class="strategies-counter-row">
+      <span id="strategies-created-counter" class="strategies-created-counter">0 of 1 created</span>
+    </div>
+
+    <div class="strat-filter-row">
+      <button type="button" class="strat-filter-pill strat-filter-active" data-filter="all" onclick="setFilter('all', this)">All</button>
+      <button type="button" class="strat-filter-pill" data-filter="breakout" onclick="setFilter('breakout', this)">Breakout</button>
+      <button type="button" class="strat-filter-pill" data-filter="trend" onclick="setFilter('trend', this)">Trend</button>
+      <button type="button" class="strat-filter-pill" data-filter="reversal" onclick="setFilter('reversal', this)">Reversal</button>
+      <button type="button" class="strat-filter-pill" data-filter="options" onclick="setFilter('options', this)">Options</button>
+      <button type="button" class="strat-filter-pill" data-filter="scalping" onclick="setFilter('scalping', this)">Scalping</button>
+      <button type="button" class="strat-filter-pill" data-filter="mine" onclick="setFilter('mine', this)">My strategies</button>
+    </div>
+
+    <div id="strategies-grid" class="strategies-grid"></div>
+    <div id="strategies-empty" class="roadmap-empty-state hidden"></div>
   </div>
 
-  <div id="strategies-list-area"></div>
+  <!-- ============ DETAIL VIEW ============ -->
+  <div id="strategy-detail-wrap" class="strat-detail-wrap hidden">
+    <button type="button" class="strat-back-link" onclick="closeStrategyDetail()">&lsaquo; All strategies</button>
 
-  <!-- Strategy detail view, shown when a card is opened -->
-  <div id="strategy-detail-wrap" class="journal-form-wrap hidden">
-    <div class="journal-form-header">
-      <div>
-        <div class="journal-form-title" id="strat-detail-name"></div>
-        <div class="journal-form-meta" id="strat-detail-author"></div>
+    <div class="strat-detail-header-card">
+      <div class="strat-detail-topbar"></div>
+      <div class="strat-detail-header-row">
+        <div>
+          <div id="strat-detail-badges" class="strat-detail-badges"></div>
+          <div id="strat-detail-name" class="strat-detail-name"></div>
+          <div id="strat-detail-summary" class="strat-detail-summary"></div>
+        </div>
+        <button type="button" class="strat-save-btn">&#9734; Save to playbook</button>
       </div>
-      <button type="button" class="journal-close-btn" onclick="closeStrategyDetail()">&times;</button>
+      <div id="strat-detail-metrics" class="strategy-card-metrics strat-detail-metrics"></div>
     </div>
 
-    <p id="strat-detail-description" class="section-note"></p>
+    <div class="strat-detail-body">
+      <div class="strat-detail-main">
+        <div class="strat-detail-section-card">
+          <div class="strat-detail-section-title">&#128200; What a valid setup looks like</div>
+          <p id="strat-detail-chart-caption" class="section-note"></p>
+          <div class="strat-detail-chart-drop">
+            <div class="strat-detail-chart-drop-icon">&#128247;</div>
+            <div>Drop an annotated chart of this setup</div>
+            <div class="foot-note">or <a href="#" onclick="return false;">browse files</a></div>
+          </div>
+        </div>
 
-    <div class="strategy-backtest-grid">
-      <div class="dash-stat-card">
-        <div class="dash-stat-label">Win Rate</div>
-        <div class="dash-stat-value" id="strat-detail-winrate">&mdash;</div>
-      </div>
-      <div class="dash-stat-card">
-        <div class="dash-stat-label">Avg Risk:Reward</div>
-        <div class="dash-stat-value" id="strat-detail-rr">&mdash;</div>
-      </div>
-      <div class="dash-stat-card">
-        <div class="dash-stat-label">Sample Size</div>
-        <div class="dash-stat-value" id="strat-detail-sample">&mdash;</div>
-      </div>
-    </div>
+        <div class="strat-detail-section-card">
+          <div class="strat-detail-label">Overview</div>
+          <p id="strat-detail-overview" class="strat-detail-text"></p>
+          <div class="strat-detail-label">Ideal Conditions</div>
+          <p id="strat-detail-ideal" class="strat-detail-text"></p>
+          <div class="strat-detail-label">Entry &amp; Stop</div>
+          <p id="strat-detail-entry" class="strat-detail-text"></p>
+          <div class="strat-detail-label">Common Mistakes</div>
+          <p id="strat-detail-mistakes" class="strat-detail-text"></p>
+        </div>
 
-    <div class="journal-section" style="margin-top:20px;">
-      <div class="journal-section-title">Setup Validity Checklist</div>
-      <p class="section-note" style="margin-bottom:10px;">Check off each condition against your current setup before entering. This is a self-check, not a guarantee.</p>
-      <div id="strategy-checklist-area"></div>
-      <div id="strategy-checklist-result" class="journal-grade-result"></div>
+        <div class="strat-detail-section-card">
+          <div class="strat-detail-checklist-head">
+            <div class="strat-detail-section-title" style="margin-bottom:0;">Pre-trade checklist</div>
+            <span id="strat-detail-checklist-count" class="strat-checklist-count">0 / 0 confirmed</span>
+          </div>
+          <p class="section-note" style="margin-bottom:12px;">Tick each condition off before you take this setup live. All must be true — if one is missing, it isn't this trade.</p>
+          <div id="strat-detail-checklist-area"></div>
+        </div>
+      </div>
+
+      <div class="strat-detail-rail">
+        <div id="strat-detail-community-wrap">
+          <div class="strat-rail-card">
+            <div class="strat-detail-label">Community Win Ratio</div>
+            <div id="strat-detail-winratio" class="strat-winratio-value"></div>
+            <div class="foot-note" style="margin-top:2px;">win rate</div>
+            <div class="strat-winratio-track"><div id="strat-winratio-fill" class="strat-winratio-fill" style="width:0%;"></div></div>
+            <div class="strat-rail-stats-row">
+              <div><div class="strat-detail-label">Sample</div><div id="strat-detail-sample" class="strat-rail-stat-value"></div></div>
+              <div><div class="strat-detail-label">Avg R</div><div id="strat-detail-avgr" class="strat-rail-stat-value"></div></div>
+            </div>
+          </div>
+
+          <div class="strat-rail-card">
+            <div class="strat-detail-label">Trader Ratings</div>
+            <div class="strat-rating-summary-row">
+              <span id="strat-detail-rating-num" class="strat-rating-big"></span>
+              <span id="strat-detail-rating-count" class="foot-note"></span>
+            </div>
+            <div id="strat-detail-rating-stars" class="strat-rating-stars-row"></div>
+            <span id="strat-detail-fav-pill" class="strat-fav-badge hidden">Community Favourite</span>
+            <div id="strat-detail-dist" class="strat-dist-wrap"></div>
+          </div>
+        </div>
+
+        <div class="strat-rail-card">
+          <div class="strat-detail-label">Rate this playbook</div>
+          <p class="foot-note">Tap a star, then tell other traders how this setup behaved for you.</p>
+          <div id="strat-detail-rate-stars" class="strat-rate-stars-row"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Add Strategy form -->
-  <div class="market-post-wrap">
-    <div class="select-step-title">Share a Strategy (as an admin-approved trader)</div>
-    <div class="journal-field-grid">
-      <div>
-        <label class="amount-label">Strategy Name</label>
-        <input type="text" id="st-name" class="journal-input" placeholder="e.g. Opening Range Breakout">
+  <!-- ============ CREATE / EDIT STRATEGY ============ -->
+  <div id="strategy-editor-wrap" class="strat-editor-wrap hidden">
+    <button type="button" class="strat-back-link" onclick="closeStrategyEditor()">&lsaquo; All strategies</button>
+    <div class="strat-editor-title">Create your own strategy</div>
+    <p class="section-note" style="margin-bottom:18px;">Fill in the same playbook template we use for every strategy. It then shows up in your library, filterable under &ldquo;My strategies&rdquo;.</p>
+
+    <div class="strat-editor-card">
+      <label class="amount-label">Strategy Name</label>
+      <input type="text" id="ed-name" class="journal-input" placeholder="e.g. My 9:20 ORB variation" oninput="updatePublishState()">
+
+      <div class="strat-editor-field-row">
+        <div>
+          <label class="amount-label">Category</label>
+          <select id="ed-category" class="journal-input">
+            <option value="breakout">Breakout</option>
+            <option value="trend">Trend</option>
+            <option value="reversal">Reversal</option>
+            <option value="options">Options</option>
+            <option value="scalping">Scalping</option>
+          </select>
+        </div>
+        <div>
+          <label class="amount-label">Bias</label>
+          <select id="ed-bias" class="journal-input">
+            <option value="Both">Both</option>
+            <option value="Long">Long</option>
+            <option value="Short">Short</option>
+          </select>
+        </div>
+        <div>
+          <label class="amount-label">Difficulty</label>
+          <select id="ed-difficulty" class="journal-input">
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label class="amount-label">Author</label>
-        <input type="text" id="st-author" class="journal-input" placeholder="e.g. Trader Alpha">
-      </div>
-      <div>
-        <label class="amount-label">Win Rate (%)</label>
-        <input type="number" id="st-winrate" class="journal-input" placeholder="e.g. 68">
-      </div>
-      <div>
-        <label class="amount-label">Avg Risk:Reward</label>
-        <input type="text" id="st-rr" class="journal-input" placeholder="e.g. 1:2.5">
-      </div>
-      <div>
-        <label class="amount-label">Sample Size (trades)</label>
-        <input type="number" id="st-sample" class="journal-input" placeholder="e.g. 120">
+
+      <div class="strat-editor-field-row strat-editor-field-row-2">
+        <div>
+          <label class="amount-label">Timeframe</label>
+          <input type="text" id="ed-timeframe" class="journal-input" placeholder="e.g. 5-15 min">
+        </div>
+        <div>
+          <label class="amount-label">Target R:R</label>
+          <input type="text" id="ed-target" class="journal-input" placeholder="e.g. 1:2">
+        </div>
       </div>
     </div>
-    <label class="amount-label" style="margin-top:12px;">Description</label>
-    <textarea id="st-description" class="journal-textarea" placeholder="What is this strategy and when does it apply?"></textarea>
-    <label class="amount-label" style="margin-top:12px;">Checklist (one condition per line)</label>
-    <textarea id="st-checklist" class="journal-textarea" placeholder="e.g.&#10;Price breaks opening range high&#10;Volume above 20-day average&#10;No major news event in next hour"></textarea>
 
-    <button type="button" class="trade-submit-btn outcome-btn" style="margin-top:14px; max-width:220px;" onclick="addStrategy()">Add Strategy</button>
-    <p id="st-add-status" class="foot-note" style="margin-top:8px;"></p>
+    <div class="strat-editor-card">
+      <label class="amount-label">One-line Summary</label>
+      <textarea id="ed-summary" class="journal-textarea" placeholder="The elevator pitch — what this setup is, in one sentence." oninput="updatePublishState()"></textarea>
+
+      <label class="amount-label">Overview</label>
+      <textarea id="ed-overview" class="journal-textarea" placeholder="Why this setup works — the idea behind it."></textarea>
+
+      <label class="amount-label">Ideal Conditions</label>
+      <textarea id="ed-ideal" class="journal-textarea" placeholder="When it works — and when to leave it alone."></textarea>
+
+      <label class="amount-label">Entry &amp; Stop *</label>
+      <textarea id="ed-entry" class="journal-textarea" placeholder="Exactly where you enter, where the stop goes, and the target." oninput="updatePublishState()"></textarea>
+
+      <label class="amount-label">Common Mistakes</label>
+      <textarea id="ed-mistakes" class="journal-textarea" placeholder="What usually goes wrong — the traps to avoid."></textarea>
+
+      <label class="amount-label">What a Valid Setup Looks Like (chart caption)</label>
+      <textarea id="ed-chart-caption" class="journal-textarea" placeholder="Describe the exact pattern shown in your chart screenshot."></textarea>
+    </div>
+
+    <div class="strat-editor-card">
+      <label class="amount-label">Pre-trade Checklist *</label>
+      <p class="foot-note" style="margin-bottom:10px;">The conditions you'll tick off before taking this trade. Add as many as you need.</p>
+      <div id="ed-checklist-rows"></div>
+      <button type="button" class="ed-add-condition-btn" onclick="addChecklistRow()">+ Add condition</button>
+    </div>
+
+    <div class="strat-editor-footer">
+      <button type="button" id="ed-publish-btn" class="strat-create-btn" disabled onclick="publishStrategy()">Publish to my library</button>
+      <button type="button" class="setup-wizard-back-btn" onclick="closeStrategyEditor()">Cancel</button>
+      <span class="foot-note">Name, summary, entry &amp; stop and at least one checklist item are required.</span>
+    </div>
   </div>
+
 </section>
 <!-- END COMPONENT: strategies -->

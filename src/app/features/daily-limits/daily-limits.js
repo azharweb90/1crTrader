@@ -1088,6 +1088,7 @@
     const tableEl  = document.getElementById('broker-day-scrip-table');
     const confirmWrap = document.getElementById('broker-import-confirm');
     if (confirmWrap) confirmWrap.classList.add('hidden');
+    setBrokerImportFooterMode('default');
     if (!overlay || !tableEl) return;
 
     const niceDate = new Date(dateString + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -1130,6 +1131,17 @@
     if (e.target === document.getElementById('broker-import-panel-overlay')) closeBrokerImportPanel();
   }
 
+  // The footer has exactly one visible button pair at a time: the default
+  // [Import This Day / Close] or the confirm [Yes, Import / Cancel] \u2014 they
+  // swap in the same slot so the modal never grows/shifts height between
+  // the two states, and there's never two primary CTAs on screen together.
+  function setBrokerImportFooterMode(mode) {
+    const defaultGroup = document.getElementById('broker-import-footer-default');
+    const confirmGroup = document.getElementById('broker-import-footer-confirm');
+    if (defaultGroup) defaultGroup.classList.toggle('hidden', mode !== 'default');
+    if (confirmGroup) confirmGroup.classList.toggle('hidden', mode !== 'confirm');
+  }
+
   function requestImportBrokerDay() {
     if (!brokerSelectedDate) return;
     const rows = (typeof window.getBrokerPnlHistory === 'function') ? window.getBrokerPnlHistory(brokerSelectedDate) : [];
@@ -1147,12 +1159,14 @@
     }
     confirmText.innerText = `Import ${rows.length} trade${rows.length === 1 ? '' : 's'} from ${niceDate} into your Trade Log? Each one will be checked against your daily-loss, soft-block, and cooldown rules in order.${warning}`;
     confirmWrap.classList.remove('hidden');
+    setBrokerImportFooterMode('confirm');
   }
 
   function cancelImportBrokerDay() {
     brokerImportPendingDate = null;
     const confirmWrap = document.getElementById('broker-import-confirm');
     if (confirmWrap) confirmWrap.classList.add('hidden');
+    setBrokerImportFooterMode('default');
   }
 
   // Evaluates a trade about to be imported AGAINST the rules as they stood

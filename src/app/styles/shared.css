@@ -116,24 +116,15 @@
 /* === END Shared: demo-mode notice banner === */
 
 /* Shared: wide variant of .suggestions-panel (see suggestions.css), used
-   by the Daily Limits and Trade Manager broker-import drawers. Both show
-   a multi-column scrip table (Scrip/Qty/Buy/Sell/Time/Status) that needs
-   real room — the base 420px panel was clipping the Status column, and
-   680px was still tight once a day has 3+ rows with long option names
-   (e.g. "BANKNIFTY 2026-05-30 CE 51000") — widened further, and the
-   table itself now scrolls horizontally as a fallback so a long scrip
-   name or a narrow viewport can never visually clip a column. */
+   by the Trade Manager broker-import drawer, which shows the same kind of
+   multi-column scrip table as Daily Limits and needs real room for it.
+   (Daily Limits' own broker-import panel moved to a centered modal —
+   .broker-import-modal in daily-limits.css — so the #broker-day-scrip-table
+   / .broker-scrip-grid overrides that used to live here were removed as
+   dead weight; Trade Manager still uses this class directly.) */
 .suggestions-panel-wide {
   width: 760px;
   max-width: 94vw;
-}
-
-.suggestions-panel-wide #broker-day-scrip-table {
-  overflow-x: auto;
-}
-
-.suggestions-panel-wide .broker-scrip-grid {
-  min-width: 620px;
 }
 
 @media (max-width: 760px) {
