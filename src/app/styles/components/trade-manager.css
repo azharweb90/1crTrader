@@ -17,48 +17,85 @@
 
 .tm-type-pills {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
-  flex: 1 1 auto;
+  margin-bottom: 20px;
 }
 
+/* Widened + left-aligned now that the label reads as "Long (Call/Buy)"
+   plus a full sentence underneath (previously a short "Call (CE)" +
+   3-word sub fit fine centered in a small pill; the longer copy needs
+   room to sit on its own lines without wrapping awkwardly). */
 .tm-type-pill {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  gap: 2px;
-  padding: 8px 16px;
+  gap: 3px;
+  flex: 1 1 240px;
+  padding: 12px 18px;
   background: #f7f9fc;
   border: 1.5px solid #dce3ec;
   border-radius: 10px;
   cursor: pointer;
   font-family: inherit;
+  text-align: left;
   transition:
     border-color 0.15s ease,
     background 0.15s ease;
-  min-width: 88px;
-}
-
-.tm-type-pill:hover {
-  border-color: #2563EB;
-  background: #EAF1FE;
-}
-
-.tm-type-pill.tm-type-pill-active {
-  border-color: #2563EB;
-  background: #EAF1FE;
 }
 
 .tm-type-pill-name {
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .tm-type-pill-sub {
-  font-size: 10px;
+  font-size: 12.5px;
   color: #8a98ad;
+  line-height: 1.4;
+}
+
+/* Long/Short read as green/red always — not just once selected — to
+   match the reference: the up-triangle + "Long" text are green and the
+   down-triangle + "Short" text are red/orange in BOTH the selected and
+   unselected state. Only the card's border/background tint changes on
+   selection. */
+.tm-type-pill-icon {
+  font-size: 10px;
+  margin-right: 2px;
+  vertical-align: 1px;
+}
+
+.tm-type-pill-call .tm-type-pill-name,
+.tm-type-pill-call .tm-type-pill-icon {
+  color: #16a34a;
+}
+
+.tm-type-pill-put .tm-type-pill-name,
+.tm-type-pill-put .tm-type-pill-icon {
+  color: #c53d22;
+}
+
+.tm-type-pill-call:hover {
+  border-color: #16a34a;
+  background: #f1f9f3;
+}
+
+.tm-type-pill-put:hover {
+  border-color: #c53d22;
+  background: #fbf0ec;
+}
+
+.tm-type-pill-call.tm-type-pill-active {
+  border-color: #16a34a;
+  background: #eaf6ed;
+}
+
+.tm-type-pill-put.tm-type-pill-active {
+  border-color: #c53d22;
+  background: #fbeae4;
 }
 
 /* ── Lots row ─────────────────────────────────────────────── */
@@ -91,7 +128,7 @@
   flex: 0 0 34px;
   border: none;
   background: #f7f9fc;
-  color: #1E293B;
+  color: #1e293b;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -119,7 +156,7 @@
   text-align: center;
   font-size: 15px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
   background: #fff;
   height: 40px;
   flex: 1 1 auto;
@@ -147,15 +184,15 @@
 }
 
 .tm-lots-stat strong {
-  color: #1E293B;
+  color: #1e293b;
   font-weight: 700;
 }
 
 .tm-lots-warning {
   font-size: 13px;
-  color: #1D4ED8;
-  background: #EAF1FE;
-  border: 1px solid #B9D4FA;
+  color: #1d4ed8;
+  background: #eaf1fe;
+  border: 1px solid #b9d4fa;
   border-radius: 7px;
   padding: 6px 10px;
   margin-top: 4px;
@@ -212,7 +249,7 @@
 .tm-position-value {
   font-size: 16px;
   font-weight: 800;
-  color: #1E293B;
+  color: #1e293b;
   font-variant-numeric: tabular-nums;
 }
 
@@ -220,10 +257,10 @@
   color: #d9381e;
 }
 .tm-position-cell-reward .tm-position-value {
-  color: #16A34A;
+  color: #16a34a;
 }
 .tm-position-cell-margin .tm-position-value {
-  color: #2563EB;
+  color: #2563eb;
 }
 
 .tm-position-sub {
@@ -288,7 +325,7 @@
 .tm-collapsed-chip.tm-collapsed-chip-long {
   background: rgba(29, 158, 117, 0.1);
   border-color: rgba(29, 158, 117, 0.3);
-  color: #16A34A;
+  color: #16a34a;
 }
 
 .tm-collapsed-chip.tm-collapsed-chip-short {
@@ -337,14 +374,14 @@
 .tm-review-value {
   font-size: 14.5px;
   font-weight: 600;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .tm-review-risk {
   color: #d9381e;
 }
 .tm-review-reward {
-  color: #16A34A;
+  color: #16a34a;
 }
 
 /* ── Direction badge ──────────────────────────────────────── */
@@ -376,7 +413,7 @@
 }
 
 .tm-direction-badge-long .tm-direction-badge-icon {
-  color: #16A34A;
+  color: #16a34a;
 }
 .tm-direction-badge-short .tm-direction-badge-icon {
   color: #d9381e;
@@ -385,7 +422,7 @@
 .tm-direction-badge-label {
   font-size: 13px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
   display: block;
 }
 
@@ -433,24 +470,24 @@
 }
 
 .tm-level-pill-reward .tm-level-pill-price {
-  color: #16A34A;
+  color: #16a34a;
 }
 .tm-level-pill-reward .tm-level-pill-rs {
   background: rgba(29, 158, 117, 0.12);
-  color: #16A34A;
+  color: #16a34a;
 }
 
 .tm-level-pill-trail .tm-level-pill-price {
-  color: #2563EB;
+  color: #2563eb;
 }
 .tm-level-pill-trail .tm-level-pill-rs {
   background: rgba(44, 111, 214, 0.12);
-  color: #2563EB;
+  color: #2563eb;
 }
 
 /* ── R:R summary chips ────────────────────────────────────── */
 .tm-rr-chip-long {
-  color: #16A34A;
+  color: #16a34a;
   background: rgba(29, 158, 117, 0.1);
   border-color: rgba(29, 158, 117, 0.25) !important;
 }
@@ -539,14 +576,14 @@
 }
 
 .tm-rr-suggest-btn:hover {
-  border-color: #2563EB;
+  border-color: #2563eb;
   background: #eaf2fa;
 }
 
 .tm-rr-suggest-ratio {
   font-size: 14.5px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .tm-rr-suggest-price {
@@ -579,11 +616,11 @@
   padding: 6px 14px;
   font-size: 12.5px;
   font-weight: 600;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .tm-rr-chip strong {
-  color: #1E293B;
+  color: #1e293b;
 }
 
 /* Result state cards — same visual language as .profit-decision-card and
@@ -645,11 +682,11 @@
 }
 
 .tm-result-card.tm-result-target .tm-result-title {
-  color: #16A34A;
+  color: #16a34a;
 }
 
 .tm-result-card.tm-result-target .tm-result-message {
-  color: #16A34A;
+  color: #16a34a;
 }
 
 /* Target-hit celebration: a brief confetti burst, plays once on render and
@@ -698,11 +735,11 @@
 }
 
 .tm-result-card.tm-result-stopped-locked .tm-result-title {
-  color: #16A34A;
+  color: #16a34a;
 }
 
 .tm-result-card.tm-result-stopped-locked .tm-result-message {
-  color: #16A34A;
+  color: #16a34a;
 }
 
 .tm-result-card.tm-result-stopped-neutral {
@@ -724,7 +761,7 @@
 }
 
 .tm-result-card.tm-result-open .tm-result-title {
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .tm-result-card.tm-result-open .tm-result-message {
@@ -842,10 +879,10 @@
   color: #d9381e;
 }
 .tm-metric-reward .tm-metric-amount {
-  color: #16A34A;
+  color: #16a34a;
 }
 .tm-metric-margin .tm-metric-amount {
-  color: #2563EB;
+  color: #2563eb;
 }
 
 .tm-start-btn {
@@ -886,7 +923,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -936,8 +973,8 @@
 
 /* R:R pill selected state */
 .tm-rr-suggest-btn-selected {
-  background: #1E293B !important;
-  border-color: #1E293B !important;
+  background: #1e293b !important;
+  border-color: #1e293b !important;
   color: #ffffff !important;
 }
 .tm-rr-suggest-btn-selected .tm-rr-suggest-ratio,
@@ -974,12 +1011,14 @@
    with the trader). */
 .tm-live-card {
   background: #fff;
-  border: 1px solid #E3E9F1;
+  border: 1px solid #e3e9f1;
   border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 10px;
 }
-.tm-live-card:last-child { margin-bottom: 0; }
+.tm-live-card:last-child {
+  margin-bottom: 0;
+}
 
 .tm-live-card-row {
   display: flex;
@@ -989,12 +1028,12 @@
 }
 
 .tm-live-card-label {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 10.5px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #8A98AD;
+  color: #8a98ad;
   margin-bottom: 6px;
 }
 
@@ -1005,12 +1044,12 @@
 .tm-live-card-value {
   font-size: 18px;
   font-weight: 800;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .tm-live-card-sub {
   font-size: 13.5px;
-  color: #8A98AD;
+  color: #8a98ad;
   margin-top: 4px;
 }
 
@@ -1020,14 +1059,18 @@
   font-variant-numeric: tabular-nums;
 }
 
-.tm-live-badge-pos { color: #15803D; }
-.tm-live-badge-neg { color: #C53D22; }
+.tm-live-badge-pos {
+  color: #15803d;
+}
+.tm-live-badge-neg {
+  color: #c53d22;
+}
 
 .tm-live-riskfree {
-  color: #15803D;
+  color: #15803d;
   font-weight: 700;
 }
 
 .tm-live-rr-footer {
-  background: #F7F9FC;
+  background: #f7f9fc;
 }

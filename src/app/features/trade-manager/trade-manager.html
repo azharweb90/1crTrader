@@ -4,24 +4,33 @@
   <!-- ═══ SETUP PANEL ═══════════════════════════════════════════════════ -->
   <div id="tm-setup-wrap" class="dash-section-card">
 
-    <!-- Type pills — CE/PE only, direction explicit -->
-    <div class="tm-type-pills" style="margin-bottom:20px;">
-      <button type="button" class="tm-type-pill" data-type="call" onclick="setInstrumentType('call')">
-        <span class="tm-type-pill-name">Call (CE)</span>
-        <span class="tm-type-pill-sub">Long · buying a call</span>
-      </button>
-      <button type="button" class="tm-type-pill" data-type="put" onclick="setInstrumentType('put')">
-        <span class="tm-type-pill-name">Put (PE)</span>
-        <span class="tm-type-pill-sub">Short · buying a put</span>
+    <!-- Import from broker strip — sits above the direction toggle now,
+         per explicit user instruction: import bar on top, Long/Short
+         buttons below it. -->
+    <div class="tm-broker-import-strip" id="tm-broker-import-strip" style="margin-bottom:20px;">
+      <span class="tm-broker-import-label">Have a trade open? Import from broker order history</span>
+      <button type="button" class="tm-broker-import-mini-btn" onclick="openBrokerImportModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Import Trade
       </button>
     </div>
 
-    <!-- Import from broker strip -->
-    <div class="tm-broker-import-strip" id="tm-broker-import-strip">
-      <span class="tm-broker-import-label">Have a trade open? Import from broker order history</span>
-      <button type="button" class="tm-broker-import-mini-btn" onclick="openBrokerImportModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Import Trade
+    <!-- Type pills — CE/PE under the hood (data-type/onclick unchanged so
+         all existing JS logic keeps working), but labeled Long/Short per
+         the reference design and the user's explicit request. -->
+    <div class="tm-type-pills">
+      <button type="button" class="tm-type-pill tm-type-pill-call" data-type="call" onclick="setInstrumentType('call')">
+        <span class="tm-type-pill-name"><span class="tm-type-pill-icon">&#9650;</span> Long (Call/Buy)</span>
+        <span class="tm-type-pill-sub">You profit when price rises. Stop-loss below entry.</span>
+      </button>
+      <button type="button" class="tm-type-pill tm-type-pill-put" data-type="put" onclick="setInstrumentType('put')">
+        <span class="tm-type-pill-name"><span class="tm-type-pill-icon">&#9660;</span> Short (Put/Sell)</span>
+        <span class="tm-type-pill-sub">You profit when price falls. Stop-loss above entry.</span>
       </button>
     </div>
 
@@ -33,20 +42,24 @@
         <div class="tm-setup-grid">
           <div class="amount-input-wrap">
             <label class="amount-label" for="tm-instrument">Strike / Instrument</label>
-            <input type="text" id="tm-instrument" class="amount-input" placeholder="e.g. NIFTY 23200 CE" autocomplete="off">
+            <input type="text" id="tm-instrument" class="amount-input" placeholder="e.g. NIFTY 23200 CE"
+              autocomplete="off">
           </div>
           <div class="amount-input-wrap">
             <label class="amount-label" for="tm-entry">Entry price</label>
-            <input type="number" id="tm-entry" class="amount-input" step="0.5" placeholder="e.g. 155" oninput="onSetupPriceInput()" autocomplete="off">
+            <input type="number" id="tm-entry" class="amount-input" step="0.5" placeholder="e.g. 155"
+              oninput="onSetupPriceInput()" autocomplete="off">
           </div>
           <div class="amount-input-wrap">
             <label class="amount-label" for="tm-sl">Stop-loss price</label>
-            <input type="number" id="tm-sl" class="amount-input" step="0.5" placeholder="e.g. 120" oninput="onSetupPriceInput()" autocomplete="off">
+            <input type="number" id="tm-sl" class="amount-input" step="0.5" placeholder="e.g. 120"
+              oninput="onSetupPriceInput()" autocomplete="off">
             <span id="tm-sl-hint" class="tm-price-hint"></span>
           </div>
           <div class="amount-input-wrap">
             <label class="amount-label" for="tm-target">Target price</label>
-            <input type="number" id="tm-target" class="amount-input" step="0.5" placeholder="e.g. 330" oninput="onSetupPriceInput()" autocomplete="off">
+            <input type="number" id="tm-target" class="amount-input" step="0.5" placeholder="e.g. 330"
+              oninput="onSetupPriceInput()" autocomplete="off">
             <span id="tm-target-hint" class="tm-price-hint"></span>
           </div>
         </div>
@@ -57,7 +70,8 @@
             <label class="amount-label" for="tm-lots">Lots</label>
             <div class="tm-lots-stepper">
               <button type="button" class="tm-lots-step-btn" onclick="stepLots(-1)">−</button>
-              <input type="number" id="tm-lots" class="tm-lots-input" value="1" min="1" max="200" oninput="onLotsInput()" autocomplete="off">
+              <input type="number" id="tm-lots" class="tm-lots-input" value="1" min="1" max="200"
+                oninput="onLotsInput()" autocomplete="off">
               <button type="button" class="tm-lots-step-btn" onclick="stepLots(1)">+</button>
             </div>
           </div>
@@ -77,7 +91,12 @@
       <div class="tm-metrics-col">
         <div class="tm-metrics-panel" id="tm-metrics-panel">
           <div class="tm-metrics-panel-empty" id="tm-metrics-empty">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
+              <line x1="12" y1="20" x2="12" y2="10" />
+              <line x1="18" y1="20" x2="18" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="16" />
+            </svg>
             <span>Fill in prices to see risk &amp; reward</span>
           </div>
           <div id="tm-position-summary" class="hidden"></div>
@@ -99,7 +118,10 @@
       <div id="tm-collapsed-setup" class="tm-collapsed-setup" onclick="toggleSetupReview()">
         <div id="tm-collapsed-setup-text" class="tm-collapsed-setup-text"></div>
         <span class="tm-collapsed-setup-chevron" id="tm-setup-review-chevron">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </span>
       </div>
       <div id="tm-setup-review" class="tm-setup-review hidden">
@@ -116,15 +138,13 @@
         <div class="tm-inline-price-wrap">
           <label class="amount-label" for="tm-current-price" style="margin-bottom:4px;">Current price</label>
           <input type="number" id="tm-current-price" class="amount-input tm-inline-price-input" step="0.5"
-            placeholder="e.g. 250"
-            oninput="onTradeManagerPricePreview()"
-            onblur="onTradeManagerCheckIn()"
-            onkeydown="if(event.key==='Enter'){onTradeManagerCheckIn();event.target.blur();}"
-            autocomplete="off">
+            placeholder="e.g. 250" oninput="onTradeManagerPricePreview()" onblur="onTradeManagerCheckIn()"
+            onkeydown="if(event.key==='Enter'){onTradeManagerCheckIn();event.target.blur();}" autocomplete="off">
         </div>
       </div>
 
-      <p class="foot-note" style="margin:8px 0 16px;">Type to preview. Press Enter or click away to confirm stop or target.</p>
+      <p class="foot-note" style="margin:8px 0 16px;">Type to preview. Press Enter or click away to confirm stop or
+        target.</p>
 
       <!-- Result card — always visible right column during tracking -->
       <div class="tm-active-columns">
@@ -146,7 +166,12 @@
       <!-- End trade button -->
       <div style="margin-top:20px; display:flex; justify-content:center;">
         <button type="button" class="tm-end-btn" onclick="endTradeManager()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+          </svg>
           End this trade &amp; start a new one
         </button>
       </div>
@@ -165,14 +190,17 @@
       </div>
       <button type="button" class="suggestions-panel-close" onclick="closeTmImportPanel()">&times;</button>
     </div>
-    <div class="suggestions-panel-body" style="flex:1 1 auto;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+    <div class="suggestions-panel-body"
+      style="flex:1 1 auto;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
       <div class="rm-modal-field">
         <label class="amount-label">Stock / Scrip name</label>
-        <input type="text" id="tm-imp-scrip" class="amount-input" style="margin-top:6px;" placeholder="e.g. NIFTY 2026-06-30 23850 CE">
+        <input type="text" id="tm-imp-scrip" class="amount-input" style="margin-top:6px;"
+          placeholder="e.g. NIFTY 2026-06-30 23850 CE">
       </div>
       <div class="rm-modal-field">
         <label class="amount-label">Buy Price (Entry)</label>
-        <input type="number" id="tm-imp-buy" class="amount-input" style="margin-top:6px;" step="0.01" placeholder="e.g. 91.70">
+        <input type="number" id="tm-imp-buy" class="amount-input" style="margin-top:6px;" step="0.01"
+          placeholder="e.g. 91.70">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="rm-modal-field">
@@ -181,7 +209,8 @@
         </div>
         <div class="rm-modal-field">
           <label class="amount-label">Executed at</label>
-          <input type="text" id="tm-imp-time" class="amount-input" style="margin-top:6px;" placeholder="e.g. 10:25:59" readonly>
+          <input type="text" id="tm-imp-time" class="amount-input" style="margin-top:6px;" placeholder="e.g. 10:25:59"
+            readonly>
         </div>
       </div>
       <div class="rm-modal-field">
@@ -191,7 +220,8 @@
           <option value="put">Put (PE) — Short</option>
         </select>
       </div>
-      <p class="foot-note">Stop-loss and target are your own discipline rules — set them in the form after importing.</p>
+      <p class="foot-note">Stop-loss and target are your own discipline rules — set them in the form after importing.
+      </p>
     </div>
     <div class="suggestions-panel-footer" style="padding:14px 20px;border-top:1px solid #E3E9F1;display:flex;gap:10px;">
       <button type="button" class="broker-import-btn" style="flex:1;border-radius:8px;" onclick="applyBrokerImport()">

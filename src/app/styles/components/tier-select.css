@@ -26,7 +26,9 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 76px); /* 76px = .content-area's own 28px+48px v-padding, see layout-shell.css */
+  height: calc(
+    100vh - 76px
+  ); /* 76px = .content-area's own 28px+48px v-padding, see layout-shell.css */
   /* This page shouldn't read as one big enclosing white card like other
      .content-section pages — the reference design shows the intro text
      and step 1/2/3 headers sitting directly on the app's gray canvas,
@@ -103,7 +105,7 @@
   width: 26px;
   height: 26px;
   border-radius: 8px;
-  background: #2563EB;
+  background: #2563eb;
   color: #fff;
   display: flex;
   align-items: center;
@@ -117,7 +119,7 @@
   margin: 0;
   font-size: 17px;
   font-weight: 800;
-  color: #1E293B;
+  color: #1e293b;
   letter-spacing: -0.3px;
 }
 
@@ -141,7 +143,7 @@
   width: 320px;
   flex: 0 0 auto;
   background: #fff;
-  border-left: 1px solid #E8EDF4;
+  border-left: 1px solid #e8edf4;
   padding: 26px 24px;
   display: flex;
   flex-direction: column;
@@ -172,8 +174,8 @@
 
 .setup-summary-tile {
   padding: 13px 15px;
-  background: #F7F9FC;
-  border: 1px solid #EFF3F8;
+  background: #f7f9fc;
+  border: 1px solid #eff3f8;
   border-radius: 11px;
 }
 
@@ -188,8 +190,8 @@
 }
 
 .setup-summary-tile-capital {
-  background: #EAF1FE;
-  border-color: #CFE0FB;
+  background: #eaf1fe;
+  border-color: #cfe0fb;
 }
 
 .setup-summary-label {
@@ -201,26 +203,26 @@
 }
 
 .setup-summary-tile-capital .setup-summary-label {
-  color: #3A5170;
+  color: #3a5170;
 }
 
 .setup-summary-value {
   font-size: 15.5px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
   line-height: 1.4;
 }
 
 .setup-summary-value-accent {
   font-size: 15.5px;
   font-weight: 800;
-  color: #2563EB;
+  color: #2563eb;
 }
 
 .setup-summary-value-capital {
   font-size: 18px;
   font-weight: 800;
-  color: #1D4ED8;
+  color: #1d4ed8;
   font-family: "IBM Plex Mono", monospace;
 }
 
@@ -237,7 +239,7 @@
   font-weight: 700;
   font-family: inherit;
   width: 100%;
-  background: #2563EB;
+  background: #2563eb;
   color: #fff;
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
@@ -249,7 +251,7 @@
 }
 
 .setup-cta-btn:disabled {
-  background: #C9D3DF;
+  background: #c9d3df;
   color: #fff;
   cursor: not-allowed;
   box-shadow: none;
@@ -258,7 +260,7 @@
 .setup-cta-hint {
   font-size: 13px;
   line-height: 1.5;
-  color: #9AA7B8;
+  color: #9aa7b8;
   text-align: center;
   margin-top: 10px;
 }
@@ -269,13 +271,13 @@
   gap: 10px;
   margin-top: 16px;
   padding: 13px 16px;
-  background: #EAF1FE;
-  border: 1px solid #CFE0FB;
+  background: #eaf1fe;
+  border: 1px solid #cfe0fb;
   border-radius: 10px;
   max-width: 600px;
   font-size: 14px;
   line-height: 1.5;
-  color: #3A5170;
+  color: #3a5170;
 }
 
 .setup-wizard-note svg {
@@ -301,7 +303,7 @@
   display: block;
   background: none;
   border: none;
-  color: #2563EB;
+  color: #2563eb;
   font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
@@ -321,13 +323,13 @@
 }
 
 .setup-broker-links-sep {
-  color: #CBD4E0;
+  color: #cbd4e0;
 }
 
 .setup-broker-links .setup-more-toggle {
   font-size: 14.5px;
   font-weight: 600;
-  color: #2563EB;
+  color: #2563eb;
   background: none;
   border: none;
   cursor: pointer;
@@ -345,7 +347,7 @@
   gap: 11px;
   text-align: left;
   background: #fff;
-  border: 1px solid #E3E9F1;
+  border: 1px solid #e3e9f1;
   border-radius: 12px;
   padding: 14px 15px;
   cursor: pointer;
@@ -354,7 +356,7 @@
 }
 
 .setup-broker-card:hover:not(:disabled) {
-  border-color: #2563EB;
+  border-color: #2563eb;
 }
 
 .setup-broker-card:disabled {
@@ -378,12 +380,12 @@
 .setup-broker-card-name {
   font-size: 15.5px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .setup-broker-card-tag {
   font-size: 11.5px;
-  color: #8A98AD;
+  color: #8a98ad;
   margin-top: 1px;
 }
 
@@ -394,7 +396,7 @@
 .setup-connected-card,
 .setup-manual-card {
   background: #fff;
-  border: 1px solid #E3E9F1;
+  border: 1px solid #e3e9f1;
   border-radius: 13px;
   overflow: hidden;
 }
@@ -404,7 +406,7 @@
   align-items: center;
   gap: 12px;
   padding: 15px 18px;
-  border-bottom: 1px solid #EFF3F8;
+  border-bottom: 1px solid #eff3f8;
 }
 
 .setup-connected-body {
@@ -421,7 +423,7 @@
 .setup-connected-name {
   font-size: 15px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .setup-connected-live-pill {
@@ -430,23 +432,23 @@
   gap: 5px;
   font-size: 11px;
   font-weight: 600;
-  color: #16A34A;
-  background: #E7F6EC;
-  border: 1px solid #C6EBD3;
+  color: #16a34a;
+  background: #e7f6ec;
+  border: 1px solid #c6ebd3;
   border-radius: 20px;
   padding: 3px 9px;
 }
 
 .setup-connected-sub {
   font-size: 13.5px;
-  color: #8A98AD;
+  color: #8a98ad;
   margin-top: 2px;
 }
 
 .setup-connected-change-link {
   font-size: 14.5px;
   font-weight: 600;
-  color: #2563EB;
+  color: #2563eb;
   text-decoration: none;
   cursor: pointer;
   background: none;
@@ -465,7 +467,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
-  background: #EFF3F8;
+  background: #eff3f8;
 }
 
 .setup-connected-detail {
@@ -477,7 +479,7 @@
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
   letter-spacing: 0.8px;
-  color: #8A98AD;
+  color: #8a98ad;
   text-transform: uppercase;
   margin-bottom: 5px;
 }
@@ -485,14 +487,14 @@
 .setup-connected-detail-value {
   font-size: 19px;
   font-weight: 800;
-  color: #1E293B;
+  color: #1e293b;
   font-family: "IBM Plex Mono", monospace;
 }
 
 .setup-connected-detail-value-accent {
   font-size: 19px;
   font-weight: 800;
-  color: #2563EB;
+  color: #2563eb;
   font-family: inherit;
 }
 
@@ -510,7 +512,7 @@
 .setup-manual-head-label {
   font-size: 15.5px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .setup-capital-label {
@@ -525,7 +527,7 @@
   display: flex;
   align-items: center;
   background: #fff;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 10px;
   padding: 0 14px;
   max-width: 320px;
@@ -533,12 +535,12 @@
 }
 
 .setup-capital-input-row:focus-within {
-  border-color: #2563EB;
+  border-color: #2563eb;
 }
 
 .setup-capital-prefix {
   font-size: 17px;
-  color: #8A98AD;
+  color: #8a98ad;
   font-weight: 600;
 }
 
@@ -548,7 +550,7 @@
   font-family: "IBM Plex Mono", monospace;
   font-size: 17px;
   font-weight: 600;
-  color: #1E293B;
+  color: #1e293b;
   padding: 13px 10px;
   width: 100%;
   background: transparent;
@@ -565,7 +567,7 @@
   position: relative;
   text-align: left;
   background: #fff;
-  border: 1.5px solid #E3E9F1;
+  border: 1.5px solid #e3e9f1;
   border-radius: 12px;
   padding: 15px 34px 14px 15px; /* extra right padding clears the always-visible checkbox circle */
   cursor: pointer;
@@ -581,7 +583,7 @@
 }
 
 .trader-type-card:hover {
-  border-color: #2563EB;
+  border-color: #2563eb;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
   transform: translateY(-2px);
 }
@@ -591,14 +593,14 @@
 }
 
 .trader-type-card.selected {
-  border-color: #2563EB;
+  border-color: #2563eb;
   background: #fff;
 }
 
 .trader-type-name {
   font-size: 16px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
   margin-bottom: 5px;
 }
 
@@ -624,7 +626,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 1.5px solid #CBD4E0;
+  border: 1.5px solid #cbd4e0;
   background: #fff;
   color: #fff;
   display: flex;
@@ -638,19 +640,19 @@
 }
 
 .trader-type-card:hover::after {
-  border-color: #2563EB;
+  border-color: #2563eb;
 }
 
 .trader-type-card.selected::after {
   content: "\2713";
-  border-color: #2563EB;
-  background: #2563EB;
+  border-color: #2563eb;
+  background: #2563eb;
 }
 
 /* Continue button, disabled until every required section is filled */
 .profile-continue-btn {
   width: 100%;
-  background: #1E293B;
+  background: #1e293b;
   color: #ffffff;
   border: none;
   padding: 11px 18px;
@@ -662,7 +664,7 @@
 }
 
 .profile-continue-btn:hover:not(:disabled) {
-  background: #2563EB;
+  background: #2563eb;
 }
 
 .profile-continue-btn:disabled {
@@ -674,7 +676,7 @@
 /* Header "Change Tier" button + active-tier indicator */
 .change-tier-btn {
   background: #eef6ff;
-  color: #2563EB;
+  color: #2563eb;
   border: 1px solid #d6e7fb;
   padding: 8px 16px;
   border-radius: 8px;
@@ -712,8 +714,8 @@
 
 .dark-mode-toggle-btn:hover {
   background: #f7f9fc;
-  border-color: #2563EB;
-  color: #2563EB;
+  border-color: #2563eb;
+  color: #2563eb;
 }
 
 /* Font-size control — A- / A / A+ trio in the header. Scales the whole
@@ -749,7 +751,7 @@
 
 .font-size-btn:hover {
   background: #f1f4f8;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .font-size-btn:disabled {
@@ -779,7 +781,7 @@
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  background: #8A98AD;
+  background: #8a98ad;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -819,7 +821,7 @@
 .header-account-menu-name {
   font-size: 14px;
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .header-account-menu-email {
@@ -832,8 +834,8 @@
 .header-account-menu-tier {
   font-size: 11.5px;
   font-weight: 600;
-  color: #1D4ED8;
-  background: #EAF1FE;
+  color: #1d4ed8;
+  background: #eaf1fe;
   border-radius: 999px;
   padding: 3px 10px;
   display: inline-block;
@@ -849,7 +851,7 @@
   font-family: inherit;
   font-size: 13.5px;
   font-weight: 600;
-  color: #1E293B;
+  color: #1e293b;
   padding: 9px 10px;
   border-radius: 8px;
   cursor: pointer;
@@ -871,8 +873,8 @@
    design (claude.ai/design 1CrTrader App), this is a plain light card
    with dark bold text, not a filled color pill. */
 .header-balance-pill {
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: #f7f9fc;
+  border: 1px solid #e3e9f1;
   border-radius: 10px;
   padding: 7px 16px;
   display: flex;
@@ -886,14 +888,14 @@
   font-size: 9.5px;
   font-weight: 500;
   letter-spacing: 1.2px;
-  color: #8A98AD;
+  color: #8a98ad;
   text-transform: uppercase;
 }
 
 .header-balance-value {
   font-size: 15px;
   font-weight: 700;
-  color: #16A34A;
+  color: #16a34a;
   font-variant-numeric: tabular-nums;
 }
 
@@ -903,7 +905,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #16A34A 0%, #16A34A 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #16a34a 100%);
   color: #ffffff;
   padding: 14px 20px;
   border-radius: 10px;
@@ -928,12 +930,12 @@
 /* Highlight state applied to a matching ladder/rules row or pricing card
    once a tier has been selected on the setup screen. */
 .grid-table .label.tier-highlight {
-  background: #EAF1FE !important;
-  color: #1D4ED8 !important;
+  background: #eaf1fe !important;
+  color: #1d4ed8 !important;
 }
 
 .pricing-card.tier-highlight {
-  border-color: #2563EB;
+  border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
 }
 
@@ -947,7 +949,7 @@
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #2563EB;
+  color: #2563eb;
   cursor: pointer;
   margin-bottom: 12px;
   font-family: inherit;
@@ -956,12 +958,12 @@
 
 .select-all-btn:hover {
   background: #eef6ff;
-  border-color: #2563EB;
+  border-color: #2563eb;
 }
 
 .select-all-btn.all-selected {
-  background: #2563EB;
-  border-color: #2563EB;
+  background: #2563eb;
+  border-color: #2563eb;
   color: #ffffff;
 }
 
@@ -981,7 +983,7 @@
 
 .instrument-picker-search:focus {
   outline: none;
-  border-color: #2563EB;
+  border-color: #2563eb;
 }
 
 /* The instrument picker's OWN search box — a bordered row with a leading
@@ -992,14 +994,14 @@
   align-items: center;
   gap: 10px;
   background: #fff;
-  border: 1px solid #DCE3EC;
+  border: 1px solid #dce3ec;
   border-radius: 10px;
   padding: 0 14px;
   margin-bottom: 14px;
 }
 
 .setup-instrument-search-row:focus-within {
-  border-color: #2563EB;
+  border-color: #2563eb;
 }
 
 .setup-instrument-search {
@@ -1009,7 +1011,7 @@
   outline: none;
   font-size: 15.5px;
   font-family: inherit;
-  color: #1E293B;
+  color: #1e293b;
   background: transparent;
 }
 
@@ -1031,9 +1033,9 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: #EAF1FE;
-  border: 1px solid #CFE0FB;
-  color: #1D4ED8;
+  background: #eaf1fe;
+  border: 1px solid #cfe0fb;
+  color: #1d4ed8;
   font-size: 13px;
   font-weight: 600;
   padding: 5px 8px 5px 12px;
@@ -1041,9 +1043,9 @@
 }
 
 .instrument-picker-chip-remove {
-  background: #CFE0FB;
+  background: #cfe0fb;
   border: none;
-  color: #1D4ED8;
+  color: #1d4ed8;
   width: 17px;
   height: 17px;
   border-radius: 50%;
@@ -1057,7 +1059,7 @@
 }
 
 .instrument-picker-chip-remove:hover {
-  background: #BAD3F7;
+  background: #bad3f7;
 }
 
 .instrument-picker-category {
@@ -1114,7 +1116,7 @@
 .instrument-picker-select-all-btn {
   background: none;
   border: none;
-  color: #2563EB;
+  color: #2563eb;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -1162,7 +1164,7 @@
   width: 20px;
   height: 20px;
   border-radius: 6px;
-  border: 1.5px solid #CBD4E0;
+  border: 1.5px solid #cbd4e0;
   background: #fff;
   color: #fff;
   flex-shrink: 0;
@@ -1175,8 +1177,8 @@
 }
 
 .instrument-picker-row.selected .instrument-check {
-  background: #2563EB;
-  border-color: #2563EB;
+  background: #2563eb;
+  border-color: #2563eb;
 }
 
 .instrument-picker-row.selected .instrument-check::after {
@@ -1192,7 +1194,7 @@
 
 .instrument-picker-row-name {
   font-weight: 600;
-  color: #1E293B;
+  color: #1e293b;
   font-size: 15.5px;
   flex: 1;
 }
@@ -1215,7 +1217,7 @@
 
 .instrument-lots-input:focus {
   outline: none;
-  border-color: #2563EB;
+  border-color: #2563eb;
 }
 
 /* Custom stocks free-text entry + chips */
@@ -1235,7 +1237,7 @@
 }
 
 .custom-stock-add-btn {
-  background: #1E293B;
+  background: #1e293b;
   color: #ffffff;
   border: none;
   padding: 9px 18px;
@@ -1248,7 +1250,7 @@
 }
 
 .custom-stock-add-btn:hover {
-  background: #2563EB;
+  background: #2563eb;
 }
 
 .custom-stock-chips {
@@ -1263,7 +1265,7 @@
   align-items: center;
   gap: 6px;
   background: #eef6ff;
-  color: #2563EB;
+  color: #2563eb;
   border: 1px solid #d6e7fb;
   padding: 5px 6px 5px 12px;
   border-radius: 16px;
@@ -1274,7 +1276,7 @@
 .custom-stock-chip-remove {
   background: none;
   border: none;
-  color: #2563EB;
+  color: #2563eb;
   cursor: pointer;
   font-size: 15px;
   line-height: 1;

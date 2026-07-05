@@ -39,13 +39,30 @@
     </div>
   </div>
 
-  <!-- ── STEP 2: GOAL SIMULATOR ────────────────────────────────── -->
+  <!-- ── STEP 2: GOAL ────────────────────────────────────────────
+       Two mutually-exclusive ways to pick a target: the next tier
+       (the default — no typing required, just "how far to the next
+       rung") or a custom amount via the slider. Only one is ever
+       shown at a time, and only one goal feeds Step 3 below — this
+       used to always show a ₹10L–1Cr custom slider by default (with
+       a target totally disconnected from tiers) at the same time as
+       a separate tier-based projection block in Step 3, which is
+       exactly the "confusing, don't know what's happening" overlap
+       the user flagged. -->
   <div class="dash-section-card">
     <div class="rm-step-label">Step 2 — Set Your Goal</div>
-    <p class="section-note" style="margin-bottom:18px;">Pick a target and simulate what it takes at your current pace — or adjust win rate and profit to find a path that works.</p>
+    <p class="section-note" style="margin-bottom:18px;">Pick what you're aiming for — we'll simulate what it takes at your pace.</p>
 
-    <!-- Slider goal picker -->
-    <div class="rm-goal-slider-wrap">
+    <div class="rm-goal-tabs" id="rm-goal-tabs">
+      <button type="button" class="rm-goal-tab-btn active" data-mode="tier" onclick="setGoalMode('tier')">Reach next tier</button>
+      <button type="button" class="rm-goal-tab-btn" data-mode="custom" onclick="setGoalMode('custom')">Custom amount</button>
+    </div>
+
+    <!-- Tier mode: no typing, just a clear read of what's next -->
+    <div id="rm-goal-tier-summary" class="rm-goal-tier-summary"></div>
+
+    <!-- Custom mode: slider goal picker -->
+    <div class="rm-goal-slider-wrap hidden" id="rm-goal-custom-wrap">
       <div class="rm-goal-slider-row">
         <span class="rm-goal-slider-min">₹10L</span>
         <input type="range" id="rm-goal-slider" class="rm-goal-slider"
@@ -66,9 +83,14 @@
     </div>
   </div>
 
-  <!-- ── STEP 3: SIMULATOR & METRICS ───────────────────────────── -->
+  <!-- ── STEP 3: YOUR PATH ────────────────────────────────────────
+       ONE result block reacting to whichever goal was picked above
+       (previously there were two overlapping stat grids here — a
+       tier-based one that was always on, and a goal-based one for
+       the custom slider — showing different numbers for what looked
+       like the same question). -->
   <div class="dash-section-card">
-    <div class="rm-step-label">Step 3 — Roadmap Simulator</div>
+    <div class="rm-step-label">Step 3 — Your Path</div>
 
     <div id="rm-simulator-status" class="rm-simulator-status"></div>
 
@@ -109,8 +131,8 @@
       <p class="foot-note" style="margin-top:6px;">Once you've logged real trades, this updates automatically from your history.</p>
     </div>
 
-    <!-- Result metric cards -->
-    <div id="roadmap-projection-area"></div>
+    <!-- Result metric cards — the one and only stat grid for whatever
+         goal is active (tier or custom) -->
     <div id="goal-result-area"></div>
   </div>
 
@@ -137,7 +159,13 @@
 
 </div>
 
-<!-- Challenge modal -->
+<!-- Challenge modal — a challenge is a FRESH profit target from today,
+     deliberately separate from the account's total balance (previously
+     "Target Capital" was compared straight against the running account
+     balance, so a target lower than the current balance instantly read
+     as "100% done" with "+₹0 gained" — a confusing contradiction. Now
+     the target is explicitly a profit amount, tracked against whatever
+     the balance is the day tracking starts. -->
 <div id="rm-challenge-modal-overlay" class="rm-modal-overlay hidden" onclick="closeChallengeModalIfOutside(event)">
   <div class="rm-modal">
     <div class="rm-modal-header">
@@ -146,19 +174,38 @@
     </div>
     <div class="rm-modal-body">
       <div class="rm-modal-field">
-        <label class="amount-label">Target Capital (₹)</label>
+        <label class="amount-label">Target Profit (₹)</label>
         <div class="roadmap-input-row" style="margin-top:6px;">
           <span class="roadmap-input-prefix">₹</span>
-          <input type="number" id="rm-ch-target" class="roadmap-input" placeholder="e.g. 500000" min="1000">
+          <input type="number" id="rm-ch-target" class="roadmap-input" placeholder="e.g. 100000" min="1000">
+        </div>
+        <p class="foot-note" style="margin-top:6px;">How much you want to <strong>gain</strong> from today — not your total account balance.</p>
+      </div>
+
+      <div class="rm-modal-field">
+        <label class="amount-label">Start</label>
+        <div class="rm-goal-tabs" id="rm-ch-start-tabs" style="margin-top:6px;">
+          <button type="button" class="rm-goal-tab-btn active" data-start="today" onclick="setChallengeStartMode('today')">Start today</button>
+          <button type="button" class="rm-goal-tab-btn" data-start="later" onclick="setChallengeStartMode('later')">Schedule for later</button>
+        </div>
+        <div id="rm-ch-start-date-wrap" class="hidden" style="margin-top:10px;">
+          <input type="date" id="rm-ch-start-date" class="select-input" style="width:100%;">
+          <p class="foot-note" id="rm-ch-start-hint" style="margin-top:6px;"></p>
         </div>
       </div>
+
       <div class="rm-modal-field">
         <label class="amount-label">Target Date</label>
         <input type="date" id="rm-ch-date" class="select-input" style="margin-top:6px; width:100%;">
       </div>
       <div class="rm-modal-field">
         <label class="amount-label">Challenge Name (optional)</label>
-        <input type="text" id="rm-ch-name" class="amount-input" style="margin-top:6px;" placeholder="e.g. My ₹5L Goal">
+        <input type="text" id="rm-ch-name" class="amount-input" style="margin-top:6px;" placeholder="e.g. My First Goal">
+      </div>
+
+      <div class="setup-wizard-note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <div>We'll compute a daily target from your current balance and the deadline, and track your pace against it right here on the Roadmap.</div>
       </div>
     </div>
     <div class="rm-modal-footer">

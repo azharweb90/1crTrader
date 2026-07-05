@@ -25,8 +25,10 @@
 
   // ── State ──────────────────────────────────────────────────────────────
   let avgWinManualValue = null;
-  let selectedGoalAmount = 5000000; // default ₹50L
-  let challenge = null; // { name, target, date } or null
+  let selectedGoalAmount = 5000000; // used only in 'custom' goal mode
+  let goalMode = 'tier'; // 'tier' (default — next tier up) | 'custom' (slider amount)
+  let challenge = null; // { name, target, date, setDate, startDate, startBalance, trackingStarted } or null
+  let challengeStartMode = 'today'; // 'today' | 'later' — modal-only UI state
   // Simulator overrides — null means "use actual"
   let simWinRateOverride = null;
   let simAvgWinOverride  = null;
