@@ -64,7 +64,7 @@
     "tab-dashboard": "Dashboard",
     "tab-calculator": "Daily Limits Tool",
     "tab-trade-manager": "Trade Manager",
-    "tab-roadmap": "Roadmap",
+    "tab-roadmap": "Challenge",
     "tab-journal": "Trading Journal",
     "tab-learn": "Knowledge Area",
     "tab-strategies": "Strategies",

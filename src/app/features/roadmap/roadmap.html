@@ -1,216 +1,56 @@
-<!-- COMPONENT: roadmap -->
-<div class="dash-home-wrap">
+<!-- COMPONENT: roadmap (displayed as "Challenge" — see app-shell.js
+     PAGE_TITLES/sidebar; internal tab id/folder name kept as "roadmap"
+     for the same reason "learn" is displayed as "Knowledge Area".)
 
-  <!-- ── STEP 1: WHERE YOU ARE ─────────────────────────────────── -->
-  <div class="roadmap-balance-card">
-    <div class="roadmap-balance-label">Current Balance</div>
-    <div id="roadmap-balance-value" class="roadmap-balance-value">₹—</div>
-    <div id="roadmap-balance-sub" class="roadmap-balance-sub">—</div>
+     Rebuilt to match the Claude Design "Challenge" mockup: up to 3
+     money-target goals, each its own card with progress, a day-by-day
+     trade log scoped to that goal, and a "Your path" projection of the
+     average win needed per trading day. Replaces the old tier-stage
+     track / goal-slider / win-rate simulator entirely. -->
+<section class="content-section chal-wrap">
+
+  <div class="chal-header-row">
+    <div>
+      <h2 class="chal-title">Your goals</h2>
+      <p id="chal-subtitle" class="section-note" style="margin:2px 0 0;">Track a single goal or up to 3.</p>
+    </div>
+    <button type="button" id="chal-create-btn" class="rm-challenge-set-btn" onclick="openChallengeModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Create a goal
+    </button>
   </div>
 
-  <div id="congrats-banner-slot"></div>
+  <div id="chal-goals-area"></div>
 
-  <div class="dash-section-card" style="padding:20px 28px;">
-    <div class="roadmap-progress-track" id="roadmap-progress-track">
-      <div class="roadmap-stage" data-stage="small">
-        <div class="roadmap-stage-line"></div>
-        <div class="roadmap-stage-dot"></div>
-        <div class="roadmap-stage-name">Small</div>
-        <div class="roadmap-stage-range">₹25,000+</div>
-      </div>
-      <div class="roadmap-stage" data-stage="medium">
-        <div class="roadmap-stage-line"></div>
-        <div class="roadmap-stage-dot"></div>
-        <div class="roadmap-stage-name">Medium</div>
-        <div class="roadmap-stage-range">₹1,00,000+</div>
-      </div>
-      <div class="roadmap-stage" data-stage="large">
-        <div class="roadmap-stage-line"></div>
-        <div class="roadmap-stage-dot"></div>
-        <div class="roadmap-stage-name">Large</div>
-        <div class="roadmap-stage-range">₹5,00,000+</div>
-      </div>
-      <div class="roadmap-stage" data-stage="pro">
-        <div class="roadmap-stage-line"></div>
-        <div class="roadmap-stage-dot"></div>
-        <div class="roadmap-stage-name">Pro</div>
-        <div class="roadmap-stage-range">₹10,00,000+</div>
-      </div>
-    </div>
-  </div>
+</section>
 
-  <!-- ── STEP 2: GOAL ────────────────────────────────────────────
-       Two mutually-exclusive ways to pick a target: the next tier
-       (the default — no typing required, just "how far to the next
-       rung") or a custom amount via the slider. Only one is ever
-       shown at a time, and only one goal feeds Step 3 below — this
-       used to always show a ₹10L–1Cr custom slider by default (with
-       a target totally disconnected from tiers) at the same time as
-       a separate tier-based projection block in Step 3, which is
-       exactly the "confusing, don't know what's happening" overlap
-       the user flagged. -->
-  <div class="dash-section-card">
-    <div class="rm-step-label">Step 2 — Set Your Goal</div>
-    <p class="section-note" style="margin-bottom:18px;">Pick what you're aiming for — we'll simulate what it takes at your pace.</p>
-
-    <div class="rm-goal-tabs" id="rm-goal-tabs">
-      <button type="button" class="rm-goal-tab-btn active" data-mode="tier" onclick="setGoalMode('tier')">Reach next tier</button>
-      <button type="button" class="rm-goal-tab-btn" data-mode="custom" onclick="setGoalMode('custom')">Custom amount</button>
-    </div>
-
-    <!-- Tier mode: no typing, just a clear read of what's next -->
-    <div id="rm-goal-tier-summary" class="rm-goal-tier-summary"></div>
-
-    <!-- Custom mode: slider goal picker -->
-    <div class="rm-goal-slider-wrap hidden" id="rm-goal-custom-wrap">
-      <div class="rm-goal-slider-row">
-        <span class="rm-goal-slider-min">₹10L</span>
-        <input type="range" id="rm-goal-slider" class="rm-goal-slider"
-          min="1000000" max="10000000" step="500000" value="5000000"
-          oninput="onRoadmapSliderInput(this.value)">
-        <span class="rm-goal-slider-max">₹1 Crore</span>
-      </div>
-      <div class="rm-goal-custom-row">
-        <span class="rm-goal-custom-label">Target amount</span>
-        <div class="rm-goal-custom-input-wrap">
-          <span class="rm-goal-prefix">₹</span>
-          <input type="number" id="rm-goal-custom-input" class="rm-goal-custom-input"
-            placeholder="e.g. 5000000" min="100000" max="100000000"
-            oninput="onRoadmapGoalCustomInput(this.value)">
-        </div>
-        <div id="rm-goal-display" class="rm-goal-display">₹50,00,000</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── STEP 3: YOUR PATH ────────────────────────────────────────
-       ONE result block reacting to whichever goal was picked above
-       (previously there were two overlapping stat grids here — a
-       tier-based one that was always on, and a goal-based one for
-       the custom slider — showing different numbers for what looked
-       like the same question). -->
-  <div class="dash-section-card">
-    <div class="rm-step-label">Step 3 — Your Path</div>
-
-    <div id="rm-simulator-status" class="rm-simulator-status"></div>
-
-    <!-- Simulation sliders — shown when "not reachable" to let the user
-         find a path. Hidden when already reachable at current pace. -->
-    <div id="rm-sim-controls" class="rm-sim-controls hidden">
-      <p class="rm-sim-hint">Adjust below to simulate what changes are needed to reach this goal:</p>
-      <div class="rm-sim-slider-group">
-        <div class="rm-sim-slider-label-row">
-          <span class="rm-sim-slider-label">Win Rate</span>
-          <span id="rm-sim-winrate-val" class="rm-sim-slider-value">50%</span>
-        </div>
-        <input type="range" id="rm-sim-winrate" class="rm-goal-slider"
-          min="10" max="100" step="5" value="50"
-          oninput="onSimulatorInput()">
-        <div class="rm-sim-slider-hint" id="rm-sim-winrate-hint"></div>
-      </div>
-      <div class="rm-sim-slider-group">
-        <div class="rm-sim-slider-label-row">
-          <span class="rm-sim-slider-label">Avg. Profit per Winning Trade</span>
-          <span id="rm-sim-avgwin-val" class="rm-sim-slider-value">₹2,500</span>
-        </div>
-        <input type="range" id="rm-sim-avgwin" class="rm-goal-slider"
-          min="500" max="20000" step="500" value="2500"
-          oninput="onSimulatorInput()">
-      </div>
-    </div>
-
-    <!-- Average win input (when no history exists) -->
-    <div id="rm-avg-win-wrap" class="rm-avg-win-wrap hidden">
-      <label class="amount-label" for="roadmap-avg-win-input">Your average profit per winning trade (₹)</label>
-      <div class="roadmap-input-row" style="margin-top:6px; max-width:260px;">
-        <span class="roadmap-input-prefix">₹</span>
-        <input type="number" id="roadmap-avg-win-input" class="roadmap-input"
-          min="0" step="1" placeholder="e.g. 2500"
-          oninput="onRoadmapAvgWinInput()">
-      </div>
-      <p class="foot-note" style="margin-top:6px;">Once you've logged real trades, this updates automatically from your history.</p>
-    </div>
-
-    <!-- Result metric cards — the one and only stat grid for whatever
-         goal is active (tier or custom) -->
-    <div id="goal-result-area"></div>
-  </div>
-
-  <!-- ── CHALLENGE ─────────────────────────────────────────────── -->
-  <div class="dash-section-card rm-challenge-card">
-    <div class="rm-challenge-header">
-      <div>
-        <div class="rm-step-label" style="margin-bottom:4px;">Personal Challenge</div>
-        <p class="section-note" style="margin-bottom:0;">Set a specific money target with a deadline. Track your daily progress here.</p>
-      </div>
-      <button type="button" class="rm-challenge-set-btn" id="rm-challenge-set-btn" onclick="openChallengeModal()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 21 12"/></svg>
-        Set Challenge
-      </button>
-    </div>
-    <div id="rm-challenge-body"></div>
-  </div>
-
-  <!-- ── DAILY LOG HISTORY ──────────────────────────────────────── -->
-  <div class="dash-section-card">
-    <div class="rm-step-label" style="margin-bottom:14px;">Daily Log History</div>
-    <div id="roadmap-history-area"></div>
-  </div>
-
-</div>
-
-<!-- Challenge modal — a challenge is a FRESH profit target from today,
-     deliberately separate from the account's total balance (previously
-     "Target Capital" was compared straight against the running account
-     balance, so a target lower than the current balance instantly read
-     as "100% done" with "+₹0 gained" — a confusing contradiction. Now
-     the target is explicitly a profit amount, tracked against whatever
-     the balance is the day tracking starts. -->
+<!-- Create / Edit goal modal (reused for both — prefilled when editing) -->
 <div id="rm-challenge-modal-overlay" class="rm-modal-overlay hidden" onclick="closeChallengeModalIfOutside(event)">
   <div class="rm-modal">
     <div class="rm-modal-header">
-      <span class="rm-modal-title">Set a Trading Challenge</span>
+      <span id="rm-modal-title-text" class="rm-modal-title">Create a goal</span>
       <button type="button" class="rm-modal-close" onclick="closeChallengeModal()">&times;</button>
     </div>
     <div class="rm-modal-body">
       <div class="rm-modal-field">
-        <label class="amount-label">Target Profit (₹)</label>
+        <label class="amount-label">Goal Name (optional)</label>
+        <input type="text" id="rm-ch-name" class="amount-input" style="margin-top:6px;" placeholder="e.g. ₹1 Lakh Challenge">
+      </div>
+      <div class="rm-modal-field">
+        <label class="amount-label">Target Amount (₹)</label>
         <div class="roadmap-input-row" style="margin-top:6px;">
           <span class="roadmap-input-prefix">₹</span>
           <input type="number" id="rm-ch-target" class="roadmap-input" placeholder="e.g. 100000" min="1000">
         </div>
-        <p class="foot-note" style="margin-top:6px;">How much you want to <strong>gain</strong> from today — not your total account balance.</p>
       </div>
-
-      <div class="rm-modal-field">
-        <label class="amount-label">Start</label>
-        <div class="rm-goal-tabs" id="rm-ch-start-tabs" style="margin-top:6px;">
-          <button type="button" class="rm-goal-tab-btn active" data-start="today" onclick="setChallengeStartMode('today')">Start today</button>
-          <button type="button" class="rm-goal-tab-btn" data-start="later" onclick="setChallengeStartMode('later')">Schedule for later</button>
-        </div>
-        <div id="rm-ch-start-date-wrap" class="hidden" style="margin-top:10px;">
-          <input type="date" id="rm-ch-start-date" class="select-input" style="width:100%;">
-          <p class="foot-note" id="rm-ch-start-hint" style="margin-top:6px;"></p>
-        </div>
-      </div>
-
       <div class="rm-modal-field">
         <label class="amount-label">Target Date</label>
         <input type="date" id="rm-ch-date" class="select-input" style="margin-top:6px; width:100%;">
       </div>
-      <div class="rm-modal-field">
-        <label class="amount-label">Challenge Name (optional)</label>
-        <input type="text" id="rm-ch-name" class="amount-input" style="margin-top:6px;" placeholder="e.g. My First Goal">
-      </div>
-
-      <div class="setup-wizard-note">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
-        <div>We'll compute a daily target from your current balance and the deadline, and track your pace against it right here on the Roadmap.</div>
-      </div>
     </div>
     <div class="rm-modal-footer">
       <button type="button" class="broker-import-btn" style="min-width:140px; border-radius:8px;" onclick="saveChallengeModal()">
-        ✓ Set Challenge
+        ✓ Save Goal
       </button>
       <button type="button" class="setup-wizard-back-btn" onclick="closeChallengeModal()">Cancel</button>
     </div>

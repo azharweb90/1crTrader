@@ -588,7 +588,6 @@
     `).join('');
 
     const qty=lots*qtyPerLot;
-    const slRs=fmtRs(riskPoints*qty),tgtRs=fmtRs(targetPoints*qty);
     const trailRs=trailSlPts>=0?'+'+fmtRs(trailSlPts*qty):'−'+fmtRs(Math.abs(trailSlPts*qty));
 
     container.innerHTML=`
@@ -609,11 +608,9 @@
         <div style="position:absolute;left:8px;top:${Math.max(yTarget-8,0)}px;font-size:11px;color:#1d9e75;font-weight:600;">Target ${fmtPts(targetPrice)}</div>
         <div class="tm-level-pill tm-level-pill-risk" style="top:${Math.max(ySl-14,0)}px;">
           <span class="tm-level-pill-price">${fmtPts(slPrice)}</span>
-          <span class="tm-level-pill-rs">${slRs} risk</span>
         </div>
         <div class="tm-level-pill tm-level-pill-reward" style="top:${Math.max(yTarget-14,0)}px;">
           <span class="tm-level-pill-price">${fmtPts(targetPrice)}</span>
-          <span class="tm-level-pill-rs">${tgtRs} reward</span>
         </div>
         <div class="tm-level-pill tm-level-pill-trail" style="top:${Math.max(yTrail-14,0)}px;">
           <span class="tm-level-pill-price">Trail ${fmtPts(priceFromPIF(trailSlPts))}</span>
