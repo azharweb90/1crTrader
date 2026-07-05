@@ -192,15 +192,21 @@
     const area = document.getElementById('chal-goals-area');
     const subtitle = document.getElementById('chal-subtitle');
     const createBtn = document.getElementById('chal-create-btn');
-    if (subtitle) subtitle.innerText = `${goals.length} of ${MAX_GOALS} goals — track a single goal or up to ${MAX_GOALS}.`;
+    if (subtitle) {
+      subtitle.innerText = goals.length === 0
+        ? 'No goals yet'
+        : `${goals.length} of ${MAX_GOALS} goals — track a single goal or up to ${MAX_GOALS}.`;
+    }
     if (createBtn) createBtn.disabled = goals.length >= MAX_GOALS;
     if (!area) return;
 
     if (goals.length === 0) {
       area.innerHTML = `
         <div class="chal-empty-state">
-          <div class="chal-empty-icon">🎯</div>
-          <div class="chal-empty-text">No goal set yet. Create a money target with a deadline and track your daily progress toward it here.</div>
+          <div class="chal-empty-icon-box">🎯</div>
+          <div class="chal-empty-heading">Create your first goal</div>
+          <div class="chal-empty-text">Pick a profit target and a deadline. We'll track your profit day by day — no account balance, just how much you've made toward the goal.</div>
+          <button type="button" class="chal-empty-cta-btn" onclick="openChallengeModal()">Create a goal</button>
         </div>
       `;
       return;
@@ -209,32 +215,83 @@
   }
 
   // ── Create / Edit / Remove ──────────────────────────────────────────────
+  const todayIso = () => new Date().toISOString().slice(0, 10);
+
+  // Live "If I earn ₹X /day → N days to reach it" helper — purely
+  // informational, recalculated from the Target Profit + rate fields.
+  // Doesn't write into any other field; it's just guidance while the
+  // trader picks a Target Date below.
+  function updateGoalRateHelper() {
+    const daysEl = document.getElementById('rm-rate-days');
+    if (!daysEl) return;
+    const target = parseFloat(document.getElementById('rm-ch-target').value);
+    const rate = parseFloat(document.getElementById('rm-ch-rate').value);
+    if (!target || target <= 0 || !rate || rate <= 0) {
+      daysEl.innerText = '— days';
+      return;
+    }
+    daysEl.innerText = `${Math.ceil(target / rate)} days`;
+  }
+
+  // Start: Today / Pick a date segmented toggle — "Today" (default) keeps
+  // the start-date field hidden and implicit; "Pick a date" reveals a
+  // date input so the trader can backdate/forward-date a goal's start.
+  function setGoalStartMode(mode) {
+    const todayBtn = document.getElementById('rm-start-today-btn');
+    const pickBtn  = document.getElementById('rm-start-pick-btn');
+    const dateInput = document.getElementById('rm-ch-start-date');
+    if (!todayBtn || !pickBtn || !dateInput) return;
+    todayBtn.classList.toggle('active', mode === 'today');
+    pickBtn.classList.toggle('active', mode === 'pick');
+    if (mode === 'pick') {
+      dateInput.classList.remove('hidden');
+      if (!dateInput.value) dateInput.value = todayIso();
+    } else {
+      dateInput.classList.add('hidden');
+    }
+  }
+
   function openChallengeModal(goalId) {
     const overlay = document.getElementById('rm-challenge-modal-overlay');
     if (!overlay) return;
     editingGoalId = goalId || null;
 
     const titleEl = document.getElementById('rm-modal-title-text');
+    const subtitleEl = document.getElementById('rm-modal-subtitle-text');
+    const saveBtnEl = document.getElementById('rm-modal-save-btn');
     const nameEl  = document.getElementById('rm-ch-name');
     const targetEl = document.getElementById('rm-ch-target');
     const dateEl  = document.getElementById('rm-ch-date');
+    const rateEl  = document.getElementById('rm-ch-rate');
+    const startDateEl = document.getElementById('rm-ch-start-date');
 
     if (editingGoalId) {
       const goal = goals.find(g => g.id === editingGoalId);
       if (!goal) { editingGoalId = null; }
       else {
         if (titleEl) titleEl.innerText = 'Edit goal';
+        if (subtitleEl) subtitleEl.innerText = 'Update your target, deadline, or start date.';
+        if (saveBtnEl) saveBtnEl.innerHTML = '✓ Save changes';
         if (nameEl) nameEl.value = goal.name || '';
         if (targetEl) targetEl.value = goal.target;
         if (dateEl) dateEl.value = goal.date;
+        if (rateEl) rateEl.value = 2500;
+        if (startDateEl) startDateEl.value = goal.setDate;
+        setGoalStartMode(goal.setDate === todayIso() ? 'today' : 'pick');
       }
     }
     if (!editingGoalId) {
       if (titleEl) titleEl.innerText = 'Create a goal';
+      if (subtitleEl) subtitleEl.innerText = 'A target with a deadline to keep you honest.';
+      if (saveBtnEl) saveBtnEl.innerHTML = '✓ Create goal';
       if (nameEl) nameEl.value = '';
       if (targetEl) targetEl.value = '';
       if (dateEl) dateEl.value = '';
+      if (rateEl) rateEl.value = 2500;
+      if (startDateEl) startDateEl.value = '';
+      setGoalStartMode('today');
     }
+    updateGoalRateHelper();
     overlay.classList.remove('hidden');
   }
 
@@ -252,6 +309,10 @@
     const target = parseInt(document.getElementById('rm-ch-target').value, 10);
     const date   = document.getElementById('rm-ch-date').value;
     const name   = document.getElementById('rm-ch-name').value.trim();
+    const startPicking = document.getElementById('rm-start-pick-btn').classList.contains('active');
+    const setDate = startPicking
+      ? (document.getElementById('rm-ch-start-date').value || todayIso())
+      : todayIso();
     if (!target || target <= 0 || !date) {
       alert('Please enter a valid target amount and date.');
       return;
@@ -259,13 +320,13 @@
 
     if (editingGoalId) {
       const goal = goals.find(g => g.id === editingGoalId);
-      if (goal) { goal.target = target; goal.date = date; goal.name = name; }
+      if (goal) { goal.target = target; goal.date = date; goal.name = name; goal.setDate = setDate; }
     } else {
       if (goals.length >= MAX_GOALS) { closeChallengeModal(); return; }
       goals.push({
         id: 'g' + (nextGoalId++),
         name, target, date,
-        setDate: new Date().toISOString().slice(0, 10),
+        setDate,
       });
     }
     closeChallengeModal();
@@ -287,6 +348,8 @@
   window.closeChallengeModal      = closeChallengeModal;
   window.closeChallengeModalIfOutside = closeChallengeModalIfOutside;
   window.saveChallengeModal       = saveChallengeModal;
+  window.updateGoalRateHelper     = updateGoalRateHelper;
+  window.setGoalStartMode         = setGoalStartMode;
   window.removeGoal               = removeGoal;
   window.renderRoadmap            = render;
 

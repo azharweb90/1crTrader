@@ -7,7 +7,10 @@
    this file previously held (removed along with their CSS below).
    =========================================================== */
 
-.chal-wrap { max-width: 900px; }
+/* Full width of the content canvas (no max-width cap) — matches the
+   reference design, where the goals list/card fills the available
+   space next to the sidebar rather than sitting in a narrow column. */
+.chal-wrap { width: 100%; }
 
 .chal-header-row {
   display: flex;
@@ -34,11 +37,47 @@
   background: #ffffff;
   border: 1px solid #E3E9F1;
   border-radius: 14px;
-  padding: 40px 24px;
+  padding: 72px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
-.chal-empty-icon { font-size: 30px; margin-bottom: 10px; }
-.chal-empty-text { font-size: 15px; color: #5B6B82; line-height: 1.6; max-width: 440px; margin: 0 auto; }
+
+/* Rounded-square icon tile (matches the reference design's "beautiful
+   icon" treatment — a soft cream tile behind the target emoji, rather
+   than a bare emoji floating on white). */
+.chal-empty-icon-box {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: #FDF1D3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 22px;
+}
+.chal-empty-heading {
+  font-size: 19px;
+  font-weight: 800;
+  color: #1E293B;
+  margin-bottom: 10px;
+}
+.chal-empty-text { font-size: 15px; color: #5B6B82; line-height: 1.6; max-width: 460px; margin: 0 auto; }
+.chal-empty-cta-btn {
+  margin-top: 26px;
+  background: #2563EB;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 26px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.chal-empty-cta-btn:hover { background: #1D4ED8; }
 
 /* ── Goal card ─────────────────────────────────────────────── */
 .chal-goal-card {
@@ -315,13 +354,102 @@
 }
 .rm-modal-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 18px 22px 14px;
   border-bottom: 1px solid #E3E9F1;
   flex: 0 0 auto;
 }
-.rm-modal-title { font-size: 17px; font-weight: 800; color: #1E293B; }
+.rm-modal-title { font-size: 17px; font-weight: 800; color: #1E293B; display: block; }
+.rm-modal-subtitle { font-size: 13px; color: #8A98AD; margin-top: 3px; }
+.rm-modal-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8A98AD;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* "If I earn ₹__ /day → N days to reach it" live helper row */
+.rm-rate-helper {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #5B6B82;
+  margin-top: -6px;
+}
+.rm-rate-input-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid #DCE3EC;
+  border-radius: 7px;
+  background: #fff;
+  overflow: hidden;
+}
+.rm-rate-input-prefix {
+  padding: 6px 8px;
+  background: #F1F4F8;
+  color: #5B6B82;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-right: 1px solid #DCE3EC;
+}
+.rm-rate-input {
+  width: 74px;
+  padding: 6px 8px;
+  border: none;
+  outline: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1E293B;
+  font-variant-numeric: tabular-nums;
+}
+.rm-rate-days { font-weight: 800; color: #2563EB; }
+
+/* Start: Today / Pick a date segmented toggle */
+.rm-start-toggle {
+  display: flex;
+  gap: 8px;
+}
+.rm-start-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #DCE3EC;
+  border-radius: 8px;
+  background: #fff;
+  color: #5B6B82;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.rm-start-btn.active {
+  border-color: #2563EB;
+  background: #EAF1FE;
+  color: #1D4ED8;
+}
+
+.rm-modal-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #EAF1FE;
+  border: 1px solid #B9D4FA;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13.5px;
+  color: #1E3A6E;
+  line-height: 1.5;
+}
+.rm-modal-info-icon { flex-shrink: 0; color: #2563EB; font-size: 15px; line-height: 1.3; }
 .rm-modal-close {
   background: none;
   border: none;

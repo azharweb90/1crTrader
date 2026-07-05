@@ -28,29 +28,59 @@
 <div id="rm-challenge-modal-overlay" class="rm-modal-overlay hidden" onclick="closeChallengeModalIfOutside(event)">
   <div class="rm-modal">
     <div class="rm-modal-header">
-      <span id="rm-modal-title-text" class="rm-modal-title">Create a goal</span>
+      <div>
+        <span id="rm-modal-title-text" class="rm-modal-title">Create a goal</span>
+        <div id="rm-modal-subtitle-text" class="rm-modal-subtitle">A target with a deadline to keep you honest.</div>
+      </div>
       <button type="button" class="rm-modal-close" onclick="closeChallengeModal()">&times;</button>
     </div>
     <div class="rm-modal-body">
       <div class="rm-modal-field">
-        <label class="amount-label">Goal Name (optional)</label>
-        <input type="text" id="rm-ch-name" class="amount-input" style="margin-top:6px;" placeholder="e.g. ₹1 Lakh Challenge">
-      </div>
-      <div class="rm-modal-field">
-        <label class="amount-label">Target Amount (₹)</label>
-        <div class="roadmap-input-row" style="margin-top:6px;">
+        <label class="rm-modal-label">Target Profit (₹)</label>
+        <div class="roadmap-input-row">
           <span class="roadmap-input-prefix">₹</span>
-          <input type="number" id="rm-ch-target" class="roadmap-input" placeholder="e.g. 100000" min="1000">
+          <input type="number" id="rm-ch-target" class="roadmap-input" placeholder="e.g. 1000000" min="1000" oninput="updateGoalRateHelper()">
         </div>
       </div>
+
+      <div class="rm-rate-helper">
+        <span>If I earn</span>
+        <div class="rm-rate-input-row">
+          <span class="rm-rate-input-prefix">₹</span>
+          <input type="number" id="rm-ch-rate" class="rm-rate-input" value="2500" min="1" oninput="updateGoalRateHelper()">
+        </div>
+        <span>/day →</span>
+        <span id="rm-rate-days" class="rm-rate-days">— days</span>
+        <span>to reach it</span>
+      </div>
+
       <div class="rm-modal-field">
-        <label class="amount-label">Target Date</label>
-        <input type="date" id="rm-ch-date" class="select-input" style="margin-top:6px; width:100%;">
+        <label class="rm-modal-label">Start</label>
+        <div class="rm-start-toggle">
+          <button type="button" id="rm-start-today-btn" class="rm-start-btn active" onclick="setGoalStartMode('today')">Today</button>
+          <button type="button" id="rm-start-pick-btn" class="rm-start-btn" onclick="setGoalStartMode('pick')">Pick a date</button>
+        </div>
+        <input type="date" id="rm-ch-start-date" class="select-input hidden" style="margin-top:8px; width:100%;">
+      </div>
+
+      <div class="rm-modal-field">
+        <label class="rm-modal-label">Target Date</label>
+        <input type="date" id="rm-ch-date" class="select-input" style="width:100%;">
+      </div>
+
+      <div class="rm-modal-field">
+        <label class="rm-modal-label">Goal Name (optional)</label>
+        <input type="text" id="rm-ch-name" class="amount-input" placeholder="e.g. My ₹10L Goal">
+      </div>
+
+      <div class="rm-modal-info">
+        <span class="rm-modal-info-icon">&#9432;</span>
+        <span>We'll track your profit day by day and show the average you need to win to finish on time — no account balance involved.</span>
       </div>
     </div>
     <div class="rm-modal-footer">
-      <button type="button" class="broker-import-btn" style="min-width:140px; border-radius:8px;" onclick="saveChallengeModal()">
-        ✓ Save Goal
+      <button type="button" id="rm-modal-save-btn" class="broker-import-btn" style="min-width:140px; border-radius:8px;" onclick="saveChallengeModal()">
+        ✓ Create goal
       </button>
       <button type="button" class="setup-wizard-back-btn" onclick="closeChallengeModal()">Cancel</button>
     </div>
