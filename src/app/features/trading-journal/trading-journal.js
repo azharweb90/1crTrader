@@ -142,6 +142,15 @@
   function setJournalRange(range) {
     jRange = range;
     renderHero();
+    // The hero's range (This Week / This Month / All Time) now scopes the
+    // tabs below it too — previously the hero stat was range-scoped while
+    // "Needs journaling" / "Journaled entries" always showed ALL-time
+    // counts regardless, so e.g. the hero could say "4/4 (100%)" for This
+    // Week while the tab badge next to it said "Needs journaling 3" for
+    // trades from weeks earlier — a real, confusing contradiction on the
+    // same screen. Now both read from the same filtered set, so switching
+    // the range changes the whole page consistently, not just the hero.
+    if (jTab === 'todo') renderTodo(); else renderSaved();
   }
 
   function setJournalTab(tab) {
@@ -158,27 +167,42 @@
     renderSaved();
   }
 
+  // Shared by the hero stats AND both tabs below, so every number on this
+  // screen is always talking about the same period — see setJournalRange().
+  function inCurrentRange(d) {
+    if (jRange === 'all') return true;
+    const now = new Date();
+    const wb = weekBounds(now);
+    return jRange === 'week'
+      ? (d >= wb.s && d <= new Date(wb.e.getFullYear(), wb.e.getMonth(), wb.e.getDate(), 23, 59, 59))
+      : (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear());
+  }
+
+  function rangeScopedHistory() {
+    return getHistory().filter(t => inCurrentRange(parseYmd(t.date)));
+  }
+
   // ---------- Adherence hero ----------
   function renderHero() {
     document.getElementById('journal-range-week-btn').classList.toggle('broker-range-pill-active', jRange === 'week');
     document.getElementById('journal-range-month-btn').classList.toggle('broker-range-pill-active', jRange === 'month');
+    const allBtn = document.getElementById('journal-range-all-btn');
+    if (allBtn) allBtn.classList.toggle('broker-range-pill-active', jRange === 'all');
 
     const now = new Date();
     const wb = weekBounds(now);
-    const inRange = (d) => jRange === 'week'
-      ? (d >= wb.s && d <= new Date(wb.e.getFullYear(), wb.e.getMonth(), wb.e.getDate(), 23, 59, 59))
-      : (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear());
 
     const chipEl = document.getElementById('journal-range-chip');
     if (chipEl) {
       chipEl.innerText = jRange === 'week'
         ? `${formatDate(wb.s.toISOString().slice(0, 10))}  –  ${formatDate(now.toISOString().slice(0, 10))}`
-        : now.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+        : jRange === 'month'
+          ? now.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })
+          : 'All time';
     }
 
-    const history = getHistory();
     const entries = getEntries();
-    const rangeTrades = history.filter(t => inRange(parseYmd(t.date)));
+    const rangeTrades = rangeScopedHistory();
     const journaledInRange = rangeTrades.filter(t => entries[t.id]);
     const total = rangeTrades.length;
     const done = journaledInRange.length;
@@ -207,26 +231,35 @@
     }
   }
 
+  // Keeps both tab badges in sync no matter which tab is currently open —
+  // called from both renderTodo() and renderSaved() below.
+  function updateTabBadges(scopedHistory, entries) {
+    const todoCountEl = document.getElementById('journal-todo-count');
+    const savedCountEl = document.getElementById('journal-saved-count');
+    if (todoCountEl) todoCountEl.innerText = scopedHistory.filter(t => !entries[t.id]).length;
+    if (savedCountEl) savedCountEl.innerText = scopedHistory.filter(t => entries[t.id]).length;
+  }
+
   // ---------- Needs-journaling tab ----------
   function renderTodo() {
-    const history = getHistory();
+    const scopedHistory = rangeScopedHistory();
     const entries = getEntries();
-    const todo = history.filter(t => !entries[t.id]).slice().sort((a, b) => {
+    const todo = scopedHistory.filter(t => !entries[t.id]).slice().sort((a, b) => {
       if (a.date !== b.date) return a.date < b.date ? 1 : -1;
       return (a.submittedAt || 0) < (b.submittedAt || 0) ? 1 : -1;
     });
 
-    document.getElementById('journal-todo-count').innerText = todo.length;
-    document.getElementById('journal-saved-count').innerText = history.filter(t => entries[t.id]).length;
+    updateTabBadges(scopedHistory, entries);
 
     const rowsEl = document.getElementById('journal-todo-rows');
     if (!rowsEl) return;
 
     if (todo.length === 0) {
+      const rangeNote = jRange === 'all' ? '' : ' in this period — switch to "All Time" above to see the full backlog.';
       rowsEl.innerHTML = `
         <div class="journal-empty" style="grid-column:1/-1;">
           <div class="journal-empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <div class="journal-empty-text">All caught up — every trade has been journaled. New trades from the Daily Limits Tool will appear here.</div>
+          <div class="journal-empty-text">All caught up — every trade has been journaled${rangeNote}. New trades from the Daily Limits Tool will appear here.</div>
         </div>
       `;
       return;
@@ -283,11 +316,13 @@
     document.getElementById('journal-group-week-btn').classList.toggle('active', jGroup === 'week');
     document.getElementById('journal-group-month-btn').classList.toggle('active', jGroup === 'month');
 
-    const history = getHistory();
-    populateInstrumentFilter(history);
+    const scopedHistory = rangeScopedHistory();
+    populateInstrumentFilter(getHistory()); // filter options reflect every instrument ever traded, not just this range
     const entries = getEntries();
 
-    let journaled = history.filter(t => entries[t.id]);
+    updateTabBadges(scopedHistory, entries);
+
+    let journaled = scopedHistory.filter(t => entries[t.id]);
     if (activeInstrumentFilter) journaled = journaled.filter(t => t.instrument === activeInstrumentFilter);
     if (activeGradeFilter) journaled = journaled.filter(t => gradeFor(ptsFor(entries[t.id].checklist)).base === activeGradeFilter);
     if (activeDateFrom) journaled = journaled.filter(t => t.date >= activeDateFrom);

@@ -1,0 +1,294 @@
+/* ===========================================================
+   FIRST-RUN ONBOARDING MODAL — "Discipline Features" handoff, Feature 4.
+   A blocking, full-screen modal shown once before a trader's first
+   session: picks a capital tier, confirms the daily loss limit that
+   comes with it, and captures a personal "stop rule" that reappears
+   later on the Cool-Down Lock screen (Feature 3). Injected into
+   document.body by onboarding.js — same pattern as product-tour.js's
+   own overlay. Sits above every other overlay in the app (z-index
+   1000) since it must run to completion before anything else is
+   usable, per "Run first, then go into the existing setup page."
+   =========================================================== */
+
+.onb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: linear-gradient(160deg, #EAF1FE 0%, #F5F6FA 55%, #ffffff 120%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+.onb-overlay.hidden { display: none; }
+
+.onb-card {
+  background: #ffffff;
+  width: 540px;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #E3E9F1;
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(20, 35, 61, 0.22);
+  padding: 34px 36px;
+  margin: auto;
+}
+
+/* ── Progress header (steps 1–4 only) ─────────────────────── */
+.onb-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+.onb-progress.hidden { display: none; }
+
+.onb-progress-dots { display: flex; gap: 6px; }
+.onb-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #DCE3EC;
+}
+.onb-dot-done { background: #2563EB; }
+
+.onb-progress-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8A98AD;
+}
+
+/* ── Shared step chrome ────────────────────────────────────── */
+.onb-heading {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1E293B;
+  margin: 0 0 10px;
+  text-align: center;
+}
+.onb-heading-left { text-align: left; }
+
+.onb-sub {
+  font-size: 13.5px;
+  color: #5B6B82;
+  line-height: 1.55;
+  margin: 0 0 20px;
+  text-align: left;
+}
+
+.onb-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+/* ── Step 0 — Welcome ──────────────────────────────────────── */
+.onb-step0 { text-align: center; }
+.onb-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  margin: 0 auto 18px;
+  display: block;
+  object-fit: contain;
+}
+.onb-step0 .onb-heading { font-size: 27px; }
+.onb-step0 .onb-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #5B6B82;
+  margin: 0 0 26px;
+}
+.onb-skip-link {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #8A98AD;
+  cursor: pointer;
+  margin-top: 14px;
+  padding: 4px;
+}
+.onb-skip-link:hover { color: #5B6B82; text-decoration: underline; }
+
+/* ── Step 1 — Capital / tier picker ───────────────────────── */
+.onb-tier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.onb-tier-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: #ffffff;
+  border: 1.5px solid #DCE3EC;
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.onb-tier-row:hover { border-color: #93C5FD; }
+.onb-tier-row-selected {
+  border-color: #2563EB;
+  background: #EAF1FE;
+}
+
+.onb-tier-radio {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 2px solid #DCE3EC;
+  background: #ffffff;
+  position: relative;
+}
+.onb-tier-radio-selected {
+  border-color: #2563EB;
+}
+.onb-tier-radio-selected::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 999px;
+  background: #2563EB;
+}
+
+.onb-tier-row-text { display: flex; flex-direction: column; gap: 3px; }
+.onb-tier-name { font-size: 14.5px; font-weight: 700; color: #1E293B; }
+.onb-tier-meta { font-size: 12px; color: #8A98AD; }
+
+/* ── Step 2 — Daily loss limit ─────────────────────────────── */
+.onb-loss-callout {
+  background: #EAF1FE;
+  border: 1px solid #CFE0FB;
+  border-radius: 14px;
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+.onb-loss-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5B6B82;
+  margin-bottom: 6px;
+}
+.onb-loss-value {
+  font-size: 42px;
+  font-weight: 800;
+  color: #1D4ED8;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.onb-loss-sub {
+  font-size: 13px;
+  color: #5B6B82;
+  margin-top: 6px;
+}
+
+.onb-warn-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #FFF7E6;
+  border: 1px solid #F3E2B3;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #8A6414;
+}
+.onb-warn-icon { flex: 0 0 auto; font-size: 15px; line-height: 1.4; }
+
+/* ── Step 3 — Stop rule ────────────────────────────────────── */
+.onb-note-textarea {
+  width: 100%;
+  min-height: 130px;
+  resize: vertical;
+  border: 1px solid #DCE3EC;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #1E293B;
+  background: #F7F9FC;
+  box-sizing: border-box;
+}
+.onb-note-textarea:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  background: #ffffff;
+}
+
+/* ── Step 4 — Done ─────────────────────────────────────────── */
+.onb-step4 { text-align: center; }
+.onb-done-check {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
+  border-radius: 999px;
+  background: #E3F5EC;
+  border: 1px solid #8ED6AE;
+  color: #15803D;
+  font-size: 26px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.onb-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 22px 0 26px;
+  text-align: left;
+}
+.onb-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #F7F9FC;
+  border: 1px solid #E8EDF4;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1E293B;
+}
+.onb-summary-icon {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #E3F5EC;
+  color: #15803D;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 560px) {
+  .onb-card { padding: 26px 22px; }
+  .onb-loss-value { font-size: 34px; }
+}
+/* === END COMPONENT: onboarding === */

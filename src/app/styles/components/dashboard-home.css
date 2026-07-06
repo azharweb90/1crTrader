@@ -291,4 +291,537 @@
 .dash-recent-wrap {
   margin-top: 8px;
 }
+
+/* ===========================================================
+   DISCIPLINE SCORE + STREAK — "Discipline Features" handoff,
+   Feature 1. Dashboard hero card. See dashboard-home.js
+   renderDisciplineScore() for the data this renders.
+   =========================================================== */
+.disc-card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #E3E9F1;
+  border-radius: 16px;
+  padding: 24px 26px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.disc-card::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  width: 60%;
+  height: 100%;
+  background: radial-gradient(42% 70% at 92% 0%, rgba(37, 99, 235, 0.07), transparent 60%);
+  pointer-events: none;
+}
+
+.disc-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 30px;
+  align-items: center;
+}
+
+/* ── Left column — score ring ─────────────────────────────── */
+.disc-ring-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.disc-ring-wrap {
+  position: relative;
+  width: 132px;
+  height: 132px;
+}
+.disc-ring-svg { transform: rotate(-90deg); }
+.disc-ring-track {
+  fill: none;
+  stroke: #EAEFF5;
+  stroke-width: 11;
+}
+.disc-ring-value {
+  fill: none;
+  stroke: #2563EB;
+  stroke-width: 11;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s ease;
+}
+.disc-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.disc-ring-score {
+  font-size: 38px;
+  font-weight: 800;
+  color: #1E293B;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.disc-ring-max {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #AEB9C8;
+  margin-top: 3px;
+}
+
+.disc-ring-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1E293B;
+  margin-top: 14px;
+}
+.disc-ring-delta {
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.disc-delta-good { color: #16A34A; }
+.disc-delta-bad { color: #C53D22; }
+.disc-delta-flat { color: #8A98AD; }
+
+/* ── Right column — streak + heatmap + habits ─────────────── */
+.disc-right-col { min-width: 0; }
+
+.disc-streak-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.disc-streak-main {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1E293B;
+}
+.disc-streak-emoji { font-size: 20px; }
+.disc-streak-sub {
+  font-size: 13px;
+  color: #5B6B82;
+  margin-top: 4px;
+}
+.disc-heatmap-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8A98AD;
+  white-space: nowrap;
+  margin-top: 6px;
+}
+
+.disc-heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(21, 1fr);
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.disc-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: filter 0.1s ease, box-shadow 0.1s ease;
+}
+.disc-cell:hover {
+  filter: brightness(0.95);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+.disc-cell-good { background: #E3F5EC; border-color: #8ED6AE; }
+.disc-cell-bad { background: #FBE7E2; border-color: #EBA595; }
+.disc-cell-none { background: #EDF1F6; border-color: #DDE4EC; }
+
+.disc-legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  font-size: 11px;
+  color: #8A98AD;
+  margin-bottom: 18px;
+}
+.disc-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.disc-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.disc-legend-swatch-good { background: #E3F5EC; border: 1px solid #8ED6AE; }
+.disc-legend-swatch-bad { background: #FBE7E2; border: 1px solid #EBA595; }
+.disc-legend-swatch-none { background: #EDF1F6; border: 1px solid #DDE4EC; }
+.disc-legend-note { margin-left: auto; font-style: italic; }
+
+.disc-habits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.disc-habit-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #F7F9FC;
+  border: 1px solid #E8EDF4;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.disc-habit-icon {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+.disc-habit-icon-ok { background: #E3F5EC; color: #15803D; }
+.disc-habit-icon-warn { background: #FFF3E0; color: #B7791F; }
+.disc-habit-label { font-size: 12.5px; font-weight: 700; color: #1E293B; }
+.disc-habit-detail { font-size: 11px; color: #8A98AD; margin-top: 1px; }
+
+@media (max-width: 720px) {
+  .disc-grid { grid-template-columns: 1fr; }
+  .disc-ring-col { flex-direction: row; justify-content: flex-start; gap: 16px; }
+  .disc-heatmap-grid { grid-template-columns: repeat(7, 1fr); }
+}
+
+/* ── Day-detail modal (click any heatmap cell) ────────────── */
+.disc-day-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 700;
+  background: rgba(20, 35, 61, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.disc-day-modal-overlay.hidden { display: none; }
+
+.disc-day-modal {
+  background: #ffffff;
+  width: 440px;
+  max-width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(20, 35, 61, 0.32);
+  padding: 24px 26px;
+}
+
+.disc-day-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.disc-day-modal-date { font-size: 16px; font-weight: 800; color: #1E293B; }
+.disc-day-modal-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.disc-pill-good { background: #DCFCE7; color: #15803D; }
+.disc-pill-bad { background: #FCEFEA; color: #C53D22; }
+.disc-pill-none { background: #F1F4F8; color: #5B6B82; }
+.disc-day-modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #8A98AD;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.disc-day-modal-headline {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 14px;
+}
+
+.disc-day-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.disc-day-modal-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13.5px;
+  color: #1E293B;
+}
+.disc-day-modal-item-icon {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  margin-top: 1px;
+}
+.disc-item-ok { background: #E3F5EC; color: #15803D; }
+.disc-item-bad { background: #FBE7E2; color: #C53D22; }
+
+.disc-day-modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F7F9FC;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #5B6B82;
+}
+.disc-day-modal-footer-icon { flex: 0 0 auto; }
+
+/* ===========================================================
+   WEEKLY / MONTHLY DISCIPLINED REVIEW — "Discipline Features"
+   handoff, Feature 2. Dashboard card. See dashboard-home.js
+   renderWeeklyReview() for the data this renders.
+   =========================================================== */
+.wr-card { position: relative; }
+
+.wr-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.wr-headline-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wr-headline-emoji { font-size: 17px; }
+.wr-headline { font-size: 19px; font-weight: 800; color: #1E293B; }
+.wr-sub { font-size: 13.5px; color: #5B6B82; margin-top: 4px; }
+
+.wr-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wr-mode-toggle {
+  display: flex;
+  background: #EEF1F6;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+.wr-mode-btn {
+  background: transparent;
+  border: none;
+  color: #5B6B82;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.wr-mode-btn-active {
+  background: #ffffff;
+  color: #2563EB;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.12);
+}
+
+.wr-period-picker-wrap { position: relative; }
+.wr-period-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1E293B;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.wr-period-chevron { font-size: 9px; color: #8A98AD; }
+
+.wr-period-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 250px;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #E3E9F1;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(20, 35, 61, 0.16);
+  z-index: 20;
+  padding: 6px;
+}
+.wr-period-dropdown.hidden { display: none; }
+
+.wr-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+.wr-picker-row:hover { background: #F7F9FC; }
+.wr-picker-row-active { background: #F7F9FC; }
+.wr-picker-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+.wr-picker-dot-good { background: #16A34A; }
+.wr-picker-dot-warn { background: #D97706; }
+.wr-picker-dot-bad { background: #DC2626; }
+.wr-picker-dot-neutral { background: #AEB9C8; }
+.wr-picker-range { flex: 1; font-size: 13px; color: #1E293B; }
+.wr-picker-pnl { font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 600; color: #5B6B82; }
+
+.wr-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.wr-stat {
+  background: #F7F9FC;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.wr-stat-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8A98AD;
+  margin-bottom: 6px;
+}
+.wr-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1E293B;
+  font-variant-numeric: tabular-nums;
+}
+.wr-stat-positive { color: #16A34A; }
+.wr-stat-negative { color: #C53D22; }
+
+.wr-insights-eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8A98AD;
+  margin-bottom: 11px;
+}
+.wr-insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.wr-insight {
+  display: flex;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 13px;
+}
+.wr-insight-good { background: #EAF7F0; border: 1px solid #C3EAD5; }
+.wr-insight-warn { background: #FFF7E6; border: 1px solid #F3E2B3; }
+.wr-insight-bad { background: #FCEFEA; border: 1px solid #F2C9BD; }
+.wr-insight-neutral { background: #F7F9FC; border: 1px solid #E8EDF4; }
+
+.wr-insight-icon {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  border: 1px solid;
+}
+.wr-insight-icon-good { color: #15803D; border-color: #C3EAD5; }
+.wr-insight-icon-warn { color: #B7791F; border-color: #F3E2B3; }
+.wr-insight-icon-bad { color: #C53D22; border-color: #F2C9BD; }
+.wr-insight-icon-neutral { color: #8A98AD; border-color: #E8EDF4; }
+
+.wr-insight-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8A98AD;
+  margin-bottom: 4px;
+}
+.wr-insight-stat { font-size: 14.5px; font-weight: 800; color: #1E293B; margin-bottom: 4px; }
+.wr-insight-text { font-size: 13px; line-height: 1.55; color: #5B6B82; }
+
+.wr-footer {
+  border-top: 1px solid #F1F4F8;
+  margin-top: 20px;
+  padding-top: 18px;
+}
+.wr-journal-btn {
+  background: #2563EB;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 20px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.wr-journal-btn:hover { filter: brightness(1.05); }
+.wr-footer-note { font-size: 12.5px; color: #8A98AD; margin: 10px 0 0; }
+
+@media (max-width: 720px) {
+  .wr-stats-row { grid-template-columns: 1fr 1fr; }
+}
 /* === END COMPONENT: dashboard-home === */

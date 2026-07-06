@@ -3,6 +3,12 @@
   <p class="section-note" style="margin-bottom:20px;">A quick look at where things stand, and shortcuts to where you'll
     spend most of your time.</p>
 
+  <!-- Discipline Score + Streak — dashboard hero card. Scores rule-
+       following (not P&L): a 0-100 score ring, a consecutive-clean-day
+       streak, a 21-day heatmap, and 4 at-a-glance habit rows. Per the
+       "Discipline Features" handoff (Feature 1). -->
+  <div id="disc-score-card" class="disc-card"></div>
+
   <!-- Four stat boxes — each its own independent card -->
   <div id="dash-stat-grid" class="dash-stat-grid"></div>
 
@@ -61,6 +67,16 @@
     <div id="dash-recent-wrap" class="dash-recent-wrap dash-section-card">
       <div id="dash-recent-area"></div>
     </div>
+  </div>
+
+  <!-- Weekly / Monthly Disciplined Review — an auto-generated behavioural
+       review (not a P&L report): spots patterns in the trader's real
+       logged trades (win/loss, rule-adherence) rather than judging by
+       P&L. Lives at the bottom of the Dashboard per the "Discipline
+       Features" handoff (Feature 2). -->
+  <div class="dash-section-group">
+    <div class="dash-stat-label">This week's review</div>
+    <div id="dash-review-card" class="wr-card dash-section-card"></div>
   </div>
 </div>
 <!-- END COMPONENT: dashboard-home -->

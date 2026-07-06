@@ -201,10 +201,691 @@
     container.innerHTML = html;
   }
 
+  /* =========================================================
+     WEEKLY / MONTHLY DISCIPLINED REVIEW — "Discipline Features"
+     handoff, Feature 2. An auto-generated behavioural review, built
+     from the SAME tradeHistory this dashboard already reads (with its
+     real per-trade ruleStatus set by the Daily Limits Tool / broker
+     import — see recordCompletedDay()/updateTradeRuleStatus() in
+     app-shell.js) — no separate/duplicated data source, no fabricated
+     numbers. Judges rule adherence, not P&L, per the product's core
+     thesis; P&L is shown for context only.
+     ========================================================= */
+
+  let reviewMode = 'weekly';   // 'weekly' | 'monthly'
+  let weekSel = 0;             // selected index into the computed weeks[] (0 = most recent)
+  let monthSel = 0;            // selected index into the computed months[] (0 = most recent)
+  let periodPickerOpen = false;
+
+  function parseIsoDate(dateStr) {
+    const parts = dateStr.split('-').map(Number);
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+
+  function toIsoDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function addDays(d, n) {
+    const copy = new Date(d);
+    copy.setDate(copy.getDate() + n);
+    return copy;
+  }
+
+  // Monday-start ISO week.
+  function mondayOf(d) {
+    const day = d.getDay(); // 0 Sun .. 6 Sat
+    const diff = day === 0 ? -6 : 1 - day;
+    return addDays(d, diff);
+  }
+
+  function formatWeekRange(start, end) {
+    const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
+    const year = end.getFullYear();
+    if (sameMonth) {
+      const monthLabel = end.toLocaleDateString('en-IN', { month: 'short' });
+      return `${start.getDate()}–${end.getDate()} ${monthLabel} ${year}`;
+    }
+    const startLabel = start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    const endLabel = end.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    return `${startLabel} – ${endLabel} ${year}`;
+  }
+
+  // Builds one period's full stats/tone record from the trade entries
+  // that fall inside [startIso, endIso] (inclusive). "Rules respected"
+  // is measured per TRADING DAY (a day with >=1 logged trade), not per
+  // trade — a day only counts as respected if every trade logged that
+  // day had ruleStatus.compliant !== false.
+  function buildPeriodRecord(startIso, endIso, rangeLabel, tag, allHistory) {
+    const entries = allHistory.filter(e => e.date >= startIso && e.date <= endIso);
+    const trades = entries.length;
+    const wins = entries.filter(e => e.netResult > 0).length;
+    const winRate = trades > 0 ? Math.round((wins / trades) * 100) : null;
+    const netPnl = entries.reduce((sum, e) => sum + e.netResult, 0);
+
+    const byDate = {};
+    entries.forEach(e => {
+      if (!byDate[e.date]) byDate[e.date] = [];
+      byDate[e.date].push(e);
+    });
+    const sessionDates = Object.keys(byDate).sort();
+    const sessionDays = sessionDates.length;
+
+    let compliantDays = 0;
+    const violations = [];
+    sessionDates.forEach(date => {
+      const dayEntries = byDate[date];
+      const dayCompliant = dayEntries.every(e => !e.ruleStatus || e.ruleStatus.compliant !== false);
+      if (dayCompliant) compliantDays++;
+      dayEntries.forEach(e => {
+        if (e.ruleStatus && e.ruleStatus.compliant === false) {
+          violations.push({ label: e.ruleStatus.label, message: e.ruleStatus.message, date });
+        }
+      });
+    });
+
+    let tone;
+    if (sessionDays === 0) tone = 'neutral';
+    else if (violations.length > 0) tone = 'bad';
+    else tone = 'good';
+
+    return {
+      startIso, endIso, rangeLabel, tag, entries, sessionDates,
+      trades, wins, winRate, netPnl, sessionDays, compliantDays, violations, tone,
+    };
+  }
+
+  // Every week that actually has trade data, plus the current week even
+  // if empty (so there's always at least a "This week" row) — newest
+  // first, capped at 12 so the period picker never grows unbounded.
+  function computeWeeks(history) {
+    const today = new Date();
+    const weekStartTimes = new Set([mondayOf(today).getTime()]);
+    history.forEach(e => weekStartTimes.add(mondayOf(parseIsoDate(e.date)).getTime()));
+
+    const sorted = Array.from(weekStartTimes).sort((a, b) => b - a).slice(0, 12);
+    return sorted.map((ts, idx) => {
+      const start = new Date(ts);
+      const end = addDays(start, 6);
+      const startIso = toIsoDate(start);
+      const endIso = toIsoDate(end);
+      const tag = idx === 0 ? 'This week' : idx === 1 ? 'Last week' : `${idx} weeks ago`;
+      return buildPeriodRecord(startIso, endIso, formatWeekRange(start, end), tag, history);
+    });
+  }
+
+  function computeMonths(history) {
+    const today = new Date();
+    const monthKeys = new Set([`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`]);
+    history.forEach(e => {
+      const d = parseIsoDate(e.date);
+      monthKeys.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    });
+
+    const sorted = Array.from(monthKeys).sort((a, b) => b.localeCompare(a)).slice(0, 12);
+    return sorted.map((key, idx) => {
+      const [y, m] = key.split('-').map(Number);
+      const startIso = `${key}-01`;
+      const lastDay = new Date(y, m, 0).getDate();
+      const endIso = `${key}-${String(lastDay).padStart(2, '0')}`;
+      const tag = idx === 0 ? 'This month' : idx === 1 ? 'Last month' : `${idx} months ago`;
+      const label = new Date(y, m - 1, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+      return buildPeriodRecord(startIso, endIso, label, tag, history);
+    });
+  }
+
+  // Turns one period's numbers into plain-language headline/sub/insights
+  // — every line here is derived from real computed facts on the record
+  // (violation labels + their own coaching message already written in
+  // daily-limits.js's evaluateBrokerTradeCompliance(), win/loss sequencing),
+  // not canned copy.
+  function buildNarrative(record, periodWord) {
+    const { sessionDays, compliantDays, violations, trades, entries, sessionDates } = record;
+
+    if (sessionDays === 0) {
+      return {
+        headline: `No trading sessions this ${periodWord} yet`,
+        sub: `Log a trade in the Daily Limits Tool and this review fills in automatically.`,
+        insights: [{
+          tone: 'neutral', tag: 'Heads up', stat: 'Nothing logged',
+          text: `There's no trade data for this ${periodWord} yet — insights need at least one logged day.`,
+        }],
+      };
+    }
+
+    const insights = [];
+
+    if (violations.length > 0) {
+      const groups = {};
+      violations.forEach(v => {
+        if (!groups[v.label]) groups[v.label] = { count: 0, message: v.message };
+        groups[v.label].count++;
+      });
+      Object.keys(groups).forEach(label => {
+        const g = groups[label];
+        insights.push({
+          tone: 'bad', tag: 'Rule break',
+          stat: g.count > 1 ? `${label} × ${g.count}` : label,
+          text: g.message || `This showed up ${g.count} time${g.count > 1 ? 's' : ''} this ${periodWord}.`,
+        });
+      });
+    } else {
+      insights.push({
+        tone: 'good', tag: 'Working', stat: `Clean ${periodWord}`,
+        text: `You respected every rule this ${periodWord} — ${compliantDays}/${sessionDays} day${sessionDays > 1 ? 's' : ''}, no breaks.`,
+      });
+    }
+
+    // Day-after-a-loss pattern — checked against the trader's own
+    // consecutive LOGGED sessions in this period (not calendar days),
+    // since that's the meaningful "next time you traded" for a part-time
+    // F&O trader who may skip days.
+    if (insights.length < 3 && sessionDates.length >= 2) {
+      const netByDate = {};
+      entries.forEach(e => { netByDate[e.date] = (netByDate[e.date] || 0) + e.netResult; });
+
+      let lossOpportunities = 0, lossFollowedByLoss = 0;
+      for (let i = 0; i < sessionDates.length - 1; i++) {
+        if (netByDate[sessionDates[i]] < 0) {
+          lossOpportunities++;
+          if (netByDate[sessionDates[i + 1]] < 0) lossFollowedByLoss++;
+        }
+      }
+
+      if (lossOpportunities >= 2) {
+        if (lossFollowedByLoss > 0) {
+          const ratio = Math.round((lossFollowedByLoss / lossOpportunities) * 100);
+          insights.push({
+            tone: 'warn', tag: 'Pattern',
+            stat: `${ratio}% of losses followed by another loss`,
+            text: `Out of ${lossOpportunities} losing sessions this ${periodWord}, ${lossFollowedByLoss} were followed by another loss the next time you traded — worth a longer pause after a red day.`,
+          });
+        } else {
+          insights.push({
+            tone: 'good', tag: 'Working', stat: 'No loss chains',
+            text: `Every losing session this ${periodWord} was followed by a reset, not another loss — that's the habit this app is built around.`,
+          });
+        }
+      }
+    }
+
+    const headline = violations.length === 0
+      ? `A fully disciplined ${periodWord}`
+      : violations.length === 1
+        ? `A disciplined ${periodWord} — with one leak to plug`
+        : `${violations.length} rule breaks this ${periodWord} — worth a look`;
+    const sub = `${trades} trade${trades !== 1 ? 's' : ''} logged · ${compliantDays}/${sessionDays} day${sessionDays !== 1 ? 's' : ''} within the rules.`;
+
+    return { headline, sub, insights: insights.slice(0, 3) };
+  }
+
+  function renderWeeklyReview() {
+    const card = document.getElementById('dash-review-card');
+    if (!card) return;
+
+    const history = getHistory();
+    const weeks = computeWeeks(history);
+    const months = computeMonths(history);
+    const periods = reviewMode === 'weekly' ? weeks : months;
+
+    const rawSel = reviewMode === 'weekly' ? weekSel : monthSel;
+    const selIdx = Math.max(0, Math.min(rawSel, periods.length - 1));
+    if (reviewMode === 'weekly') weekSel = selIdx; else monthSel = selIdx;
+
+    const record = periods[selIdx];
+    const periodWord = reviewMode === 'weekly' ? 'week' : 'month';
+    const narrative = buildNarrative(record, periodWord);
+
+    const netPnlSign = record.netPnl > 0 ? '+' : record.netPnl < 0 ? '-' : '';
+    const netPnlClass = record.netPnl > 0 ? 'wr-stat-positive' : record.netPnl < 0 ? 'wr-stat-negative' : '';
+
+    const statsHtml = `
+      <div class="wr-stats-row">
+        <div class="wr-stat"><div class="wr-stat-label">Trades</div><div class="wr-stat-value">${record.trades}</div></div>
+        <div class="wr-stat"><div class="wr-stat-label">Win rate</div><div class="wr-stat-value">${record.winRate !== null ? record.winRate + '%' : '&mdash;'}</div></div>
+        <div class="wr-stat"><div class="wr-stat-label">Rules respected</div><div class="wr-stat-value">${record.sessionDays > 0 ? record.compliantDays + '/' + record.sessionDays + ' days' : '&mdash;'}</div></div>
+        <div class="wr-stat"><div class="wr-stat-label">Net P&amp;L</div><div class="wr-stat-value ${netPnlClass}">${record.trades > 0 ? netPnlSign + '₹' + fmt(Math.abs(record.netPnl)) : '&mdash;'}</div></div>
+      </div>
+    `;
+
+    const insightIcon = { good: '✓', warn: '⚠', bad: '!', neutral: '•' };
+    const insightsHtml = narrative.insights.map(ins => `
+      <div class="wr-insight wr-insight-${ins.tone}">
+        <div class="wr-insight-icon wr-insight-icon-${ins.tone}">${insightIcon[ins.tone] || '•'}</div>
+        <div class="wr-insight-body">
+          <div class="wr-insight-tag">${ins.tag}</div>
+          <div class="wr-insight-stat">${ins.stat}</div>
+          <div class="wr-insight-text">${ins.text}</div>
+        </div>
+      </div>
+    `).join('');
+
+    const pickerRowsHtml = periods.map((p, idx) => {
+      const pnlClass = p.netPnl > 0 ? 'wr-stat-positive' : p.netPnl < 0 ? 'wr-stat-negative' : '';
+      const pnlText = p.trades > 0
+        ? (p.netPnl > 0 ? '+' : p.netPnl < 0 ? '-' : '') + '₹' + fmt(Math.abs(p.netPnl))
+        : '&mdash;';
+      return `
+        <button type="button" class="wr-picker-row ${idx === selIdx ? 'wr-picker-row-active' : ''}" onclick="reviewSelectPeriod(${idx})">
+          <span class="wr-picker-dot wr-picker-dot-${p.tone}"></span>
+          <span class="wr-picker-range">${p.rangeLabel}</span>
+          <span class="wr-picker-pnl ${pnlClass}">${pnlText}</span>
+        </button>
+      `;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="wr-header-row">
+        <div class="wr-header-left">
+          <div class="wr-headline-row"><span class="wr-headline-emoji">\u{1F5D3}️</span> <span class="wr-headline">${narrative.headline}</span></div>
+          <div class="wr-sub">${narrative.sub}</div>
+        </div>
+        <div class="wr-header-right">
+          <div class="wr-mode-toggle">
+            <button type="button" class="wr-mode-btn ${reviewMode === 'weekly' ? 'wr-mode-btn-active' : ''}" onclick="reviewSetMode('weekly')">Weekly</button>
+            <button type="button" class="wr-mode-btn ${reviewMode === 'monthly' ? 'wr-mode-btn-active' : ''}" onclick="reviewSetMode('monthly')">Monthly</button>
+          </div>
+          <div class="wr-period-picker-wrap">
+            <button type="button" class="wr-period-btn" onclick="reviewTogglePicker(event)">${record.rangeLabel} <span class="wr-period-chevron">▾</span></button>
+            <div id="wr-period-dropdown" class="wr-period-dropdown ${periodPickerOpen ? '' : 'hidden'}">${pickerRowsHtml}</div>
+          </div>
+        </div>
+      </div>
+
+      ${statsHtml}
+
+      <div class="wr-insights-eyebrow">What the data noticed</div>
+      <div class="wr-insights-list">${insightsHtml}</div>
+
+      <div class="wr-footer">
+        <button type="button" class="wr-journal-btn" onclick="switchTab(null, 'tab-journal')">Review this ${periodWord} in the journal</button>
+        <p class="wr-footer-note">A fresh review lands every Sunday, built from your trades, limits and journal.</p>
+      </div>
+    `;
+  }
+
+  function reviewSetMode(mode) {
+    if (mode !== 'weekly' && mode !== 'monthly') return;
+    reviewMode = mode;
+    periodPickerOpen = false;
+    renderWeeklyReview();
+  }
+
+  function reviewSelectPeriod(idx) {
+    if (reviewMode === 'weekly') weekSel = idx; else monthSel = idx;
+    periodPickerOpen = false;
+    renderWeeklyReview();
+  }
+
+  function reviewTogglePicker(e) {
+    if (e) e.stopPropagation();
+    periodPickerOpen = !periodPickerOpen;
+    renderWeeklyReview();
+  }
+
+  // Closes the period dropdown on any outside click — added once, since
+  // this script only ever loads a single time (see scriptLoaded cache in
+  // app-shell.js's loadComponent()).
+  document.addEventListener('click', (e) => {
+    if (!periodPickerOpen) return;
+    const wrap = document.querySelector('.wr-period-picker-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      periodPickerOpen = false;
+      renderWeeklyReview();
+    }
+  });
+
+  window.reviewSetMode = reviewSetMode;
+  window.reviewSelectPeriod = reviewSelectPeriod;
+  window.reviewTogglePicker = reviewTogglePicker;
+
+  /* =========================================================
+     DISCIPLINE SCORE + STREAK — "Discipline Features" handoff,
+     Feature 1. Dashboard hero card: a 0–100 score ring, a consecutive-
+     clean-day streak, a 21-day heatmap, and a 4-item habits grid — all
+     read from ONE real adherence computation below (evaluateDayCompliance),
+     itself built from the app's existing tradeHistory (ruleStatus already
+     set by the Daily Limits Tool / broker import) and journalEntries
+     (getAllJournalEntries()). Scored on rule-following, never on P&L,
+     per the product's core thesis. Shares its date helpers with the
+     Weekly/Monthly Review above (parseIsoDate/toIsoDate/addDays).
+     ========================================================= */
+
+  const DISC_MAX_TRADES_PER_DAY = 2; // same app-wide rule used elsewhere (roadmap.js, daily-limits.js)
+  const DISC_HEATMAP_DAYS = 21;
+  const DISC_SCORE_WINDOW_DAYS = 30; // rolling window the headline score is measured over
+
+  let discDayCache = {}; // iso -> { status, entries, reasons, dayLoss, lossOk, tradesOk, cooldownOk, journalOk, streakImpact }
+
+  function getJournalMap() {
+    return typeof window.getAllJournalEntries === 'function' ? window.getAllJournalEntries() : {};
+  }
+
+  function getMaxLossRupees() {
+    const summary = typeof window.getRiskSummary === 'function' ? window.getRiskSummary() : null;
+    return summary && summary.maxLossRupees !== undefined ? summary.maxLossRupees : null;
+  }
+
+  // Evaluates the 4 rules the README specifies for a single trading day:
+  // stayed within the daily loss limit, kept to max 2 trades, took the
+  // cooldown between trades (reuses the SAME ruleStatus.compliant flag
+  // the Daily Limits Tool / broker import already computed for
+  // overtrading + broken cooldowns — see evaluateBrokerTradeCompliance()
+  // in daily-limits.js), and journaled every trade logged that day.
+  function evaluateDayCompliance(dayEntries, journalMap, maxLossRupees) {
+    const dayLoss = dayEntries.reduce((sum, e) => sum + (e.netResult < 0 ? -e.netResult : 0), 0);
+    const lossOk = maxLossRupees === null || maxLossRupees === undefined || dayLoss <= maxLossRupees;
+
+    const overtradingFlag = dayEntries.some(e => e.ruleStatus && e.ruleStatus.compliant === false && /overtrad/i.test(e.ruleStatus.label || ''));
+    const tradesOk = dayEntries.length <= DISC_MAX_TRADES_PER_DAY && !overtradingFlag;
+
+    const cooldownBroken = dayEntries.some(e => e.ruleStatus && e.ruleStatus.compliant === false && /cooldown/i.test(e.ruleStatus.label || ''));
+    const cooldownOk = !cooldownBroken;
+
+    const journalOk = dayEntries.every(e => !!journalMap[e.id]);
+
+    const reasons = [
+      { ok: lossOk, text: lossOk ? 'Stayed within your daily loss limit' : `Exceeded your daily loss limit (₹${fmt(dayLoss)} lost)` },
+      { ok: tradesOk, text: tradesOk ? 'Kept to max 2 trades' : `${dayEntries.length} trades logged — over the 2-trade limit` },
+      { ok: cooldownOk, text: cooldownOk ? 'Took the 30-minute cooldown between trades' : 'Skipped the 30-minute cooldown between trades' },
+      { ok: journalOk, text: journalOk ? 'Journaled every trade' : 'Left at least one trade without a journal entry' },
+    ];
+
+    const respected = lossOk && tradesOk && cooldownOk && journalOk;
+    return { respected, lossOk, tradesOk, cooldownOk, journalOk, reasons, dayLoss };
+  }
+
+  // Walks backward from today to the trader's join date (or their
+  // earliest logged trade if joinDate isn't set), building one status
+  // per calendar day: 'respected' | 'broken' | 'no-session'. Weekends and
+  // days with zero logged trades are 'no-session' — they neither help
+  // nor break the streak, per the README.
+  function computeDayStatuses(history, journalMap, maxLossRupees) {
+    const byDate = {};
+    history.forEach(e => { (byDate[e.date] = byDate[e.date] || []).push(e); });
+
+    const state = typeof window.getProfileState === 'function' ? window.getProfileState() : {};
+    const sortedDates = Object.keys(byDate).sort();
+
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+
+    // Always walk back at least DISC_SCORE_WINDOW_DAYS days, regardless of
+    // account age — otherwise a brand-new account (no joinDate, no trade
+    // history yet) would bound the walk to "today" only, producing an
+    // empty heatmap/score instead of a full 21/30-day spread of
+    // "no-session" cells.
+    const minWindowBound = addDays(todayMidnight, -(DISC_SCORE_WINDOW_DAYS - 1));
+    let earliestBound = state.joinDate
+      ? parseIsoDate(state.joinDate)
+      : (sortedDates.length ? parseIsoDate(sortedDates[0]) : todayMidnight);
+    if (earliestBound > minWindowBound) earliestBound = minWindowBound;
+
+    const days = []; // newest-first
+    let cur = new Date(todayMidnight);
+    while (cur >= earliestBound) {
+      const iso = toIsoDate(cur);
+      const dayEntries = byDate[iso];
+      if (!dayEntries) {
+        days.push({ iso, status: 'no-session' });
+      } else {
+        const evalResult = evaluateDayCompliance(dayEntries, journalMap, maxLossRupees);
+        days.push({ iso, status: evalResult.respected ? 'respected' : 'broken', entries: dayEntries, evalResult });
+      }
+      cur = addDays(cur, -1);
+    }
+    return days; // newest-first
+  }
+
+  function computeWindowScore(daysSlice) {
+    const sessionDays = daysSlice.filter(d => d.status !== 'no-session');
+    if (sessionDays.length === 0) return null;
+    const respected = sessionDays.filter(d => d.status === 'respected').length;
+    return Math.round((respected / sessionDays.length) * 100);
+  }
+
+  function renderDisciplineScore() {
+    const card = document.getElementById('disc-score-card');
+    if (!card) return;
+
+    const history = getHistory();
+    const journalMap = getJournalMap();
+    const maxLossRupees = getMaxLossRupees();
+    const days = computeDayStatuses(history, journalMap, maxLossRupees); // newest-first
+
+    // Cache day records (for the click-through modal) and compute
+    // streak-impact text while scanning chronologically.
+    discDayCache = {};
+    const chrono = days.slice().reverse();
+    let running = 0;
+    let best = 0;
+    chrono.forEach(day => {
+      let impactText;
+      if (day.status === 'broken') {
+        running = 0;
+        impactText = 'Streak reset to 0 this day.';
+      } else if (day.status === 'respected') {
+        running++;
+        best = Math.max(best, running);
+        impactText = `Streak continued (day ${running}).`;
+      } else {
+        impactText = 'No session — streak unaffected.';
+      }
+      discDayCache[day.iso] = Object.assign({}, day, { streakImpact: impactText });
+    });
+
+    // Current streak: from today backward, count respected days, skip
+    // no-session days, stop at the first broken day.
+    let streak = 0;
+    for (const day of days) {
+      if (day.status === 'broken') break;
+      if (day.status === 'respected') streak++;
+    }
+    best = Math.max(best, streak);
+
+    const score = computeWindowScore(days.slice(0, DISC_SCORE_WINDOW_DAYS));
+    const thisWeekScore = computeWindowScore(days.slice(0, 7));
+    const lastWeekScore = computeWindowScore(days.slice(7, 14));
+    const hasDelta = thisWeekScore !== null && lastWeekScore !== null;
+    const delta = hasDelta ? thisWeekScore - lastWeekScore : null;
+
+    // ---------- Score ring ----------
+    const circumference = 2 * Math.PI * 52;
+    const ringScore = score !== null ? score : 0;
+    const dash = (ringScore / 100) * circumference;
+    const deltaClass = delta > 0 ? 'disc-delta-good' : delta < 0 ? 'disc-delta-bad' : 'disc-delta-flat';
+    const deltaArrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '—';
+    const deltaText = hasDelta
+      ? `${deltaArrow} ${delta > 0 ? '+' : ''}${delta} this week`
+      : (thisWeekScore !== null ? 'New this week' : 'Not enough data yet');
+
+    // ---------- Streak + heatmap ----------
+    const last21 = days.slice(0, DISC_HEATMAP_DAYS).slice().reverse(); // chronological, oldest-first
+    const cellsHtml = last21.map(day => {
+      const cls = day.status === 'respected' ? 'disc-cell-good' : day.status === 'broken' ? 'disc-cell-bad' : 'disc-cell-none';
+      return `<div class="disc-cell ${cls}" onclick="discOpenDayModal('${day.iso}')" title="${day.iso}"></div>`;
+    }).join('');
+
+    // ---------- Habits grid (last 7 calendar days) ----------
+    const last7 = days.slice(0, 7);
+    const sessionDays7 = last7.filter(d => d.status !== 'no-session');
+    const dayCount7 = sessionDays7.length;
+    let lossOkDays = 0, tradesOkDays = 0, cooldownApplicable = 0, cooldownOkDays = 0, totalTrades = 0, journaledTrades = 0;
+    sessionDays7.forEach(d => {
+      const r = d.evalResult;
+      if (r.lossOk) lossOkDays++;
+      if (r.tradesOk) tradesOkDays++;
+      if (d.entries.length >= 2) {
+        cooldownApplicable++;
+        if (r.cooldownOk) cooldownOkDays++;
+      }
+      totalTrades += d.entries.length;
+      journaledTrades += d.entries.filter(e => journalMap[e.id]).length;
+    });
+
+    const habits = [
+      {
+        ok: dayCount7 === 0 || lossOkDays === dayCount7,
+        label: 'Daily loss limit',
+        detail: dayCount7 > 0 ? `${lossOkDays}/${dayCount7} days within limit` : 'No sessions this week',
+      },
+      {
+        ok: dayCount7 === 0 || tradesOkDays === dayCount7,
+        label: 'Max 2 trades/day',
+        detail: dayCount7 > 0 ? `${tradesOkDays}/${dayCount7} days at or under 2` : 'No sessions this week',
+      },
+      {
+        ok: cooldownApplicable === 0 || cooldownOkDays === cooldownApplicable,
+        label: '30-min cooldown',
+        detail: cooldownApplicable > 0 ? `${cooldownOkDays}/${cooldownApplicable} multi-trade days` : 'No multi-trade days yet',
+      },
+      {
+        ok: totalTrades === 0 || journaledTrades === totalTrades,
+        label: 'Journaled every trade',
+        detail: totalTrades > 0 ? `${journaledTrades}/${totalTrades} trades logged` : 'No trades this week',
+      },
+    ];
+
+    const habitsHtml = habits.map(h => `
+      <div class="disc-habit-row">
+        <div class="disc-habit-icon ${h.ok ? 'disc-habit-icon-ok' : 'disc-habit-icon-warn'}">${h.ok ? '✓' : '!'}</div>
+        <div class="disc-habit-text">
+          <div class="disc-habit-label">${h.label}</div>
+          <div class="disc-habit-detail">${h.detail}</div>
+        </div>
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="disc-grid">
+        <div class="disc-ring-col">
+          <div class="disc-ring-wrap">
+            <svg class="disc-ring-svg" viewBox="0 0 132 132" width="132" height="132">
+              <circle class="disc-ring-track" cx="66" cy="66" r="52"></circle>
+              <circle class="disc-ring-value" cx="66" cy="66" r="52" style="stroke-dasharray:${dash} ${circumference};"></circle>
+            </svg>
+            <div class="disc-ring-center">
+              <div class="disc-ring-score">${score !== null ? score : '&mdash;'}</div>
+              <div class="disc-ring-max">/ 100</div>
+            </div>
+          </div>
+          <div class="disc-ring-label">Discipline Score</div>
+          <div class="disc-ring-delta ${deltaClass}">${deltaText}</div>
+        </div>
+
+        <div class="disc-right-col">
+          <div class="disc-streak-row">
+            <div class="disc-streak-block">
+              <div class="disc-streak-main"><span class="disc-streak-emoji">\u{1F525}</span> <span class="disc-streak-num">${streak}-day streak</span></div>
+              <div class="disc-streak-sub">Consecutive days you respected every rule · best ${best}</div>
+            </div>
+            <div class="disc-heatmap-label">Last ${DISC_HEATMAP_DAYS} days</div>
+          </div>
+
+          <div class="disc-heatmap-grid">${cellsHtml}</div>
+
+          <div class="disc-legend-row">
+            <span class="disc-legend-item"><span class="disc-legend-swatch disc-legend-swatch-good"></span>Rules respected</span>
+            <span class="disc-legend-item"><span class="disc-legend-swatch disc-legend-swatch-bad"></span>Broke a rule</span>
+            <span class="disc-legend-item"><span class="disc-legend-swatch disc-legend-swatch-none"></span>No session</span>
+            <span class="disc-legend-note">Scored on rules, not P&amp;L</span>
+          </div>
+
+          <div class="disc-habits-grid">${habitsHtml}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ---------- Day-detail modal (click any heatmap cell) ----------
+
+  function formatFullDate(iso) {
+    const d = parseIsoDate(iso);
+    return d.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function ensureDiscModalExists() {
+    if (document.getElementById('disc-day-modal-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'disc-day-modal-overlay';
+    overlay.className = 'disc-day-modal-overlay hidden';
+    overlay.onclick = discCloseIfOutside;
+    overlay.innerHTML = `
+      <div class="disc-day-modal">
+        <div class="disc-day-modal-header">
+          <div>
+            <div id="disc-day-modal-date" class="disc-day-modal-date"></div>
+          </div>
+          <span id="disc-day-modal-pill" class="disc-day-modal-pill"></span>
+          <button type="button" class="disc-day-modal-close" onclick="discCloseDayModal()" aria-label="Close">&times;</button>
+        </div>
+        <div id="disc-day-modal-headline" class="disc-day-modal-headline"></div>
+        <div id="disc-day-modal-list" class="disc-day-modal-list"></div>
+        <div id="disc-day-modal-footer" class="disc-day-modal-footer"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  function discOpenDayModal(iso) {
+    ensureDiscModalExists();
+    const day = discDayCache[iso];
+    if (!day) return;
+
+    const overlay = document.getElementById('disc-day-modal-overlay');
+    const dateEl = document.getElementById('disc-day-modal-date');
+    const pillEl = document.getElementById('disc-day-modal-pill');
+    const headlineEl = document.getElementById('disc-day-modal-headline');
+    const listEl = document.getElementById('disc-day-modal-list');
+    const footerEl = document.getElementById('disc-day-modal-footer');
+
+    dateEl.innerText = formatFullDate(iso);
+
+    const pillClass = day.status === 'respected' ? 'disc-pill-good' : day.status === 'broken' ? 'disc-pill-bad' : 'disc-pill-none';
+    const pillText = day.status === 'respected' ? 'Rules respected' : day.status === 'broken' ? 'Broke a rule' : 'No session';
+    pillEl.className = `disc-day-modal-pill ${pillClass}`;
+    pillEl.innerText = pillText;
+
+    if (day.status === 'no-session') {
+      headlineEl.innerText = 'No trades logged this day.';
+      listEl.innerHTML = '';
+    } else {
+      const failedReason = day.evalResult.reasons.find(r => !r.ok);
+      headlineEl.innerText = day.status === 'respected' ? 'Every rule respected today.' : failedReason.text;
+      listEl.innerHTML = day.evalResult.reasons.map(r => `
+        <div class="disc-day-modal-item">
+          <span class="disc-day-modal-item-icon ${r.ok ? 'disc-item-ok' : 'disc-item-bad'}">${r.ok ? '✓' : '✕'}</span>
+          <span>${r.text}</span>
+        </div>
+      `).join('');
+    }
+
+    footerEl.innerHTML = `<span class="disc-day-modal-footer-icon">ⓘ</span> ${day.streakImpact}`;
+
+    overlay.classList.remove('hidden');
+  }
+
+  function discCloseDayModal() {
+    const overlay = document.getElementById('disc-day-modal-overlay');
+    if (overlay) overlay.classList.add('hidden');
+  }
+
+  function discCloseIfOutside(e) {
+    if (e.target && e.target.id === 'disc-day-modal-overlay') discCloseDayModal();
+  }
+
+  window.discOpenDayModal = discOpenDayModal;
+  window.discCloseDayModal = discCloseDayModal;
+
   function render() {
     renderStatCards();
     renderRiskRules();
     renderRecentActivity();
+    renderDisciplineScore();
+    renderWeeklyReview();
   }
 
   window.renderDashboardHome = render;

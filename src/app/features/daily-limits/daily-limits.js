@@ -559,6 +559,12 @@
           "Kill Switch Activated — Day Over",
           `Trade #1 loss has reached or exceeded your maximum daily loss of ₹${fmt(rule.loss)}. Shut down the system. Come back fresh tomorrow.`);
         trade2Unlocked = false;
+        // Cool-Down Lock (Feature 3) — the full-screen "blue screen" that
+        // enforces the kill switch just triggered above, rather than
+        // leaving it as just an inline alert box. See cooldown-lock.js.
+        if (typeof window.triggerCoolDownLock === 'function') {
+          window.triggerCoolDownLock(rule.loss, trade1Amount);
+        }
       } else if (lossRatio >= SOFT_BLOCK_RATIO) {
         setAlert(alertBox, alertTitle, alertMsg, "warning",
           "Trade #2 Not Allowed Today",
@@ -680,6 +686,23 @@
     setAlert(alertBox, alertTitle, alertMsg, "danger",
       "Kill Switch Activated — Day Over",
       "Trade #2 has been completed. Maximum of 2 trades reached for today — no further trades, regardless of this result.");
+
+    // Cool-Down Lock (Feature 3) — only fires here if Trade 2's own loss
+    // pushes the CUMULATIVE day net past the tier's max daily loss (per
+    // the README: "startBreathe() is called ... when a Trade-2 loss
+    // pushes the day net past tier.maxLoss"). Reaching the 2-trade cap
+    // alone does not trigger it — a profitable/breakeven day that simply
+    // used up both trades should not show the same screen as a real
+    // limit breach.
+    const rule = currentRule();
+    if (rule) {
+      const trade1Net = trade1Status === 'profit' ? trade1Amount : -trade1Amount;
+      const dayNet = trade1Net + netResult;
+      const dayLoss = dayNet < 0 ? -dayNet : 0;
+      if (dayLoss >= rule.loss && typeof window.triggerCoolDownLock === 'function') {
+        window.triggerCoolDownLock(rule.loss, dayLoss);
+      }
+    }
 
     const chosenDate = getSelectedLogDate();
     const t2RuleStatus = { compliant: true, label: 'Final trade \u2014 day over after this', source: 'manual' };
@@ -1312,6 +1335,24 @@
   // too would mark the section "seen" before it's ever shown, since profile
   // setup (and therefore renderInstrumentSlTable) typically runs before this
   // component even loads.
+
+  // Cool-Down Lock (Feature 3) — if the trader already hit their daily
+  // loss limit earlier today (this is a reload, or they navigated away
+  // and back), re-show the full-screen lock immediately and keep both
+  // trades' inputs disabled. Per the README: dismissing the lock screen
+  // does NOT reopen trading, and a reload must not be able to bypass a
+  // lock started earlier the same day — this is the "block all trade
+  // entry points while locked" requirement, applied at the one place
+  // trades actually get submitted.
+  if (typeof window.isTradingLockedToday === 'function' && window.isTradingLockedToday()) {
+    ['t1-profit', 't1-loss', 't1-amount', 't1-instrument', 't2-profit', 't2-loss', 't2-amount', 't2-instrument'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = true;
+    });
+    if (typeof window.reshowCoolDownLockIfActive === 'function') {
+      window.reshowCoolDownLockIfActive();
+    }
+  }
 
 })();
 /* === END COMPONENT: risk-calculator (logic) === */
