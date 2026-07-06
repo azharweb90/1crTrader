@@ -514,6 +514,7 @@
 /* ---------- Journal entry form ---------- */
 .journal-form-wrap {
   max-width: 1120px;
+  margin: 0 auto;
 }
 
 .journal-back-btn {
