@@ -905,7 +905,7 @@ hr,
 }
 
 .journal-form-wrap {
-  background: var(--color-surface);
+  background: transparent;
   border-color: var(--color-border);
 }
 
