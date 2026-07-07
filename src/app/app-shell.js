@@ -27,6 +27,10 @@
       html: "/src/app/features/dashboard-home/dashboard-home.html",
       js: "/src/app/features/dashboard-home/dashboard-home.js",
     },
+    "tab-chart-prep": {
+      html: "/src/app/features/chart-prep/chart-prep.html",
+      js: "/src/app/features/chart-prep/chart-prep.js",
+    },
     "tab-calculator": {
       html: "/src/app/features/daily-limits/daily-limits.html",
       js: "/src/app/features/daily-limits/daily-limits.js",
@@ -38,6 +42,10 @@
     "tab-roadmap": {
       html: "/src/app/features/roadmap/roadmap.html",
       js: "/src/app/features/roadmap/roadmap.js",
+    },
+    "tab-calculators": {
+      html: "/src/app/features/calculators/calculators.html",
+      js: "/src/app/features/calculators/calculators.js",
     },
     "tab-journal": {
       html: "/src/app/features/trading-journal/trading-journal.html",
@@ -62,9 +70,11 @@
   const PAGE_TITLES = {
     "tab-select": "Set Up Your Profile",
     "tab-dashboard": "Dashboard",
+    "tab-chart-prep": "Chart Prep",
     "tab-calculator": "Daily Limits Tool",
     "tab-trade-manager": "Trade Manager",
     "tab-roadmap": "Challenge",
+    "tab-calculators": "Calculators",
     "tab-journal": "Trading Journal",
     "tab-learn": "Knowledge Area",
     "tab-strategies": "Strategies",
@@ -392,6 +402,19 @@
       }
       if (tabId === 'tab-dashboard' && typeof window.renderDashboardHome === 'function') {
         window.renderDashboardHome();
+      }
+      // Re-render on every visit (not just the first load) so Account
+      // Equity picks up any balance change since last time, and Withdraw
+      // & Scale's "From trades" list reflects any trades logged elsewhere
+      // in the meantime.
+      if (tabId === 'tab-calculators' && typeof window.renderCalculators === 'function') {
+        window.renderCalculators();
+      }
+      // Re-render on every visit so the date pill stays current and any
+      // key levels/plan saved earlier today (or a bias change made
+      // elsewhere) are reflected immediately.
+      if (tabId === 'tab-chart-prep' && typeof window.renderChartPrep === 'function') {
+        window.renderChartPrep();
       }
       // Start the per-tab tour the first time this tab is visited —
       // delayed 300ms so the component's own render() calls (which

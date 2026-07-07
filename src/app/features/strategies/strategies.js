@@ -220,6 +220,12 @@
   let ownIdCounter = 1;
 
   let activeFilter = 'all';   // 'all' | category key | 'mine'
+  // Deep-link filter by direction ('all' | 'Long' | 'Short') — not a visible
+  // permanent pill row like the category filters above; set programmatically
+  // by Chart Prep's "Browse matching strategies" button (window.setBiasFilter)
+  // so today's bullish/bearish read only surfaces strategies that actually
+  // suit that direction. A 'Both'-bias strategy matches either direction.
+  let activeBiasFilter = 'all';
   let activeStrategyId = null;
   let starRatingsGiven = {};  // { [id]: 1-5 }  local "rate this playbook" input, session-only
   let viewDensity = 'small';  // 'small' | 'large' — cosmetic grid density toggle
@@ -271,6 +277,11 @@
     } else if (activeFilter !== 'all') {
       list = list.filter(s => s.category === activeFilter);
     }
+    if (activeBiasFilter !== 'all') {
+      list = list.filter(s => s.bias === activeBiasFilter || s.bias === 'Both');
+    }
+
+    updateBiasBanner();
 
     if (list.length === 0) {
       grid.innerHTML = '';
@@ -278,7 +289,9 @@
         empty.classList.remove('hidden');
         empty.innerText = activeFilter === 'mine'
           ? 'You haven’t created a strategy yet. Use "+ Create strategy" above to write your first one.'
-          : 'No strategies in this category yet.';
+          : (activeBiasFilter !== 'all'
+            ? `No ${activeBiasFilter.toLowerCase()} strategies in this category yet.`
+            : 'No strategies in this category yet.');
       }
       return;
     }
@@ -319,6 +332,31 @@
     document.querySelectorAll('.strat-filter-pill').forEach(p => p.classList.remove('strat-filter-active'));
     if (btn) btn.classList.add('strat-filter-active');
     renderList();
+  }
+
+  // Called from Chart Prep's "Browse matching strategies" button (deep-link,
+  // not a visible pill) — see the activeBiasFilter comment above. Also
+  // callable directly by the user via the banner's own "Clear" button once
+  // a bias filter is active.
+  function setBiasFilter(bias) {
+    activeBiasFilter = bias || 'all';
+    renderList();
+  }
+
+  function clearBiasFilter() {
+    setBiasFilter('all');
+  }
+
+  function updateBiasBanner() {
+    const banner = document.getElementById('strategies-bias-banner');
+    const text = document.getElementById('strategies-bias-banner-text');
+    if (!banner) return;
+    if (activeBiasFilter === 'all') {
+      banner.classList.add('hidden');
+      return;
+    }
+    banner.classList.remove('hidden');
+    if (text) text.innerText = `Filtered to ${activeBiasFilter} setups — from today's Chart Prep read`;
   }
 
   function setViewDensity(density, btn) {
@@ -522,6 +560,8 @@
   window.onStrategyChecklistToggle = onStrategyChecklistToggle;
   window.rateStrategy = rateStrategy;
   window.setFilter = setFilter;
+  window.setBiasFilter = setBiasFilter;
+  window.clearBiasFilter = clearBiasFilter;
   window.setViewDensity = setViewDensity;
   window.openStrategyEditor = openStrategyEditor;
   window.closeStrategyEditor = closeStrategyEditor;

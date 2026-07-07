@@ -1,0 +1,355 @@
+<!-- COMPONENT: calculators — five standalone "what-if" calculators
+     (Position Size, Trade Expectancy, Drawdown & Recovery, Equity
+     Simulator, Withdraw & Scale). Everything recalculates live as you
+     type; no values are saved. Account Equity / Starting Capital is one
+     shared value seeded from the trader's real balance and kept in sync
+     across all five tabs (see calculators.js: sharedEquity). -->
+<div class="calc-wrap">
+  <p class="section-note" style="margin:0 0 20px; max-width:780px;">Fast math for every decision — size a position, check whether an edge is really profitable, see what a drawdown costs to recover, and project where your account is headed. Everything updates as you type.</p>
+
+  <div class="calc-tabs" id="calc-tabs">
+    <button type="button" class="calc-tab-btn" data-calc="position" onclick="setCalcTab('position')">
+      <span class="calc-tab-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="4" y2="12"/><line x1="10" y1="20" x2="10" y2="6"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="21" y2="9"/></svg></span>
+      <span class="calc-tab-text"><span class="calc-tab-title">Position Size</span><span class="calc-tab-sub">How many units to buy</span></span>
+    </button>
+    <button type="button" class="calc-tab-btn" data-calc="expectancy" onclick="setCalcTab('expectancy')">
+      <span class="calc-tab-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg></span>
+      <span class="calc-tab-text"><span class="calc-tab-title">Trade Expectancy</span><span class="calc-tab-sub">Is the edge profitable?</span></span>
+    </button>
+    <button type="button" class="calc-tab-btn" data-calc="drawdown" onclick="setCalcTab('drawdown')">
+      <span class="calc-tab-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 18l-9.5-9.5-5 5L1 6"/><path d="M17 18h6v-6"/></svg></span>
+      <span class="calc-tab-text"><span class="calc-tab-title">Drawdown &amp; Recovery</span><span class="calc-tab-sub">Cost of digging out</span></span>
+    </button>
+    <button type="button" class="calc-tab-btn" data-calc="equity" onclick="setCalcTab('equity')">
+      <span class="calc-tab-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
+      <span class="calc-tab-text"><span class="calc-tab-title">Equity Simulator</span><span class="calc-tab-sub">Project your curve</span></span>
+    </button>
+    <button type="button" class="calc-tab-btn" data-calc="withdraw" onclick="setCalcTab('withdraw')">
+      <span class="calc-tab-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5a2.5 2.5 0 0 1 2.5-1.5h1a2.25 2.25 0 0 1 0 4.5h-1a2.25 2.25 0 0 0 0 4.5h1a2.5 2.5 0 0 0 2.5-1.5"/></svg></span>
+      <span class="calc-tab-text"><span class="calc-tab-title">Withdraw &amp; Scale</span><span class="calc-tab-sub">When to bank, when to size up</span></span>
+    </button>
+  </div>
+
+  <!-- ===== POSITION SIZE ===== -->
+  <div class="calc-panel" id="calc-panel-position">
+    <div class="calc-grid">
+      <div class="calc-card">
+        <div class="calc-card-label">INPUTS</div>
+        <div class="calc-field">
+          <label for="ps-equity">Account Equity (₹)</label>
+          <input type="number" id="ps-equity" class="calc-input" oninput="onSharedEquityInput(this.value); recalcPosition();">
+        </div>
+        <div class="calc-field">
+          <label for="ps-risk">Risk per Trade (%)</label>
+          <input type="number" id="ps-risk" class="calc-input" value="1" oninput="recalcPosition()">
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="ps-entry">Entry Price (₹)</label>
+            <input type="number" id="ps-entry" class="calc-input" placeholder="0.00" oninput="recalcPosition()">
+          </div>
+          <div class="calc-field">
+            <label for="ps-stop">Stop-Loss (₹)</label>
+            <input type="number" id="ps-stop" class="calc-input" placeholder="0.00" oninput="recalcPosition()">
+          </div>
+        </div>
+        <p class="calc-formula-note">Position Size = (Equity × Risk%) ÷ |Entry − Stop-Loss|. This is the number of units where hitting your stop loses exactly your chosen risk, and no more.</p>
+      </div>
+
+      <div class="calc-result-col">
+        <div class="calc-hero-card calc-hero-blue">
+          <div class="calc-hero-label">POSITION SIZE</div>
+          <div class="calc-hero-value-row"><span id="ps-out-units" class="calc-hero-value">—</span><span class="calc-hero-unit">units</span></div>
+          <div id="ps-out-sub" class="calc-hero-sub">Enter entry &amp; stop-loss</div>
+        </div>
+        <div class="calc-stat-row">
+          <div class="calc-stat-card">
+            <div class="calc-stat-label">MAX ₹ RISK</div>
+            <div id="ps-out-maxrisk" class="calc-stat-value calc-stat-value-loss">—</div>
+            <div id="ps-out-maxrisk-sub" class="calc-stat-sub">—</div>
+          </div>
+          <div class="calc-stat-card">
+            <div class="calc-stat-label">RISK / UNIT</div>
+            <div id="ps-out-riskunit" class="calc-stat-value">—</div>
+            <div class="calc-stat-sub">Entry to stop distance</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TRADE EXPECTANCY ===== -->
+  <div class="calc-panel hidden" id="calc-panel-expectancy">
+    <div class="calc-grid">
+      <div class="calc-card">
+        <div class="calc-card-header-row">
+          <div class="calc-card-label">INPUTS</div>
+          <div class="calc-toggle-row calc-toggle-row-small" id="te-mode-toggle">
+            <button type="button" class="calc-toggle-btn active" data-mode="amount" onclick="setExpectancyMode('amount')">₹ amount</button>
+            <button type="button" class="calc-toggle-btn" data-mode="multiple" onclick="setExpectancyMode('multiple')" disabled title="R-multiple mode is coming soon">R multiple</button>
+          </div>
+        </div>
+        <div class="calc-field">
+          <label for="te-winrate">Win Rate (%)</label>
+          <input type="number" id="te-winrate" class="calc-input" value="50" oninput="recalcExpectancy()">
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="te-avgwin">Average Win (₹)</label>
+            <input type="number" id="te-avgwin" class="calc-input" placeholder="0" oninput="recalcExpectancy()">
+          </div>
+          <div class="calc-field">
+            <label for="te-avgloss">Average Loss (₹)</label>
+            <input type="number" id="te-avgloss" class="calc-input" placeholder="0" oninput="recalcExpectancy()">
+          </div>
+        </div>
+        <p class="calc-formula-note">Expectancy = (Win% × Avg Win) − (Loss% × Avg Loss). A positive number means the strategy makes money over enough trades — regardless of how any single trade turns out.</p>
+      </div>
+
+      <div class="calc-result-col">
+        <div class="calc-hero-card calc-hero-blue" id="te-hero-card">
+          <div class="calc-hero-header-row">
+            <div class="calc-hero-label">EXPECTED VALUE / TRADE</div>
+            <span id="te-out-badge" class="calc-hero-badge hidden">—</span>
+          </div>
+          <div class="calc-hero-value-row"><span id="te-out-value" class="calc-hero-value">—</span></div>
+          <div id="te-out-sub" class="calc-hero-sub">Enter win rate, average win and average loss</div>
+        </div>
+        <div class="calc-stat-card">
+          <div class="calc-stat-label">BREAK-EVEN WIN RATE</div>
+          <div id="te-out-breakeven" class="calc-stat-value">—</div>
+          <div class="calc-stat-sub">The minimum win rate that keeps you flat at this win/loss size. Beat it and the edge is positive.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DRAWDOWN & RECOVERY ===== -->
+  <div class="calc-panel hidden" id="calc-panel-drawdown">
+    <div class="calc-dd-grid">
+      <div class="calc-dd-col">
+        <div class="calc-card">
+          <div class="calc-card-label">BY DRAWDOWN %</div>
+          <div class="calc-field-row">
+            <div class="calc-field">
+              <label for="dd-pct">Drawdown (%)</label>
+              <input type="number" id="dd-pct" class="calc-input" placeholder="0" oninput="recalcDrawdown()">
+            </div>
+            <div class="calc-field">
+              <label for="dd-equity">Account Equity (₹)</label>
+              <input type="number" id="dd-equity" class="calc-input" oninput="onSharedEquityInput(this.value); recalcDrawdown();">
+            </div>
+          </div>
+          <div class="calc-dd-banner">
+            <div class="calc-dd-banner-label">GAIN NEEDED TO GET BACK TO EVEN</div>
+            <div id="dd-out-gain" class="calc-dd-banner-value">—</div>
+            <div id="dd-out-recover" class="calc-dd-banner-sub">Enter a drawdown %</div>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-label">BY LOSING STREAK</div>
+          <div class="calc-field-row">
+            <div class="calc-field">
+              <label for="dd-streak">Consecutive Losses</label>
+              <input type="number" id="dd-streak" class="calc-input" placeholder="0" oninput="recalcDrawdown()">
+            </div>
+            <div class="calc-field">
+              <label for="dd-streak-risk">Risk per Trade (%)</label>
+              <input type="number" id="dd-streak-risk" class="calc-input" placeholder="0" oninput="recalcDrawdown()">
+            </div>
+          </div>
+          <div class="calc-dd-stat-pair">
+            <div class="calc-dd-stat">
+              <div class="calc-stat-label">RESULTING DRAWDOWN</div>
+              <div id="dd-out-streak-drawdown" class="calc-stat-value">—</div>
+            </div>
+            <div class="calc-dd-stat">
+              <div class="calc-stat-label">GAIN TO RECOVER</div>
+              <div id="dd-out-streak-gain" class="calc-stat-value calc-stat-value-loss">—</div>
+            </div>
+          </div>
+          <div id="dd-out-streak-caption" class="calc-formula-note" style="margin:10px 0 0;">Enter consecutive losses and risk per trade</div>
+        </div>
+      </div>
+
+      <div class="calc-card calc-dd-matrix-card">
+        <div class="calc-card-label">RECOVERY MATRIX</div>
+        <p class="calc-formula-note" style="margin-bottom:14px;">Losses and the gains needed to erase them aren't symmetric — the deeper the hole, the steeper the climb.</p>
+        <div class="calc-matrix-table" id="dd-matrix-table"></div>
+        <div class="calc-warning-note">
+          <span class="calc-warning-icon">⚠</span>
+          <span>A 50% loss needs a 100% gain to break even. This is exactly why the daily loss limit exists — small holes are easy to climb out of, big ones aren't.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EQUITY SIMULATOR ===== -->
+  <div class="calc-panel hidden" id="calc-panel-equity">
+    <div class="calc-grid">
+      <div class="calc-card">
+        <div class="calc-card-label">INPUTS</div>
+        <div class="calc-field">
+          <label for="es-capital">Starting Capital (₹)</label>
+          <input type="number" id="es-capital" class="calc-input" oninput="onSharedEquityInput(this.value); recalcEquitySim();">
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="es-trades-month">Trades / Month</label>
+            <input type="number" id="es-trades-month" class="calc-input" value="20" oninput="recalcEquitySim()">
+          </div>
+          <div class="calc-field">
+            <label for="es-winrate">Win Rate (%)</label>
+            <input type="number" id="es-winrate" class="calc-input" value="50" oninput="recalcEquitySim()">
+          </div>
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="es-risk">Risk / Trade (%)</label>
+            <input type="number" id="es-risk" class="calc-input" value="1" oninput="recalcEquitySim()">
+          </div>
+          <div class="calc-field">
+            <label for="es-reward">Reward : Risk</label>
+            <input type="number" id="es-reward" class="calc-input" value="2" oninput="recalcEquitySim()">
+          </div>
+        </div>
+        <div class="calc-field">
+          <label>Horizon</label>
+          <div class="calc-toggle-row" id="es-horizon-toggle">
+            <button type="button" class="calc-toggle-btn" data-horizon="6" onclick="setEquitySimHorizon(6)">6 months</button>
+            <button type="button" class="calc-toggle-btn active" data-horizon="12" onclick="setEquitySimHorizon(12)">12 months</button>
+          </div>
+        </div>
+        <p class="calc-formula-note">Compounds each trade's expected return — (Win% × Reward) − (Loss% × Risk) — across your projected trade count. A model, not a promise: real curves are bumpier.</p>
+      </div>
+
+      <div class="calc-result-col">
+        <div class="calc-hero-card calc-hero-blue">
+          <div class="calc-hero-label" id="es-out-label">PROJECTED EQUITY · MONTH 12</div>
+          <div class="calc-hero-value-row"><span id="es-out-value" class="calc-hero-value calc-hero-value-profit">—</span></div>
+          <div id="es-out-sub" class="calc-hero-sub">Enter your inputs to project a curve</div>
+        </div>
+        <div class="calc-stat-row">
+          <div class="calc-stat-card">
+            <div class="calc-stat-label">TOTAL RETURN</div>
+            <div id="es-out-return" class="calc-stat-value calc-stat-value-profit">—</div>
+          </div>
+          <div class="calc-stat-card">
+            <div class="calc-stat-label">EDGE / TRADE</div>
+            <div id="es-out-edge" class="calc-stat-value calc-stat-value-profit">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card calc-chart-card">
+      <div class="calc-card-label">PROJECTED EQUITY CURVE</div>
+      <div id="es-chart-area" class="calc-chart-area"></div>
+    </div>
+  </div>
+
+  <!-- ===== WITHDRAW & SCALE ===== -->
+  <div class="calc-panel hidden" id="calc-panel-withdraw">
+    <div class="calc-grid">
+      <div class="calc-card">
+        <div class="calc-card-label">YOUR WEEK</div>
+        <div class="calc-field">
+          <label for="ws-capital">Starting Capital (₹)</label>
+          <input type="number" id="ws-capital" class="calc-input" oninput="onSharedEquityInput(this.value); recalcWithdraw();">
+        </div>
+        <div class="calc-field-row">
+          <div class="calc-field">
+            <label for="ws-limit-pct">Weekly Loss Limit (%)</label>
+            <input type="number" id="ws-limit-pct" class="calc-input" value="10" oninput="recalcWithdraw()">
+          </div>
+          <div class="calc-field">
+            <label for="ws-days">Trading Days / Week</label>
+            <input type="number" id="ws-days" class="calc-input" value="5" oninput="recalcWithdraw()">
+          </div>
+        </div>
+
+        <div class="calc-card-header-row" style="margin-top:4px;">
+          <label style="font-size:13.5px; font-weight:600; color:var(--color-text-primary);">This Week's Result so far</label>
+          <div class="calc-toggle-row calc-toggle-row-small" id="ws-source-toggle">
+            <button type="button" class="calc-toggle-btn active" data-source="trades" onclick="setWithdrawSource('trades')">From trades</button>
+            <button type="button" class="calc-toggle-btn" data-source="manual" onclick="setWithdrawSource('manual')">Manual</button>
+          </div>
+        </div>
+
+        <div id="ws-trades-block">
+          <div class="calc-ws-trades-header">
+            <span id="ws-trades-count-label">0 closed trades</span>
+            <span id="ws-trades-total" class="calc-ws-trades-total">—</span>
+          </div>
+          <div id="ws-trades-list" class="calc-ws-trades-list"></div>
+          <p class="calc-formula-note">Auto-summed from your closed trades this week — no typing. Switch to Manual to try other numbers.</p>
+        </div>
+
+        <div id="ws-manual-block" class="hidden">
+          <div class="calc-toggle-row" id="ws-sign-toggle">
+            <button type="button" class="calc-toggle-btn active" data-sign="profit" onclick="setWithdrawSign('profit')">In profit</button>
+            <button type="button" class="calc-toggle-btn" data-sign="loss" onclick="setWithdrawSign('loss')">In loss</button>
+          </div>
+          <input type="number" id="ws-manual-amount" class="calc-input" placeholder="0" style="margin-top:10px;" oninput="recalcWithdraw()">
+          <p class="calc-formula-note">Demo entry — type any amount to preview the verdict.</p>
+        </div>
+
+        <div class="calc-stat-row calc-stat-row-3">
+          <div class="calc-stat-card">
+            <div class="calc-stat-label">PER DAY</div>
+            <div id="ws-out-perday" class="calc-stat-value">—</div>
+          </div>
+          <div class="calc-stat-card">
+            <div class="calc-stat-label">PER WEEK</div>
+            <div id="ws-out-perweek" class="calc-stat-value">—</div>
+          </div>
+          <div class="calc-stat-card">
+            <div class="calc-stat-label">PER MONTH</div>
+            <div id="ws-out-permonth" class="calc-stat-value">—</div>
+          </div>
+        </div>
+        <p class="calc-formula-note">Your loss budget, laid out. Bank the week's risk amount as profit the moment you're up more than it — then next week runs on that cushion, not your capital.</p>
+      </div>
+
+      <div class="calc-result-col">
+        <div id="ws-move-card" class="calc-hero-card calc-hero-blue">
+          <div class="calc-hero-header-row">
+            <div class="calc-hero-label">THIS WEEK'S MOVE</div>
+            <span id="ws-out-pill" class="calc-hero-badge hidden">—</span>
+          </div>
+          <div id="ws-out-title" class="calc-ws-move-title">Waiting on this week's numbers</div>
+          <p id="ws-out-body" class="calc-ws-move-body">Enter your starting capital and this week's result to see the move.</p>
+          <div id="ws-move-stats" class="calc-stat-row hidden">
+            <div class="calc-stat-card">
+              <div class="calc-stat-label">WITHDRAW NOW</div>
+              <div id="ws-out-withdraw" class="calc-stat-value calc-stat-value-profit">—</div>
+            </div>
+            <div class="calc-stat-card">
+              <div class="calc-stat-label">NEXT WEEK CUSHION</div>
+              <div id="ws-out-cushion" class="calc-stat-value">—</div>
+              <div id="ws-out-cushion-sub" class="calc-stat-sub">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-card">
+          <div class="calc-card-header-row">
+            <div class="calc-card-label">SCALE-UP MILESTONE (+50%)</div>
+            <span id="ws-milestone-status" class="calc-ws-milestone-status">HOLD</span>
+          </div>
+          <div class="calc-ws-milestone-track"><div id="ws-milestone-fill" class="calc-ws-milestone-fill" style="width:0%;"></div></div>
+          <div class="calc-ws-milestone-labels">
+            <span id="ws-milestone-start" class="calc-ws-milestone-label">—</span>
+            <span id="ws-milestone-current" class="calc-ws-milestone-label calc-ws-milestone-label-current">—</span>
+            <span id="ws-milestone-target" class="calc-ws-milestone-label">—</span>
+          </div>
+          <div id="ws-milestone-headline" class="calc-ws-milestone-headline">Don't increase lot size yet</div>
+          <p id="ws-milestone-body" class="calc-formula-note">Enter your starting capital to see your scale-up milestone.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- END COMPONENT: calculators -->

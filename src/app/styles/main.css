@@ -15,6 +15,7 @@
 @import url("./shared.css");
 
 @import url("./components/tier-select.css");
+@import url("./components/chart-prep.css");
 @import url("./components/capital-ladder.css");
 @import url("./components/trading-rules.css");
 @import url("./components/subscription-pricing.css");
@@ -28,5 +29,6 @@
 @import url("./components/strategies.css");
 @import url("./components/trade-manager.css");
 @import url("./components/suggestions.css");
+@import url("./components/calculators.css");
 
 @import url("./responsive-overrides.css");

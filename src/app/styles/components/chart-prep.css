@@ -1,0 +1,367 @@
+/* ===========================================================
+   COMPONENT: chart-prep — daily pre-market homework page.
+   Colors reference design tokens (styles/tokens.css) so this follows
+   the active theme automatically, same convention as every other
+   component stylesheet.
+   =========================================================== */
+
+.cp-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cp-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cp-intro {
+  margin: 0;
+  max-width: 720px;
+}
+
+.cp-date-pill {
+  flex: 0 0 auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+.cp-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* ---------- Shared card chrome ---------- */
+.cp-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.05);
+}
+
+.cp-col-left,
+.cp-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cp-card-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.cp-card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.cp-card-header-row .cp-card-label { margin-bottom: 0; }
+
+.cp-field { margin-bottom: 16px; }
+.cp-field:last-of-type { margin-bottom: 0; }
+
+.cp-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.cp-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.cp-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.cp-note {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 10px 0 0;
+}
+
+/* ---------- The Open: 3-way segmented toggles ---------- */
+.cp-open-toggle,
+.cp-bias-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--color-surface-inset);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.cp-open-btn,
+.cp-bias-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cp-open-btn.active,
+.cp-bias-btn.active {
+  background: var(--color-surface);
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.1);
+  color: var(--color-text-primary);
+}
+
+.cp-open-icon { display: inline-flex; }
+.cp-open-icon-up { color: var(--color-profit); }
+.cp-open-icon-flat { color: var(--color-text-muted); }
+.cp-open-icon-down { color: var(--color-loss); }
+
+.cp-bias-btn[data-bias="bullish"].active { color: var(--color-profit); }
+.cp-bias-btn[data-bias="bearish"].active { color: var(--color-loss); }
+
+/* ---------- Today's Key Levels ---------- */
+.cp-levels-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  margin-bottom: 4px;
+}
+
+.cp-levels-grid .cp-field { margin-bottom: 0; }
+
+/* ---------- Today's Plan ---------- */
+.cp-plan-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 110px;
+  resize: vertical;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.cp-plan-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.cp-plan-textarea::placeholder { color: var(--color-text-muted); }
+
+/* ---------- Your Side Today ---------- */
+.cp-side-card {
+  border-radius: 14px;
+  padding: 18px 20px;
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-accent-soft);
+}
+
+.cp-side-card.cp-side-bullish {
+  border-color: var(--color-profit-tint);
+  background: #EAF9EF;
+}
+
+.cp-side-card.cp-side-bearish {
+  border-color: var(--color-loss-tint);
+  background: #FCEEEA;
+}
+
+.cp-side-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.cp-side-header-row .cp-card-label { margin-bottom: 0; }
+
+.cp-side-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-surface);
+  color: var(--color-accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.cp-side-bullish .cp-side-pill { border-color: var(--color-profit-tint); color: var(--color-profit); }
+.cp-side-bearish .cp-side-pill { border-color: var(--color-loss-tint); color: var(--color-loss); }
+
+.cp-side-pill-chevron {
+  display: inline-block;
+  font-size: 9px;
+  transition: transform 0.15s ease;
+}
+
+.cp-side-pill-chevron-collapsed { transform: rotate(180deg); }
+
+.cp-side-body-collapsed { display: none; }
+
+.cp-side-headline {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-accent);
+  margin: 6px 0 8px;
+}
+
+.cp-side-bullish .cp-side-headline { color: var(--color-profit); }
+.cp-side-bearish .cp-side-headline { color: var(--color-loss); }
+
+.cp-side-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin: 0 0 14px;
+}
+
+.cp-side-inset {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 10px;
+  padding: 13px 15px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+  margin-bottom: 12px;
+}
+
+.cp-side-inset.hidden { display: none; }
+
+.cp-side-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid #F5D48A;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #7A5A12;
+}
+
+.cp-side-warning.hidden { display: none; }
+
+.cp-warning-icon {
+  flex: 0 0 auto;
+  color: var(--color-warning);
+  font-size: 14px;
+}
+
+/* ---------- Setups to Hunt ---------- */
+.cp-setups-pill {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--color-profit-tint);
+  color: #0F6B37;
+  white-space: nowrap;
+}
+
+.cp-setups-pill.cp-setups-pill-short { background: var(--color-loss-tint); color: #8A2E17; }
+.cp-setups-pill.hidden { display: none; }
+
+.cp-setups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.cp-setup-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cp-setup-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--color-profit);
+  margin-top: 6px;
+}
+
+.cp-setup-dot.cp-setup-dot-short { background: var(--color-loss); }
+
+.cp-setup-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.cp-setup-desc {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.cp-browse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cp-browse-btn.hidden { display: none; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .cp-grid { grid-template-columns: 1fr; }
+  .cp-levels-grid { grid-template-columns: 1fr; }
+}
+/* === END COMPONENT: chart-prep === */

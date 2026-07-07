@@ -104,7 +104,18 @@
     return (typeof window.getAllJournalEntries === 'function') ? window.getAllJournalEntries() : {};
   }
 
+  // Delegates to the shared window.getWeekBounds() (formatters.js) — this
+  // used to compute its own Sunday-start week here, which quietly
+  // disagreed with dashboard-home.js's Monday-start "this week" (used by
+  // the Weekly Review card). Now both — plus Calculators' Withdraw &
+  // Scale — agree on the same Monday-start trading week. Kept as a thin
+  // local wrapper (rather than rewriting every {s,e} call site below to
+  // {start,end}) so this is a one-line behavioral fix, not a refactor.
   function weekBounds(d) {
+    if (typeof window.getWeekBounds === 'function') {
+      const wk = window.getWeekBounds(d);
+      return { s: wk.start, e: wk.end };
+    }
     const s = new Date(d); s.setHours(0, 0, 0, 0); s.setDate(d.getDate() - d.getDay());
     const e = new Date(s); e.setDate(s.getDate() + 6);
     return { s, e };

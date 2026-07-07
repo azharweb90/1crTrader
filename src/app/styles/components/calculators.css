@@ -1,0 +1,623 @@
+/* ===========================================================
+   COMPONENT: calculators — five standalone "what-if" calculators.
+   Colors reference design tokens (styles/tokens.css) so this follows
+   the active theme automatically, same convention as every other
+   component stylesheet.
+   =========================================================== */
+
+.calc-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---------- Tab pill row ---------- */
+.calc-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.calc-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 200px;
+  min-width: 180px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.calc-tab-btn:hover:not(.active) {
+  border-color: var(--color-accent-border);
+  background: var(--color-surface-inset);
+}
+
+.calc-tab-icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--color-surface-inset);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-tab-btn.active {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  box-shadow: 0 0 0 1px var(--color-accent) inset;
+}
+
+.calc-tab-btn.active .calc-tab-icon {
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+}
+
+.calc-tab-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.calc-tab-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.calc-tab-sub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Shared layout: inputs card + results column ---------- */
+.calc-panel.hidden { display: none; }
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.calc-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.05);
+}
+
+.calc-card + .calc-card {
+  margin-top: 16px;
+}
+
+.calc-card-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.calc-card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.calc-card-header-row .calc-card-label { margin-bottom: 0; }
+
+.calc-field {
+  margin-bottom: 16px;
+}
+
+.calc-field:last-of-type { margin-bottom: 12px; }
+
+.calc-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.calc-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.calc-field-row .calc-field { margin-bottom: 0; }
+
+.calc-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.calc-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.calc-input::placeholder { color: var(--color-text-muted); }
+
+.calc-formula-note {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---------- Segmented toggle (amount/multiple, 6mo/12mo, trades/manual, profit/loss) ---------- */
+.calc-toggle-row {
+  display: flex;
+  gap: 4px;
+  background: var(--color-surface-inset);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.calc-toggle-row-small { align-self: flex-start; }
+
+.calc-toggle-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.calc-toggle-btn.active {
+  background: var(--color-surface);
+  color: var(--color-accent);
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.1);
+}
+
+.calc-toggle-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ---------- Hero result card (blue/green/red variants) ---------- */
+.calc-result-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calc-hero-card {
+  border-radius: 14px;
+  padding: 20px 22px;
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-accent-soft);
+}
+
+.calc-hero-card.calc-hero-green {
+  border-color: var(--color-profit-tint);
+  background: #EAF9EF;
+}
+
+.calc-hero-card.calc-hero-red {
+  border-color: var(--color-loss-tint);
+  background: #FCEEEA;
+}
+
+.calc-hero-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.calc-hero-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.calc-hero-green .calc-hero-label { color: var(--color-profit); }
+.calc-hero-red .calc-hero-label { color: var(--color-loss); }
+
+.calc-hero-badge {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--color-profit);
+  color: #ffffff;
+}
+
+.calc-hero-badge.calc-hero-badge-loss { background: var(--color-loss); }
+.calc-hero-badge.calc-hero-badge-neutral { background: var(--color-text-muted); }
+.calc-hero-badge.hidden { display: none; }
+
+.calc-hero-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.calc-hero-value {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.5px;
+}
+
+.calc-hero-value-profit { color: var(--color-profit); }
+.calc-hero-value-loss { color: var(--color-loss); }
+
+.calc-hero-unit {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.calc-hero-sub {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+}
+
+/* ---------- Small stat cards ---------- */
+.calc-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.calc-stat-row.hidden { display: none; }
+
+.calc-stat-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.calc-stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.calc-stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.calc-stat-value {
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.calc-stat-value-loss { color: var(--color-loss); }
+.calc-stat-value-profit { color: var(--color-profit); }
+
+.calc-stat-sub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+  line-height: 1.45;
+}
+
+/* ---------- Drawdown & Recovery ---------- */
+.calc-dd-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.calc-dd-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calc-dd-col .calc-card + .calc-card { margin-top: 0; }
+
+.calc-dd-banner {
+  background: #FCEEEA;
+  border: 1px solid var(--color-loss-tint);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 4px;
+}
+
+.calc-dd-banner-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-loss);
+  margin-bottom: 8px;
+}
+
+.calc-dd-banner-value {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--color-loss);
+  letter-spacing: -0.4px;
+}
+
+.calc-dd-banner-sub {
+  font-size: 12.5px;
+  color: #A8422C;
+  margin-top: 4px;
+}
+
+.calc-dd-stat-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  background: var(--color-surface-inset);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.calc-dd-stat { min-width: 0; }
+
+.calc-dd-matrix-card { align-self: stretch; }
+
+.calc-matrix-table {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.calc-matrix-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.calc-matrix-row + .calc-matrix-row { border-top: 1px solid var(--color-border-subtle); }
+
+.calc-matrix-head {
+  background: var(--color-surface-inset);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.calc-matrix-cell {
+  padding: 10px 14px;
+  font-size: 13.5px;
+  color: var(--color-text-primary);
+}
+
+.calc-matrix-cell.num {
+  text-align: right;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  color: var(--color-loss);
+}
+
+.calc-matrix-row.calc-matrix-head-row .calc-matrix-cell {
+  padding: 9px 14px;
+}
+
+.calc-matrix-row.calc-matrix-head-row .calc-matrix-cell.num { color: var(--color-text-muted); }
+
+.calc-warning-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #FFF7E8;
+  border: 1px solid #F5D48A;
+  border-radius: 12px;
+  padding: 13px 15px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #7A5A12;
+}
+
+.calc-warning-icon {
+  flex: 0 0 auto;
+  color: var(--color-warning);
+  font-size: 14px;
+}
+
+/* ---------- Equity Simulator chart ---------- */
+.calc-chart-card { margin-top: 16px; }
+
+.calc-chart-area {
+  width: 100%;
+  overflow: hidden;
+}
+
+.calc-chart-area svg { display: block; width: 100%; height: auto; }
+
+/* ---------- Withdraw & Scale ---------- */
+.calc-ws-trades-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
+
+.calc-ws-trades-total {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-profit);
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: inherit;
+}
+
+.calc-ws-trades-total.calc-ws-trades-total-loss { color: var(--color-loss); }
+
+.calc-ws-trades-list {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.calc-ws-trade-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+}
+
+.calc-ws-trade-row + .calc-ws-trade-row { border-top: 1px solid var(--color-border-subtle); }
+
+.calc-ws-trade-day {
+  flex: 0 0 34px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.calc-ws-trade-instrument {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calc-ws-trade-amount {
+  flex: 0 0 auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+}
+
+.calc-ws-trade-amount.profit { color: var(--color-profit); }
+.calc-ws-trade-amount.loss { color: var(--color-loss); }
+
+.calc-ws-move-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-accent);
+  margin: 0 0 8px;
+}
+
+.calc-hero-green .calc-ws-move-title { color: var(--color-profit); }
+.calc-hero-red .calc-ws-move-title { color: var(--color-loss); }
+
+.calc-ws-move-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin: 0 0 16px;
+}
+
+.calc-ws-milestone-status {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.calc-ws-milestone-status.calc-ws-milestone-status-done { color: var(--color-profit); }
+
+.calc-ws-milestone-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-surface-inset);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.calc-ws-milestone-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-accent);
+  transition: width 0.25s ease;
+}
+
+.calc-ws-milestone-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.calc-ws-milestone-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.calc-ws-milestone-label-current {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.calc-ws-milestone-label.calc-ws-milestone-struck {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.calc-ws-milestone-headline {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--color-accent);
+  margin: 0 0 6px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .calc-grid,
+  .calc-dd-grid {
+    grid-template-columns: 1fr;
+  }
+  .calc-tab-btn { flex: 1 1 100%; }
+}
+/* === END COMPONENT: calculators === */

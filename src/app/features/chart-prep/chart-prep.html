@@ -1,0 +1,105 @@
+<!-- COMPONENT: chart-prep — daily pre-market homework: mark today's key
+     levels, set a bias from the open, get the single side you're allowed
+     to trade today, and write the plan in your own words. Persists per
+     calendar day (see chart-prep.js: STORAGE_KEY) — resets blank on the
+     next trading day. -->
+<div class="cp-wrap">
+
+  <div class="cp-header-row">
+    <p class="section-note cp-intro">Your homework before the bell. Mark today's key levels, set your bias from the open, then write the plan in your own words — so when the market tempts you to fight it, you already know which side you're allowed to trade.</p>
+    <div id="cp-date-pill" class="cp-date-pill">—</div>
+  </div>
+
+  <div class="cp-grid">
+    <div class="cp-col-left">
+
+      <div class="cp-card">
+        <div class="cp-card-label">THE OPEN</div>
+        <div class="cp-field">
+          <label>How did the market open?</label>
+          <div class="cp-open-toggle" id="cp-open-toggle">
+            <button type="button" class="cp-open-btn" data-open="gap-up" onclick="setChartPrepOpen('gap-up')">
+              <span class="cp-open-icon cp-open-icon-up"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
+              <span>Gap up</span>
+            </button>
+            <button type="button" class="cp-open-btn" data-open="flat" onclick="setChartPrepOpen('flat')">
+              <span class="cp-open-icon cp-open-icon-flat"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></span>
+              <span>Flat</span>
+            </button>
+            <button type="button" class="cp-open-btn" data-open="gap-down" onclick="setChartPrepOpen('gap-down')">
+              <span class="cp-open-icon cp-open-icon-down"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></span>
+              <span>Gap down</span>
+            </button>
+          </div>
+        </div>
+        <div class="cp-field" style="margin-bottom:10px;">
+          <label>Your bias for the day</label>
+          <div class="cp-bias-toggle" id="cp-bias-toggle">
+            <button type="button" class="cp-bias-btn" data-bias="bullish" onclick="setChartPrepBias('bullish')">Bullish</button>
+            <button type="button" class="cp-bias-btn" data-bias="neutral" onclick="setChartPrepBias('neutral')">Neutral</button>
+            <button type="button" class="cp-bias-btn" data-bias="bearish" onclick="setChartPrepBias('bearish')">Bearish</button>
+          </div>
+        </div>
+        <p id="cp-open-hint" class="cp-note">Mark how the market opened above, and we'll suggest a starting bias.</p>
+      </div>
+
+      <div class="cp-card">
+        <div class="cp-card-label">TODAY'S KEY LEVELS</div>
+        <div class="cp-levels-grid">
+          <div class="cp-field"><label for="cp-yh">Yesterday's High</label><input type="number" id="cp-yh" class="cp-input" oninput="onChartPrepLevelInput()"></div>
+          <div class="cp-field"><label for="cp-yl">Yesterday's Low</label><input type="number" id="cp-yl" class="cp-input" oninput="onChartPrepLevelInput()"></div>
+          <div class="cp-field"><label for="cp-sh">Swing High</label><input type="number" id="cp-sh" class="cp-input" oninput="onChartPrepLevelInput()"></div>
+          <div class="cp-field"><label for="cp-sl">Swing Low</label><input type="number" id="cp-sl" class="cp-input" oninput="onChartPrepLevelInput()"></div>
+          <div class="cp-field"><label for="cp-f5h">First 5-min High</label><input type="number" id="cp-f5h" class="cp-input" oninput="onChartPrepLevelInput()"></div>
+          <div class="cp-field"><label for="cp-f5l">First 5-min Low</label><input type="number" id="cp-f5l" class="cp-input" oninput="onChartPrepLevelInput()"></div>
+        </div>
+        <p class="cp-note">Mark them from your chart each morning. These become the triggers and invalidation lines for the side you're allowed to trade.</p>
+      </div>
+
+      <div class="cp-card">
+        <div class="cp-card-label">TODAY'S PLAN — YOUR WORDS</div>
+        <textarea id="cp-plan" class="cp-plan-textarea" placeholder="What has to happen for you to take a trade today? What tells you you're wrong? Write it in your own words." oninput="onChartPrepPlanInput()"></textarea>
+        <p class="cp-note">This is the plan you agreed to before the bell. If the market pulls you somewhere else, this is what pulls you back.</p>
+      </div>
+
+    </div>
+
+    <div class="cp-col-right">
+
+      <div id="cp-side-card" class="cp-side-card cp-side-neutral">
+        <div class="cp-side-header-row">
+          <div class="cp-card-label">YOUR SIDE TODAY</div>
+          <button type="button" id="cp-side-toggle-btn" class="cp-side-pill" onclick="toggleChartPrepSide()">
+            <span id="cp-side-pill-text">PICK A BIAS</span>
+            <span id="cp-side-pill-chevron" class="cp-side-pill-chevron">▲</span>
+          </button>
+        </div>
+        <div id="cp-side-body" class="cp-side-body">
+          <h3 id="cp-side-headline" class="cp-side-headline">Set your bias to see today's side</h3>
+          <p id="cp-side-text" class="cp-side-text">Mark how the market opened, or pick a bias directly, and we'll lay out which side you're allowed to trade today.</p>
+          <div id="cp-side-trigger-box" class="cp-side-inset hidden"></div>
+          <div id="cp-side-warning-box" class="cp-side-warning hidden">
+            <span class="cp-warning-icon">⚠</span>
+            <span id="cp-side-warning-text"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="cp-setups-card" class="cp-card">
+        <div class="cp-card-header-row">
+          <div class="cp-card-label" id="cp-setups-label">SETUPS TO HUNT</div>
+          <span id="cp-setups-pill" class="cp-setups-pill hidden">—</span>
+        </div>
+        <div id="cp-setups-list" class="cp-setups-list"></div>
+        <div id="cp-setups-inset" class="cp-side-inset hidden"></div>
+        <button type="button" id="cp-browse-btn" class="setup-cta-btn cp-browse-btn hidden" onclick="browseMatchingStrategies()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
+          Browse matching strategies
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- END COMPONENT: chart-prep -->

@@ -44,8 +44,33 @@
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
+  // Monday-start week bounds — the Indian trading week runs Mon–Fri, so
+  // "this week" should start Monday, not Sunday. Added when the
+  // Calculators feature needed a third "what week are we in" calculation
+  // and it turned out two slightly different versions already existed:
+  // trading-journal.js's local weekBounds() started the week on SUNDAY,
+  // while dashboard-home.js's local mondayOf() (used by the Weekly Review
+  // card) already started on Monday. Consolidated here as the one real
+  // implementation — trading-journal.js's weekBounds() now delegates to
+  // this instead of computing its own (slightly different) answer.
+  // Returns { start, end } as Date objects: start at 00:00:00.000 Monday,
+  // end at 23:59:59.999 the following Sunday.
+  function getWeekBounds(d) {
+    const ref = d ? new Date(d) : new Date();
+    ref.setHours(0, 0, 0, 0);
+    const day = ref.getDay(); // 0 Sun .. 6 Sat
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    const start = new Date(ref);
+    start.setDate(ref.getDate() + diffToMonday);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
+    return { start, end };
+  }
+
   window.fmt = fmt;
   window.todayDateString = todayDateString;
   window.getInitials = getInitials;
+  window.getWeekBounds = getWeekBounds;
 
 })();

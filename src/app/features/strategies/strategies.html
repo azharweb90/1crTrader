@@ -32,6 +32,11 @@
       <button type="button" class="strat-filter-pill" data-filter="mine" onclick="setFilter('mine', this)">My strategies</button>
     </div>
 
+    <div id="strategies-bias-banner" class="strat-bias-banner hidden">
+      <span id="strategies-bias-banner-text">Filtered</span>
+      <button type="button" class="strat-bias-banner-clear" onclick="clearBiasFilter()">Clear</button>
+    </div>
+
     <div id="strategies-grid" class="strategies-grid"></div>
     <div id="strategies-empty" class="roadmap-empty-state hidden"></div>
   </div>
