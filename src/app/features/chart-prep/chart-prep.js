@@ -31,16 +31,24 @@
     'gap-down': "A gap-down open usually sets a bearish tone — we've suggested Bearish. Override if price says otherwise.",
   };
 
-  const LONG_SETUPS = [
-    { name: 'Bullish FVG + Order Block', desc: 'Price dips to fill a fair-value gap into a demand order block — your prime long POI.' },
-    { name: 'Breakout + retest', desc: 'Clean break above a key level, then a retest that holds it as support.' },
-    { name: 'Trendline breakout (up)', desc: 'A falling trendline breaks to the upside and price holds above it.' },
+  // Placeholder examples shown (greyed) in the 5 empty "My rules" step
+  // inputs — steps 1/2/5 read the same either direction; only the
+  // stop-loss/target steps (3/4) mirror for a short.
+  const RULE_PLACEHOLDERS_LONG = [
+    'e.g. I will find a 5-min FVG',
+    'e.g. Refine it down to a 1-min FVG',
+    'e.g. Stop-loss just below the order block',
+    'e.g. Reward target = the swing high',
+    'e.g. Only enter at the Point of Interest',
   ];
-  const SHORT_SETUPS = [
-    { name: 'Bearish FVG + Order Block', desc: 'Price rallies to fill a fair-value gap into a supply order block — your prime short POI.' },
-    { name: 'Breakdown + retest', desc: 'Clean break below a key level, then a retest that holds it as resistance.' },
-    { name: 'Trendline breakdown (down)', desc: 'A rising trendline breaks to the downside and price holds below it.' },
+  const RULE_PLACEHOLDERS_SHORT = [
+    'e.g. I will find a 5-min FVG',
+    'e.g. Refine it down to a 1-min FVG',
+    'e.g. Stop-loss just above the order block',
+    'e.g. Reward target = the swing low',
+    'e.g. Only enter at the Point of Interest',
   ];
+  const RULE_STEP_COUNT = 5;
 
   const LEVEL_IDS = { yh: 'cp-yh', yl: 'cp-yl', sh: 'cp-sh', sl: 'cp-sl', f5h: 'cp-f5h', f5l: 'cp-f5l' };
 
@@ -48,7 +56,9 @@
   let cpBias = null;   // 'bullish' | 'neutral' | 'bearish' | null
   let cpSideCollapsed = false; // local only, not persisted
   let levels = { yh: '', yl: '', sh: '', sl: '', f5h: '', f5l: '' };
-  let cpPlan = '';
+  let ruleSteps = ['', '', '', '', '']; // "My rules" 5-step entry checklist for today
+  let ruleName = ''; // "Save these rules as a strategy" name field
+  let cpSetupsTab = 'mine'; // 'mine' | 'strategy' — local only, not persisted
 
   function today() {
     return (typeof window.todayDateString === 'function') ? window.todayDateString() : new Date().toISOString().slice(0, 10);
@@ -72,7 +82,10 @@
         yh: parsed.yh || '', yl: parsed.yl || '', sh: parsed.sh || '', sl: parsed.sl || '',
         f5h: parsed.f5h || '', f5l: parsed.f5l || '',
       };
-      cpPlan = parsed.plan || '';
+      ruleSteps = Array.isArray(parsed.ruleSteps) && parsed.ruleSteps.length === RULE_STEP_COUNT
+        ? parsed.ruleSteps
+        : ['', '', '', '', ''];
+      ruleName = parsed.ruleName || '';
     } catch (e) {
       // corrupted storage — ignore and start fresh rather than throwing
     }
@@ -80,7 +93,7 @@
 
   function saveState() {
     const payload = {
-      date: today(), open: cpOpen, bias: cpBias, plan: cpPlan,
+      date: today(), open: cpOpen, bias: cpBias, ruleSteps, ruleName,
       yh: levels.yh, yl: levels.yl, sh: levels.sh, sl: levels.sl, f5h: levels.f5h, f5l: levels.f5l,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -115,12 +128,6 @@
     saveState();
     renderSideCard();
     renderSetupsCard();
-  }
-
-  function onChartPrepPlanInput() {
-    const el = document.getElementById('cp-plan');
-    cpPlan = el ? el.value : '';
-    saveState();
   }
 
   // ---------- Your Side Today (collapsible) ----------
@@ -211,17 +218,32 @@
   }
 
   // ---------- Setups to Hunt ----------
+  // Ensures Strategies' script is loaded (it's a separate lazy-loaded tab)
+  // before calling one of its window.* functions — see the comment on
+  // window.preloadTab in app-shell.js for why this is safe to call
+  // repeatedly and can't double-load or reset that tab's state.
+  function ensureStrategiesReady() {
+    if (typeof window.preloadTab === 'function') {
+      return Promise.resolve(window.preloadTab('tab-strategies'));
+    }
+    return Promise.resolve();
+  }
+
+  function biasForStrategyLookup() {
+    return cpBias === 'bullish' ? 'Long' : (cpBias === 'bearish' ? 'Short' : 'all');
+  }
+
   function renderSetupsCard() {
     const labelEl = document.getElementById('cp-setups-label');
     const pillEl = document.getElementById('cp-setups-pill');
-    const listEl = document.getElementById('cp-setups-list');
+    const emptyEl = document.getElementById('cp-setups-empty');
+    const bodyEl = document.getElementById('cp-setups-body');
     const insetEl = document.getElementById('cp-setups-inset');
     const browseBtn = document.getElementById('cp-browse-btn');
-    if (!labelEl || !listEl) return;
+    if (!labelEl || !bodyEl || !emptyEl) return;
 
     if (cpBias === 'bullish' || cpBias === 'bearish') {
       const isLong = cpBias === 'bullish';
-      const setups = isLong ? LONG_SETUPS : SHORT_SETUPS;
 
       labelEl.innerText = isLong ? 'LONG SETUPS TO HUNT' : 'SHORT SETUPS TO HUNT';
       if (pillEl) {
@@ -229,16 +251,12 @@
         pillEl.classList.toggle('cp-setups-pill-short', !isLong);
         pillEl.innerText = isLong ? 'Min 3% upside to target' : 'Min 3% downside to target';
       }
+      emptyEl.classList.add('hidden');
+      bodyEl.classList.remove('hidden');
 
-      listEl.innerHTML = setups.map(s => `
-        <div class="cp-setup-row">
-          <span class="cp-setup-dot ${isLong ? '' : 'cp-setup-dot-short'}"></span>
-          <div>
-            <div class="cp-setup-name">${s.name}</div>
-            <div class="cp-setup-desc">${s.desc}</div>
-          </div>
-        </div>
-      `).join('');
+      renderRulesList();
+      updateSaveButtonState();
+      if (cpSetupsTab === 'strategy') renderStrategyPanel();
 
       if (insetEl) {
         insetEl.classList.remove('hidden');
@@ -248,31 +266,177 @@
     } else {
       labelEl.innerText = 'SETUPS TO HUNT';
       if (pillEl) pillEl.classList.add('hidden');
-      listEl.innerHTML = '<div class="roadmap-empty-state">Pick a bias above to see today’s setups to hunt.</div>';
+      emptyEl.classList.remove('hidden');
+      bodyEl.classList.add('hidden');
       if (insetEl) insetEl.classList.add('hidden');
       if (browseBtn) browseBtn.classList.add('hidden');
     }
   }
 
-  // Deep-links into Strategies filtered to today's direction. strategies.js
-  // is lazy-loaded (only once that tab has been opened at least once this
-  // session), so window.setBiasFilter may not exist yet the instant this
-  // fires — poll briefly rather than assuming a fixed load time.
-  function browseMatchingStrategies() {
-    const bias = cpBias === 'bullish' ? 'Long' : (cpBias === 'bearish' ? 'Short' : 'all');
+  function setChartPrepSetupsTab(tab) {
+    cpSetupsTab = tab;
+    document.querySelectorAll('#cp-setups-tab-toggle .cp-toggle-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.setupstab === tab);
+    });
+    const rulesPanel = document.getElementById('cp-rules-panel');
+    const strategyPanel = document.getElementById('cp-strategy-panel');
+    if (rulesPanel) rulesPanel.classList.toggle('hidden', tab !== 'mine');
+    if (strategyPanel) strategyPanel.classList.toggle('hidden', tab !== 'strategy');
+    if (tab === 'strategy') renderStrategyPanel();
+  }
+
+  // ---------- "My rules": 5-step entry checklist for today ----------
+  function renderRulesList() {
+    const wrap = document.getElementById('cp-rules-list');
+    if (!wrap) return;
+    const placeholders = cpBias === 'bearish' ? RULE_PLACEHOLDERS_SHORT : RULE_PLACEHOLDERS_LONG;
+    wrap.innerHTML = ruleSteps.map((val, i) => `
+      <div class="cp-rule-row">
+        <span class="cp-rule-num">${i + 1}</span>
+        <input type="text" class="cp-input cp-rule-input" data-rule-index="${i}" placeholder="${placeholders[i] || ''}" oninput="onChartPrepRuleStepInput(${i})">
+      </div>
+    `).join('');
+    ruleSteps.forEach((val, i) => {
+      const input = wrap.querySelector(`.cp-rule-input[data-rule-index="${i}"]`);
+      if (input && document.activeElement !== input) input.value = val;
+    });
+  }
+
+  function onChartPrepRuleStepInput(index) {
+    const input = document.querySelector(`.cp-rule-input[data-rule-index="${index}"]`);
+    ruleSteps[index] = input ? input.value : '';
+    saveState();
+    updateSaveButtonState();
+  }
+
+  function onChartPrepRuleNameInput() {
+    const el = document.getElementById('cp-rules-name');
+    ruleName = el ? el.value : '';
+    saveState();
+    updateSaveButtonState();
+  }
+
+  function updateSaveButtonState() {
+    const btn = document.getElementById('cp-rules-save-btn');
+    if (!btn) return;
+    const hasStep = ruleSteps.some(s => s.trim());
+    btn.disabled = !(ruleName.trim() && hasStep);
+  }
+
+  // Publishes today's rule steps into the REAL Strategies catalog (via
+  // window.publishStrategyFromChartPrep, strategies.js) rather than just
+  // saving them locally — per the design, "your filled steps become a
+  // reusable strategy in your library."
+  async function saveChartPrepRulesAsStrategy() {
+    const name = ruleName.trim();
+    const checklist = ruleSteps.map(s => s.trim()).filter(Boolean);
+    if (!name || checklist.length === 0) return;
+
+    const btn = document.getElementById('cp-rules-save-btn');
+    const statusEl = document.getElementById('cp-rules-save-status');
+    if (btn) { btn.disabled = true; btn.innerText = 'Saving…'; }
+
+    await ensureStrategiesReady();
+
+    if (typeof window.publishStrategyFromChartPrep !== 'function') {
+      if (btn) { btn.disabled = false; btn.innerText = 'Save as strategy'; }
+      if (statusEl) {
+        statusEl.classList.remove('hidden');
+        statusEl.innerText = "Couldn't reach your strategy library — try again.";
+      }
+      return;
+    }
+
+    const bias = cpBias === 'bullish' ? 'Long' : (cpBias === 'bearish' ? 'Short' : 'Both');
+    const newId = window.publishStrategyFromChartPrep({ name, bias, checklist });
+
+    if (btn) { btn.disabled = false; btn.innerText = 'Save as strategy'; }
+
+    if (newId) {
+      if (statusEl) {
+        statusEl.classList.remove('hidden');
+        statusEl.innerText = `Saved as "${name}" in your strategy library.`;
+      }
+      renderSavedRulesBullets(checklist);
+    } else if (statusEl) {
+      statusEl.classList.remove('hidden');
+      statusEl.innerText = "Your strategy library is full for your tier — free up a slot on the Strategies tab first.";
+    }
+  }
+
+  function renderSavedRulesBullets(checklist) {
+    const wrap = document.getElementById('cp-rules-saved-list');
+    if (!wrap) return;
+    wrap.classList.remove('hidden');
+    wrap.innerHTML = checklist.map(step => `
+      <div class="cp-setup-row">
+        <span class="cp-setup-dot ${cpBias === 'bearish' ? 'cp-setup-dot-short' : ''}"></span>
+        <div class="cp-setup-desc">${step}</div>
+      </div>
+    `).join('');
+  }
+
+  // ---------- "From strategy": reference an existing playbook's checklist ----------
+  function renderStrategyPanel() {
+    const select = document.getElementById('cp-strategy-select');
+    const checklistWrap = document.getElementById('cp-strategy-checklist');
+    if (!select) return;
+
+    const applyOptions = (list) => {
+      const previousValue = select.value;
+      select.innerHTML = '<option value="">Select a strategy</option>' + list.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      if (list.some(s => s.id === previousValue)) {
+        select.value = previousValue;
+      } else if (checklistWrap) {
+        checklistWrap.innerHTML = '';
+      }
+    };
+
+    if (typeof window.getStrategiesForBias === 'function') {
+      applyOptions(window.getStrategiesForBias(biasForStrategyLookup()));
+    } else {
+      select.innerHTML = '<option value="">Loading…</option>';
+      ensureStrategiesReady().then(() => {
+        if (typeof window.getStrategiesForBias === 'function') {
+          applyOptions(window.getStrategiesForBias(biasForStrategyLookup()));
+        }
+      });
+    }
+  }
+
+  function onChartPrepStrategySelect() {
+    const select = document.getElementById('cp-strategy-select');
+    const checklistWrap = document.getElementById('cp-strategy-checklist');
+    if (!select || !checklistWrap) return;
+    const id = select.value;
+    if (!id || typeof window.getStrategiesForBias !== 'function') {
+      checklistWrap.innerHTML = '';
+      return;
+    }
+    const list = window.getStrategiesForBias(biasForStrategyLookup());
+    const strategy = list.find(s => s.id === id);
+    if (!strategy || strategy.checklist.length === 0) {
+      checklistWrap.innerHTML = '<div class="roadmap-empty-state">No checklist saved for this strategy.</div>';
+      return;
+    }
+    checklistWrap.innerHTML = strategy.checklist.map(step => `
+      <div class="cp-setup-row">
+        <span class="cp-setup-dot ${cpBias === 'bearish' ? 'cp-setup-dot-short' : ''}"></span>
+        <div class="cp-setup-desc">${step}</div>
+      </div>
+    `).join('');
+  }
+
+  // Deep-links into Strategies filtered to today's direction.
+  async function browseMatchingStrategies() {
+    const bias = biasForStrategyLookup();
+    await ensureStrategiesReady();
     if (typeof window.switchTab === 'function') {
       window.switchTab(null, 'tab-strategies');
     }
-    let attempts = 0;
-    const tryApply = () => {
-      attempts++;
-      if (typeof window.setBiasFilter === 'function') {
-        window.setBiasFilter(bias);
-      } else if (attempts < 20) {
-        setTimeout(tryApply, 50);
-      }
-    };
-    setTimeout(tryApply, 50);
+    if (typeof window.setBiasFilter === 'function') {
+      window.setBiasFilter(bias);
+    }
   }
 
   // ---------- Date pill ----------
@@ -297,8 +461,8 @@
       const el = document.getElementById(LEVEL_IDS[key]);
       if (el && document.activeElement !== el) el.value = levels[key];
     });
-    const planEl = document.getElementById('cp-plan');
-    if (planEl && document.activeElement !== planEl) planEl.value = cpPlan;
+    const nameEl = document.getElementById('cp-rules-name');
+    if (nameEl && document.activeElement !== nameEl) nameEl.value = ruleName;
 
     renderOpenHint();
     renderSideCard();
@@ -314,8 +478,12 @@
   window.setChartPrepOpen = setChartPrepOpen;
   window.setChartPrepBias = setChartPrepBias;
   window.onChartPrepLevelInput = onChartPrepLevelInput;
-  window.onChartPrepPlanInput = onChartPrepPlanInput;
   window.toggleChartPrepSide = toggleChartPrepSide;
+  window.setChartPrepSetupsTab = setChartPrepSetupsTab;
+  window.onChartPrepRuleStepInput = onChartPrepRuleStepInput;
+  window.onChartPrepRuleNameInput = onChartPrepRuleNameInput;
+  window.saveChartPrepRulesAsStrategy = saveChartPrepRulesAsStrategy;
+  window.onChartPrepStrategySelect = onChartPrepStrategySelect;
   window.browseMatchingStrategies = browseMatchingStrategies;
   window.renderChartPrep = renderAll;
 

@@ -112,9 +112,10 @@
   margin: 10px 0 0;
 }
 
-/* ---------- The Open: 3-way segmented toggles ---------- */
+/* ---------- The Open: 3-way segmented toggles (also used by Setups to Hunt tab toggle) ---------- */
 .cp-open-toggle,
-.cp-bias-toggle {
+.cp-bias-toggle,
+.cp-toggle-row {
   display: flex;
   gap: 4px;
   background: var(--color-surface-inset);
@@ -123,8 +124,11 @@
   padding: 3px;
 }
 
+.cp-toggle-row { margin-bottom: 16px; }
+
 .cp-open-btn,
-.cp-bias-btn {
+.cp-bias-btn,
+.cp-toggle-btn {
   flex: 1;
   display: flex;
   align-items: center;
@@ -143,7 +147,8 @@
 }
 
 .cp-open-btn.active,
-.cp-bias-btn.active {
+.cp-bias-btn.active,
+.cp-toggle-btn.active {
   background: var(--color-surface);
   box-shadow: 0 1px 3px rgba(20, 35, 61, 0.1);
   color: var(--color-text-primary);
@@ -166,30 +171,6 @@
 }
 
 .cp-levels-grid .cp-field { margin-bottom: 0; }
-
-/* ---------- Today's Plan ---------- */
-.cp-plan-textarea {
-  width: 100%;
-  box-sizing: border-box;
-  min-height: 110px;
-  resize: vertical;
-  padding: 12px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.cp-plan-textarea:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
-}
-
-.cp-plan-textarea::placeholder { color: var(--color-text-muted); }
 
 /* ---------- Your Side Today ---------- */
 .cp-side-card {
@@ -358,6 +339,78 @@
 }
 
 .cp-browse-btn.hidden { display: none; }
+
+/* ---------- Setups to Hunt: My rules step builder ---------- */
+.cp-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.cp-rule-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cp-rule-num {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cp-rule-input { flex: 1; }
+
+.cp-rules-save-row {
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 14px;
+  margin-top: 4px;
+}
+
+.cp-rules-save-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.cp-rules-save-fields {
+  display: flex;
+  gap: 10px;
+}
+
+.cp-rules-save-fields .cp-input { flex: 1; }
+
+.cp-rules-save-btn {
+  flex: 0 0 auto;
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cp-rules-save-btn:disabled {
+  background: var(--color-surface-inset);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {

@@ -525,6 +525,20 @@
     return ready;
   }
 
+  // Shared by the full editor (publishStrategy, below) and Chart Prep's
+  // lighter "Save as strategy" capture (publishStrategyFromChartPrep) —
+  // both just build a fields object and hand it here, so there's one real
+  // OWN_STRATEGIES.push() + id-assignment, not two.
+  function pushOwnStrategy(fields) {
+    const id = `own-${ownIdCounter++}`;
+    OWN_STRATEGIES.push(Object.assign({
+      id,
+      winRate: 0, sample: 0, avgR: '—', rating: 0, ratingCount: 0, communityFavourite: false,
+      isOwn: true,
+    }, fields));
+    return id;
+  }
+
   function publishStrategy() {
     if (!updatePublishState()) return;
     if (OWN_STRATEGIES.length >= createCap()) return;
@@ -534,9 +548,8 @@
     const difficulty = document.getElementById('ed-difficulty').value;
     const checklist = Array.from(document.querySelectorAll('.ed-checklist-input')).map(i => i.value.trim()).filter(Boolean);
 
-    const id = `own-${ownIdCounter++}`;
-    OWN_STRATEGIES.push({
-      id, category, bias, difficulty,
+    pushOwnStrategy({
+      category, bias, difficulty,
       name: document.getElementById('ed-name').value.trim(),
       timeframe: document.getElementById('ed-timeframe').value.trim() || '—',
       targetRR: document.getElementById('ed-target').value.trim() || '—',
@@ -547,12 +560,54 @@
       commonMistakes: document.getElementById('ed-mistakes').value.trim() || 'Not specified.',
       chartCaption: document.getElementById('ed-chart-caption').value.trim() || 'No chart pattern description provided.',
       checklist,
-      winRate: 0, sample: 0, avgR: '—', rating: 0, ratingCount: 0, communityFavourite: false,
-      isOwn: true,
     });
 
     closeStrategyEditor();
     setFilter('mine', document.querySelector('.strat-filter-pill[data-filter="mine"]'));
+  }
+
+  // Called from Chart Prep's "Save as strategy" (chart-prep.js) — a much
+  // lighter capture than the full editor above (just a name + up to 5
+  // entry steps), so this fills sensible defaults for every field the
+  // editor collects that this quick-capture flow doesn't ask for. Returns
+  // the new strategy's id, or null if it couldn't be saved (missing
+  // required fields, or this tier's "My strategies" cap is already hit).
+  function publishStrategyFromChartPrep(data) {
+    if (!data || !data.name || !data.checklist || data.checklist.length === 0) return null;
+    if (OWN_STRATEGIES.length >= createCap()) return null;
+
+    const bias = (data.bias === 'Long' || data.bias === 'Short') ? data.bias : 'Both';
+    const todayStr = (typeof window.todayDateString === 'function') ? window.todayDateString() : '';
+
+    return pushOwnStrategy({
+      category: 'breakout', // reasonable default — this quick-capture form doesn't ask for one
+      bias,
+      difficulty: 'Intermediate',
+      name: data.name,
+      timeframe: '—',
+      targetRR: '—',
+      summary: `Captured from Chart Prep on ${todayStr} — a ${bias.toLowerCase()} setup.`,
+      overview: 'Saved from a Chart Prep session rather than the full strategy editor — edit any of these fields anytime from My strategies.',
+      idealConditions: 'Not specified.',
+      entryStop: 'See the entry steps below.',
+      commonMistakes: 'Not specified.',
+      chartCaption: 'No chart pattern description provided.',
+      checklist: data.checklist,
+    });
+  }
+
+  // Called from Chart Prep's "From strategy" tab — returns a light
+  // {id, name, checklist} projection of every strategy (catalog + own)
+  // matching the given bias ('Long' | 'Short' | 'all'), so that tab can
+  // let the trader reference an existing playbook's checklist instead of
+  // writing fresh entry steps. A 'Both'-bias strategy matches either
+  // direction, same rule setBiasFilter uses.
+  function getStrategiesForBias(bias) {
+    const list = allStrategies();
+    const filtered = (!bias || bias === 'all')
+      ? list
+      : list.filter(s => s.bias === bias || s.bias === 'Both');
+    return filtered.map(s => ({ id: s.id, name: s.name, checklist: s.checklist || [] }));
   }
 
   window.openStrategyDetail = openStrategyDetail;
@@ -569,6 +624,8 @@
   window.removeChecklistRow = removeChecklistRow;
   window.updatePublishState = updatePublishState;
   window.publishStrategy = publishStrategy;
+  window.publishStrategyFromChartPrep = publishStrategyFromChartPrep;
+  window.getStrategiesForBias = getStrategiesForBias;
 
   renderList();
 

@@ -56,12 +56,6 @@
         <p class="cp-note">Mark them from your chart each morning. These become the triggers and invalidation lines for the side you're allowed to trade.</p>
       </div>
 
-      <div class="cp-card">
-        <div class="cp-card-label">TODAY'S PLAN — YOUR WORDS</div>
-        <textarea id="cp-plan" class="cp-plan-textarea" placeholder="What has to happen for you to take a trade today? What tells you you're wrong? Write it in your own words." oninput="onChartPrepPlanInput()"></textarea>
-        <p class="cp-note">This is the plan you agreed to before the bell. If the market pulls you somewhere else, this is what pulls you back.</p>
-      </div>
-
     </div>
 
     <div class="cp-col-right">
@@ -90,12 +84,47 @@
           <div class="cp-card-label" id="cp-setups-label">SETUPS TO HUNT</div>
           <span id="cp-setups-pill" class="cp-setups-pill hidden">—</span>
         </div>
-        <div id="cp-setups-list" class="cp-setups-list"></div>
-        <div id="cp-setups-inset" class="cp-side-inset hidden"></div>
-        <button type="button" id="cp-browse-btn" class="setup-cta-btn cp-browse-btn hidden" onclick="browseMatchingStrategies()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
-          Browse matching strategies
-        </button>
+
+        <div id="cp-setups-empty" class="roadmap-empty-state">Pick a bias above to see today's setups to hunt.</div>
+
+        <div id="cp-setups-body" class="hidden">
+          <div class="cp-toggle-row" id="cp-setups-tab-toggle">
+            <button type="button" class="cp-toggle-btn active" data-setupstab="mine" onclick="setChartPrepSetupsTab('mine')">My rules</button>
+            <button type="button" class="cp-toggle-btn" data-setupstab="strategy" onclick="setChartPrepSetupsTab('strategy')">From strategy</button>
+          </div>
+
+          <div id="cp-rules-panel">
+            <div id="cp-rules-list" class="cp-rules-list"></div>
+            <p class="cp-note">Write your own entry steps for today — all optional. These are the rules you'll only act on at the Point of Interest.</p>
+
+            <div class="cp-rules-save-row">
+              <label class="cp-rules-save-label" for="cp-rules-name">Save these rules as a strategy</label>
+              <div class="cp-rules-save-fields">
+                <input type="text" id="cp-rules-name" class="cp-input" placeholder="Name it — e.g. 1-min FVG continuation" oninput="onChartPrepRuleNameInput()">
+                <button type="button" id="cp-rules-save-btn" class="cp-rules-save-btn" onclick="saveChartPrepRulesAsStrategy()" disabled>Save as strategy</button>
+              </div>
+              <p class="cp-note">Give it a name and your filled steps become a reusable strategy in your library — and show as bullets below.</p>
+              <div id="cp-rules-saved-list" class="cp-setups-list hidden"></div>
+              <p id="cp-rules-save-status" class="cp-note hidden"></p>
+            </div>
+          </div>
+
+          <div id="cp-strategy-panel" class="hidden">
+            <div class="cp-field">
+              <label for="cp-strategy-select">Pick one of your strategies</label>
+              <select id="cp-strategy-select" class="cp-input" onchange="onChartPrepStrategySelect()">
+                <option value="">Select a strategy</option>
+              </select>
+            </div>
+            <div id="cp-strategy-checklist" class="cp-setups-list"></div>
+          </div>
+
+          <div id="cp-setups-inset" class="cp-side-inset hidden"></div>
+          <button type="button" id="cp-browse-btn" class="setup-cta-btn cp-browse-btn hidden" onclick="browseMatchingStrategies()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
+            Browse matching strategies
+          </button>
+        </div>
       </div>
 
     </div>
