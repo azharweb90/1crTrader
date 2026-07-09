@@ -181,11 +181,36 @@
   max-width: 680px;
 }
 
+/* Each numbered step (broker / trading style / instruments) now sits
+   inside its own white card instead of the heading floating directly
+   on the gray canvas — the previous look only put the CONTENT
+   (broker tiles, trader-type cards) in white boxes, leaving the
+   number badge + title + description sitting bare, which is what
+   this was corrected against. */
+.setup-step-card {
+  background: #ffffff;
+  border: 1px solid #e3e9f1;
+  border-radius: 16px;
+  padding: 26px 28px 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(13, 30, 60, 0.05);
+}
+
+.setup-step-card:last-child {
+  margin-bottom: 0;
+}
+
 .setup-section-head {
   display: flex;
   align-items: center;
   gap: 11px;
-  margin: 34px 0 6px;
+  /* Was `34px 0 6px` for the old bare-canvas layout, where that top
+     margin separated one section's heading from the previous
+     section's content. Now every heading is the first thing inside
+     its own .setup-step-card, so that spacing is handled by the
+     card's margin-bottom instead — a top margin here would just add
+     unwanted empty space inside the card, above the heading. */
+  margin: 0 0 6px;
 }
 
 .setup-section-head-first {
