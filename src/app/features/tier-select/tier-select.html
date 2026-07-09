@@ -13,64 +13,39 @@
      shape has been removed. -->
 <section class="content-section setup-wizard">
 
-  <!-- Left promo panel — reuses the exact .onb-left/.onb-checklist/etc.
-       classes from the first-run onboarding modal (onboarding.css,
-       loaded globally on app-shell.html) so the "why 1CrTrader" framing
-       carries visually from the discipline-rules modal straight into
-       this page, rather than the trader hitting a plain white form
-       right after a navy/blue split screen. Static content (no scroll-
-       sync to the 3 sections below) — kept simple and decoupled from
-       app-shell.js's setup state on purpose. Already responsive: the
-       "@media (max-width: 780px) { .onb-left { display:none } }" rule
-       in onboarding.css applies here too, for free. -->
-  <aside class="onb-left">
-    <div class="onb-logo-row">
-      <img src="/assets/images/logos/1crtraders-icon.png" alt="" class="onb-logo-icon">
+  <!-- Slim top bar — logo left, Skip right. Replaces the earlier
+       .onb-left promo-panel treatment: the actual reference design for
+       THIS page (not the discipline-rules modal) is a plain single-
+       column form under a minimal header, not a two-column split. Skip
+       lives here now instead of inside .setup-summary-head below, so
+       there's exactly one Skip button, not two. -->
+  <header class="setup-topbar">
+    <div class="setup-topbar-logo">
+      <img src="/assets/images/logos/1crtraders-icon.png" alt="" class="setup-topbar-logo-icon">
       <div>
-        <div class="onb-logo-name">1Cr Traders</div>
-        <div class="onb-logo-tag">REWARD ABOVE RISK</div>
+        <div class="setup-topbar-logo-name">1Cr Traders</div>
+        <div class="setup-topbar-logo-tag">REWARD ABOVE RISK</div>
       </div>
     </div>
-    <div class="onb-left-mid">
-      <div class="onb-eyebrow">One-time setup</div>
-      <h2 class="onb-headline">Your dashboard is only as accurate as this page.</h2>
-      <p class="onb-left-sub">Everything you tell us here becomes the rules we enforce — a broker feed alone can't capture your trading style or your risk tolerance.</p>
-      <div class="onb-checklist">
-        <div class="onb-check-item onb-check-item-active">
-          <span class="onb-check-icon"></span>
-          <span class="onb-check-text">Your broker's balance, synced read-only — or entered manually in seconds.</span>
-        </div>
-        <div class="onb-check-item onb-check-item-active">
-          <span class="onb-check-icon"></span>
-          <span class="onb-check-text">A trading style only you know — no API can infer it for you.</span>
-        </div>
-        <div class="onb-check-item onb-check-item-active">
-          <span class="onb-check-icon"></span>
-          <span class="onb-check-text">The exact instruments you'll be logging, ready from day one.</span>
-        </div>
-      </div>
-      <div class="onb-left-quote">"Protecting my capital IS the trade." That's the rule every 1CrTrader feature is built around.</div>
-    </div>
-    <div class="onb-left-bottom">
-      <div class="onb-avatars">
-        <span class="onb-avatar"></span>
-        <span class="onb-avatar"></span>
-        <span class="onb-avatar"></span>
-      </div>
-      <div class="onb-social-text">Join 12,000+ disciplined traders</div>
-    </div>
-  </aside>
+    <button type="button" class="setup-skip-btn" onclick="confirmProfile()">Skip for now</button>
+  </header>
 
-  <!-- No header bar here at all anymore — the topbar (app-shell.html)
-       already shows "Set Up Your Profile" as this tab's page title, and
-       Skip now lives inline with "Your profile" in the fixed right rail
-       instead of its own slim strip taking up top space. -->
   <div class="setup-body">
     <!-- ============ LEFT: scrolling form ============ -->
     <div class="setup-body-main">
+      <!-- Centered column — the reference keeps this content in a fixed
+           max-width column even on wide screens, rather than stretching
+           broker tiles/cards edge-to-edge. Only this wrapper is
+           constrained; .setup-body-main itself stays full-width so it's
+           still the scroll container and the gray canvas still fills
+           the viewport behind it. -->
+      <div class="setup-content-inner">
+      <p class="setup-eyebrow">GETTING STARTED</p>
+      <h1 class="setup-page-heading">Set up your profile</h1>
       <p class="setup-intro">Everything in one place. Connect your broker so we can pull your balance and tier, tell us how you trade, and pick the instruments you'll be logging — then jump straight into your dashboard.</p>
 
       <!-- SECTION 1 — BROKER -->
+      <div class="setup-step-card">
       <div class="setup-section-head setup-section-head-first">
         <div class="setup-section-num">1</div>
         <h3 class="setup-section-title">Connect your broker</h3>
@@ -139,8 +114,10 @@
           <div>Read-only connection. We never place trades or move funds &mdash; 1CrTrader only reads balances and positions.</div>
         </div>
       </div>
+      </div>
 
       <!-- SECTION 2 — TRADING STYLE -->
+      <div class="setup-step-card">
       <div class="setup-section-head">
         <div class="setup-section-num">2</div>
         <h3 class="setup-section-title">What's your trading style?</h3>
@@ -190,8 +167,10 @@
           </button>
         </div>
       </div>
+      </div>
 
       <!-- SECTION 3 — INSTRUMENTS -->
+      <div class="setup-step-card">
       <div class="setup-section-head">
         <div class="setup-section-num">3</div>
         <h3 class="setup-section-title">Instruments you trade</h3>
@@ -220,45 +199,26 @@
           </div>
         </div>
       </div>
+      </div>
+      </div>
     </div>
-
-    <!-- ============ RIGHT: live summary rail ============ -->
-    <aside class="setup-summary-rail">
-      <div class="setup-summary-head">
-        <div class="setup-summary-eyebrow">Your profile</div>
-        <button type="button" class="setup-skip-btn" onclick="confirmProfile()">Skip for now</button>
-      </div>
-
-      <div class="setup-summary-tiles">
-        <div class="setup-summary-tile">
-          <div class="setup-summary-label">SETUP METHOD</div>
-          <div id="setup-summary-method" class="setup-summary-value">Not set</div>
-        </div>
-        <div class="setup-summary-tile">
-          <div class="setup-summary-label">TRADING STYLE</div>
-          <div id="setup-summary-style" class="setup-summary-value">None selected</div>
-        </div>
-        <div class="setup-summary-tile-row">
-          <div class="setup-summary-tile">
-            <div class="setup-summary-label">TIER</div>
-            <div id="setup-summary-tier" class="setup-summary-value-accent">&mdash;</div>
-          </div>
-          <div class="setup-summary-tile">
-            <div class="setup-summary-label">INSTRUMENTS</div>
-            <div id="setup-summary-instruments" class="setup-summary-value">0 selected</div>
-          </div>
-        </div>
-        <div class="setup-summary-tile setup-summary-tile-capital">
-          <div class="setup-summary-label">STARTING CAPITAL</div>
-          <div id="setup-summary-capital" class="setup-summary-value-capital">&mdash;</div>
-        </div>
-      </div>
-
-      <div class="setup-summary-spacer"></div>
-
-      <button type="button" id="setup-cta-btn" class="setup-cta-btn" disabled onclick="confirmProfile()">Continue to dashboard</button>
-      <div id="setup-cta-hint" class="setup-cta-hint">Connect a broker, pick a style and an instrument to continue.</div>
-    </aside>
   </div>
+
+  <!-- Sticky bottom footer — hint text left, CTA right. Replaces the
+     old right-side summary rail: the reference design never shows a
+     live tile summary (method/tier/instruments/capital), just this
+     bottom bar. setup-cta-hint and setup-cta-btn are the same ids
+     updateContinueButtonState() (app-shell.js) already targets — its
+     hint text already reads "You can change any of this later from
+     Account." once ready, which is exactly the reference copy, so
+     no JS changes were needed here, only where these two elements
+     live in the markup. The now-unused setup-summary-* elements
+     (method/style/tier/instruments/capital tiles) are still updated
+     in app-shell.js but no longer rendered anywhere — harmless
+     no-ops via its existing null-safe `if (el)` guards. -->
+  <footer class="setup-footer">
+    <div id="setup-cta-hint" class="setup-cta-hint">Connect a broker, pick a style and an instrument to continue.</div>
+    <button type="button" id="setup-cta-btn" class="setup-cta-btn" disabled onclick="confirmProfile()">Continue to dashboard</button>
+  </footer>
 </section>
 <!-- END COMPONENT: tier-select -->

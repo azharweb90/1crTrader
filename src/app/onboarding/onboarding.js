@@ -52,12 +52,12 @@
   // showing all 12 sub-levels in a first-run modal.
   const ONB_TIER_KEYS = ['small-1', 'small-2', 'medium-1', 'medium-2', 'large-1', 'pro-1'];
   const ONB_TIER_LABELS = {
-    'small-1': 'Small 1',
-    'small-2': 'Small 2',
-    'medium-1': 'Medium 1',
-    'medium-2': 'Medium 2',
-    'large-1': 'Large 1',
-    'pro-1': 'Pro 1',
+    'small-1': 'Small - Level 1',
+    'small-2': 'Small - Level 2',
+    'medium-1': 'Medium - Level 1',
+    'medium-2': 'Medium - Level 2',
+    'large-1': 'Large - Level 1',
+    'pro-1': 'Pro - Level 1',
   };
 
   let onbStep = 0;      // 0 = welcome, 1..4 = the 4 progress-tracked steps
@@ -238,7 +238,7 @@
           <span class="onb-tier-radio ${selected ? 'onb-tier-radio-selected' : ''}"></span>
           <span class="onb-tier-row-text">
             <span class="onb-tier-name">${ONB_TIER_LABELS[key]}</span>
-            <span class="onb-tier-meta">₹${fmt(t.cap)} capital · ₹${fmt(t.loss)} max daily loss · ${t.maxLots} lot${t.maxLots > 1 ? 's' : ''}</span>
+            <span class="onb-tier-meta">Daily loss limit ₹${fmt(t.loss)} · up to ${t.maxLots} lot${t.maxLots > 1 ? 's' : ''}</span>
           </span>
         </button>
       `;
