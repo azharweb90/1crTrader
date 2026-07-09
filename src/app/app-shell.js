@@ -1201,7 +1201,7 @@
     const ok = window.confirm('Log out of 1CrTrader? You\'ll need to log back in to continue.');
     if (!ok) return;
     window.Auth.logout();
-    window.location.href = '/src/marketing/pages/auth/auth-page.html?view=login';
+    window.location.href = '/src/marketing/pages/auth/auth-page?view=login';
   }
 
   // ---------- Running balance + trade history ----------
@@ -2491,7 +2491,7 @@
     if (typeof window.Auth === 'undefined') {
       console.warn('auth.js not loaded — skipping the auth gate (app will behave as if logged in).');
     } else if (!window.Auth.getSession()) {
-      window.location.href = '/src/marketing/pages/auth/auth-page.html?view=login';
+      window.location.href = '/src/marketing/pages/auth/auth-page?view=login';
       return;
     }
 
