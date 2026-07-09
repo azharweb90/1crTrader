@@ -29,14 +29,28 @@ body {
   min-height: 100vh;
 }
 
+.auth-fatal-error {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #FBE7E2;
+  border-bottom: 1px solid #F0B7A6;
+  color: #8A2C10;
+  font-size: 13.5px;
+  line-height: 1.5;
+  padding: 12px 20px;
+  text-align: center;
+}
+
 /* ── Left: promo panel ─────────────────────────────────────── */
 .auth-left {
-  flex: 0 0 44%;
-  min-width: 380px;
-  max-width: 560px;
-  background: linear-gradient(160deg, #0B1B3F 0%, #17297A 50%, #2647B2 100%);
-  color: #ffffff;
-  padding: 48px 44px;
+  flex: 0 0 400px;
+  width: 400px;
+  background: linear-gradient(160deg, #EAF1FE 0%, #F5F6FA 55%, #ffffff 120%);
+  color: #1E293B;
+  padding: 48px 40px;
   display: flex;
   flex-direction: column;
 }
@@ -48,19 +62,17 @@ body {
 }
 
 .auth-logo-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   object-fit: contain;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 6px;
   flex: 0 0 auto;
 }
 
 .auth-logo-name {
   font-size: 15.5px;
   font-weight: 800;
-  color: #ffffff;
+  color: #1E293B;
   line-height: 1.2;
 }
 
@@ -69,7 +81,7 @@ body {
   font-size: 9.5px;
   font-weight: 600;
   letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.55);
+  color: #2563EB;
 }
 
 .auth-left-mid {
@@ -82,15 +94,15 @@ body {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8FB0FF;
+  color: #2563EB;
   margin-bottom: 14px;
 }
 
 .auth-headline {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 800;
   line-height: 1.26;
-  color: #ffffff;
+  color: #1E293B;
   margin: 0 0 26px;
   letter-spacing: -0.3px;
 }
@@ -112,8 +124,8 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #ffffff;
-  color: #17297A;
+  background: #2563EB;
+  color: #ffffff;
   font-size: 12px;
   font-weight: 800;
   display: flex;
@@ -125,7 +137,7 @@ body {
 .auth-check-text {
   font-size: 14.5px;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.9);
+  color: #1E293B;
 }
 
 .auth-left-bottom {
@@ -142,7 +154,7 @@ body {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 2px solid #17297A;
+  border: 2px solid #ffffff;
   margin-left: -8px;
   background: linear-gradient(135deg, #8FB0FF, #4C6FEA);
 }
@@ -151,7 +163,7 @@ body {
 
 .auth-social-text {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #5B6B82;
 }
 
 /* ── Right: form panel ─────────────────────────────────────── */
