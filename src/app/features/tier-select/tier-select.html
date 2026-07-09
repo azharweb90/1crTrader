@@ -13,6 +13,54 @@
      shape has been removed. -->
 <section class="content-section setup-wizard">
 
+  <!-- Left promo panel — reuses the exact .onb-left/.onb-checklist/etc.
+       classes from the first-run onboarding modal (onboarding.css,
+       loaded globally on app-shell.html) so the "why 1CrTrader" framing
+       carries visually from the discipline-rules modal straight into
+       this page, rather than the trader hitting a plain white form
+       right after a navy/blue split screen. Static content (no scroll-
+       sync to the 3 sections below) — kept simple and decoupled from
+       app-shell.js's setup state on purpose. Already responsive: the
+       "@media (max-width: 780px) { .onb-left { display:none } }" rule
+       in onboarding.css applies here too, for free. -->
+  <aside class="onb-left">
+    <div class="onb-logo-row">
+      <img src="/assets/images/logos/1crtraders-icon.png" alt="" class="onb-logo-icon">
+      <div>
+        <div class="onb-logo-name">1Cr Traders</div>
+        <div class="onb-logo-tag">REWARD ABOVE RISK</div>
+      </div>
+    </div>
+    <div class="onb-left-mid">
+      <div class="onb-eyebrow">One-time setup</div>
+      <h2 class="onb-headline">Your dashboard is only as accurate as this page.</h2>
+      <p class="onb-left-sub">Everything you tell us here becomes the rules we enforce — a broker feed alone can't capture your trading style or your risk tolerance.</p>
+      <div class="onb-checklist">
+        <div class="onb-check-item onb-check-item-active">
+          <span class="onb-check-icon"></span>
+          <span class="onb-check-text">Your broker's balance, synced read-only — or entered manually in seconds.</span>
+        </div>
+        <div class="onb-check-item onb-check-item-active">
+          <span class="onb-check-icon"></span>
+          <span class="onb-check-text">A trading style only you know — no API can infer it for you.</span>
+        </div>
+        <div class="onb-check-item onb-check-item-active">
+          <span class="onb-check-icon"></span>
+          <span class="onb-check-text">The exact instruments you'll be logging, ready from day one.</span>
+        </div>
+      </div>
+      <div class="onb-left-quote">"Protecting my capital IS the trade." That's the rule every 1CrTrader feature is built around.</div>
+    </div>
+    <div class="onb-left-bottom">
+      <div class="onb-avatars">
+        <span class="onb-avatar"></span>
+        <span class="onb-avatar"></span>
+        <span class="onb-avatar"></span>
+      </div>
+      <div class="onb-social-text">Join 12,000+ disciplined traders</div>
+    </div>
+  </aside>
+
   <!-- No header bar here at all anymore — the topbar (app-shell.html)
        already shows "Set Up Your Profile" as this tab's page title, and
        Skip now lives inline with "Your profile" in the fixed right rail

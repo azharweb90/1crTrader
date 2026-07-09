@@ -21,14 +21,40 @@
    instead (see .setup-summary-head below). The whole component is
    height-bound to the viewport so ONLY .setup-body-main scrolls
    internally; the topbar and the summary rail never move. */
+/* .tab-content's own fadeIn animation (layout-shell.css) animates
+   `transform`, which — for the ~0.3s it runs — would make #tab-select
+   the containing block for its position:fixed child below instead of
+   the viewport (any non-none transform on an ancestor does this per
+   spec), causing a brief mispositioned flash on first show. Since
+   .setup-wizard is a full-bleed takeover, not content that needs to
+   fade in relative to the page, it opts out of that animation here. */
+#tab-select.tab-content {
+  animation: none;
+}
+
 .content-section.setup-wizard {
+  /* Full-viewport takeover — same pattern as the first-run onboarding
+     modal (.onb-overlay in onboarding.css): fixed + inset:0 breaks this
+     out of .content-area entirely, so it covers the sidebar and top-bar
+     too, regardless of their own hidden/visible state. Per direction:
+     setup should NOT read as "a tab inside the app" — it's the second
+     screen of the same full-bleed two-column onboarding journey the
+     discipline-rules modal already uses, not a page with app chrome
+     around it. z-index 500 clears the top-bar's z-index:10 comfortably
+     while staying below the onboarding modal's own 1000 (only one of
+     the two is ever on screen at a time anyway — onbFinish() closes the
+     modal before this page is ever visible). */
+  position: fixed;
+  inset: 0;
+  z-index: 500;
   padding: 0;
   overflow: hidden;
   display: flex;
-  flex-direction: column;
-  height: calc(
-    100vh - 76px
-  ); /* 76px = .content-area's own 28px+48px v-padding, see layout-shell.css */
+  /* row, not column: the .onb-left promo panel (reused from the
+     first-run onboarding modal, see tier-select.html) now sits to the
+     left of .setup-body as a second flex item, both stretched to the
+     full height below via the default align-items:stretch. */
+  flex-direction: row;
   /* This page shouldn't read as one big enclosing white card like other
      .content-section pages — the reference design shows the intro text
      and step 1/2/3 headers sitting directly on the app's gray canvas,
@@ -43,7 +69,7 @@
      page's background despite this override. Compounding the selector to
      two classes (0,2,0) beats `.content-section` alone (0,1,0) regardless
      of load order. */
-  background: transparent;
+  background: #ffffff;
   border: none;
   box-shadow: none;
   border-radius: 0;
@@ -72,6 +98,7 @@
   align-items: stretch;
   gap: 0;
   flex: 1;
+  min-width: 0; /* lets this shrink properly now that it's the 2nd item in a flex ROW (the .onb-left promo panel is the 1st) */
   min-height: 0; /* required for the child scroll pane below to work inside a flex column */
 }
 
@@ -559,7 +586,11 @@
 /* ---------- Trading style multi-select cards ---------- */
 .trader-type-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* auto-fit rather than a hard repeat(4, ...): the new .onb-left promo
+     column (tier-select.html) leaves less horizontal room than before,
+     so cards now wrap to 3/2/1 per row on smaller widths instead of
+     squeezing 4 across. */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
 }
 

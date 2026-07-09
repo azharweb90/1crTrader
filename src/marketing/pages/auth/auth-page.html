@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1Cr Traders — Log in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/images/logos/favicon.png">
+  <link rel="stylesheet" href="/src/marketing/pages/auth/auth-page.css">
+</head>
+<body>
+
+  <!-- Visible fallback if auth-service.js fails to load (wrong path,
+       server not serving from project root, script blocked, etc.) —
+       previously this only logged to the console, which is invisible
+       unless DevTools happens to be open. See auth-page.js. -->
+  <div id="auth-fatal-error" class="auth-fatal-error hidden">
+    Couldn't load the login system (auth-service.js). Make sure this
+    site is served from the project root — not opened as a local file
+    — and check the browser console for the exact error.
+  </div>
+
+  <div class="auth-shell">
+
+    <!-- Left promo panel — copy swapped between login/register by
+         auth-page.js (see applyView()); structure/classes match the
+         same visual language used inside the app (onboarding modal,
+         setup-profile) but are re-declared in auth-page.css rather
+         than imported, so src/marketing stays free of any dependency
+         on src/app. -->
+    <aside class="auth-left">
+      <div class="auth-logo-row">
+        <img src="/assets/images/logos/1crtraders-icon.png" alt="" class="auth-logo-icon">
+        <div>
+          <div class="auth-logo-name">1Cr Traders</div>
+          <div class="auth-logo-tag">REWARD ABOVE RISK</div>
+        </div>
+      </div>
+
+      <div class="auth-left-mid">
+        <div id="auth-eyebrow" class="auth-eyebrow">REWARD ABOVE RISK</div>
+        <h1 id="auth-headline" class="auth-headline">The one edge that compounds is control.</h1>
+        <div class="auth-checklist">
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">A hard daily loss cap you can't override in the heat of the moment.</span>
+          </div>
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Position sizing and R:R worked out before you risk a rupee.</span>
+          </div>
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">A journal and Learn hub that quietly make you a better trader.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-left-bottom">
+        <div class="auth-avatars">
+          <span class="auth-avatar"></span>
+          <span class="auth-avatar"></span>
+          <span class="auth-avatar"></span>
+        </div>
+        <div class="auth-social-text">Join 12,000+ disciplined traders</div>
+      </div>
+    </aside>
+
+    <!-- Right: form panel — both forms live in the DOM at once;
+         auth-page.js toggles which is visible via ?view=. Keeping both
+         mounted (rather than swapping innerHTML) means no re-fetch, no
+         flash, and each keeps its own field state if the trader flips
+         back and forth via the switch-line links. -->
+    <div class="auth-right">
+      <div class="auth-right-inner">
+
+        <form id="auth-login-form" class="auth-form">
+          <h2 class="auth-form-heading">Welcome back</h2>
+          <p class="auth-form-sub">Log in to pick up your discipline where you left off.</p>
+
+          <label class="auth-field-label" for="login-email">Email</label>
+          <input type="email" id="login-email" class="auth-field-input" placeholder="you@email.com" autocomplete="email" required>
+
+          <div class="auth-field-label-row">
+            <label class="auth-field-label" for="login-password">Password</label>
+            <a href="#" class="auth-forgot-link" onclick="return false;">Forgot?</a>
+          </div>
+          <input type="password" id="login-password" class="auth-field-input" placeholder="Your password" autocomplete="current-password" required>
+
+          <p id="login-error" class="auth-error hidden"></p>
+
+          <button type="submit" class="auth-submit-btn">Log in</button>
+          <div class="auth-switch-line">New here? <a href="/src/marketing/pages/auth/auth-page.html?view=register" class="auth-switch-link">Create a free account</a></div>
+        </form>
+
+        <form id="auth-register-form" class="auth-form hidden">
+          <h2 class="auth-form-heading">Start free in 30 seconds</h2>
+          <p class="auth-form-sub">No card required. 14-day trial of Full Access.</p>
+
+          <label class="auth-field-label" for="register-name">Full name</label>
+          <input type="text" id="register-name" class="auth-field-input" placeholder="Your name" autocomplete="name" required>
+
+          <label class="auth-field-label" for="register-email">Email</label>
+          <input type="email" id="register-email" class="auth-field-input" placeholder="you@email.com" autocomplete="email" required>
+
+          <label class="auth-field-label" for="register-password">Password</label>
+          <input type="password" id="register-password" class="auth-field-input" placeholder="At least 8 characters" autocomplete="new-password" required>
+
+          <p id="register-error" class="auth-error hidden"></p>
+
+          <button type="submit" class="auth-submit-btn">Continue</button>
+          <div class="auth-switch-line">Already have an account? <a href="/src/marketing/pages/auth/auth-page.html?view=login" class="auth-switch-link">Log in</a></div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/src/marketing/services/auth-service.js"></script>
+  <script src="/src/marketing/pages/auth/auth-page.js"></script>
+</body>
+</html>

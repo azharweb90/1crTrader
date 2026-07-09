@@ -1,75 +1,262 @@
 /* ===========================================================
-   FIRST-RUN ONBOARDING MODAL — "Discipline Features" handoff, Feature 4.
-   A blocking, full-screen modal shown once before a trader's first
-   session: picks a capital tier, confirms the daily loss limit that
-   comes with it, and captures a personal "stop rule" that reappears
-   later on the Cool-Down Lock screen (Feature 3). Injected into
-   document.body by onboarding.js — same pattern as product-tour.js's
-   own overlay. Sits above every other overlay in the app (z-index
-   1000) since it must run to completion before anything else is
-   usable, per "Run first, then go into the existing setup page."
+   FIRST-RUN ONBOARDING — "Discipline Features" handoff, Feature 4.
+
+   Full-viewport two-column split (left: promo/motivation panel,
+   right: the actual step content) — same pattern as the marketing
+   site's signup page, per the trader's explicit direction: this must
+   NOT read as a small floating modal card anymore. It's the first
+   thing a trader sees after signing up, so it carries the same
+   "why 1CrTrader exists" framing all the way through to the moment
+   they land on the dashboard.
+
+   Left panel content is static chrome (logo, headline, checklist,
+   social proof); the checklist rows sync their active/done state to
+   the current step (see onb-check-item-* below) so the two columns
+   feel like one connected journey instead of a form floating over a
+   generic backdrop.
+
+   Right panel reuses the existing step markup/functions from
+   onboarding.js untouched — only the outer shell changed.
    =========================================================== */
 
 .onb-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: linear-gradient(160deg, #EAF1FE 0%, #F5F6FA 55%, #ffffff 120%);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  overflow-y: auto;
+  align-items: stretch;
+  background: #ffffff;
 }
 .onb-overlay.hidden { display: none; }
 
-.onb-card {
-  background: #ffffff;
-  width: 540px;
-  max-width: 100%;
-  max-height: 90vh;
+/* ── Left: promo / motivation panel ───────────────────────── */
+.onb-left {
+  flex: 0 0 44%;
+  min-width: 380px;
+  max-width: 560px;
+  background: linear-gradient(160deg, #0B1B3F 0%, #17297A 50%, #2647B2 100%);
+  color: #ffffff;
+  padding: 48px 44px;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
-  border: 1px solid #E3E9F1;
-  border-radius: 20px;
-  box-shadow: 0 30px 80px rgba(20, 35, 61, 0.22);
-  padding: 34px 36px;
-  margin: auto;
 }
 
-/* ── Progress header (steps 1–4 only) ─────────────────────── */
-.onb-progress {
+.onb-logo-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 26px;
+  gap: 12px;
+}
+
+.onb-logo-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 6px;
+  flex: 0 0 auto;
+}
+
+.onb-logo-name {
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.onb-logo-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.onb-left-mid {
+  margin-top: 64px;
+}
+
+.onb-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8FB0FF;
+  margin-bottom: 14px;
+}
+
+.onb-headline {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.28;
+  color: #ffffff;
+  margin: 0 0 14px;
+  letter-spacing: -0.3px;
+}
+
+.onb-left-sub {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 30px;
+  max-width: 400px;
+}
+
+.onb-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.onb-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  opacity: 0.5;
+  transition: opacity 0.25s ease;
+}
+
+.onb-check-item-active,
+.onb-check-item-done {
+  opacity: 1;
+}
+
+.onb-check-icon {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: transparent;
+  margin-top: 1px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.onb-check-item-active .onb-check-icon {
+  border-color: #8FB0FF;
+  background: rgba(143, 176, 255, 0.18);
+}
+
+.onb-check-item-done .onb-check-icon {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #17297A;
+}
+
+.onb-check-item-done .onb-check-icon::after { content: "\2713"; }
+
+.onb-check-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.onb-check-item-active .onb-check-text {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.onb-left-quote {
+  margin-top: 34px;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  font-style: italic;
+}
+
+.onb-left-bottom {
+  margin-top: auto;
+  padding-top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.onb-avatars {
+  display: flex;
+}
+
+.onb-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #17297A;
+  margin-left: -8px;
+  background: linear-gradient(135deg, #8FB0FF, #4C6FEA);
+}
+
+.onb-avatar:first-child { margin-left: 0; }
+
+.onb-social-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Right: step content panel ────────────────────────────── */
+.onb-right {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  padding: 48px 40px;
+}
+
+.onb-right-inner {
+  width: 100%;
+  max-width: 440px;
+  margin: auto 0;
+}
+
+/* Segmented progress bar (steps 1-4 only, hidden on the welcome step) */
+.onb-progress {
+  margin-bottom: 24px;
 }
 .onb-progress.hidden { display: none; }
 
-.onb-progress-dots { display: flex; gap: 6px; }
-.onb-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #DCE3EC;
+.onb-progress-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
 }
-.onb-dot-done { background: #2563EB; }
 
-.onb-progress-label {
+.onb-progress-seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: #E3E9F1;
+}
+
+.onb-progress-seg-done { background: #2563EB; }
+
+.onb-step-eyebrow {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #8A98AD;
+  color: #2563EB;
 }
 
 /* ── Shared step chrome ────────────────────────────────────── */
 .onb-heading {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   color: #1E293B;
-  margin: 0 0 10px;
-  text-align: center;
+  margin: 10px 0 10px;
+  text-align: left;
 }
 .onb-heading-left { text-align: left; }
 
@@ -89,16 +276,16 @@
 }
 
 /* ── Step 0 — Welcome ──────────────────────────────────────── */
-.onb-step0 { text-align: center; }
+.onb-step0 { text-align: left; }
 .onb-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  margin: 0 auto 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  margin: 0 0 20px;
   display: block;
   object-fit: contain;
 }
-.onb-step0 .onb-heading { font-size: 27px; }
+.onb-step0 .onb-heading { font-size: 27px; margin-top: 0; }
 .onb-step0 .onb-body {
   font-size: 15px;
   line-height: 1.6;
@@ -117,6 +304,7 @@
   cursor: pointer;
   margin-top: 14px;
   padding: 4px;
+  text-align: center;
 }
 .onb-skip-link:hover { color: #5B6B82; text-decoration: underline; }
 
@@ -125,6 +313,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 46vh;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .onb-tier-row {
@@ -239,21 +430,22 @@
 }
 
 /* ── Step 4 — Done ─────────────────────────────────────────── */
-.onb-step4 { text-align: center; }
+.onb-step4 { text-align: left; }
 .onb-done-check {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 18px;
+  width: 52px;
+  height: 52px;
+  margin: 0 0 18px;
   border-radius: 999px;
   background: #E3F5EC;
   border: 1px solid #8ED6AE;
   color: #15803D;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+.onb-step4 .onb-heading { font-size: 24px; }
 .onb-summary-list {
   display: flex;
   flex-direction: column;
@@ -287,8 +479,15 @@
   justify-content: center;
 }
 
+/* ── Responsive: below ~780px, drop the promo panel entirely so the
+   step content gets the full viewport — matches the same breakpoint
+   behavior the signup page uses for its own split layout. ─────── */
+@media (max-width: 780px) {
+  .onb-left { display: none; }
+  .onb-right { padding: 32px 22px; }
+}
+
 @media (max-width: 560px) {
-  .onb-card { padding: 26px 22px; }
   .onb-loss-value { font-size: 34px; }
 }
 /* === END COMPONENT: onboarding === */

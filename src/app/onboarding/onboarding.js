@@ -79,26 +79,87 @@
 
   // ---------- Overlay lifecycle ----------
 
+  // Left-panel checklist copy — maps 1:1 onto steps 1-3 of the wizard
+  // (tier -> loss limit -> stop rule) so the promo panel and the form
+  // panel visibly track the same journey instead of the left side
+  // being static decoration. See updateChecklist().
+  const ONB_CHECKLIST = [
+    { n: 1, text: 'A capital tier that sets your real max lot size — not a guess.' },
+    { n: 2, text: "A hard daily loss cap you can't override in the heat of the moment." },
+    { n: 3, text: 'A personal stop rule, from calm-you, for the day you need it most.' },
+  ];
+
   function ensureOverlayExists() {
     if (document.getElementById('onb-overlay')) return;
     const overlay = document.createElement('div');
     overlay.id = 'onb-overlay';
     overlay.className = 'onb-overlay hidden';
+
+    const checklistHtml = ONB_CHECKLIST.map(item => `
+      <div class="onb-check-item" data-check="${item.n}">
+        <span class="onb-check-icon"></span>
+        <span class="onb-check-text">${item.text}</span>
+      </div>
+    `).join('');
+
     overlay.innerHTML = `
-      <div class="onb-card">
-        <div id="onb-progress" class="onb-progress hidden">
-          <div class="onb-progress-dots">
-            <span class="onb-dot" data-dot="1"></span>
-            <span class="onb-dot" data-dot="2"></span>
-            <span class="onb-dot" data-dot="3"></span>
-            <span class="onb-dot" data-dot="4"></span>
+      <div class="onb-left">
+        <div class="onb-logo-row">
+          <img src="/assets/images/logos/1crtraders-icon.png" alt="" class="onb-logo-icon">
+          <div>
+            <div class="onb-logo-name">1Cr Traders</div>
+            <div class="onb-logo-tag">REWARD ABOVE RISK</div>
           </div>
-          <div class="onb-progress-label">STEP <span id="onb-step-num">1</span> OF 4</div>
         </div>
-        <div id="onb-step-body"></div>
+        <div class="onb-left-mid">
+          <div class="onb-eyebrow">Before your first trade</div>
+          <h2 class="onb-headline">Every rule here exists because a trader broke it once.</h2>
+          <p class="onb-left-sub">Sixty seconds now buys you the discipline most traders only learn after losing real money. Here's what you're setting up:</p>
+          <div class="onb-checklist" id="onb-checklist">${checklistHtml}</div>
+          <div class="onb-left-quote">"The goal isn't to win every trade. It's to still be trading next year." That's the whole reason 1CrTraders exists.</div>
+        </div>
+        <div class="onb-left-bottom">
+          <div class="onb-avatars">
+            <span class="onb-avatar"></span>
+            <span class="onb-avatar"></span>
+            <span class="onb-avatar"></span>
+          </div>
+          <div class="onb-social-text">Join 12,000+ disciplined traders</div>
+        </div>
+      </div>
+      <div class="onb-right">
+        <div class="onb-right-inner">
+          <div id="onb-progress" class="onb-progress hidden">
+            <div class="onb-progress-bar" id="onb-progress-bar">
+              <span class="onb-progress-seg" data-seg="1"></span>
+              <span class="onb-progress-seg" data-seg="2"></span>
+              <span class="onb-progress-seg" data-seg="3"></span>
+              <span class="onb-progress-seg" data-seg="4"></span>
+            </div>
+            <div class="onb-step-eyebrow">STEP <span id="onb-step-num">1</span> OF 4</div>
+          </div>
+          <div id="onb-step-body"></div>
+        </div>
       </div>
     `;
     document.body.appendChild(overlay);
+  }
+
+  // Syncs the left-panel checklist to the current step: earlier steps
+  // read as "done" (filled check), the step whose data currently being
+  // decided reads as "active" (highlighted outline), later ones stay
+  // dimmed. Step 4 (the done screen) marks everything complete.
+  function updateChecklist(step) {
+    const items = document.querySelectorAll('#onb-checklist .onb-check-item');
+    items.forEach(item => {
+      const n = parseInt(item.dataset.check, 10);
+      item.classList.remove('onb-check-item-active', 'onb-check-item-done');
+      if (step >= 4 || step > n) {
+        item.classList.add('onb-check-item-done');
+      } else if (step === n) {
+        item.classList.add('onb-check-item-active');
+      }
+    });
   }
 
   function openOnboarding() {
@@ -129,11 +190,13 @@
       progress.classList.remove('hidden');
       const stepNumEl = document.getElementById('onb-step-num');
       if (stepNumEl) stepNumEl.innerText = String(onbStep);
-      progress.querySelectorAll('.onb-dot').forEach(dot => {
-        const n = parseInt(dot.dataset.dot, 10);
-        dot.classList.toggle('onb-dot-done', n <= onbStep);
+      progress.querySelectorAll('.onb-progress-seg').forEach(seg => {
+        const n = parseInt(seg.dataset.seg, 10);
+        seg.classList.toggle('onb-progress-seg-done', n <= onbStep);
       });
     }
+
+    updateChecklist(onbStep);
 
     body.innerHTML = stepHtml();
 
@@ -319,6 +382,15 @@
 
   function initOnboarding() {
     if (hasOnboarded()) return;
+    // Now that a real auth gate exists (auth-service.js), app-shell.js's
+    // own DOMContentLoaded handler redirects an un-authed visitor to
+    // /src/marketing/pages/auth/auth-page.html — but that redirect isn't
+    // instant, and this listener fires on the same DOMContentLoaded
+    // event. Without this check, the modal could flash open for a
+    // moment before the redirect kicks in. If Auth isn't loaded at all
+    // (auth-service.js missing), fall back to the old behavior of just
+    // showing the modal, matching app-shell.js's own fallback.
+    if (typeof window.Auth !== 'undefined' && !window.Auth.getSession()) return;
     openOnboarding();
   }
 
