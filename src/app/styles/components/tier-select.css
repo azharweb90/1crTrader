@@ -267,20 +267,32 @@
   border-top: 1px solid #e8edf4;
 }
 
+/* NOTE: .setup-cta-btn is shared with the onboarding modal
+   (onboarding.js's "Set up my rules" / step buttons use this exact
+   class), which relies on the default being width:100% to span the
+   right panel. Do NOT change the default here — the footer-only
+   auto-width variant is scoped to `.setup-footer .setup-cta-btn`
+   below instead, so it can't leak into the modal's buttons again
+   (this broke once already from changing the shared default). */
 .setup-cta-btn {
   border: none;
   border-radius: 11px;
-  padding: 13px 28px;
+  padding: 14px;
   font-size: 15px;
   font-weight: 700;
   font-family: inherit;
-  width: auto;
-  flex: 0 0 auto;
+  width: 100%;
   background: #2563eb;
   color: #fff;
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
   transition: filter 0.15s ease;
+}
+
+.setup-footer .setup-cta-btn {
+  width: auto;
+  flex: 0 0 auto;
+  padding: 13px 28px;
 }
 
 .setup-cta-btn:hover:not(:disabled) {
