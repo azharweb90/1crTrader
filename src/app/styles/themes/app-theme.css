@@ -697,11 +697,15 @@ hr,
   border-color: var(--color-surface);
 }
 
-/* Calc history table */
+/* Calc history table — same stale dark-mode inset-background bug as the
+   broker cards above; now its own real white card, separated from the
+   (now transparent) page canvas, matching every other card on this
+   screen. */
 .calc-history-wrap {
-  background: var(--color-surface-inset);
-  border-color: var(--color-surface);
-  border-radius: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.06);
 }
 
 .calc-history-grid {
@@ -1040,11 +1044,19 @@ hr,
   background: rgba(11, 15, 23,0.85) !important;
 }
 
-/* ---------- Daily Limits Tool — comprehensive dark mode fix ---------- */
-/* The trade log area, outcome buttons, and inner panel boxes
-   were still showing as white in dark mode. */
+/* ---------- Daily Limits Tool ---------- */
+/* This block used to be a dark-mode-only fix (see the file header — there
+   is no dark/light toggle anymore, so it now applies unconditionally).
+   Left as-is it was routing every "white card" on this screen to
+   --color-surface-inset with an invisible (--color-surface, i.e. white)
+   border, which is why input-panel, the broker cards, and the trade log
+   area all read as a flat, undifferentiated white/gray surface instead of
+   separate cards — the exact bug behind "everything is one big card".
+   .tool-layout itself stays transparent (it's just the 2-col grid, not a
+   card); .input-panel was dropped from this list entirely so it keeps its
+   own white background from daily-limits.css instead of being forced
+   transparent. */
 .tool-layout,
-.input-panel,
 .right-panel,
 .calc-right-column {
   background: transparent;
@@ -1062,17 +1074,19 @@ hr,
 }
 
 .broker-quick-connect-wrap {
-  background: var(--color-surface-inset);
-  border: 1px solid var(--color-surface);
-  border-radius: 10px;
-  padding: 16px 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.06);
 }
 
 .broker-synced-panel {
-  background: var(--color-surface-inset);
-  border: 1px solid var(--color-surface);
-  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
   padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.06);
 }
 
 .broker-synced-title { color: var(--color-text-primary); }

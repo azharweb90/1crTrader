@@ -107,7 +107,7 @@
         <p id="cdl-body" class="cdl-body"></p>
 
         <div class="cdl-note-wrap">
-          <div class="cdl-note-eyebrow">Your stop rule, from onboarding</div>
+          <div class="cdl-note-eyebrow">Your reason for stopping &mdash; a note from you, to you</div>
           <textarea id="cdl-note-input" class="cdl-note-textarea" oninput="cdlNoteInput()"></textarea>
         </div>
 

@@ -31,6 +31,85 @@
       : [];
   }
 
+  // ---------- Mini graphics for the 4 top stat cards ----------
+  // All 4 are driven by the same real trade history/profile state the
+  // cards' own numbers come from — nothing here is decorative placeholder
+  // data. Each degrades to a clear "no data yet" look (flat line / empty
+  // gray arc / empty bar / neutral dash icon) rather than faking a trend
+  // before there's anything to show one.
+
+  // Starting capital -> running balance after each trade, in
+  // chronological order (same date + submittedAt sort convention used by
+  // calculators.js's Withdraw & Scale tab).
+  function buildBalanceTrail(history, startingCapital) {
+    const sorted = history.slice().sort((a, b) => {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      return (a.submittedAt || 0) - (b.submittedAt || 0);
+    });
+    const base = typeof startingCapital === "number" && !isNaN(startingCapital) ? startingCapital : 0;
+    const points = [base];
+    sorted.forEach((t) => points.push(points[points.length - 1] + (t.netResult || 0)));
+    return points;
+  }
+
+  function sparklinePath(pointsIn, width, height, pad) {
+    let points = pointsIn;
+    if (!points || points.length === 0) return "";
+    if (points.length === 1) points = [points[0], points[0]];
+    const min = Math.min(...points);
+    const max = Math.max(...points);
+    const range = max - min || 1;
+    const stepX = (width - pad * 2) / (points.length - 1);
+    return points
+      .map((v, i) => {
+        const x = pad + i * stepX;
+        const y = pad + (height - pad * 2) * (1 - (v - min) / range);
+        return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+      })
+      .join(" ");
+  }
+
+  function balanceSparkSvg(history, startingCapital) {
+    const W = 64, H = 24, PAD = 2.5;
+    const trail = buildBalanceTrail(history, startingCapital);
+    const d = sparklinePath(trail, W, H, PAD);
+    return `<svg class="dash-stat-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <path d="${d}" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+  }
+
+  // Semi-circle gauge — background arc always full/gray, foreground arc's
+  // dash-length is the exact fraction of the arc's true length (pi*r,
+  // since both radii equal r and it sweeps exactly 180deg), so 0 win
+  // rate (or no trades yet) renders as a plain empty gray arc.
+  function winRateGaugeSvg(winRate) {
+    const R = 24, CX = 30, CY = 30;
+    const ARC_LEN = Math.PI * R;
+    const pct = winRate === null ? 0 : Math.max(0, Math.min(100, winRate));
+    const filled = (pct / 100) * ARC_LEN;
+    const d = `M${CX - R},${CY} A${R},${R} 0 0 1 ${CX + R},${CY}`;
+    return `<svg class="dash-stat-gauge" viewBox="0 0 60 32">
+      <path class="dash-stat-gauge-bg" d="${d}"/>
+      <path class="dash-stat-gauge-fill" d="${d}" stroke-dasharray="${filled.toFixed(1)} ${ARC_LEN.toFixed(1)}"/>
+    </svg>`;
+  }
+
+  function netPnlTrendIcon(netPnl, hasTrades) {
+    if (!hasTrades || netPnl === 0) {
+      return `<span class="dash-stat-trend-icon dash-stat-trend-neutral"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></span>`;
+    }
+    if (netPnl > 0) {
+      return `<span class="dash-stat-trend-icon dash-stat-trend-up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg></span>`;
+    }
+    return `<span class="dash-stat-trend-icon dash-stat-trend-down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>`;
+  }
+
+  function todayIso() {
+    const d = new Date();
+    const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, "0"), day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
   function renderStatCards() {
     const grid = document.getElementById("dash-stat-grid");
     if (!grid) return;
@@ -52,21 +131,37 @@
           : "";
     const netPnlSign = netPnl > 0 ? "+" : netPnl < 0 ? "-" : "";
 
+    // Real "trades logged today" out of the app's own 2-trades/day cap
+    // (same cap the Daily Limits Tool enforces) — a meaningful fill
+    // amount, not an arbitrary decorative one.
+    const tradesToday = history.filter((t) => t.date === todayIso()).length;
+    const tradesTodayPct = Math.max(0, Math.min(100, (tradesToday / 2) * 100));
+
     grid.innerHTML = `
       <div class="dash-stat-card">
-        <div class="dash-stat-label">Current Balance</div>
+        <div class="dash-stat-card-top">
+          <div class="dash-stat-label">Current Balance</div>
+          ${balanceSparkSvg(history, state.startingCapital)}
+        </div>
         <div class="dash-stat-value">${balance !== null && balance !== undefined ? "₹" + fmt(balance) : "&mdash;"}</div>
       </div>
       <div class="dash-stat-card">
-        <div class="dash-stat-label">Win Rate</div>
+        <div class="dash-stat-card-top">
+          <div class="dash-stat-label">Win Rate</div>
+          ${winRateGaugeSvg(winRate)}
+        </div>
         <div class="dash-stat-value">${winRate !== null ? winRate.toFixed(0) + "%" : "&mdash;"}</div>
       </div>
       <div class="dash-stat-card">
         <div class="dash-stat-label">Total Trades</div>
         <div class="dash-stat-value">${totalTrades}</div>
+        <div class="dash-stat-progress-track"><div class="dash-stat-progress-fill" style="width:${tradesTodayPct}%"></div></div>
       </div>
       <div class="dash-stat-card">
-        <div class="dash-stat-label">Net P&amp;L</div>
+        <div class="dash-stat-card-top">
+          <div class="dash-stat-label">Net P&amp;L</div>
+          ${netPnlTrendIcon(netPnl, totalTrades > 0)}
+        </div>
         <div class="dash-stat-value ${netPnlClass}">${totalTrades > 0 ? netPnlSign + "₹" + fmt(Math.abs(netPnl)) : "&mdash;"}</div>
       </div>
     `;
@@ -95,20 +190,20 @@
     wrap.classList.remove("hidden");
 
     grid.innerHTML = `
-      <div class="dash-risk-card">
+      <div class="dash-risk-card dash-risk-card-tier">
         <div class="dash-risk-label">Capital Tier</div>
         <div class="dash-risk-value">${summary.tierLabel}</div>
       </div>
-      <div class="dash-risk-card">
+      <div class="dash-risk-card dash-risk-card-loss">
         <div class="dash-risk-label">Max Loss Today</div>
         <div class="dash-risk-value">₹${fmt(summary.maxLossRupees)}</div>
         <div class="dash-risk-sublabel">${summary.maxLossPct}% of capital</div>
       </div>
-      <div class="dash-risk-card">
+      <div class="dash-risk-card dash-risk-card-lots">
         <div class="dash-risk-label">Lots Allowed Right Now</div>
         <div class="dash-risk-value">${summary.maxLots}</div>
       </div>
-      <div class="dash-risk-card">
+      <div class="dash-risk-card dash-risk-card-trades">
         <div class="dash-risk-label">Max Trades / Day</div>
         <div class="dash-risk-value">2</div>
       </div>

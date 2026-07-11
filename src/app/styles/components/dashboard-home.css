@@ -62,6 +62,99 @@
   color: #c53d22;
 }
 
+/* Row pairing a stat card's label with its mini graphic (sparkline,
+   gauge, or trend icon) — label keeps its own spacing, this row's
+   margin-bottom takes over the gap above the value instead. */
+.dash-stat-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.dash-stat-card-top .dash-stat-label {
+  margin-bottom: 0;
+}
+
+/* Current Balance — small line sparkline built from the real running
+   balance after each trade (see buildBalanceTrail in dashboard-home.js),
+   not decorative fake data. */
+.dash-stat-spark {
+  width: 60px;
+  height: 22px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* Win Rate — semi-circle gauge; empty/gray until there's at least one
+   trade to compute a real win rate from. */
+.dash-stat-gauge {
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.dash-stat-gauge-bg {
+  fill: none;
+  stroke: #e3e9f1;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.dash-stat-gauge-fill {
+  fill: none;
+  stroke: #16A34A;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease;
+}
+
+/* Total Trades — thin bar showing trades logged today against the app's
+   own 2-trades/day cap (real, meaningful fill amount, not arbitrary). */
+.dash-stat-progress-track {
+  height: 5px;
+  background: #e3e9f1;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+.dash-stat-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1D4ED8 0%, #2563EB 100%);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* Net P&L — small circular trend icon: up/green when profitable,
+   down/red when negative, a neutral dash when flat or no trades yet. */
+.dash-stat-trend-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dash-stat-trend-neutral {
+  background: #F1F4F8;
+  color: #AEB9C8;
+}
+
+.dash-stat-trend-up {
+  background: #E3F8ED;
+  color: #16A34A;
+}
+
+.dash-stat-trend-down {
+  background: #FBE7E2;
+  color: #C53D22;
+}
+
 /* Groups a section's outside label with its card so dash-home-wrap's
    16px flex gap applies BETWEEN sections, not between a label and its
    own card below it — that tight spacing comes from the label's own
@@ -163,6 +256,41 @@
   height: 100%;
   background: #2563EB;
 }
+
+/* Per-card light tints, one per rule — matches the reference design:
+   each of the 4 stat tiles gets its own tinted background + accent bar
+   + label color, instead of all 4 sharing the same flat gray. Only the
+   tier/lots cards also tint their value text (blue/purple) per the
+   reference; the loss/trades cards keep the default dark value color. */
+.dash-risk-card-tier {
+  background: #EAF1FE;
+  border-color: #CFE0FB;
+}
+.dash-risk-card-tier::before { background: #2563EB; }
+.dash-risk-card-tier .dash-risk-label { color: #2563EB; }
+.dash-risk-card-tier .dash-risk-value { color: #1D4ED8; }
+
+.dash-risk-card-loss {
+  background: #E3F8F0;
+  border-color: #C3EEDA;
+}
+.dash-risk-card-loss::before { background: #0D9488; }
+.dash-risk-card-loss .dash-risk-label { color: #0D9488; }
+
+.dash-risk-card-lots {
+  background: #F1ECFE;
+  border-color: #DDD0FB;
+}
+.dash-risk-card-lots::before { background: #7C3AED; }
+.dash-risk-card-lots .dash-risk-label { color: #7C3AED; }
+.dash-risk-card-lots .dash-risk-value { color: #6D28D9; }
+
+.dash-risk-card-trades {
+  background: #EEF7E1;
+  border-color: #D9EEC0;
+}
+.dash-risk-card-trades::before { background: #65A30D; }
+.dash-risk-card-trades .dash-risk-label { color: #65A30D; }
 
 .dash-risk-label {
   font-family: "IBM Plex Mono", monospace;

@@ -1025,8 +1025,12 @@
     renderBrokerMultiMonthGrid(from, to);
   }
 
-  function renderBrokerMultiMonthGrid(from, to) {
-    const gridEl = document.getElementById('broker-multi-month-grid');
+  // containerId defaults to the inline grid on this page; the Custom
+  // Range modal passes 'custom-range-grid' to render into its own
+  // container instead — same rendering logic, same day-click handler
+  // (showBrokerDayDetail), just a different target element.
+  function renderBrokerMultiMonthGrid(from, to, containerId) {
+    const gridEl = document.getElementById(containerId || 'broker-multi-month-grid');
     if (!gridEl) return;
 
     const pnlData = (typeof window.getBrokerPnlHistory === 'function') ? window.getBrokerPnlHistory() : {};
@@ -1098,6 +1102,195 @@
     });
 
     gridEl.innerHTML = html;
+  }
+
+  // ---------- Custom Range modal ----------
+  // A dedicated wide browsing view over a sliding date window (default: the
+  // 8 months ending this month), with a Calendar/Monthly Table toggle.
+  // Reuses renderBrokerMultiMonthGrid() for the calendar view and
+  // showBrokerDayDetail() for day clicks — nothing about day-level
+  // rendering or import is duplicated, only the range-picking chrome
+  // around it is new.
+  let customRangeFrom = null;
+  let customRangeTo = null;
+  let customRangeView = 'calendar'; // 'calendar' | 'table'
+  const CUSTOM_RANGE_DEFAULT_MONTHS = 8;
+
+  function defaultCustomRangeWindow() {
+    const to = new Date();
+    const from = new Date(to.getFullYear(), to.getMonth() - (CUSTOM_RANGE_DEFAULT_MONTHS - 1), 1);
+    return { from, to };
+  }
+
+  function monthSpanInclusive(from, to) {
+    return (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth()) + 1;
+  }
+
+  function openCustomRangeModal() {
+    if (!customRangeFrom || !customRangeTo) {
+      const win = defaultCustomRangeWindow();
+      customRangeFrom = win.from;
+      customRangeTo = win.to;
+    }
+    renderCustomRangeModal();
+    const overlay = document.getElementById('custom-range-modal-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+  }
+
+  function closeCustomRangeModal() {
+    const overlay = document.getElementById('custom-range-modal-overlay');
+    if (overlay) overlay.classList.add('hidden');
+  }
+
+  function closeCustomRangeModalIfOutside(e) {
+    if (e.target === document.getElementById('custom-range-modal-overlay')) closeCustomRangeModal();
+  }
+
+  // Slides the whole window by one calendar month, keeping its span (in
+  // months) constant. Clamped so the window can never extend past today —
+  // there's no future broker data to show.
+  function shiftCustomRange(deltaMonths) {
+    if (!customRangeFrom || !customRangeTo) return;
+    const today = new Date();
+    const span = monthSpanInclusive(customRangeFrom, customRangeTo);
+    let newFrom = new Date(customRangeFrom.getFullYear(), customRangeFrom.getMonth() + deltaMonths, 1);
+    let newTo = new Date(newFrom.getFullYear(), newFrom.getMonth() + span - 1, customRangeTo.getDate());
+    if (newTo > today) {
+      newTo = today;
+      newFrom = new Date(today.getFullYear(), today.getMonth() - (span - 1), 1);
+    }
+    customRangeFrom = newFrom;
+    customRangeTo = newTo;
+    renderCustomRangeModal();
+  }
+
+  function setCustomRangeView(view) {
+    customRangeView = view;
+    renderCustomRangeModal();
+  }
+
+  function renderCustomRangeModal() {
+    if (!customRangeFrom || !customRangeTo) return;
+
+    const labelEl = document.getElementById('custom-range-label');
+    const durationEl = document.getElementById('custom-range-duration');
+    const fmtLabel = (d) => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    if (labelEl) labelEl.innerText = `${fmtLabel(customRangeFrom)} - ${fmtLabel(customRangeTo)}`;
+    const months = monthSpanInclusive(customRangeFrom, customRangeTo);
+    if (durationEl) durationEl.innerText = `${months} month${months === 1 ? '' : 's'}`;
+
+    document.querySelectorAll('#custom-range-view-toggle .broker-range-pill').forEach(btn => {
+      btn.classList.toggle('broker-range-pill-active', btn.dataset.view === customRangeView);
+    });
+
+    const calendarWrap = document.getElementById('custom-range-calendar-wrap');
+    const tableWrap = document.getElementById('custom-range-table-wrap');
+    const legendRow = document.getElementById('custom-range-legend-row');
+    if (calendarWrap) calendarWrap.classList.toggle('hidden', customRangeView !== 'calendar');
+    if (tableWrap) tableWrap.classList.toggle('hidden', customRangeView !== 'table');
+    if (legendRow) legendRow.classList.toggle('hidden', customRangeView !== 'calendar');
+
+    if (customRangeView === 'calendar') {
+      renderBrokerMultiMonthGrid(customRangeFrom, customRangeTo, 'custom-range-grid');
+    } else {
+      renderCustomRangeMonthlyTable(customRangeFrom, customRangeTo);
+    }
+
+    renderCustomRangeSummary(customRangeFrom, customRangeTo, months);
+  }
+
+  // Alternate to the dot-grid — one clean row per month in range (month,
+  // net P&L only, colored green/red), for a trader who wants a scannable
+  // summary instead of clicking through individual days. Deliberately a
+  // plain list (month left, amount right, thin divider) rather than a
+  // bordered spreadsheet grid — matches the reference's look, and keeps
+  // the color-coding as the only visual emphasis.
+  function renderCustomRangeMonthlyTable(from, to) {
+    const wrap = document.getElementById('custom-range-table-wrap');
+    if (!wrap) return;
+    const pnlData = (typeof window.getBrokerPnlHistory === 'function') ? window.getBrokerPnlHistory() : {};
+
+    const months = [];
+    let cursor = new Date(from.getFullYear(), from.getMonth(), 1);
+    const lastMonth = new Date(to.getFullYear(), to.getMonth(), 1);
+    while (cursor <= lastMonth) {
+      months.push(new Date(cursor));
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+    }
+
+    let html = `
+      <div class="custom-range-month-row custom-range-month-head">
+        <span>Month</span>
+        <span>Net P&amp;L</span>
+      </div>
+    `;
+
+    months.forEach(monthDate => {
+      const year = monthDate.getFullYear(), month = monthDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      let monthTotal = 0, tradingDays = 0;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateObj = new Date(year, month, day);
+        if (dateObj < from || dateObj > to) continue;
+        const dateStr = ymdLocal(dateObj);
+        const rows = pnlData[dateStr] || [];
+        if (rows.length > 0) {
+          tradingDays++;
+          monthTotal += rows.reduce((s, r) => s + r.netPnl, 0);
+        }
+      }
+      const cls = tradingDays > 0 ? (monthTotal >= 0 ? 'calc-history-win' : 'calc-history-loss') : 'custom-range-month-value-empty';
+      const valueText = tradingDays > 0 ? `${monthTotal >= 0 ? '+' : '-'}₹${fmt(Math.abs(monthTotal))}` : '—';
+      html += `
+        <div class="custom-range-month-row">
+          <span class="custom-range-month-name">${monthDate.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}</span>
+          <span class="custom-range-month-value ${cls}">${valueText}</span>
+        </div>
+      `;
+    });
+
+    wrap.innerHTML = html;
+  }
+
+  // No real charges field exists on the mock broker rows (scrip/qty/buy/
+  // sell/time only) — this derives a small, deterministic estimate from
+  // traded turnover (brokerage + STT + other statutory charges are
+  // commonly a fraction of a percent of turnover in a real broker report).
+  // It exists purely so Realized / Charges / Net P&L read as internally
+  // consistent (Realized − Charges = Net P&L) in this footer; it is NOT a
+  // real charges engine and shouldn't be treated as one.
+  function estimateBrokerCharges(row) {
+    const turnover = (row.buyPrice || 0) * (row.qty || 0) + (row.sellPrice || 0) * (row.qty || 0);
+    return turnover * 0.0006;
+  }
+
+  function renderCustomRangeSummary(from, to, months) {
+    const realizedEl = document.getElementById('custom-range-realized');
+    const chargesEl = document.getElementById('custom-range-charges');
+    const netEl = document.getElementById('custom-range-net');
+    const netLabelEl = document.getElementById('custom-range-net-label');
+    if (!realizedEl || !chargesEl || !netEl) return;
+
+    const pnlData = (typeof window.getBrokerPnlHistory === 'function') ? window.getBrokerPnlHistory() : {};
+    let netPnl = 0, charges = 0;
+    Object.keys(pnlData).forEach(dateStr => {
+      const dateObj = new Date(dateStr + 'T00:00:00');
+      if (dateObj < from || dateObj > to) return;
+      (pnlData[dateStr] || []).forEach(row => {
+        netPnl += row.netPnl;
+        charges += estimateBrokerCharges(row);
+      });
+    });
+    const realized = netPnl + charges;
+
+    realizedEl.innerText = `${realized >= 0 ? '+' : '-'}₹${fmt(Math.abs(realized))}`;
+    realizedEl.classList.toggle('calc-history-win', realized >= 0);
+    realizedEl.classList.toggle('calc-history-loss', realized < 0);
+    chargesEl.innerText = `₹${fmt(charges)}`;
+    netEl.innerText = `${netPnl >= 0 ? '+' : '-'}₹${fmt(Math.abs(netPnl))}`;
+    netEl.classList.toggle('calc-history-win', netPnl >= 0);
+    netEl.classList.toggle('calc-history-loss', netPnl < 0);
+    if (netLabelEl) netLabelEl.innerText = `Net P&L · ${months} month${months === 1 ? '' : 's'}`;
   }
 
   function showBrokerDayDetail(dateString) {
@@ -1312,6 +1505,11 @@
   window.renderCalculatorBrokerMode = renderCalculatorBrokerMode;
   window.setBrokerRange = setBrokerRange;
   window.onBrokerDayPicked = onBrokerDayPicked;
+  window.openCustomRangeModal = openCustomRangeModal;
+  window.closeCustomRangeModal = closeCustomRangeModal;
+  window.closeCustomRangeModalIfOutside = closeCustomRangeModalIfOutside;
+  window.shiftCustomRange = shiftCustomRange;
+  window.setCustomRangeView = setCustomRangeView;
   window.showBrokerDayDetail = showBrokerDayDetail;
   window.requestImportBrokerDay = requestImportBrokerDay;
   window.cancelImportBrokerDay = cancelImportBrokerDay;

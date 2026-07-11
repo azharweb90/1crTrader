@@ -6,11 +6,16 @@
    single most urgent state the app can be in.
    =========================================================== */
 
+/* Light theme — matches the reference design (same light-blue-to-white
+   gradient family as .auth-left/.onb-left) rather than the original dark
+   navy "blue screen". Every color below was converted from a
+   white-on-navy palette to a navy-on-light one; the structure/animations
+   are unchanged. */
 .cdl-overlay {
   position: fixed;
   inset: 0;
   z-index: 1050;
-  background: linear-gradient(165deg, #172554 0%, #1E3A8A 60%, #1D4ED8 140%);
+  background: radial-gradient(ellipse at 50% 15%, #EAF1FE 0%, #F5F6FA 55%, #ffffff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,7 +33,7 @@
 .cdl-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(50% 45% at 50% 22%, rgba(147, 197, 253, 0.18), transparent 65%);
+  background: radial-gradient(50% 45% at 50% 22%, rgba(37, 99, 235, 0.08), transparent 65%);
   pointer-events: none;
 }
 
@@ -50,8 +55,8 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: #ffffff;
+  border: 1px solid #DCE3EC;
   border-radius: 999px;
   padding: 6px 14px;
   font-family: 'IBM Plex Mono', monospace;
@@ -59,8 +64,9 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #ffffff;
+  color: #2563EB;
   margin-bottom: 28px;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.06);
 }
 .cdl-pill-icon { font-size: 12px; }
 
@@ -74,7 +80,8 @@
   width: 150px;
   height: 150px;
   border-radius: 999px;
-  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.9), rgba(147, 197, 253, 0.4) 70%, rgba(147, 197, 253, 0.15) 100%);
+  background: radial-gradient(circle at 50% 40%, #4C7EF2, #2563EB 70%, #1D4ED8 100%);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,33 +101,38 @@
 .cdl-countdown {
   font-size: 26px;
   font-weight: 800;
-  color: #1E3A8A;
+  color: #ffffff;
   font-variant-numeric: tabular-nums;
 }
 .cdl-instruction {
   font-size: 11.5px;
   font-weight: 600;
-  color: #1D4ED8;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .cdl-headline {
   font-size: 30px;
   font-weight: 800;
-  color: #ffffff;
+  color: #1E293B;
   margin: 0 0 14px;
 }
 
 .cdl-body {
   font-size: 15px;
   line-height: 1.6;
-  color: #C7D6F5;
+  color: #5B6B82;
   margin: 0 0 28px;
 }
-.cdl-body strong { color: #ffffff; }
+.cdl-body strong { color: #2563EB; }
 
 .cdl-note-wrap {
   text-align: left;
   margin-bottom: 24px;
+  background: #ffffff;
+  border: 1px solid #E3E9F1;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.06);
 }
 .cdl-note-eyebrow {
   font-family: 'IBM Plex Mono', monospace;
@@ -128,18 +140,18 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #93C5FD;
-  margin-bottom: 8px;
+  color: #2563EB;
+  margin-bottom: 10px;
 }
 .cdl-note-textarea {
   width: 100%;
   min-height: 100px;
   resize: vertical;
-  background: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
+  background: #F7F9FC;
+  border: 1px solid #DCE3EC;
+  border-radius: 10px;
   padding: 14px 16px;
-  color: #ffffff;
+  color: #1E293B;
   font-family: inherit;
   font-size: 14px;
   line-height: 1.55;
@@ -147,9 +159,11 @@
 }
 .cdl-note-textarea:focus {
   outline: none;
-  border-color: rgba(147, 197, 253, 0.6);
+  border-color: #2563EB;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
-.cdl-note-textarea::placeholder { color: rgba(255, 255, 255, 0.45); }
+.cdl-note-textarea::placeholder { color: #AEB9C8; }
 
 .cdl-ack-btn {
   display: block;
@@ -161,20 +175,22 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  background: #ffffff;
-  color: #1E3A8A;
+  background: #2563EB;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
   transition: filter 0.15s ease, opacity 0.15s ease;
 }
 .cdl-ack-btn:disabled {
-  background: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.7);
+  background: #DCE3EC;
+  color: #8A98AD;
   cursor: not-allowed;
+  box-shadow: none;
 }
-.cdl-ack-btn:hover:not(:disabled) { filter: brightness(0.97); }
+.cdl-ack-btn:hover:not(:disabled) { filter: brightness(1.05); }
 
 .cdl-footer {
   font-size: 12px;
-  color: #93A6D0;
+  color: #8A98AD;
   margin: 14px 0 0;
 }
 

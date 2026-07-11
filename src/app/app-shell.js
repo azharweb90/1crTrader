@@ -306,6 +306,112 @@
     applyReferenceSectionState(sectionId);
   }
 
+  // ---------- Position Size Calculator modal (Daily Limits Tool) ----------
+  // Per direction: shown as a modal directly on this page, not by
+  // navigating away to the Calculators tab. Reuses the exact field ids
+  // (ps-equity, ps-out-units, etc.) the REAL "Position Size" tab in
+  // features/calculators/calculators.html uses, so calculators.js's own
+  // recalcPosition()/onSharedEquityInput() run this completely unmodified
+  // — nothing about the calculator itself is duplicated, only its HTML
+  // fragment. That fragment is injected on open and cleared on close
+  // (rather than living permanently in daily-limits.html) so those ids
+  // are never simultaneously present alongside the real Calculators tab's
+  // own copy of them — getElementById only ever finds the first match in
+  // the document, so leaving both in the DOM at once would make one
+  // silently start reading/writing the other's fields the moment a
+  // trader visited that tab too. This modal is also a fixed, full-screen,
+  // higher-z-index overlay (same pattern as the broker-import modal), so
+  // a trader can't reach the sidebar to navigate there while it's open —
+  // clearing on close just removes the risk for good either way.
+  function positionCalcModalHtml() {
+    return `
+      <div class="calc-grid">
+        <div class="calc-card">
+          <div class="calc-card-label">INPUTS</div>
+          <div class="calc-field">
+            <label for="ps-equity">Account Equity (₹)</label>
+            <input type="number" id="ps-equity" class="calc-input" oninput="onSharedEquityInput(this.value); recalcPosition();">
+          </div>
+          <div class="calc-field">
+            <label for="ps-risk">Risk per Trade (%)</label>
+            <input type="number" id="ps-risk" class="calc-input" value="1" oninput="recalcPosition()">
+          </div>
+          <div class="calc-field-row">
+            <div class="calc-field">
+              <label for="ps-entry">Entry Price (₹)</label>
+              <input type="number" id="ps-entry" class="calc-input" placeholder="0.00" oninput="recalcPosition()">
+            </div>
+            <div class="calc-field">
+              <label for="ps-stop">Stop-Loss (₹)</label>
+              <input type="number" id="ps-stop" class="calc-input" placeholder="0.00" oninput="recalcPosition()">
+            </div>
+          </div>
+          <p class="calc-formula-note">Position Size = (Equity &times; Risk%) &divide; |Entry &minus; Stop-Loss|. This is the number of units where hitting your stop loses exactly your chosen risk, and no more.</p>
+        </div>
+        <div class="calc-result-col">
+          <div class="calc-hero-card calc-hero-blue">
+            <div class="calc-hero-label">POSITION SIZE</div>
+            <div class="calc-hero-value-row"><span id="ps-out-units" class="calc-hero-value">&mdash;</span><span class="calc-hero-unit">units</span></div>
+            <div id="ps-out-sub" class="calc-hero-sub">Enter entry &amp; stop-loss</div>
+          </div>
+          <div class="calc-stat-row">
+            <div class="calc-stat-card">
+              <div class="calc-stat-label">MAX &#8377; RISK</div>
+              <div id="ps-out-maxrisk" class="calc-stat-value calc-stat-value-loss">&mdash;</div>
+              <div id="ps-out-maxrisk-sub" class="calc-stat-sub">&mdash;</div>
+            </div>
+            <div class="calc-stat-card">
+              <div class="calc-stat-label">RISK / UNIT</div>
+              <div id="ps-out-riskunit" class="calc-stat-value">&mdash;</div>
+              <div class="calc-stat-sub">Entry to stop distance</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="foot-note" style="margin-top:14px;">Trade Expectancy, Drawdown &amp; Recovery, Equity Simulator and Withdraw &amp; Scale are on the full <a href="#" onclick="closePositionCalcModal(); switchTab(null, 'tab-calculators'); return false;">Calculators</a> tab.</p>
+    `;
+  }
+
+  function openPositionSizeCalculator() {
+    const overlay = document.getElementById('position-calc-modal-overlay');
+    const body = document.getElementById('position-calc-modal-body');
+    if (!overlay || !body) return;
+    body.innerHTML = positionCalcModalHtml();
+    overlay.classList.remove('hidden');
+
+    // (Re)seeds shared equity from the trader's real balance and
+    // recalculates — safe to call even though only the position-size
+    // fragment exists in this DOM right now: every other tab's ids
+    // (dd-equity, es-capital, etc.) simply aren't found and are silently
+    // skipped by num()/setText()'s own null checks.
+    function runInitialCalc() {
+      if (typeof window.renderCalculators === 'function') {
+        window.renderCalculators();
+      } else {
+        setTimeout(runInitialCalc, 50);
+      }
+    }
+
+    if (typeof window.recalcPosition === 'function') {
+      runInitialCalc();
+    } else {
+      loadScript('/src/app/features/calculators/calculators.js').then(runInitialCalc).catch(() => {});
+    }
+  }
+
+  function closePositionCalcModal() {
+    const overlay = document.getElementById('position-calc-modal-overlay');
+    const body = document.getElementById('position-calc-modal-body');
+    if (overlay) overlay.classList.add('hidden');
+    if (body) body.innerHTML = '';
+  }
+
+  function closePositionCalcModalIfOutside(event) {
+    if (event.target && event.target.id === 'position-calc-modal-overlay') {
+      closePositionCalcModal();
+    }
+  }
+
   function tierForBalance(balance) {
     for (let i = TIER_ORDER.length - 1; i >= 0; i--) {
       const t = TIER_ORDER[i];
@@ -2441,6 +2547,9 @@
   window.getOfficialSubLevelKey = getOfficialSubLevelKey;
   window.toggleReferenceSection = toggleReferenceSection;
   window.applyReferenceSectionState = applyReferenceSectionState;
+  window.openPositionSizeCalculator = openPositionSizeCalculator;
+  window.closePositionCalcModal = closePositionCalcModal;
+  window.closePositionCalcModalIfOutside = closePositionCalcModalIfOutside;
   window.getRiskSummary = getRiskSummary;
   window.confirmProfile = confirmProfile;
   window.adjustFontSize = adjustFontSize;

@@ -359,11 +359,42 @@
   margin: 0;
 }
 
-/* Compact capital ladder reference table, folded in at the top of this screen */
-.mini-ladder-wrap {
-  margin-bottom: 24px;
+/* Reference design shows each section on this screen (reference tables,
+   broker connect, trade log/output panels, history) as its own separate
+   white card afloat on the gray page canvas — not merged into one shared
+   white page card. Selector uses two classes (.content-section plus this
+   page's own marker class) to beat app-theme.css's single-class
+   `.content-section` rule on a specificity tie regardless of stylesheet
+   load order — same technique already used by `.content-section.setup-wizard`
+   in tier-select.css. */
+.content-section.daily-limits-page {
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
+/* Compact capital ladder reference table, folded in at the top of this
+   screen. Now its own white card (border + shadow) instead of a plain
+   text row sitting directly on the shared page background, matching the
+   reference's card-ized collapsible headers. */
+.mini-ladder-wrap {
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #E3E9F1);
+  border-radius: 14px;
+  /* Vertical spacing now lives entirely on the header row (fixed height,
+     see #instrument-sl-wrap/#tier-ref-wrap below) and the collapsible
+     body's own padding — not here — so the collapsed card's total height
+     equals the header's height exactly, with no extra padding on top. */
+  padding: 0 20px;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.06);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+/* Standalone banner between the two collapsible cards (moved out of
+   #instrument-ref-body per the reference design — was nested inside the
+   first card's collapsible content, now its own card on the gray
+   canvas). */
 .lot-unlock-note {
   display: flex;
   align-items: flex-start;
@@ -371,9 +402,9 @@
   background: #EEF6FF;
   border: 1px solid #BBDAFB;
   border-left: 4px solid #2563EB;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-top: 10px;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 0 0 20px;
   font-size: 15px;
   color: #1A3A63;
   line-height: 1.55;
@@ -409,13 +440,16 @@
   margin-bottom: 10px;
 }
 
-/* Collapsible reference table header (click to expand/collapse) */
+/* Collapsible reference table header (click to expand/collapse). Fixed
+   height per card (set below) so each collapsed card's total height
+   matches the reference exactly — the header no longer relies on
+   .mini-ladder-wrap's padding for its vertical size. */
 .mini-ladder-toggle-header {
   width: 100%;
   background: none;
   border: none;
   padding: 0;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -424,12 +458,82 @@
   text-align: left;
 }
 
+/* "Capital Tier & Points Stop-Loss By Instrument" — has the Position Size
+   Calculator button, needs the taller strip. */
+#instrument-sl-wrap > .mini-ladder-toggle-header {
+  height: 58px;
+}
+
+/* "See How Loss % Changes By Tier" — title + chevron only, shorter strip. */
+#tier-ref-wrap > .mini-ladder-toggle-header {
+  height: 48px;
+}
+
 .mini-ladder-toggle-header .mini-ladder-title {
   margin-bottom: 0;
 }
 
-.mini-ladder-toggle-header:hover .mini-ladder-title {
+.mini-ladder-toggle-header:hover .mini-ladder-title,
+.mini-ladder-toggle-title-btn:hover .mini-ladder-title {
   color: #1E293B;
+}
+
+/* Title half of the header, split into its own button so the Position
+   Size Calculator action button can sit beside it without nesting
+   <button> inside <button> (the collapsible header used to be one single
+   button wrapping the title + chevron). */
+.mini-ladder-toggle-title-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.mini-ladder-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.mini-ladder-calc-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.mini-ladder-calc-btn:hover {
+  opacity: 0.88;
+}
+
+.mini-ladder-chevron-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
 }
 
 .mini-ladder-chevron {
@@ -439,6 +543,12 @@
   color: #8A98AD;
   transition: transform 0.2s ease;
   flex-shrink: 0;
+}
+
+/* Legacy single-button header (the second collapsible, "See How Loss %
+   Changes By Tier", which has no action button and keeps the original
+   title+chevron-in-one-button structure) still needs its own gap. */
+.mini-ladder-toggle-header > .mini-ladder-chevron {
   margin-left: 10px;
 }
 
@@ -453,6 +563,13 @@
 .mini-ladder-collapsible-body {
   overflow: hidden;
   max-height: 2000px;
+  /* Now that .mini-ladder-wrap has no vertical padding of its own, this
+     padding is what gives expanded content breathing room below the
+     fixed-height header and above the card's rounded bottom edge. When
+     collapsed (max-height:0 below) it's clipped away along with
+     everything else in the body, so it doesn't affect the 58px/48px
+     collapsed strip height. */
+  padding: 8px 0 18px;
   transition: max-height 0.25s ease, opacity 0.2s ease;
   opacity: 1;
 }
@@ -461,6 +578,11 @@
   max-height: 0;
   opacity: 0;
   margin: 0;
+  /* Explicitly zeroed rather than relying on max-height:0 to visually
+     clip it — padding can force a box taller than its max-height in some
+     box-sizing contexts, which would silently add height back to the
+     "collapsed" strip. */
+  padding: 0;
 }
 
 .mini-ladder-grid {
@@ -644,9 +766,12 @@
   background: #FBE7E2;
 }
 
-/* Compact log history embedded directly on the Daily Limits Tool screen */
+/* Compact log history embedded directly on the Daily Limits Tool screen —
+   its own white card now too (background/border/shadow set in
+   app-theme.css's Daily Limits Tool section; padding lives here). */
 .calc-history-wrap {
   margin-top: 24px;
+  padding: 18px 20px;
 }
 
 .calc-history-grid {
@@ -840,6 +965,293 @@
   }
 }
 
+/* Position Size Calculator modal — narrower than the 760px broker-import
+   modal (no scrip table to fit), sized to .calc-grid's own 1.35fr/1fr
+   two-column layout instead. */
+.position-calc-modal {
+  width: 700px;
+}
+
+/* Custom Range modal — wider than the default broker-import modal (760px)
+   so 3 months of the bumped-up calendar cells fit comfortably; reuses
+   .broker-import-modal's overlay/card/close-button chrome, only the
+   header (nav row + view toggle) and footer (Realized/Charges/Net P&L)
+   are new. */
+.custom-range-modal {
+  width: 980px;
+}
+
+.custom-range-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 22px;
+  border-bottom: 1px solid #E3E9F1;
+  flex: 0 0 auto;
+}
+
+.custom-range-modal-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.custom-range-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-range-nav-btn {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 7px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5B6B82;
+  cursor: pointer;
+  padding: 0;
+}
+
+.custom-range-nav-btn:hover {
+  border-color: #2563EB;
+  color: #2563EB;
+}
+
+.custom-range-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1E293B;
+  white-space: nowrap;
+}
+
+.custom-range-duration-dot {
+  color: #AEB9C8;
+}
+
+.custom-range-duration {
+  font-size: 13px;
+  color: #8A98AD;
+  white-space: nowrap;
+}
+
+.custom-range-modal-header-right {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+/* #custom-range-view-toggle reuses .broker-range-pills for layout (flex
+   row + gap) but NOT .broker-range-pill's full capsule radius — per the
+   reference, Calendar/Monthly Table are rounded RECTANGLES (small
+   radius), visually distinct from the fully-pill-shaped filter buttons
+   (Pick a Day / 3 Months / etc.) elsewhere on this page. Overrides the
+   radius/padding here rather than introducing a whole separate button
+   class, since everything else about .broker-range-pill (colors, active
+   state, hover) is exactly right and should stay shared. */
+#custom-range-view-toggle {
+  margin: 0;
+}
+
+#custom-range-view-toggle .broker-range-pill {
+  border-radius: 8px;
+  padding: 7px 14px;
+}
+
+/* Close (x) button boxed to match the prev/next nav arrows' rounded-square
+   look, scoped to this modal only — the broker-import modal's own close
+   button (a different modal) is untouched. */
+.custom-range-modal-header .broker-import-modal-close {
+  background: #F7F9FC;
+  border: 1px solid #E3E9F1;
+  border-radius: 7px;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.custom-range-modal-header .broker-import-modal-close:hover {
+  border-color: #2563EB;
+  color: #2563EB;
+}
+
+.custom-range-modal-body {
+  padding: 20px 22px;
+}
+
+.custom-range-modal-body .broker-multi-month-grid {
+  overflow-x: visible;
+  flex-wrap: wrap;
+}
+
+/* Wraps the whole Month/Net P&L block (header bar + rows) in one visible
+   border, matching the reference — the header bar's own top-rounded
+   corners plus this container's border/overflow:hidden gives a single
+   clean rounded rectangle around the entire table, not just loose rows. */
+#custom-range-table-wrap {
+  border: 1px solid #E3E9F1;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Monthly Table view — plain list rows (month + colored net P&L only),
+   not a bordered spreadsheet grid, matching the reference's clean look. */
+.custom-range-month-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 4px;
+  border-bottom: 1px solid #F1F4F8;
+}
+
+.custom-range-month-row:last-child {
+  border-bottom: none;
+}
+
+.custom-range-month-head {
+  background: #F7F9FC;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 1px solid #E3E9F1;
+  padding: 12px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8A98AD;
+}
+
+.custom-range-month-row:not(.custom-range-month-head) {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.custom-range-month-name {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+/* No hardcoded color here on purpose — this class used to set
+   color:#1E293B directly, which (same specificity, later in the
+   cascade) silently beat .calc-history-win/.calc-history-loss's own
+   color and made every value render black regardless of profit/loss.
+   Color now comes ONLY from whichever state class is added alongside
+   this one in the JS (calc-history-win / calc-history-loss /
+   custom-range-month-value-empty below). */
+.custom-range-month-value {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.custom-range-month-value-empty {
+  color: #AEB9C8;
+  font-weight: 600;
+}
+
+#custom-range-table-wrap.hidden {
+  display: none;
+}
+
+.custom-range-legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 22px;
+  border-top: 1px solid #E3E9F1;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.custom-range-legend-row.hidden {
+  display: none;
+}
+
+.custom-range-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 22px;
+  border-top: 1px solid #E3E9F1;
+  background: #F7F9FC;
+  flex: 0 0 auto;
+}
+
+.custom-range-footer-stats {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.custom-range-footer-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.custom-range-footer-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8A98AD;
+}
+
+.custom-range-footer-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1E293B;
+  font-variant-numeric: tabular-nums;
+}
+
+.custom-range-footer-net {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+/* No hardcoded color here — same bug as .custom-range-month-value had:
+   this class's own color (same specificity, later in the cascade) was
+   silently beating .calc-history-win/.calc-history-loss's color, so the
+   footer's Net P&L always rendered dark navy regardless of sign. Color
+   now comes only from whichever win/loss class renderCustomRangeSummary()
+   toggles on #custom-range-net alongside this one. */
+.custom-range-footer-net-value {
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1020px) {
+  .custom-range-modal {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .custom-range-modal-header {
+    flex-direction: column;
+  }
+  .custom-range-modal-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
 /* Table itself no longer needs the drawer-era horizontal-scroll fallback
    or the 620px min-width hack — the 760px modal has room for all 6
    columns already. */
@@ -963,29 +1375,17 @@
 }
 
 /* Range selection pills */
-.broker-range-columns {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 28px;
-  align-items: start;
-}
-
-.broker-range-controls {
-  display: flex;
-  flex-direction: column;
-}
-
-@media (max-width: 760px) {
-  .broker-range-columns {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Full-width stacked layout — the pills row needs real width to sit in
+   one row; the old 260px-wide side-by-side left column (.broker-range-columns/
+   .broker-range-controls, now removed from the markup) wasn't nearly wide
+   enough for 5 pills and was what actually produced the "messy, wrapped
+   into a narrow column" look, not the idea of stacking itself. */
 .broker-range-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-top: 18px;
+  margin-bottom: 14px;
 }
 
 .broker-range-pill {
@@ -1062,19 +1462,22 @@
 }
 
 /* Multi-month dot grid: one column per month, 5 rows of day-dots, total
-   underneath — mirrors a real broker's yearly P&L overview. */
+   underneath — mirrors a real broker's yearly P&L overview. Cell size
+   bumped up from the original 210px-wide block (~25px cells, numbers read
+   as cramped) to match the reference's roomier day cells. */
 .broker-multi-month-grid {
   display: flex;
-  gap: 64px;
+  gap: 48px;
   overflow-x: auto;
   padding-bottom: 6px;
+  margin-top: 8px;
   justify-content: flex-start;
   align-items: flex-start;
 }
 
 .broker-month-block {
   flex: 0 0 auto;
-  width: 210px;
+  width: 260px;
 }
 
 .broker-month-block-label {
@@ -1088,7 +1491,7 @@
 .broker-month-weekday-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 7px;
   margin-bottom: 8px;
 }
 
@@ -1103,20 +1506,20 @@
 .broker-month-dots {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 7px;
 }
 
 .broker-month-dot {
   aspect-ratio: 1 / 1;
   width: 100%;
-  border-radius: 10px;
+  border-radius: 9px;
   border: none;
   padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: #5B6B82;

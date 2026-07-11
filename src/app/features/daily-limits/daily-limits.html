@@ -1,7 +1,6 @@
 <!-- COMPONENT: risk-calculator -->
-<section class="content-section">
-  <p class="section-note">This is your main screen — log today's trade outcomes here to stay inside your daily risk
-    limits. Completed days automatically update your running balance shown in the header and roadmap.</p>
+<section class="content-section daily-limits-page">
+  <p class="section-note">This is your main screen — log today's trade outcomes here to stay inside your daily risk limits.<br>Completed days automatically update your running balance shown in the header and roadmap.</p>
 
   <!-- Points stop-loss per selected instrument, derived from this tier's
        max rupee loss and the lot size/count chosen during profile setup.
@@ -14,11 +13,20 @@
        (confirmed with the trader — same number every row otherwise, since
        one trader has one tier). -->
   <div id="instrument-sl-wrap" class="mini-ladder-wrap hidden">
-    <button type="button" id="instrument-ref-toggle" class="mini-ladder-toggle-header"
-      onclick="toggleReferenceSection('instrument-ref')">
-      <span class="mini-ladder-title">Capital Tier &amp; Points Stop-Loss By Instrument</span>
-      <span id="instrument-ref-chevron" class="mini-ladder-chevron"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
-    </button>
+    <div class="mini-ladder-toggle-header">
+      <button type="button" class="mini-ladder-toggle-title-btn" onclick="toggleReferenceSection('instrument-ref')">
+        <span class="mini-ladder-title">Capital Tier &amp; Points Stop-Loss By Instrument</span>
+      </button>
+      <div class="mini-ladder-header-actions">
+        <button type="button" class="mini-ladder-calc-btn" onclick="openPositionSizeCalculator()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="8" y2="12"/><line x1="12" y1="12" x2="12" y2="12"/><line x1="16" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="12" y1="16" x2="12" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
+          Position Size Calculator
+        </button>
+        <button type="button" id="instrument-ref-toggle" class="mini-ladder-chevron-btn" onclick="toggleReferenceSection('instrument-ref')" aria-label="Toggle Capital Tier &amp; Points Stop-Loss By Instrument">
+          <span id="instrument-ref-chevron" class="mini-ladder-chevron"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+      </div>
+    </div>
     <div id="instrument-ref-body" class="mini-ladder-collapsible-body">
       <div id="instrument-tier-summary" class="instrument-tier-summary"></div>
       <div id="instrument-sl-grid" class="mini-ladder-grid instrument-sl-grid"></div>
@@ -27,11 +35,16 @@
         points to see what it would actually cost in rupees at your current lot count &mdash; independent of the flat
         Points SL figure, which always equals today's max loss exactly. If that figure exceeds what your tier allows
         for the lots you're using, it's flagged in red &mdash; shown for your own calculation, never blocked.</p>
-      <p id="lot-unlock-note" class="lot-unlock-note hidden"></p>
     </div>
   </div>
 
-
+  <!-- Moved out of #instrument-ref-body per the reference design — this
+       reads as its own standalone banner between the two collapsible
+       cards, not nested inside the first card's collapsible content.
+       Still the same element (#lot-unlock-note), still populated/shown by
+       the exact same JS in app-shell.js — only its position in the DOM
+       changed, not its id or behavior. -->
+  <p id="lot-unlock-note" class="lot-unlock-note hidden"></p>
 
   <!-- Full all-tiers reference table — restored per the trader's request:
        collapsed by default (so it doesn't compete with the live working
@@ -43,7 +56,7 @@
     <button type="button" id="tier-ref-toggle" class="mini-ladder-toggle-header"
       onclick="toggleReferenceSection('tier-ref')">
       <span class="mini-ladder-title">See How Loss % Changes By Tier (all tiers, for reference)</span>
-      <span id="tier-ref-chevron" class="mini-ladder-chevron"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      <span id="tier-ref-chevron" class="mini-ladder-chevron"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
     </button>
     <div id="tier-ref-body" class="mini-ladder-collapsible-body">
       <div id="tier-ref-grid" class="mini-ladder-grid mini-ladder-grid-5col"></div>
@@ -74,46 +87,118 @@
       </div>
     </div>
 
-    <!-- Two columns: controls/message on the left (range pills, date-range
-         label, empty-state prompt, legend), calendar itself on the right —
-         confirmed with the trader: stacking everything vertically above
-         the calendar left too much empty white space beside it and read
-         as messy. -->
-    <div class="broker-range-columns">
-      <div class="broker-range-controls">
-        <!-- Range pills: nothing is pre-selected — the trader picks one
-             explicitly before any data renders, rather than the calendar
-             loading pre-populated with a default range. -->
-        <div class="broker-range-pills">
-          <button type="button" id="broker-range-day" class="broker-range-pill" onclick="setBrokerRange('day')">Pick a Day</button>
-          <button type="button" id="broker-range-month" class="broker-range-pill" onclick="setBrokerRange('month')">This Month</button>
-          <button type="button" id="broker-range-3months" class="broker-range-pill" onclick="setBrokerRange('3months')">3 Months</button>
-          <button type="button" id="broker-range-fy" class="broker-range-pill" onclick="setBrokerRange('fy')">This Financial Year</button>
-        </div>
-        <div id="broker-day-picker-wrap" class="broker-day-picker-wrap hidden">
-          <input type="date" id="broker-day-picker-input" class="broker-day-picker-input" onchange="onBrokerDayPicked(this.value)">
-        </div>
-        <div id="broker-range-label" class="broker-range-label-pill">&mdash;</div>
+    <!-- Single stacked column, full width — the pills row (5 buttons) needs
+         real width to sit in one row without wrapping messily; the earlier
+         260px-wide side-by-side left column wasn't remotely wide enough
+         for that, which is what actually produced the "messy" look, not
+         the stacked layout itself. Range label, empty state, and legend
+         all stay directly under the pills; the calendar grid follows
+         below, full width. -->
+    <!-- Range pills: nothing is pre-selected — the trader picks one
+         explicitly before any data renders, rather than the calendar
+         loading pre-populated with a default range. -->
+    <div class="broker-range-pills">
+      <button type="button" id="broker-range-day" class="broker-range-pill" onclick="setBrokerRange('day')">Pick a Day</button>
+      <button type="button" id="broker-range-month" class="broker-range-pill" onclick="setBrokerRange('month')">This Month</button>
+      <button type="button" id="broker-range-3months" class="broker-range-pill" onclick="setBrokerRange('3months')">3 Months</button>
+      <button type="button" id="broker-range-fy" class="broker-range-pill" onclick="setBrokerRange('fy')">This Financial Year</button>
+      <!-- Opens the Custom Range modal (see #custom-range-modal-overlay
+           near the other modals below) instead of switching the inline
+           range in place — matches the reference, which shows Custom
+           Range as its own dedicated browsing view, not a 5th inline
+           state of this same pill row. -->
+      <button type="button" id="broker-range-custom" class="broker-range-pill" onclick="openCustomRangeModal()">Custom Range</button>
+    </div>
+    <div id="broker-day-picker-wrap" class="broker-day-picker-wrap hidden">
+      <input type="date" id="broker-day-picker-input" class="broker-day-picker-input" onchange="onBrokerDayPicked(this.value)">
+    </div>
+    <div id="broker-range-label" class="broker-range-label-pill">&mdash;</div>
 
-        <!-- Shown before the trader has picked any range — replaces the
-             old behavior of the calendar loading pre-populated by default. -->
-        <div id="broker-range-empty-state" class="broker-range-empty-state">
-          Pick a day, month, or year to see your trades for that period.
-        </div>
-
-        <p id="broker-legend-note" class="foot-note hidden" style="margin-top:14px;"><span class="broker-legend-dot broker-legend-green"></span> Profit day
-          &nbsp; <span class="broker-legend-dot broker-legend-red"></span> Loss day &nbsp; <span
-            class="broker-legend-dot broker-legend-gray"></span> No trades &nbsp;&middot;&nbsp; click a day to view and
-          import it</p>
-      </div>
-
-      <!-- Multi-month dot grid: one calendar block per month in the
-           selected range, weekday-aligned, monthly net total underneath
-           each block. -->
-      <div id="broker-multi-month-grid" class="broker-multi-month-grid hidden"></div>
+    <!-- Shown before the trader has picked any range — replaces the
+         old behavior of the calendar loading pre-populated by default. -->
+    <div id="broker-range-empty-state" class="broker-range-empty-state">
+      Pick a day, month, or year to see your trades for that period.
     </div>
 
+    <!-- Multi-month dot grid: one calendar block per month in the
+         selected range, weekday-aligned, monthly net total underneath
+         each block. -->
+    <div id="broker-multi-month-grid" class="broker-multi-month-grid hidden"></div>
+
+    <p id="broker-legend-note" class="foot-note hidden" style="margin-top:14px;"><span class="broker-legend-dot broker-legend-green"></span> Profit day
+      &nbsp; <span class="broker-legend-dot broker-legend-red"></span> Loss day &nbsp; <span
+        class="broker-legend-dot broker-legend-gray"></span> No trades &nbsp;&middot;&nbsp; click a day to view and
+      import it</p>
+
     <p id="broker-sync-status" class="foot-note" style="margin-top:10px;"></p>
+  </div>
+
+  <!-- Custom Range modal — a dedicated wide browsing view (Calendar or
+       Monthly Table) over a sliding date window, opened from the "Custom
+       Range" pill above. Clicking a day still opens the same day-detail /
+       import panel (#broker-import-panel-overlay below) as the inline
+       calendar does — showBrokerDayDetail() doesn't care which grid the
+       click came from. -->
+  <div id="custom-range-modal-overlay" class="broker-import-modal-overlay hidden" onclick="closeCustomRangeModalIfOutside(event)">
+    <div class="broker-import-modal custom-range-modal">
+      <div class="custom-range-modal-header">
+        <div class="custom-range-modal-header-left">
+          <div class="broker-import-modal-title">Custom Range</div>
+          <div class="custom-range-nav-row">
+            <button type="button" class="custom-range-nav-btn" onclick="shiftCustomRange(-1)" aria-label="Earlier">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span id="custom-range-label" class="custom-range-label">&mdash;</span>
+            <span class="custom-range-duration-dot">&middot;</span>
+            <span id="custom-range-duration" class="custom-range-duration">&mdash;</span>
+            <button type="button" class="custom-range-nav-btn" onclick="shiftCustomRange(1)" aria-label="Later">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="custom-range-modal-header-right">
+          <div class="broker-range-pills" id="custom-range-view-toggle">
+            <button type="button" class="broker-range-pill" data-view="calendar" onclick="setCustomRangeView('calendar')">Calendar</button>
+            <button type="button" class="broker-range-pill" data-view="table" onclick="setCustomRangeView('table')">Monthly Table</button>
+          </div>
+          <button type="button" class="broker-import-modal-close" onclick="closeCustomRangeModal()">&times;</button>
+        </div>
+      </div>
+      <div class="broker-import-modal-body custom-range-modal-body">
+        <div id="custom-range-calendar-wrap">
+          <div id="custom-range-grid" class="broker-multi-month-grid"></div>
+        </div>
+        <div id="custom-range-table-wrap" class="hidden"></div>
+      </div>
+      <!-- Legend + click hint — same dot legend as the inline calendar's
+           #broker-legend-note, fixed above the footer (outside the
+           scrollable body) so it stays visible while the grid scrolls.
+           Calendar-only: hidden in Monthly Table view via
+           renderCustomRangeModal(), same as the summary stats aren't
+           day-click-driven in that view. -->
+      <div id="custom-range-legend-row" class="custom-range-legend-row">
+        <p class="foot-note" style="margin:0;"><span class="broker-legend-dot broker-legend-green"></span> Profit day
+          &nbsp; <span class="broker-legend-dot broker-legend-red"></span> Loss day &nbsp; <span
+            class="broker-legend-dot broker-legend-gray"></span> No trades</p>
+        <p class="foot-note" style="margin:0;">Click a day to view and import it</p>
+      </div>
+      <div class="custom-range-modal-footer">
+        <div class="custom-range-footer-stats">
+          <div class="custom-range-footer-stat">
+            <div class="custom-range-footer-label">Realized</div>
+            <div id="custom-range-realized" class="custom-range-footer-value">&mdash;</div>
+          </div>
+          <div class="custom-range-footer-stat">
+            <div class="custom-range-footer-label">Charges</div>
+            <div id="custom-range-charges" class="custom-range-footer-value">&mdash;</div>
+          </div>
+        </div>
+        <div class="custom-range-footer-net">
+          <div id="custom-range-net-label" class="custom-range-footer-label">Net P&amp;L</div>
+          <div id="custom-range-net" class="custom-range-footer-net-value">&mdash;</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Centered modal (not a right-side drawer, on purpose) — the scrip
@@ -348,6 +433,30 @@
     75% of the max daily loss blocks Trade 2 entirely; a loss reaching 100% triggers the kill switch. Otherwise — profit
     or a sub-cutoff loss — Trade 2 unlocks only after a mandatory 30-minute cooldown. Each trade is submitted and
     recorded individually.</p>
+
+  <!-- Position Size Calculator modal — opened from the "Capital Tier &
+       Points Stop-Loss" header button above, without leaving this page.
+       #position-calc-modal-body is filled in and cleared out by
+       openPositionSizeCalculator()/closePositionCalcModal() (app-shell.js)
+       rather than holding static markup here — see the comment on those
+       functions for why (duplicate-id collision with the real "Position
+       Size" tab under Calculators otherwise). Reuses the broker-import
+       modal's overlay/header/close-button chrome for consistency with the
+       rest of this page's modals. -->
+  <div id="position-calc-modal-overlay" class="broker-import-modal-overlay hidden" onclick="closePositionCalcModalIfOutside(event)">
+    <div class="broker-import-modal position-calc-modal">
+      <div class="broker-import-modal-header">
+        <div>
+          <div class="broker-import-modal-title">Position Size Calculator</div>
+          <div class="foot-note" style="margin-top:3px;">How many units to buy, sized to your risk.</div>
+        </div>
+        <button type="button" class="broker-import-modal-close" onclick="closePositionCalcModal()">&times;</button>
+      </div>
+      <div class="broker-import-modal-body">
+        <div id="position-calc-modal-body"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Quick journal note modal — lightweight, opened from either trade card.
        Saves into the SAME journal entry record used by the full Trading
