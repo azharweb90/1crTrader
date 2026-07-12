@@ -151,10 +151,55 @@
     return null;
   }
 
-  // Stricter check used on the SIGN-UP form (login just needs "not empty").
+  // ---------- Password strength (register form only) ----------
+  // Login just needs "not empty" (validatePasswordRequired above) —
+  // this stricter, requirement-by-requirement check only applies to
+  // choosing a NEW password on signup, and drives the live strength
+  // meter/checklist in updatePasswordStrength() below.
+  function getPasswordRequirements(value) {
+    const v = value || '';
+    return {
+      length: v.length >= 8,
+      uppercase: /[A-Z]/.test(v),
+      lowercase: /[a-z]/.test(v),
+      number: /[0-9]/.test(v),
+      special: /[^A-Za-z0-9]/.test(v),
+    };
+  }
+
+  function allPasswordRequirementsMet(reqs) {
+    return reqs.length && reqs.uppercase && reqs.lowercase && reqs.number && reqs.special;
+  }
+
   function validateNewPassword(value) {
-    if (!value) return 'Enter a password.';
-    if (value.length < 8) return 'Password must be at least 8 characters.';
+    if (!value) return 'Password is required.';
+    if (!allPasswordRequirementsMet(getPasswordRequirements(value))) {
+      return 'Your password doesn’t meet all requirements below.';
+    }
+    return null;
+  }
+
+  // Maps how many of the 5 requirements are met to a bar fill/label —
+  // deliberately coarse (4 buckets) rather than a raw percentage, so
+  // small differences in password length don't make the bar/label
+  // flicker between near-identical states while typing.
+  function getPasswordStrength(reqs) {
+    const metCount = Object.keys(reqs).filter(key => reqs[key]).length;
+    if (metCount <= 1) return { level: 'weak', label: 'Weak', percent: 20 };
+    if (metCount <= 3) return { level: 'fair', label: 'Fair', percent: 50 };
+    if (metCount === 4) return { level: 'good', label: 'Good', percent: 75 };
+    return { level: 'strong', label: 'Strong', percent: 100 };
+  }
+
+  function validateConfirmPassword(value, original) {
+    if (!value) return 'Please confirm your password.';
+    if (value !== original) return 'Passwords don’t match.';
+    return null;
+  }
+
+  function validateName(value) {
+    const v = (value || '').trim();
+    if (!v) return 'Full name is required.';
     return null;
   }
 
@@ -197,9 +242,58 @@
   const ICON_EYE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
   const ICON_EYE_OFF = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.8 21.8 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 5c7 0 11 7 11 7a21.8 21.8 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 
+  // ---------- Password copy-to-clipboard (register form only) ----------
+  const ICON_COPY = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  const ICON_CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const ICON_CHECK_SMALL = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  // ---------- Password strength meter UI (register form only) ----------
+  // Live-updates the bar/label/checklist as the trader types — see the
+  // 'input' listener on register-password below. Hidden entirely while
+  // the field is empty; nothing to grade yet.
+  function setStrengthCheck(key, met) {
+    const el = document.querySelector('.auth-strength-check[data-check="' + key + '"]');
+    if (!el) return;
+    el.classList.toggle('auth-strength-check-met', met);
+    const iconEl = el.querySelector('.auth-strength-check-icon');
+    if (iconEl) iconEl.innerHTML = met ? ICON_CHECK_SMALL : '';
+  }
+
+  function updatePasswordStrength(value) {
+    const wrap = document.getElementById('register-password-strength');
+    const checklist = document.getElementById('register-password-checklist');
+    const reqs = getPasswordRequirements(value);
+
+    if (!value) {
+      if (wrap) wrap.classList.add('hidden');
+      if (checklist) checklist.classList.add('hidden');
+      Object.keys(reqs).forEach(key => setStrengthCheck(key, false));
+      return;
+    }
+
+    if (wrap) wrap.classList.remove('hidden');
+    if (checklist) checklist.classList.remove('hidden');
+    Object.keys(reqs).forEach(key => setStrengthCheck(key, reqs[key]));
+
+    const strength = getPasswordStrength(reqs);
+    const fillEl = document.getElementById('register-password-strength-fill');
+    const labelEl = document.getElementById('register-password-strength-label');
+    if (fillEl) {
+      fillEl.style.width = strength.percent + '%';
+      fillEl.className = 'auth-strength-bar-fill auth-strength-bar-fill-' + strength.level;
+    }
+    if (labelEl) {
+      labelEl.innerText = strength.label;
+      labelEl.className = 'auth-strength-label auth-strength-label-' + strength.level;
+    }
+  }
+
   function initPasswordIcons() {
     document.querySelectorAll('[id$="-password-toggle"]').forEach(btn => {
       btn.innerHTML = ICON_EYE;
+    });
+    document.querySelectorAll('[id$="-password-copy"]').forEach(btn => {
+      btn.innerHTML = ICON_COPY;
     });
   }
 
@@ -214,6 +308,40 @@
     }
   }
   window.togglePasswordVisibility = togglePasswordVisibility;
+
+  // Copies the password field's current value to the clipboard and
+  // swaps the icon to a checkmark for ~1.2s as feedback — there's
+  // nothing else on screen that would tell the trader the click
+  // registered. Copy is a convenience only; if the Clipboard API is
+  // unavailable or blocked, this fails silently rather than blocking
+  // sign-up in any way.
+  function copyPasswordToClipboard(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input || !input.value) return;
+
+    const showCopied = () => {
+      if (!btn) return;
+      btn.innerHTML = ICON_CHECK;
+      btn.setAttribute('aria-label', 'Copied');
+      window.setTimeout(() => {
+        btn.innerHTML = ICON_COPY;
+        btn.setAttribute('aria-label', 'Copy password');
+      }, 1200);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(input.value).then(showCopied).catch(() => {});
+    } else {
+      try {
+        input.select();
+        document.execCommand('copy');
+        showCopied();
+      } catch (err) {
+        // Ignore — copy is a convenience, not required to sign up.
+      }
+    }
+  }
+  window.copyPasswordToClipboard = copyPasswordToClipboard;
 
   // ---------- Google continue (UI only — no backend wired up yet) ----------
   function handleGoogleContinue() {
@@ -351,19 +479,130 @@
       // ---------- Register form ----------
       const registerForm = document.getElementById('auth-register-form');
       const registerError = document.getElementById('register-error');
+
+      const registerNameInput = document.getElementById('register-name');
+      const registerNameError = document.getElementById('register-name-error');
+      const registerEmailInput = document.getElementById('register-email');
+      const registerEmailError = document.getElementById('register-email-error');
+      const registerPhoneInput = document.getElementById('register-phone');
+      const registerPhoneError = document.getElementById('register-phone-error');
+      const registerPasswordInput = document.getElementById('register-password');
+      const registerPasswordError = document.getElementById('register-password-error');
+      const registerConfirmPasswordInput = document.getElementById('register-confirm-password');
+      const registerConfirmPasswordError = document.getElementById('register-confirm-password-error');
+      const registerTermsInput = document.getElementById('register-terms');
+      const registerTermsBox = registerTermsInput ? registerTermsInput.nextElementSibling : null;
+      const registerTermsError = document.getElementById('register-terms-error');
+
+      function checkRegisterName() {
+        const message = validateName(registerNameInput ? registerNameInput.value : '');
+        if (message) showFieldError(registerNameInput, registerNameError, message);
+        else clearFieldError(registerNameInput, registerNameError);
+        return message;
+      }
+
+      function checkRegisterEmail() {
+        const message = validateEmail(registerEmailInput ? registerEmailInput.value : '');
+        if (message) showFieldError(registerEmailInput, registerEmailError, message);
+        else clearFieldError(registerEmailInput, registerEmailError);
+        return message;
+      }
+
+      function checkRegisterPhone() {
+        const message = validatePhone(registerPhoneInput ? registerPhoneInput.value : '');
+        if (message) showFieldError(registerPhoneInput, registerPhoneError, message);
+        else clearFieldError(registerPhoneInput, registerPhoneError);
+        return message;
+      }
+
+      function checkRegisterPassword() {
+        const message = validateNewPassword(registerPasswordInput ? registerPasswordInput.value : '');
+        if (message) showFieldError(registerPasswordInput, registerPasswordError, message);
+        else clearFieldError(registerPasswordInput, registerPasswordError);
+        return message;
+      }
+
+      function checkRegisterConfirmPassword() {
+        const message = validateConfirmPassword(
+          registerConfirmPasswordInput ? registerConfirmPasswordInput.value : '',
+          registerPasswordInput ? registerPasswordInput.value : ''
+        );
+        if (message) showFieldError(registerConfirmPasswordInput, registerConfirmPasswordError, message);
+        else clearFieldError(registerConfirmPasswordInput, registerConfirmPasswordError);
+        return message;
+      }
+
+      function checkRegisterTerms() {
+        if (registerTermsInput && !registerTermsInput.checked) {
+          showCheckboxError(registerTermsBox, registerTermsError, 'Please accept the Terms of Service and Privacy Policy.');
+          return 'required';
+        }
+        clearCheckboxError(registerTermsBox, registerTermsError);
+        return null;
+      }
+
+      if (registerTermsInput) {
+        registerTermsInput.addEventListener('change', () => {
+          if (registerTermsInput.checked) clearCheckboxError(registerTermsBox, registerTermsError);
+        });
+      }
+
+      [
+        [registerNameInput, checkRegisterName],
+        [registerEmailInput, checkRegisterEmail],
+        [registerPhoneInput, checkRegisterPhone],
+        [registerConfirmPasswordInput, checkRegisterConfirmPassword],
+      ].forEach(([input, checker]) => {
+        if (!input) return;
+        input.addEventListener('blur', checker);
+        input.addEventListener('input', () => {
+          if (input.classList.contains('auth-field-input-invalid')) checker();
+        });
+      });
+
+      // Password gets its own listener, separate from the generic
+      // "only re-check once already invalid" pattern above — the
+      // strength meter/checklist need to update on every keystroke
+      // regardless of validity, and (per the design) the error below
+      // it updates live too, not just on blur.
+      if (registerPasswordInput) {
+        registerPasswordInput.addEventListener('input', () => {
+          updatePasswordStrength(registerPasswordInput.value);
+          checkRegisterPassword();
+          // If they go back and edit the password after a "don't
+          // match" error on confirm, re-check confirm too rather than
+          // leaving a stale error under a field they didn't touch.
+          if (registerConfirmPasswordInput && registerConfirmPasswordInput.classList.contains('auth-field-input-invalid')) {
+            checkRegisterConfirmPassword();
+          }
+        });
+      }
+
       if (registerForm) {
         registerForm.addEventListener('submit', (e) => {
           e.preventDefault();
           try {
             clearError(registerError);
-            const name = document.getElementById('register-name').value;
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            const result = window.Auth.signUp({ name, email, password });
+            const nameMsg = checkRegisterName();
+            const emailMsg = checkRegisterEmail();
+            const phoneMsg = checkRegisterPhone();
+            const passwordMsg = checkRegisterPassword();
+            const confirmMsg = checkRegisterConfirmPassword();
+            const termsMsg = checkRegisterTerms();
+            if (nameMsg || emailMsg || phoneMsg || passwordMsg || confirmMsg || termsMsg) return;
+
+            const submitBtn = registerForm.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+            const name = registerNameInput.value;
+            const email = registerEmailInput.value;
+            const phone = registerPhoneInput.value;
+            const password = registerPasswordInput.value;
+            const result = window.Auth.signUp({ name, email, phone, password });
             if (result.ok) {
               goToApp();
             } else {
               showError(registerError, result.error);
+              if (submitBtn) submitBtn.disabled = false;
             }
           } catch (err) {
             showFatal('Create account failed: ' + err.message);

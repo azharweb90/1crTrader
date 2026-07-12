@@ -144,17 +144,90 @@
         </form>
 
         <form id="auth-register-form" class="auth-form hidden">
-          <h2 class="auth-form-heading">Start free in 30 seconds</h2>
-          <p class="auth-form-sub">No card required. 14-day trial of Full Access.</p>
+          <h2 class="auth-form-heading">Create your account</h2>
+          <p class="auth-form-sub">Choose a plan and get set up in 30 seconds.</p>
 
-          <label class="auth-field-label" for="register-name">Full name</label>
-          <input type="text" id="register-name" class="auth-field-input" placeholder="Your name" autocomplete="name" required>
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-name">Full name</label>
+            <input type="text" id="register-name" class="auth-field-input" placeholder="Your name" autocomplete="name">
+            <p id="register-name-error" class="auth-error hidden"></p>
+          </div>
 
-          <label class="auth-field-label" for="register-email">Email</label>
-          <input type="email" id="register-email" class="auth-field-input" placeholder="you@email.com" autocomplete="email" required>
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-email">Email</label>
+            <input type="email" id="register-email" class="auth-field-input" placeholder="you@email.com" autocomplete="email">
+            <p id="register-email-error" class="auth-error hidden"></p>
+          </div>
 
-          <label class="auth-field-label" for="register-password">Password</label>
-          <input type="password" id="register-password" class="auth-field-input" placeholder="At least 8 characters" autocomplete="new-password" required>
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-phone">Mobile number</label>
+            <div class="auth-phone-wrap">
+              <span class="auth-phone-prefix">+91</span>
+              <input type="tel" id="register-phone" class="auth-field-input auth-field-input-phone" placeholder="98765 43210" autocomplete="tel" inputmode="numeric" maxlength="10">
+            </div>
+            <p id="register-phone-error" class="auth-error hidden"></p>
+          </div>
+
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-password">Password</label>
+            <div class="auth-password-wrap auth-password-wrap-double">
+              <input type="password" id="register-password" class="auth-field-input" placeholder="Create a strong password" autocomplete="new-password">
+              <div class="auth-password-actions">
+                <button type="button" class="auth-icon-btn" id="register-password-copy" aria-label="Copy password" onclick="copyPasswordToClipboard('register-password', this)"></button>
+                <button type="button" class="auth-icon-btn" id="register-password-toggle" aria-label="Show password" onclick="togglePasswordVisibility('register-password', this)"></button>
+              </div>
+            </div>
+
+            <div id="register-password-strength" class="auth-strength-wrap hidden">
+              <div class="auth-strength-bar-track">
+                <div id="register-password-strength-fill" class="auth-strength-bar-fill"></div>
+              </div>
+              <span id="register-password-strength-label" class="auth-strength-label"></span>
+            </div>
+
+            <div id="register-password-checklist" class="auth-strength-checklist hidden">
+              <div class="auth-strength-check" data-check="length">
+                <span class="auth-strength-check-icon"></span>
+                <span class="auth-strength-check-text">8+ characters</span>
+              </div>
+              <div class="auth-strength-check" data-check="uppercase">
+                <span class="auth-strength-check-icon"></span>
+                <span class="auth-strength-check-text">Uppercase letter</span>
+              </div>
+              <div class="auth-strength-check" data-check="lowercase">
+                <span class="auth-strength-check-icon"></span>
+                <span class="auth-strength-check-text">Lowercase letter</span>
+              </div>
+              <div class="auth-strength-check" data-check="number">
+                <span class="auth-strength-check-icon"></span>
+                <span class="auth-strength-check-text">Number</span>
+              </div>
+              <div class="auth-strength-check" data-check="special">
+                <span class="auth-strength-check-icon"></span>
+                <span class="auth-strength-check-text">Special character</span>
+              </div>
+            </div>
+
+            <p id="register-password-error" class="auth-error hidden"></p>
+          </div>
+
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-confirm-password">Confirm password</label>
+            <div class="auth-password-wrap auth-password-wrap-single">
+              <input type="password" id="register-confirm-password" class="auth-field-input" placeholder="Re-enter your password" autocomplete="new-password">
+              <div class="auth-password-actions">
+                <button type="button" class="auth-icon-btn" id="register-confirm-password-toggle" aria-label="Show password" onclick="togglePasswordVisibility('register-confirm-password', this)"></button>
+              </div>
+            </div>
+            <p id="register-confirm-password-error" class="auth-error hidden"></p>
+          </div>
+
+          <label class="auth-terms-row">
+            <input type="checkbox" id="register-terms" class="auth-checkbox-input">
+            <span class="auth-checkbox-box auth-checkbox-box-square"></span>
+            <span class="auth-checkbox-label">I agree to the <a href="/src/marketing/pages/legal/legal-page.html?doc=terms" target="_blank" rel="noopener" onclick="event.stopPropagation()">Terms of Service</a> and <a href="/src/marketing/pages/legal/legal-page.html?doc=privacy" target="_blank" rel="noopener" onclick="event.stopPropagation()">Privacy Policy</a>.</span>
+          </label>
+          <p id="register-terms-error" class="auth-error hidden"></p>
 
           <p id="register-error" class="auth-error hidden"></p>
 

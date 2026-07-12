@@ -364,6 +364,13 @@ body {
   padding-right: 44px;
 }
 
+/* Register's password field has two icon buttons (copy + show/hide)
+   instead of login's one, so it needs more reserved space on the
+   right so text never runs under the icons. */
+.auth-password-wrap-double .auth-field-input {
+  padding-right: 76px;
+}
+
 .auth-password-actions {
   position: absolute;
   top: 50%;
@@ -371,6 +378,7 @@ body {
   transform: translateY(-50%);
   display: flex;
   align-items: center;
+  gap: 2px;
 }
 
 .auth-icon-btn {
@@ -391,6 +399,92 @@ body {
 .auth-icon-btn:hover {
   color: #2563EB;
   background: #F0F4FA;
+}
+
+/* ── Password strength meter (register form) ───────────────────
+   Bar + label + 5-item requirements checklist, all driven live off
+   #register-password's input event (see updatePasswordStrength() in
+   auth-page.js). Hidden via the shared .hidden class until the trader
+   has typed something — no point grading an empty field. */
+.auth-strength-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.auth-strength-bar-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #E3E9F1;
+  overflow: hidden;
+}
+
+.auth-strength-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.2s ease, background-color 0.2s ease;
+  background: #DC2626;
+}
+
+.auth-strength-bar-fill-weak { background: #DC2626; }
+.auth-strength-bar-fill-fair { background: #F59E0B; }
+.auth-strength-bar-fill-good { background: #84A522; }
+.auth-strength-bar-fill-strong { background: #16A34A; }
+
+.auth-strength-label {
+  flex: 0 0 auto;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.auth-strength-label-weak { color: #DC2626; }
+.auth-strength-label-fair { color: #F59E0B; }
+.auth-strength-label-good { color: #84A522; }
+.auth-strength-label-strong { color: #16A34A; }
+
+.auth-strength-checklist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  margin-top: 12px;
+}
+
+.auth-strength-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.auth-strength-check-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid #DCE3EC;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.auth-strength-check-text {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #93A5C2;
+  transition: color 0.15s ease;
+}
+
+.auth-strength-check-met .auth-strength-check-icon {
+  background: #16A34A;
+  border-color: #16A34A;
+}
+
+.auth-strength-check-met .auth-strength-check-text {
+  color: #16A34A;
+  font-weight: 600;
 }
 
 /* Field-level error — small red alert-circle icon + message, shown

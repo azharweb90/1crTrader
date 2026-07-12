@@ -7,7 +7,7 @@
      - getSession()        -> { name, email } | null
      - logout()
      - markProfileComplete()
-     - signUp({name,email,password}) -> { ok, error? }   [new, this page]
+     - signUp({name,email,phone,password}) -> { ok, error? } [new, this page]
      - logIn({email,password})       -> { ok, error? }   [new, this page]
      - accountExists(email)          -> boolean          [forgot-password-page.js]
      - resetPassword({email,newPassword}) -> { ok, error? } [forgot-password-page.js]
@@ -53,7 +53,12 @@
     }));
   }
 
-  function signUp({ name, email, password }) {
+  // `phone` is optional and stored as-given (raw 10 digits — the +91
+  // prefix on the register form is a display-only chip, see
+  // auth-page.css/.js) purely for record-keeping; there's no
+  // phone-based login yet (see logIn's header note), so it isn't
+  // validated or used to authenticate here.
+  function signUp({ name, email, phone, password }) {
     const key = normalizeEmail(email);
     if (!name || !name.trim() || !key || !password) {
       return { ok: false, error: 'Fill in your name, email and password.' };
@@ -68,6 +73,7 @@
     accounts[key] = {
       name: name.trim(),
       email: key,
+      phone: phone ? String(phone).trim() : '',
       password, // prototype only — see file header
       profileComplete: false,
       createdAt: new Date().toISOString(),
