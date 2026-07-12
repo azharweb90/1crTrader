@@ -3,22 +3,26 @@
    at once and toggled by class (same pattern as auth-page.js's
    login/register swap, legal-page.js's terms/privacy swap):
 
-     1. fp-step-email  — confirm the account's email exists
+     1. fp-step-email  — confirm the account exists, by EMAIL OR
+                         MOBILE NUMBER (single combined field, per the
+                         "Reset your password" design)
      2. fp-step-reset  — set + confirm a new password
      3. fp-step-done   — success, link back to login
 
    Talks to the mock window.Auth (auth-service.js) via
-   accountExists(email) and resetPassword({email, newPassword}). Since
-   this prototype has no real email delivery, there is no token/link
-   step — moving from step 1 to step 2 happens immediately once the
-   email is confirmed to exist. That is an intentional, honest
-   shortcut for local testing; a real backend will replace this with
-   an emailed, time-limited reset link before anything here reaches
-   production.
+   accountExists(identifier) and resetPassword({identifier,
+   newPassword}) — auth-service.js resolves the identifier to an
+   account by email or by the phone number stored at signup. Since
+   this prototype has no real email/SMS delivery, there is no
+   code/link step — moving from step 1 to step 2 happens immediately
+   once the identifier is confirmed to match an account. That is an
+   intentional, honest shortcut for local testing; a real backend will
+   replace this with an emailed/texted, time-limited reset code before
+   anything here reaches production.
    =========================================================== */
 (function () {
 
-  let resetEmail = '';
+  let resetIdentifier = '';
 
   function showFatal(message) {
     console.error(message);
@@ -47,10 +51,19 @@
 
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  function validateEmail(value) {
+  // Accepts either an email address or a 10-digit Indian mobile
+  // number (with or without a +91/91/0 prefix) — the design's single
+  // "Email or mobile number" field, rather than login/register's
+  // separate email vs. phone inputs.
+  function validateIdentifier(value) {
     const v = (value || '').trim();
-    if (!v) return 'Email is required.';
-    if (!EMAIL_RE.test(v)) return 'Enter a valid email address.';
+    if (!v) return 'Enter your email or mobile number.';
+    if (v.includes('@')) {
+      if (!EMAIL_RE.test(v)) return 'Enter a valid email address.';
+      return null;
+    }
+    const digits = v.replace(/[\s-]/g, '').replace(/^\+?91/, '').replace(/^0/, '');
+    if (!/^[6-9][0-9]{9}$/.test(digits)) return 'Enter a valid email or 10-digit mobile number.';
     return null;
   }
 
@@ -90,7 +103,7 @@
   }
 
   function fpBackToEmail() {
-    resetEmail = '';
+    resetIdentifier = '';
     const newPasswordInput = document.getElementById('fp-new-password');
     const confirmPasswordInput = document.getElementById('fp-confirm-password');
     if (newPasswordInput) newPasswordInput.value = '';
@@ -123,19 +136,19 @@
 
       emailForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const message = validateEmail(emailInput.value);
+        const message = validateIdentifier(emailInput.value);
         if (message) {
           showFieldError(emailInput, emailError, message);
           return;
         }
         if (!window.Auth.accountExists(emailInput.value)) {
-          showFieldError(emailInput, emailError, 'No account found with that email.');
+          showFieldError(emailInput, emailError, 'No account found with that email or mobile number.');
           return;
         }
         clearFieldError(emailInput, emailError);
-        resetEmail = emailInput.value.trim();
+        resetIdentifier = emailInput.value.trim();
         const sub = document.getElementById('fp-reset-sub');
-        if (sub) sub.innerText = 'Choose a new password for ' + resetEmail + '.';
+        if (sub) sub.innerText = 'Choose a new password for ' + resetIdentifier + '.';
         showStep('reset');
         const newPasswordInput = document.getElementById('fp-new-password');
         if (newPasswordInput) newPasswordInput.focus();
@@ -186,7 +199,7 @@
         const submitBtn = resetForm.querySelector('button[type="submit"]');
         try {
           if (submitBtn) submitBtn.disabled = true;
-          const result = window.Auth.resetPassword({ email: resetEmail, newPassword: newPasswordInput.value });
+          const result = window.Auth.resetPassword({ identifier: resetIdentifier, newPassword: newPasswordInput.value });
           if (result.ok) {
             showStep('done');
           } else {

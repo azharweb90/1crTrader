@@ -119,6 +119,17 @@ body {
   letter-spacing: -0.3px;
 }
 
+/* Optional subtext under the headline (forgot-password page only —
+   login/register don't use this). Pulls up into the headline's own
+   26px margin-bottom rather than stacking on top of it, then supplies
+   its own gap down to the checklist. */
+.auth-left-sub {
+  margin: -14px 0 26px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #5B6B82;
+}
+
 .auth-checklist {
   display: flex;
   flex-direction: column;
@@ -739,6 +750,14 @@ body {
   color: #2563EB;
   font-weight: 600;
   text-decoration: underline;
+}
+
+/* Plain centered link, no leading gray sentence — used on the
+   forgot-password page ("Back to log in" / "Use a different email or
+   mobile number") where the design has just the link by itself. */
+.auth-fp-back-link {
+  text-align: center;
+  margin-top: 18px;
 }
 
 .auth-form.hidden { display: none; }

@@ -9,8 +9,10 @@
      - markProfileComplete()
      - signUp({name,email,phone,password}) -> { ok, error? } [new, this page]
      - logIn({email,password})       -> { ok, error? }   [new, this page]
-     - accountExists(email)          -> boolean          [forgot-password-page.js]
-     - resetPassword({email,newPassword}) -> { ok, error? } [forgot-password-page.js]
+     - accountExists(identifier)     -> boolean          [forgot-password-page.js]
+     - resetPassword({identifier,newPassword}) -> { ok, error? } [forgot-password-page.js]
+       (identifier is an email OR the mobile number stored at signup —
+       see findAccountByIdentifier())
 
    Accounts + session persisted to localStorage ONLY. Passwords are
    stored in plain text in that same localStorage record — acceptable
@@ -36,6 +38,27 @@
 
   function normalizeEmail(email) {
     return String(email || '').trim().toLowerCase();
+  }
+
+  function normalizePhone(phone) {
+    return String(phone || '').replace(/[\s-]/g, '').replace(/^\+?91/, '').replace(/^0/, '');
+  }
+
+  // The forgot-password page takes a single "email or mobile number"
+  // field (see its header comment) — this resolves either shape to
+  // the matching account, or null. Used by accountExists() and
+  // resetPassword() below.
+  function findAccountByIdentifier(identifier) {
+    const raw = String(identifier || '').trim();
+    if (!raw) return null;
+    const accounts = loadAccounts();
+    if (raw.includes('@')) {
+      return accounts[normalizeEmail(raw)] || null;
+    }
+    const digits = normalizePhone(raw);
+    if (!digits) return null;
+    const match = Object.keys(accounts).find(key => accounts[key].phone && normalizePhone(accounts[key].phone) === digits);
+    return match ? accounts[match] : null;
   }
 
   function getSession() {
@@ -107,31 +130,30 @@
   // Used by forgot-password-page.js's step 1 to confirm there's an
   // account before letting the trader move on to setting a new
   // password. A real backend would never expose this directly (email
-  // enumeration risk) — it would always reply "check your email" and
-  // do the existence check server-side. Fine for this client-only
+  // enumeration risk) — it would always reply "check your email/phone"
+  // and do the existence check server-side. Fine for this client-only
   // prototype; must not carry over as-is once a real backend exists.
-  function accountExists(email) {
-    return !!loadAccounts()[normalizeEmail(email)];
+  function accountExists(identifier) {
+    return !!findAccountByIdentifier(identifier);
   }
 
   // Used by forgot-password-page.js's step 2. No token/session check
   // here (see that file's header comment) — this prototype has no
-  // real email delivery, so there's nothing to verify against besides
-  // the account existing.
-  function resetPassword({ email, newPassword }) {
-    const key = normalizeEmail(email);
-    if (!key || !newPassword) {
-      return { ok: false, error: 'Missing email or new password.' };
+  // real email/SMS delivery, so there's nothing to verify against
+  // besides the account existing.
+  function resetPassword({ identifier, newPassword }) {
+    if (!identifier || !newPassword) {
+      return { ok: false, error: 'Missing email/mobile number or new password.' };
     }
     if (newPassword.length < 8) {
       return { ok: false, error: 'Password must be at least 8 characters.' };
     }
-    const accounts = loadAccounts();
-    const account = accounts[key];
+    const account = findAccountByIdentifier(identifier);
     if (!account) {
-      return { ok: false, error: 'No account found with that email.' };
+      return { ok: false, error: 'No account found with that email or mobile number.' };
     }
-    account.password = newPassword; // prototype only — see file header
+    const accounts = loadAccounts();
+    accounts[account.email].password = newPassword; // prototype only — see file header
     saveAccounts(accounts);
     return { ok: true };
   }
