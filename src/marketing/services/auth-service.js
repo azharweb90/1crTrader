@@ -13,6 +13,7 @@
      - resetPassword({identifier,newPassword}) -> { ok, error? } [forgot-password-page.js]
        (identifier is an email OR the mobile number stored at signup —
        see findAccountByIdentifier())
+     - setPlan({plan,billingCycle})  -> { ok, error? }   [plans-page.js]
 
    Accounts + session persisted to localStorage ONLY. Passwords are
    stored in plain text in that same localStorage record — acceptable
@@ -158,6 +159,22 @@
     return { ok: true };
   }
 
+  // Called by plans-page.js once the trader picks a plan and hits
+  // Continue. Informational only in this prototype — nothing actually
+  // gates app access on it yet; a real backend would use this to
+  // provision entitlements/billing instead of just recording a label.
+  function setPlan({ plan, billingCycle }) {
+    const session = getSession();
+    if (!session) return { ok: false, error: 'No active session.' };
+    const accounts = loadAccounts();
+    const account = accounts[normalizeEmail(session.email)];
+    if (!account) return { ok: false, error: 'Account not found.' };
+    account.plan = plan;
+    account.billingCycle = billingCycle;
+    saveAccounts(accounts);
+    return { ok: true };
+  }
+
   // Called by app-shell.js's confirmProfile() once the "Set Up Your
   // Profile" page is confirmed. Purely informational in this prototype
   // (the profile's actual data — tier, capital, instruments — still
@@ -183,5 +200,6 @@
     markProfileComplete,
     accountExists,
     resetPassword,
+    setPlan,
   };
 })();

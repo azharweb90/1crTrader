@@ -24,9 +24,17 @@ body {
 
 .hidden { display: none !important; }
 
+/* Fixed-height shell, not min-height — so the shell itself never
+   grows past the viewport and scrolls as one unit. Each side handles
+   its own overflow instead: .auth-left never scrolls (the "Join
+   12,000+ disciplined traders" strip at its bottom must always stay
+   visible), while .auth-right/.plans-right scroll independently when
+   their content (a long form, or the plans table) runs taller than
+   the viewport. */
 .auth-shell {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .auth-fatal-error {
@@ -51,6 +59,7 @@ body {
   background: linear-gradient(160deg, #EAF1FE 0%, #F5F6FA 55%, #ffffff 120%);
   color: #1E293B;
   padding: 48px 40px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }

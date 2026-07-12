@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1Cr Traders — Choose your plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/images/logos/favicon.png">
+  <link rel="stylesheet" href="/src/marketing/pages/auth/auth-page.css?v=4">
+  <link rel="stylesheet" href="/src/marketing/pages/plans/plans-page.css?v=4">
+</head>
+<body>
+
+  <div id="plans-fatal-error" class="auth-fatal-error hidden">
+    Couldn't load the login system (auth-service.js). Make sure this
+    site is served from the project root — not opened as a local file
+    — and check the browser console for the exact error.
+  </div>
+
+  <div class="auth-shell">
+
+    <!-- Same promo-panel structure/classes as the other auth pages
+         (auth-page.css), copy swapped for the "pick a plan" context. -->
+    <aside class="auth-left">
+      <a href="/src/marketing/pages/auth/auth-page.html?view=login" class="auth-logo-row">
+        <img src="/assets/images/logos/1crtraders-icon.png" alt="" class="auth-logo-icon">
+        <div>
+          <div class="auth-logo-name">1Cr Traders</div>
+          <div class="auth-logo-tag">REWARD ABOVE RISK</div>
+        </div>
+      </a>
+
+      <div class="auth-left-mid">
+        <div class="auth-eyebrow">ACTIVATE YOUR ACCOUNT</div>
+        <h1 class="auth-headline">Three plans, one discipline system.</h1>
+        <p class="auth-left-sub">Starter builds the habit, Pro adds the full trading toolkit, Elite layers on coaching and challenge access — pick the one that fits where you are.</p>
+        <div class="auth-checklist">
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Hard daily loss caps and lockouts on every plan</span>
+          </div>
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Trade journal on every plan, analytics from Pro up</span>
+          </div>
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Cancel or switch plans anytime</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-left-bottom">
+        <div class="auth-avatars">
+          <img src="/assets/images/avatars/deepika-trading-femme.png" alt="" class="auth-avatar">
+          <img src="/assets/images/avatars/gautham-jha.png" alt="" class="auth-avatar">
+          <img src="/assets/images/avatars/mayank-raj-traderoom.png" alt="" class="auth-avatar">
+        </div>
+        <div class="auth-social-text">Join 12,000+ disciplined traders</div>
+      </div>
+    </aside>
+
+    <div class="plans-right">
+      <div class="plans-card">
+
+        <div class="plans-banner">
+          <h1 class="plans-banner-title">The right plan for your trading discipline</h1>
+          <p class="plans-banner-sub">Pick a plan to activate your account. Switch anytime from Account &amp; Billing.</p>
+        </div>
+
+        <div class="plans-billing-row">
+          <span id="plans-monthly-label" class="plans-billing-label plans-billing-label-active">Monthly</span>
+          <button type="button" class="plans-toggle" id="plans-billing-toggle" role="switch" aria-checked="false" aria-label="Toggle yearly billing" onclick="toggleBillingCycle()">
+            <span class="plans-toggle-knob"></span>
+          </button>
+          <span id="plans-yearly-label" class="plans-billing-label">Yearly</span>
+          <span class="plans-save-badge">Save 20%</span>
+        </div>
+
+        <div class="plans-table-wrap">
+          <div class="plans-table">
+
+            <!-- Row: plan headers -->
+            <div class="plans-cell plans-row-label plans-row-label-plan">PLAN</div>
+            <div class="plans-cell plans-plan-header" data-plan="starter">
+              <label class="plans-radio-row">
+                <input type="radio" name="plan" value="starter" class="plans-radio-input" onchange="selectPlan('starter')">
+                <span class="plans-radio-dot"></span>
+              </label>
+              <div class="plans-plan-name">Starter</div>
+              <div class="plans-plan-price"><span id="plans-price-starter" class="plans-price-amount">₹499</span><span id="plans-price-suffix-starter" class="plans-price-suffix">/mo</span></div>
+              <div class="plans-plan-tagline">Build the habit</div>
+              <button type="button" class="plans-choose-btn" onclick="selectPlan('starter')">Choose</button>
+            </div>
+            <div class="plans-cell plans-plan-header plans-plan-header-popular" data-plan="pro">
+              <div class="plans-popular-badge">POPULAR</div>
+              <label class="plans-radio-row">
+                <input type="radio" name="plan" value="pro" class="plans-radio-input" onchange="selectPlan('pro')">
+                <span class="plans-radio-dot"></span>
+              </label>
+              <div class="plans-plan-name">Pro</div>
+              <div class="plans-plan-price"><span id="plans-price-pro" class="plans-price-amount">₹999</span><span id="plans-price-suffix-pro" class="plans-price-suffix">/mo</span></div>
+              <div class="plans-plan-tagline">Full toolkit</div>
+              <button type="button" class="plans-choose-btn plans-choose-btn-inverse" onclick="selectPlan('pro')">Choose</button>
+            </div>
+            <div class="plans-cell plans-plan-header" data-plan="elite">
+              <label class="plans-radio-row">
+                <input type="radio" name="plan" value="elite" class="plans-radio-input" onchange="selectPlan('elite')">
+                <span class="plans-radio-dot"></span>
+              </label>
+              <div class="plans-plan-name">Elite</div>
+              <div class="plans-plan-price"><span id="plans-price-elite" class="plans-price-amount">₹2,499</span><span id="plans-price-suffix-elite" class="plans-price-suffix">/mo</span></div>
+              <div class="plans-plan-tagline">Coaching &amp; scale</div>
+              <button type="button" class="plans-choose-btn" onclick="selectPlan('elite')">Choose</button>
+            </div>
+
+            <!-- Section: Overview -->
+            <div class="plans-section-bar">OVERVIEW</div>
+
+            <div class="plans-cell plans-row-label">Daily Limits Tool</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="starter">&#10003;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="pro">&#10003;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="elite">&#10003;</div>
+
+            <div class="plans-cell plans-row-label">Discipline score &amp; streaks</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="starter">&#10003;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="pro">&#10003;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="elite">&#10003;</div>
+
+            <div class="plans-cell plans-row-label">Saved strategies</div>
+            <div class="plans-cell plans-feature-cell" data-plan="starter">1</div>
+            <div class="plans-cell plans-feature-cell" data-plan="pro">Unlimited</div>
+            <div class="plans-cell plans-feature-cell" data-plan="elite">Unlimited</div>
+
+            <div class="plans-cell plans-row-label">Chart Prep</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-no" data-plan="starter">&#10007;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="pro">&#10003;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="elite">&#10003;</div>
+
+            <div class="plans-cell plans-row-label">Trade Manager</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-no" data-plan="starter">&#10007;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="pro">&#10003;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="elite">&#10003;</div>
+
+            <!-- Section: Analytics & Tools -->
+            <div class="plans-section-bar">ANALYTICS &amp; TOOLS</div>
+
+            <div class="plans-cell plans-row-label">Trading journal</div>
+            <div class="plans-cell plans-feature-cell" data-plan="starter">Basic</div>
+            <div class="plans-cell plans-feature-cell" data-plan="pro">Advanced</div>
+            <div class="plans-cell plans-feature-cell" data-plan="elite">Advanced</div>
+
+            <div class="plans-cell plans-row-label">Position &amp; risk calculators</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-no" data-plan="starter">&#10007;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="pro">&#10003;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="elite">&#10003;</div>
+
+            <div class="plans-cell plans-row-label">Broker sync</div>
+            <div class="plans-cell plans-feature-cell" data-plan="starter">Standard</div>
+            <div class="plans-cell plans-feature-cell" data-plan="pro">Standard</div>
+            <div class="plans-cell plans-feature-cell" data-plan="elite">Priority</div>
+
+            <!-- Section: Coaching & Growth -->
+            <div class="plans-section-bar">COACHING &amp; GROWTH</div>
+
+            <div class="plans-cell plans-row-label">Knowledge Area</div>
+            <div class="plans-cell plans-feature-cell" data-plan="starter">Limited</div>
+            <div class="plans-cell plans-feature-cell" data-plan="pro">Standard</div>
+            <div class="plans-cell plans-feature-cell" data-plan="elite">Full + coaching</div>
+
+            <div class="plans-cell plans-row-label">Funded Challenge access</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-no" data-plan="starter">&#10007;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-no" data-plan="pro">&#10007;</div>
+            <div class="plans-cell plans-feature-cell plans-feature-cell-check" data-plan="elite">&#10003;</div>
+
+            <div class="plans-cell plans-row-label">Support</div>
+            <div class="plans-cell plans-feature-cell" data-plan="starter">Email</div>
+            <div class="plans-cell plans-feature-cell" data-plan="pro">Email</div>
+            <div class="plans-cell plans-feature-cell" data-plan="elite">Priority</div>
+
+          </div>
+        </div>
+
+        <div class="plans-footer">
+          <button type="button" id="plans-continue-btn" class="auth-submit-btn plans-continue-btn plans-continue-btn-disabled" disabled onclick="continueWithPlan()">Continue with a plan</button>
+          <p class="plans-footer-note">Secure payment &middot; no plan, no access.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/src/marketing/services/auth-service.js"></script>
+  <script src="/src/marketing/pages/plans/plans-page.js"></script>
+</body>
+</html>

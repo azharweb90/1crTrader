@@ -129,6 +129,15 @@
     window.location.href = '/src/app/app-shell.html';
   }
 
+  // Fresh signups go through plan selection first — plans-page.js
+  // requires the session this just created and redirects to
+  // app-shell.html once a plan is chosen. Logging in (an existing
+  // account) skips straight to goToApp(); they've already been
+  // through this.
+  function goToPlans() {
+    window.location.href = '/src/marketing/pages/plans/plans-page.html';
+  }
+
   // ---------- Validators ----------
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -599,7 +608,7 @@
             const password = registerPasswordInput.value;
             const result = window.Auth.signUp({ name, email, phone, password });
             if (result.ok) {
-              goToApp();
+              goToPlans();
             } else {
               showError(registerError, result.error);
               if (submitBtn) submitBtn.disabled = false;

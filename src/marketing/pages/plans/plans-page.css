@@ -1,0 +1,392 @@
+/* ===========================================================
+   CHOOSE YOUR PLAN — shown right after signup, before the trader ever
+   reaches app-shell.html (see plans-page.js's session guard + the
+   redirect wired up in auth-page.js's register submit handler).
+
+   Left promo panel reuses auth-page.css's .auth-shell/.auth-left/etc.
+   as-is (same pattern as forgot-password-page.html) — only the right
+   side is new, since this needs a much wider comparison table instead
+   of a narrow centered form.
+   =========================================================== */
+
+.plans-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 40px;
+  overflow-y: auto;
+}
+
+.plans-card {
+  width: 100%;
+  max-width: 920px;
+  background: #ffffff;
+  border: 1px solid #E3E9F1;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(20, 35, 61, 0.08);
+}
+
+/* ── Banner ─────────────────────────────────────────────────── */
+.plans-banner {
+  background: linear-gradient(115deg, #0F1F4D 0%, #2563EB 100%);
+  padding: 34px 40px;
+  text-align: center;
+}
+
+.plans-banner-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+
+.plans-banner-sub {
+  font-size: 14px;
+  color: #C9D9FB;
+  margin: 0;
+}
+
+/* ── Monthly / Yearly toggle ────────────────────────────────── */
+.plans-billing-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 22px 24px 4px;
+}
+
+.plans-billing-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8A98AD;
+  transition: color 0.15s ease;
+}
+
+.plans-billing-label-active {
+  color: #1E293B;
+}
+
+.plans-toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  border: none;
+  background: #DCE3EC;
+  cursor: pointer;
+  padding: 0;
+  flex: 0 0 auto;
+  transition: background-color 0.15s ease;
+}
+
+.plans-toggle.plans-toggle-on {
+  background: #2563EB;
+}
+
+.plans-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.plans-toggle.plans-toggle-on .plans-toggle-knob {
+  transform: translateX(18px);
+}
+
+.plans-save-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #92400E;
+  background: #FDECC8;
+  border-radius: 999px;
+  padding: 4px 10px;
+  margin-left: 4px;
+}
+
+/* ── Table ──────────────────────────────────────────────────── */
+.plans-table-wrap {
+  padding: 20px 24px 0;
+  overflow-x: auto;
+}
+
+.plans-table {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr 1fr;
+  min-width: 720px;
+  border: 1px solid #E3E9F1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.plans-cell {
+  padding: 14px 16px;
+  border-bottom: 1px solid #EEF2F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13.5px;
+  color: #1E293B;
+}
+
+.plans-row-label {
+  justify-content: flex-start;
+  text-align: left;
+  font-weight: 600;
+  color: #3E4C61;
+}
+
+.plans-row-label-plan {
+  align-items: flex-end;
+  padding-bottom: 18px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #93A5C2;
+  text-transform: uppercase;
+}
+
+/* ── Section divider bars (span all 4 columns) ─────────────── */
+.plans-section-bar {
+  grid-column: 1 / -1;
+  background: #F5F7FB;
+  border-bottom: 1px solid #EEF2F7;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #8A98AD;
+  text-transform: uppercase;
+}
+
+/* ── Plan header cell (row 1: radio, name, price, tagline, button) ── */
+.plans-plan-header {
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 16px 18px;
+  position: relative;
+}
+
+.plans-radio-row {
+  display: flex;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+
+.plans-radio-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.plans-radio-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #DCE3EC;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease;
+}
+
+.plans-radio-dot::after {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.plans-radio-input:checked + .plans-radio-dot {
+  border-color: #2563EB;
+}
+
+.plans-radio-input:checked + .plans-radio-dot::after {
+  background: #2563EB;
+}
+
+.plans-plan-name {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.plans-plan-price {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #5B6B82;
+}
+
+.plans-price-amount {
+  font-size: 21px;
+  font-weight: 800;
+  color: #1E293B;
+}
+
+.plans-plan-tagline {
+  font-size: 12.5px;
+  color: #8A98AD;
+  margin-bottom: 8px;
+}
+
+.plans-choose-btn {
+  width: 100%;
+  border: 1px solid #DCE3EC;
+  border-radius: 9px;
+  padding: 9px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #2563EB;
+  background: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.plans-choose-btn:hover { background: #F0F4FA; }
+
+/* ── Popular (Pro) column highlight ─────────────────────────── */
+.plans-plan-header-popular {
+  background: linear-gradient(160deg, #2563EB 0%, #1D4ED8 100%);
+  border-radius: 10px 10px 0 0;
+  /* Extra room up top so the POPULAR badge (sitting fully inside the
+     card now, not straddling its edge) has clear breathing room
+     before the radio circle right below it — the badge is
+     absolutely positioned (out of flow), so this padding is the only
+     thing controlling that gap, not a margin on the badge itself. */
+  padding-top: 46px;
+}
+
+.plans-plan-header-popular .plans-plan-name,
+.plans-plan-header-popular .plans-price-amount,
+.plans-plan-header-popular .plans-plan-price {
+  color: #ffffff;
+}
+
+.plans-plan-header-popular .plans-plan-tagline {
+  color: #C9D9FB;
+}
+
+.plans-plan-header-popular .plans-radio-dot {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+}
+
+.plans-plan-header-popular .plans-radio-input:checked + .plans-radio-dot {
+  border-color: #ffffff;
+}
+
+.plans-plan-header-popular .plans-radio-input:checked + .plans-radio-dot::after {
+  background: #ffffff;
+}
+
+.plans-choose-btn-inverse {
+  border-color: transparent;
+  color: #2563EB;
+  background: #ffffff;
+}
+
+.plans-choose-btn-inverse:hover { background: #EAF1FE; }
+
+.plans-popular-badge {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #2563EB;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(20, 35, 61, 0.18);
+  white-space: nowrap;
+}
+
+/* ── Feature cells ──────────────────────────────────────────── */
+.plans-feature-cell {
+  font-weight: 600;
+  color: #1E293B;
+}
+
+/* Green is reserved for actual checkmarks — descriptive values like
+   "Unlimited"/"Advanced"/"Priority" stay plain dark text
+   (.plans-feature-cell's own color), matching the reference exactly. */
+.plans-feature-cell-check {
+  color: #16A34A;
+  font-size: 15px;
+}
+
+.plans-feature-cell-no {
+  color: #C3CCDA;
+  font-size: 14px;
+}
+
+/* Last row in each section shouldn't double up its border with the
+   section bar/table border right after it. */
+.plans-table > .plans-cell:nth-last-child(-n+4) {
+  border-bottom: none;
+}
+
+/* ── Selected plan column highlight ─────────────────────────
+   Whichever plan is currently selected (via selectPlan() in
+   plans-page.js toggling .plans-selected-<plan> on .plans-table)
+   gets a faint wash running down its whole column — not fixed on Pro.
+   Pro's header keeps its own permanent blue gradient card
+   (:not(.plans-plan-header-popular)) regardless of selection, since
+   that's a "most popular" marketing indicator, not a selection state;
+   Pro's BODY cells still pick up the wash like any other column when
+   Pro itself is selected. */
+.plans-table.plans-selected-starter [data-plan="starter"]:not(.plans-plan-header-popular),
+.plans-table.plans-selected-pro [data-plan="pro"]:not(.plans-plan-header-popular),
+.plans-table.plans-selected-elite [data-plan="elite"]:not(.plans-plan-header-popular) {
+  background-color: #F3F7FF;
+}
+
+/* ── Footer / CTA ───────────────────────────────────────────── */
+.plans-footer {
+  padding: 22px 24px 28px;
+  text-align: center;
+}
+
+.plans-continue-btn {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.plans-continue-btn-disabled {
+  background: #E9EDF3;
+  color: #9AA7BA;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.plans-continue-btn-disabled:hover { filter: none; }
+
+.plans-footer-note {
+  font-size: 12.5px;
+  color: #8A98AD;
+  margin: 12px 0 0;
+}
+
+@media (max-width: 780px) {
+  .auth-left { display: none; }
+  .plans-right { padding: 28px 18px; }
+  .plans-banner { padding: 26px 22px; }
+  .plans-table-wrap { padding: 16px 16px 0; }
+}
