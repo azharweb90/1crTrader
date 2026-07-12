@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1Cr Traders — Legal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/images/logos/favicon.png">
+  <link rel="stylesheet" href="/src/marketing/pages/legal/legal-page.css">
+</head>
+<body>
+
+  <header class="legal-header">
+    <button type="button" class="legal-back-btn" onclick="legalGoBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      <span>Back</span>
+    </button>
+    <div class="legal-doc-toggle" role="tablist">
+      <button type="button" class="legal-doc-btn" id="legal-doc-terms-btn" onclick="setLegalDoc('terms')">Terms of Service</button>
+      <button type="button" class="legal-doc-btn" id="legal-doc-privacy-btn" onclick="setLegalDoc('privacy')">Privacy Policy</button>
+    </div>
+    <div class="legal-header-spacer"></div>
+  </header>
+
+  <main class="legal-body">
+    <div class="legal-content">
+
+      <!-- ===== Terms of Service ===== -->
+      <article id="legal-doc-terms" class="legal-doc">
+        <div class="legal-eyebrow">LEGAL</div>
+        <h1 class="legal-title">Terms of Service</h1>
+        <div class="legal-updated">Last updated: July 1, 2026</div>
+
+        <h2>1. Acceptance of terms</h2>
+        <p>By creating an account with 1Cr Traders, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree, please do not use the service.</p>
+
+        <h2>2. Eligibility</h2>
+        <p>You must be at least 18 years old and legally capable of entering a binding contract to use 1Cr Traders. By registering, you confirm that the details you provide — including your name, email, and mobile number — are accurate and belong to you.</p>
+
+        <h2>3. Nature of the service</h2>
+        <p>1Cr Traders is a trade-journaling and discipline-enforcement tool. It helps you define personal risk rules, track trades, and review performance. It does not place trades on your behalf, does not connect to your broker for execution, and is not a registered investment adviser. Nothing in the app constitutes financial or investment advice.</p>
+
+        <h2>4. Trading risk disclaimer</h2>
+        <p>Trading in equities, derivatives, and options carries substantial risk of loss and is not suitable for every investor. Past performance shown in the Learn hub or journal analytics is not indicative of future results. You are solely responsible for your trading decisions and outcomes.</p>
+
+        <h2>5. Discipline rules &amp; lockouts</h2>
+        <p>Daily loss limits, position-size caps, and cool-down lockouts that you configure during onboarding are self-imposed guardrails. You acknowledge these are advisory safeguards within the app and do not prevent you from placing trades directly with your broker outside the app.</p>
+
+        <h2>6. Account responsibilities</h2>
+        <p>You are responsible for keeping your password confidential and for all activity under your account. Notify us immediately at <a href="mailto:support@1crtraders.com">support@1crtraders.com</a> if you suspect unauthorized access.</p>
+
+        <h2>7. Subscription &amp; billing</h2>
+        <p>Your 14-day trial gives full access at no charge. After the trial, continued access to paid features requires an active subscription, billed in advance. You may cancel anytime from Account settings; no partial refunds are issued for unused days.</p>
+
+        <h2>8. Prohibited use</h2>
+        <p>You may not reverse-engineer the app, resell access, upload unlawful content, or use the service to violate any exchange, SEBI, or other applicable regulation.</p>
+
+        <h2>9. Termination</h2>
+        <p>We may suspend or terminate accounts that violate these terms. You may close your account at any time from Account settings; your journal data is retained per our Privacy Policy retention schedule.</p>
+
+        <h2>10. Limitation of liability</h2>
+        <p>1Cr Traders is provided "as is." We are not liable for trading losses, missed alerts, or downtime. To the maximum extent permitted by law, our aggregate liability is limited to the fees you paid in the preceding 3 months.</p>
+
+        <h2>11. Governing law</h2>
+        <p>These terms are governed by the laws of India, with courts in Mumbai having exclusive jurisdiction over any dispute.</p>
+
+        <h2>12. Changes to these terms</h2>
+        <p>We may update these terms from time to time. Material changes will be notified in-app at least 7 days before taking effect.</p>
+
+        <h2>13. Contact</h2>
+        <p>Questions about these terms? Reach us at <a href="mailto:support@1crtraders.com">support@1crtraders.com</a>.</p>
+      </article>
+
+      <!-- ===== Privacy Policy ===== -->
+      <article id="legal-doc-privacy" class="legal-doc hidden">
+        <div class="legal-eyebrow">LEGAL</div>
+        <h1 class="legal-title">Privacy Policy</h1>
+        <div class="legal-updated">Last updated: July 1, 2026</div>
+
+        <h2>1. Information we collect</h2>
+        <p>We collect information you provide directly — full name, email, mobile number, and password (stored as a salted hash, never in plain text) — plus trading data you log, such as entries, exits, position sizes, and journal notes. If you connect a broker, we store the capital and account details you confirm during setup.</p>
+
+        <h2>2. How we use your information</h2>
+        <p>Your information is used to operate your account, enforce the risk rules you set, generate your performance analytics, send transactional emails (like password resets), and improve the Learn hub's recommendations for you.</p>
+
+        <h2>3. Data storage &amp; security</h2>
+        <p>Data is encrypted in transit (TLS) and at rest. Passwords are hashed with a modern, salted algorithm and are never visible to our staff. We run regular access audits and restrict internal access to the minimum needed to support you.</p>
+
+        <h2>4. Third-party sharing</h2>
+        <p>We do not sell your personal data. We share limited data with payment processors to bill subscriptions, and with infrastructure providers who host the app under strict confidentiality agreements. We never share your trading data with brokers or third parties for marketing.</p>
+
+        <h2>5. Cookies &amp; analytics</h2>
+        <p>We use essential cookies to keep you signed in and lightweight product analytics to understand which features help traders stay disciplined. You can opt out of non-essential analytics in Account settings.</p>
+
+        <h2>6. Your rights &amp; choices</h2>
+        <p>You can access, export, correct, or delete your data at any time from Account settings, or by emailing us. You may also request a full copy of your journal history in CSV format.</p>
+
+        <h2>7. Data retention</h2>
+        <p>We retain your data for as long as your account is active. If you close your account, we delete personal identifiers within 30 days, and retain anonymized trading statistics only for aggregate product research.</p>
+
+        <h2>8. Children's privacy</h2>
+        <p>1Cr Traders is not directed at anyone under 18, and we do not knowingly collect data from minors.</p>
+
+        <h2>9. Changes to this policy</h2>
+        <p>We'll notify you in-app if we make material changes to how we handle your data, at least 7 days before they take effect.</p>
+
+        <h2>10. Contact us</h2>
+        <p>For any privacy question or request, email <a href="mailto:privacy@1crtraders.com">privacy@1crtraders.com</a>.</p>
+      </article>
+
+    </div>
+  </main>
+
+  <script src="/src/marketing/pages/legal/legal-page.js"></script>
+</body>
+</html>

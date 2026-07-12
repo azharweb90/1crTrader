@@ -9,6 +9,8 @@
      - markProfileComplete()
      - signUp({name,email,password}) -> { ok, error? }   [new, this page]
      - logIn({email,password})       -> { ok, error? }   [new, this page]
+     - accountExists(email)          -> boolean          [forgot-password-page.js]
+     - resetPassword({email,newPassword}) -> { ok, error? } [forgot-password-page.js]
 
    Accounts + session persisted to localStorage ONLY. Passwords are
    stored in plain text in that same localStorage record — acceptable
@@ -96,6 +98,38 @@
     localStorage.removeItem(SESSION_KEY);
   }
 
+  // Used by forgot-password-page.js's step 1 to confirm there's an
+  // account before letting the trader move on to setting a new
+  // password. A real backend would never expose this directly (email
+  // enumeration risk) — it would always reply "check your email" and
+  // do the existence check server-side. Fine for this client-only
+  // prototype; must not carry over as-is once a real backend exists.
+  function accountExists(email) {
+    return !!loadAccounts()[normalizeEmail(email)];
+  }
+
+  // Used by forgot-password-page.js's step 2. No token/session check
+  // here (see that file's header comment) — this prototype has no
+  // real email delivery, so there's nothing to verify against besides
+  // the account existing.
+  function resetPassword({ email, newPassword }) {
+    const key = normalizeEmail(email);
+    if (!key || !newPassword) {
+      return { ok: false, error: 'Missing email or new password.' };
+    }
+    if (newPassword.length < 8) {
+      return { ok: false, error: 'Password must be at least 8 characters.' };
+    }
+    const accounts = loadAccounts();
+    const account = accounts[key];
+    if (!account) {
+      return { ok: false, error: 'No account found with that email.' };
+    }
+    account.password = newPassword; // prototype only — see file header
+    saveAccounts(accounts);
+    return { ok: true };
+  }
+
   // Called by app-shell.js's confirmProfile() once the "Set Up Your
   // Profile" page is confirmed. Purely informational in this prototype
   // (the profile's actual data — tier, capital, instruments — still
@@ -119,5 +153,7 @@
     logout,
     getSession,
     markProfileComplete,
+    accountExists,
+    resetPassword,
   };
 })();

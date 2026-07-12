@@ -59,6 +59,9 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  width: fit-content;
 }
 
 .auth-logo-icon {
@@ -84,8 +87,17 @@ body {
   color: #2563EB;
 }
 
+/* Fills all the leftover space between the logo (fixed, top) and the
+   avatar strip (fixed, bottom via .auth-left-bottom's margin-top:auto)
+   and centers the eyebrow/headline/checklist inside it — rather than
+   a fixed margin-top that left the block pinned near the logo with a
+   large dead gap underneath on tall viewports. */
 .auth-left-mid {
-  margin-top: 76px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 0;
 }
 
 .auth-eyebrow {
@@ -157,6 +169,8 @@ body {
   border: 2px solid #ffffff;
   margin-left: -8px;
   background: linear-gradient(135deg, #8FB0FF, #4C6FEA);
+  object-fit: cover;
+  display: block;
 }
 
 .auth-avatar:first-child { margin-left: 0; }
@@ -196,6 +210,36 @@ body {
   margin: 0 0 28px;
 }
 
+/* ── Email / Mobile Number toggle (login form) ────────────── */
+.auth-login-method-toggle {
+  display: flex;
+  background: #F1F4F9;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 2px;
+  margin-bottom: 20px;
+}
+
+.auth-login-method-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #8A98AD;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-login-method-btn.active {
+  background: #ffffff;
+  color: #1E293B;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.1);
+}
+
 .auth-field-label {
   display: block;
   font-size: 13.5px;
@@ -213,6 +257,27 @@ body {
 
 .auth-field-label-row .auth-field-label {
   margin-bottom: 7px;
+}
+
+/* Consistent field spacing, regardless of what's inside (a plain
+   input, or a password-wrap with an icon button). The GROUP owns the
+   18px gap to the next field — every element inside it (input,
+   password-wrap, label-row) has its own margin zeroed out — so the
+   gap from input-bottom to error-message-top is always exactly the
+   error's own 7px margin-top, never doubled by also inheriting the
+   input's 18px margin-bottom via margin collapsing. See the "space
+   above the mobile number error was bigger than the password one" fix.
+*/
+.auth-field-group {
+  margin-bottom: 18px;
+}
+
+.auth-field-group .auth-field-input {
+  margin-bottom: 0;
+}
+
+.auth-field-group .auth-field-label-row {
+  margin-top: 0;
 }
 
 .auth-forgot-link {
@@ -244,11 +309,232 @@ body {
 
 .auth-field-input::placeholder { color: #AAB4C4; }
 
-.auth-error {
-  font-size: 13.5px;
+/* Invalid state — red border, toggled alongside the icon+message error
+   paragraph below it (see auth-page.js's showFieldError()). */
+.auth-field-input.auth-field-input-invalid {
+  border-color: #DC2626;
+}
+
+.auth-field-input.auth-field-input-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+/* Mobile number field — fixed "+91" country-code prefix, since the
+   app is India-only for now (Indian mobile validation regex in
+   auth-page.js). Prefix is a plain visual chip, not a real input, so
+   it can't be edited/selected/deleted by mistake; the input itself
+   still only ever holds the 10 raw digits. */
+.auth-phone-wrap {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.auth-phone-prefix {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  height: 22px;
+  padding-right: 12px;
+  border-right: 1px solid #DCE3EC;
+  font-size: 15px;
   font-weight: 600;
-  color: #C53D22;
-  margin: -6px 0 14px;
+  color: #1E293B;
+  pointer-events: none;
+}
+
+.auth-phone-wrap .auth-field-input-phone {
+  padding-left: 60px;
+  margin-bottom: 0;
+}
+
+/* Password fields get a show/hide icon button inside the field —
+   wrapped so the icon can be absolutely positioned against the input
+   without disturbing its own margin-bottom spacing (moved onto the
+   wrap instead, so top:50% centering is exact). */
+.auth-password-wrap {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.auth-password-wrap .auth-field-input {
+  margin-bottom: 0;
+  padding-right: 44px;
+}
+
+.auth-password-actions {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.auth-icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #93A5C2;
+  cursor: pointer;
+  border-radius: 7px;
+  padding: 0;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.auth-icon-btn:hover {
+  color: #2563EB;
+  background: #F0F4FA;
+}
+
+/* Field-level error — small red alert-circle icon + message, shown
+   directly under the field it belongs to (see showFieldError() /
+   clearFieldError() in auth-page.js). */
+.auth-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #DC2626;
+  margin: 7px 0 0;
+}
+
+.auth-error-icon {
+  flex: 0 0 auto;
+}
+
+/* General (non-field) errors, e.g. "Incorrect email or password" from
+   the server — same look, just given its own top margin since it isn't
+   directly under a single field. */
+#login-error.auth-error,
+#register-error.auth-error {
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+
+/* Neutral variant of .auth-error — same icon+text row, but blue
+   instead of red, for things that aren't a mistake the trader made
+   (e.g. "mobile login isn't available yet"). Toggled onto #login-error
+   alongside .auth-error via showInfoNote()/clearError() in
+   auth-page.js, rather than a red validation failure. */
+.auth-error.auth-error-info {
+  color: #2563EB;
+}
+
+.auth-inline-note {
+  text-align: center;
+  font-size: 13px;
+  color: #5B6B82;
+  margin: 10px 0 0;
+}
+
+/* ── Remember me + Forgot Password row ─────────────────────── */
+.auth-remember-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 0;
+  margin-bottom: 22px;
+  cursor: pointer;
+  user-select: none;
+  width: fit-content;
+}
+
+.auth-checkbox-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.auth-checkbox-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #DCE3EC;
+  background: #ffffff;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Checkmark is a real SVG (data-URI background), not a CSS
+   border-rotate hack — the hack rendered thin/off-center at 18px and
+   didn't match the reference design's checkmark closely enough. Same
+   image works for both the circular (Remember me) and square (Terms)
+   variants below. */
+.auth-checkbox-box::after {
+  content: '';
+  width: 11px;
+  height: 11px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.auth-checkbox-input:checked + .auth-checkbox-box {
+  background: #16A34A;
+  border-color: #16A34A;
+}
+
+.auth-checkbox-input:checked + .auth-checkbox-box::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+}
+
+/* Square variant, used by the Terms/Privacy consent checkbox — same
+   box/checkmark mechanics as .auth-checkbox-box, just not fully round. */
+.auth-checkbox-box-square {
+  border-radius: 5px;
+}
+
+/* Invalid state — shown if the trader tries to log in without
+   agreeing to the Terms/Privacy checkbox. */
+.auth-checkbox-box-invalid {
+  border-color: #DC2626;
+}
+
+.auth-checkbox-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1E293B;
+}
+
+.auth-checkbox-label a {
+  color: #2563EB;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ── Terms/Privacy consent row ─────────────────────────────── */
+.auth-terms-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 4px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ── Two-button row (Login Now / Create Account) ───────────── */
+.auth-btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-btn-row .auth-submit-btn {
+  flex: 1;
+  width: auto;
 }
 
 .auth-submit-btn {
@@ -268,6 +554,86 @@ body {
 
 .auth-submit-btn:hover { filter: brightness(1.05); }
 
+.auth-btn-secondary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #DCE3EC;
+  border-radius: 11px;
+  padding: 15px;
+  font-size: 15.5px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #1E293B;
+  background: #ffffff;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.auth-btn-secondary:hover { background: #F5F6FA; }
+
+/* ── "or continue with" divider + Google button ────────────── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #8A98AD;
+  font-size: 12.5px;
+  margin: 22px 0 18px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #E3E9F1;
+}
+
+.auth-divider span {
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.auth-google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid #DCE3EC;
+  border-radius: 11px;
+  padding: 13px;
+  font-size: 14.5px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #1E293B;
+  background: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.auth-google-btn:hover { background: #F5F6FA; }
+
+/* ── Terms / Privacy footer ─────────────────────────────────── */
+.auth-legal-footer {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: #8A98AD;
+}
+
+.auth-legal-footer a {
+  color: #8A98AD;
+  text-decoration: underline;
+}
+
+.auth-legal-footer a:hover { color: #2563EB; }
+
+.auth-legal-footer span { margin: 0 6px; }
+
 .auth-switch-line {
   text-align: center;
   font-size: 13.5px;
@@ -282,6 +648,37 @@ body {
 }
 
 .auth-form.hidden { display: none; }
+
+/* ── Forgot-password success step (forgot-password-page.html) ─── */
+.auth-form-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.auth-form-center .auth-form-sub {
+  margin-bottom: 26px;
+}
+
+.auth-success-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #16A34A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.auth-submit-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
 
 @media (max-width: 780px) {
   .auth-left { display: none; }

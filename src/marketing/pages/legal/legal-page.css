@@ -1,0 +1,149 @@
+/* ===========================================================
+   TERMS OF SERVICE / PRIVACY POLICY — shared legal document page.
+   Self-contained (no dependency on src/app CSS), matching the same
+   navy/blue/gray palette used across auth-page.css and the app itself.
+   =========================================================== */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1E293B;
+  background: #ffffff;
+}
+
+.hidden { display: none !important; }
+
+/* ── Header ─────────────────────────────────────────────────── */
+.legal-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid #E3E9F1;
+  background: #ffffff;
+}
+
+.legal-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1E293B;
+  cursor: pointer;
+  padding: 8px 4px;
+  flex: 0 0 auto;
+  width: 110px;
+}
+
+.legal-back-btn:hover { color: #2563EB; }
+
+.legal-header-spacer {
+  flex: 0 0 auto;
+  width: 110px;
+}
+
+.legal-doc-toggle {
+  display: flex;
+  background: #F1F4F9;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.legal-doc-btn {
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #8A98AD;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.legal-doc-btn.active {
+  background: #ffffff;
+  color: #1E293B;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.1);
+}
+
+/* ── Body ───────────────────────────────────────────────────── */
+.legal-body {
+  display: flex;
+  justify-content: center;
+  padding: 40px 24px 80px;
+}
+
+.legal-content {
+  width: 100%;
+  max-width: 680px;
+}
+
+.legal-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2563EB;
+  margin-bottom: 10px;
+}
+
+.legal-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: #1E293B;
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+}
+
+.legal-updated {
+  font-size: 13.5px;
+  color: #8A98AD;
+  margin-bottom: 34px;
+}
+
+.legal-doc h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 28px 0 10px;
+}
+
+.legal-doc h2:first-of-type { margin-top: 0; }
+
+.legal-doc p {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: #3E4C61;
+  margin: 0;
+}
+
+.legal-doc a {
+  color: #2563EB;
+  text-decoration: none;
+}
+
+.legal-doc a:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .legal-header { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px 18px; }
+  .legal-back-btn, .legal-header-spacer { width: auto; }
+  .legal-body { padding: 28px 18px 60px; }
+  .legal-title { font-size: 25px; }
+}
