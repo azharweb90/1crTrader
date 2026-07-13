@@ -300,6 +300,7 @@
 
 /* ── Shared step chrome ────────────────────────────────────── */
 .onb-heading {
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   font-size: 24px;
   font-weight: 800;
   color: #1E293B;
@@ -336,6 +337,22 @@
   border-top: 1px solid #E3E9F1;
   box-shadow: 0 -8px 20px rgba(20, 35, 61, 0.06);
   box-sizing: border-box;
+  /* Hidden until the trader scrolls .onb-right or makes the step's
+     primary selection (onbPickTier) — same pattern as plans-page.css's
+     .plans-footer, applied here per explicit follow-up request. JS
+     (onboarding.js: revealOnbFooter/renderStep) toggles
+     .onb-footer-visible and force-shows it if a step's content is too
+     short to scroll at all. */
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.onb-footer.onb-footer-visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 @media (min-width: 781px) {
@@ -383,14 +400,14 @@
 }
 .onb-skip-link:hover { color: #5B6B82; text-decoration: underline; }
 
-/* ── Step 1 — Capital/tier picker + inline loss reveal + optional
-   stop rule ──────────────────────────────────────────────────
-   All three pieces of the old 3-step wizard now live on this one
-   screen: pick a tier -> the loss box appears immediately below the
-   grid -> "Add a personal stop rule" is an optional collapsible row,
-   not a forced step. Two-column tier grid, widened .onb-right-inner
-   (560px) gives each card room without feeling cramped — all 6 tiers
-   fit in 3 rows with no scroll needed. */
+/* ── Step 2 — Derived tier/loss/drawdown + optional stop rule ──
+   .onb-tier-list/.onb-tier-row below are now DEAD — this screen used to
+   be a manual 6-card tier picker (step 1, before the broker-connect
+   reorder); the tier is derived from step 1's fetched/entered capital
+   now, so nothing renders these classes anymore. Left in place rather
+   than deleted since removing CSS on a hunch is riskier than an unused
+   rule. "Add a personal stop rule" stays an optional collapsible row,
+   not a forced step. */
 .onb-tier-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -458,7 +475,7 @@
   margin-bottom: 18px;
 }
 .onb-loss-callout-inline {
-  margin-top: 16px;
+  margin-top: 0;
   margin-bottom: 0;
 }
 .onb-loss-label {
@@ -471,15 +488,56 @@
   margin-bottom: 6px;
 }
 .onb-loss-value {
-  font-size: 38px;
+  font-size: 34px;
   font-weight: 800;
   color: #1D4ED8;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
 .onb-loss-sub {
-  font-size: 13px;
+  font-size: 12.5px;
   color: #5B6B82;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* Two guardrails side by side once a tier is picked — the existing
+   per-day loss cap (blue) and the new total drawdown cap (red/pink,
+   below), which doesn't reset daily. See tier-rules.js's
+   drawdownPct/drawdown comment for the 3x-daily formula and intent. */
+.onb-guardrail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.onb-drawdown-callout {
+  background: #FDECEA;
+  border: 1px solid #F6C6C0;
+  border-radius: 14px;
+  padding: 20px 22px;
+  text-align: center;
+}
+.onb-drawdown-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #B3261E;
+  margin-bottom: 6px;
+}
+.onb-drawdown-value {
+  font-size: 34px;
+  font-weight: 800;
+  color: #C0362C;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.onb-drawdown-sub {
+  font-size: 12.5px;
+  color: #8A5550;
   margin-top: 6px;
   line-height: 1.5;
 }
@@ -563,15 +621,19 @@
   background: #ffffff;
 }
 
-/* ── Step 2 — Connect broker + Trading style ─────────────────
-   Broker cards reuse .setup-broker-card/.setup-broker-icon/.broker-chip-*
-   (tier-select.css / settings.css, both loaded globally on app-shell.html
-   via main.css's @import chain) as-is; trading-style cards likewise reuse
-   .trader-type-card/.trader-type-name/.trader-type-desc unmodified — only
-   overridden below where this step's own look needs to diverge (square
-   checkbox instead of circle, light-blue selected wash) and only scoped
-   under .onb-step2 so the real tier-select page's own styling elsewhere
-   is untouched. */
+/* ── Step 1 — Connect broker (+ manual fallback) + Trading style ──
+   Class name kept as .onb-step2 even though this is step 1 now (the
+   broker-connect reorder swapped step 1 and 2's content, not their
+   CSS scoping) — renaming would be a pure churn diff across every
+   selector below with zero visual change. Broker cards reuse
+   .setup-broker-card/.setup-broker-icon/.broker-chip-* (tier-select.css
+   / settings.css, both loaded globally on app-shell.html via main.css's
+   @import chain) as-is; trading-style cards likewise reuse
+   .trader-type-card/.trader-type-name/.trader-type-desc unmodified —
+   only overridden below where this step's own look needs to diverge
+   (square checkbox instead of circle, light-blue selected wash) and
+   only scoped under .onb-step2 so the real tier-select page's own
+   styling elsewhere is untouched. */
 .onb-locked-banner {
   display: flex;
   align-items: flex-start;
@@ -619,6 +681,89 @@
   color: #8A98AD;
   margin: 0;
   text-align: left;
+}
+
+/* Manual capital entry — a deliberately secondary fallback (link, not a
+   card) for someone who won't connect a broker. See onbToggleManual()/
+   onbUseManualCapital() in onboarding.js. */
+.onb-manual-toggle-row {
+  text-align: center;
+  margin-top: 14px;
+}
+
+.onb-manual-link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563EB;
+  cursor: pointer;
+  padding: 4px;
+}
+.onb-manual-link:hover { text-decoration: underline; }
+
+.onb-manual-box {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #E3E9F1;
+  border-radius: 12px;
+  background: #F7F9FC;
+  text-align: left;
+}
+
+.onb-manual-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5B6B82;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.onb-manual-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.onb-manual-input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #DCE3EC;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1E293B;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+.onb-manual-input:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.onb-manual-use-btn {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #2563EB;
+  cursor: pointer;
+}
+.onb-manual-use-btn:hover { filter: brightness(1.05); }
+
+.onb-manual-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #8A98AD;
 }
 
 .onb-style-header {
@@ -721,7 +866,8 @@
 }
 
 @media (max-width: 560px) {
-  .onb-loss-value { font-size: 34px; }
+  .onb-loss-value, .onb-drawdown-value { font-size: 28px; }
   .onb-tier-list { grid-template-columns: 1fr; }
+  .onb-guardrail-grid { grid-template-columns: 1fr; }
 }
 /* === END COMPONENT: onboarding === */

@@ -395,6 +395,21 @@
   background: #ffffff;
   border-top: 1px solid #E3E9F1;
   box-shadow: 0 -8px 20px rgba(20, 35, 61, 0.07);
+  /* Hidden on initial load — only slides in once the trader scrolls
+     .plans-right (the real scrollport), toggled by initFooterReveal()
+     in plans-page.js. That function also force-shows it if the table
+     doesn't scroll at all, so the CTA is never stranded behind a
+     "scroll down" gesture that isn't actually possible. */
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.plans-footer.plans-footer-visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 @media (min-width: 781px) {

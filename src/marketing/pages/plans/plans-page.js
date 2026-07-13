@@ -88,6 +88,12 @@
       // whatever the table happens to be showing.
       continueBtn.innerText = 'Continue with ' + PLANS[plan].name + ' — ' + formatRupees(PLANS[plan].monthly) + '/mo';
     }
+
+    // Picking a plan is as clear a signal of intent as scrolling — show
+    // the footer immediately rather than making them scroll first to
+    // find the button that just became usable.
+    const footer = document.querySelector('.plans-footer');
+    if (footer) footer.classList.add('plans-footer-visible');
   }
   window.selectPlan = selectPlan;
 
@@ -120,6 +126,28 @@
   }
   window.continueWithPlan = continueWithPlan;
 
+  // Continue bar starts hidden (see .plans-footer in plans-page.css) and
+  // only slides in once the trader scrolls .plans-right, the actual
+  // scrollport — not the instant the page loads. If the table happens to
+  // be short enough to fit without scrolling, there'd be no "scroll
+  // down" gesture available to reveal it, so force it visible in that
+  // case rather than stranding the CTA off-screen.
+  function initFooterReveal() {
+    const scrollport = document.querySelector('.plans-right');
+    const footer = document.querySelector('.plans-footer');
+    if (!scrollport || !footer) return;
+
+    function update() {
+      const canScroll = scrollport.scrollHeight > scrollport.clientHeight + 4;
+      const scrolled = scrollport.scrollTop > 8;
+      footer.classList.toggle('plans-footer-visible', !canScroll || scrolled);
+    }
+
+    scrollport.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     try {
       if (typeof window.Auth === 'undefined') {
@@ -137,6 +165,7 @@
       }
 
       renderPrices();
+      initFooterReveal();
     } catch (err) {
       showFatal('plans-page.js crashed during setup: ' + err.message);
     }

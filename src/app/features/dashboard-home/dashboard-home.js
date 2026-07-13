@@ -288,7 +288,7 @@
       html += `
         <div class="calc-history-cell">${formatDateShort(entry.date)}</div>
         <div class="calc-history-cell num ${resultClass}">${sign}₹${fmt(Math.abs(entry.netResult))}</div>
-        <div class="calc-history-cell num">₹${fmt(entry.balanceAfter)}</div>
+        <div class="calc-history-cell num ${resultClass}">₹${fmt(entry.balanceAfter)}</div>
       `;
     });
     html += "</div>";
@@ -975,9 +975,209 @@
   window.discOpenDayModal = discOpenDayModal;
   window.discCloseDayModal = discCloseDayModal;
 
+  /* =========================================================
+     RISK EXPOSURE — Max Drawdown + Trading Hours. Added alongside the
+     drawdown limit rule introduced in onboarding (see tierRulesMatrix's
+     drawdownPct/drawdown comment in tier-rules.js). Max Drawdown reads
+     the exact same real tradeHistory every other card on this page
+     reads from — no separate data source. Trading Hours needs per-trade
+     EXECUTION TIME, which only exists for broker-synced trades
+     (getBrokerPnlHistory()'s rows carry executedTime) — manually-logged
+     Daily Limits Tool entries only ever carry a date, not a time of
+     day — so it shows an honest empty state until a broker is
+     connected, rather than fabricating hour-level data that doesn't
+     exist for manual entries.
+     ========================================================= */
+
+  const CLOCK_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>';
+  const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  function formatMonthDay(isoDateString) {
+    const d = parseIsoDate(isoDateString);
+    return `${MONTH_ABBR[d.getMonth()]} ${d.getDate()}`;
+  }
+
+  function renderDrawdownCard() {
+    const card = document.getElementById('dash-drawdown-card');
+    if (!card) return;
+
+    const state = getState();
+    const history = getHistory();
+    const summary = typeof window.getRiskSummary === 'function' ? window.getRiskSummary() : null;
+    const limit = summary ? summary.maxDrawdownRupees : null;
+
+    if (!history || history.length === 0 || state.startingCapital === null || limit === null) {
+      card.innerHTML = `
+        <div class="dash-exposure-head">
+          <div class="dash-stat-label">Max. Drawdown</div>
+          <span class="dash-exposure-clock-icon">${CLOCK_SVG}</span>
+        </div>
+        <p class="dash-exposure-empty">Log a trade to start tracking your drawdown${limit !== null ? ` against the ₹${fmt(limit)} limit` : ''}.</p>
+      `;
+      return;
+    }
+
+    // Chronological walk (same sort convention as recordCompletedDay) —
+    // running peak balance vs. current balance. Current drawdown is how
+    // far below that peak the trader sits right now, 0 at a new high —
+    // matches "drawdown" as most trading platforms define it
+    // (peak-to-trough), not a fixed lookback window.
+    const sorted = history.slice().sort((a, b) => {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      return (a.submittedAt || 0) - (b.submittedAt || 0);
+    });
+    let running = state.startingCapital;
+    let peak = state.startingCapital;
+    sorted.forEach((e) => {
+      running += e.netResult;
+      if (running > peak) peak = running;
+    });
+    const currentDrawdown = Math.max(0, peak - running);
+    const inDrawdown = currentDrawdown > 0;
+
+    // Grouped by date for the "recent days" list — trade count per day
+    // is however many entries were logged that date (a day can have
+    // multiple submissions), same grouping convention used elsewhere on
+    // this page (buildPeriodRecord's byDate above).
+    const byDate = {};
+    sorted.forEach((e) => {
+      if (!byDate[e.date]) byDate[e.date] = [];
+      byDate[e.date].push(e);
+    });
+    const recentDates = Object.keys(byDate).sort().reverse().slice(0, 3);
+    const rowsHtml = recentDates.map((date) => {
+      const entries = byDate[date];
+      const dayNet = entries.reduce((sum, e) => sum + e.netResult, 0);
+      const pct = state.startingCapital ? (dayNet / state.startingCapital) * 100 : 0;
+      const isLoss = dayNet < 0;
+      const sign = dayNet > 0 ? '+' : (dayNet < 0 ? '-' : '');
+      return `
+        <div class="dash-exposure-row">
+          <span class="dash-exposure-row-date">${formatMonthDay(date)} &middot; ${entries.length}</span>
+          <span class="dash-exposure-row-value ${isLoss ? 'dash-exposure-neg' : 'dash-exposure-pos'}">${sign}₹${fmt(Math.abs(dayNet))} ${sign}${Math.abs(pct).toFixed(1)}%</span>
+        </div>
+      `;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="dash-exposure-head">
+        <div class="dash-stat-label">Max. Drawdown</div>
+        <span class="dash-exposure-clock-icon">${CLOCK_SVG}</span>
+      </div>
+      <div class="dash-drawdown-value ${inDrawdown ? 'dash-exposure-neg' : ''}">-₹${fmt(currentDrawdown)}<span class="dash-drawdown-limit"> / -₹${fmt(limit)} limit</span></div>
+      <span class="dash-drawdown-badge ${inDrawdown ? '' : 'dash-drawdown-badge-ok'}">${inDrawdown ? 'Currently in drawdown' : 'At a new high'}</span>
+      <div class="dash-exposure-rows">${rowsHtml}</div>
+    `;
+  }
+
+  const TRADING_HOUR_BUCKETS = [
+    { startMin: 9 * 60 + 15, endMin: 10 * 60 + 15, label: '9:15-10:15 AM' },
+    { startMin: 10 * 60 + 15, endMin: 11 * 60 + 15, label: '10:15-11:15 AM' },
+    { startMin: 11 * 60 + 15, endMin: 12 * 60 + 15, label: '11:15 AM-12:15 PM' },
+    { startMin: 12 * 60 + 15, endMin: 13 * 60 + 15, label: '12:15-1:15 PM' },
+    { startMin: 13 * 60 + 15, endMin: 14 * 60 + 15, label: '1:15-2:15 PM' },
+    { startMin: 14 * 60 + 15, endMin: 15 * 60 + 30, label: '2:15-3:30 PM' },
+  ];
+
+  let dashHoursMode = 'best'; // 'best' | 'worst'
+
+  // Buckets the trailing 7 calendar days of broker-synced trades (today
+  // and the 6 days before it) into fixed hour-long market-session
+  // windows, only returning buckets that actually have a trade in them.
+  // Deliberately a rolling window, NOT the Monday-start calendar week
+  // "This week's review" above uses — the mock broker data generator
+  // only backfills up to today, so on a Monday (or any day early in a
+  // fresh calendar week) a strict Mon-Sun window would have nothing but
+  // today to draw from, making this card empty most of the time purely
+  // by which day it happens to be rather than by data availability.
+  function bucketBrokerTradesThisWeek() {
+    const brokerHistory = typeof window.getBrokerPnlHistory === 'function' ? window.getBrokerPnlHistory() : {};
+    const today = new Date();
+    const weekStartIso = toIsoDate(addDays(today, -6));
+    const weekEndIso = toIsoDate(today);
+
+    const buckets = TRADING_HOUR_BUCKETS.map((b) => ({ ...b, count: 0, netPnl: 0 }));
+
+    Object.keys(brokerHistory).forEach((date) => {
+      if (date < weekStartIso || date > weekEndIso) return;
+      (brokerHistory[date] || []).forEach((row) => {
+        const parts = (row.executedTime || '00:00:00').split(':').map(Number);
+        const totalMin = (parts[0] || 0) * 60 + (parts[1] || 0);
+        const bucket = buckets.find((b) => totalMin >= b.startMin && totalMin < b.endMin);
+        if (bucket) {
+          bucket.count += 1;
+          bucket.netPnl += row.netPnl;
+        }
+      });
+    });
+
+    return buckets.filter((b) => b.count > 0);
+  }
+
+  function renderTradingHoursCard() {
+    const card = document.getElementById('dash-hours-card');
+    if (!card) return;
+
+    const state = getState();
+    const buckets = bucketBrokerTradesThisWeek();
+
+    if (!state.brokerConnected || buckets.length === 0) {
+      card.innerHTML = `
+        <div class="dash-exposure-head">
+          <div class="dash-stat-label">Trading Hours</div>
+        </div>
+        <p class="dash-exposure-empty">${!state.brokerConnected
+          ? 'Connect a broker to see which hours you trade best — this needs real trade timestamps, which manual logging doesn\'t capture.'
+          : 'No broker-synced trades in the last 7 days.'}</p>
+      `;
+      return;
+    }
+
+    const sorted = buckets.slice().sort((a, b) => (dashHoursMode === 'best' ? b.netPnl - a.netPnl : a.netPnl - b.netPnl));
+    const top3 = sorted.slice(0, 3);
+    const headline = top3[0];
+    const headlineIsProfit = headline.netPnl >= 0;
+
+    const rowsHtml = top3.map((b) => {
+      const rowPct = state.startingCapital ? (b.netPnl / state.startingCapital) * 100 : 0;
+      const isLoss = b.netPnl < 0;
+      const sign = b.netPnl > 0 ? '+' : (b.netPnl < 0 ? '-' : '');
+      return `
+        <div class="dash-exposure-row">
+          <span class="dash-hours-row-left">
+            <span class="dash-hours-clock-icon">${CLOCK_SVG}</span>
+            <span>${b.label}<br><span class="dash-hours-row-count">${b.count} trade${b.count > 1 ? 's' : ''}</span></span>
+          </span>
+          <span class="dash-exposure-row-value ${isLoss ? 'dash-exposure-neg' : 'dash-exposure-pos'}">${sign}₹${fmt(Math.abs(b.netPnl))}<br><span class="dash-hours-row-pct">${sign}${Math.abs(rowPct).toFixed(1)}%</span></span>
+        </div>
+      `;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="dash-exposure-head">
+        <div class="dash-stat-label">Trading Hours</div>
+        <div class="dash-hours-toggle">
+          <button type="button" class="dash-hours-toggle-btn ${dashHoursMode === 'best' ? 'dash-hours-toggle-btn-active' : ''}" onclick="dashSetHoursMode('best')">Best</button>
+          <button type="button" class="dash-hours-toggle-btn ${dashHoursMode === 'worst' ? 'dash-hours-toggle-btn-active' : ''}" onclick="dashSetHoursMode('worst')">Worst</button>
+        </div>
+      </div>
+      <div class="dash-hours-headline">${headline.label}</div>
+      <p class="dash-hours-headline-sub">Your ${dashHoursMode} trading hour in the last 7 days, with a ${headlineIsProfit ? 'profit' : 'loss'} of ${headlineIsProfit ? '+' : '-'}₹${fmt(Math.abs(headline.netPnl))}</p>
+      <div class="dash-exposure-rows">${rowsHtml}</div>
+    `;
+  }
+
+  function dashSetHoursMode(mode) {
+    dashHoursMode = mode;
+    renderTradingHoursCard();
+  }
+  window.dashSetHoursMode = dashSetHoursMode;
+
   function render() {
     renderStatCards();
     renderRiskRules();
+    renderDrawdownCard();
+    renderTradingHoursCard();
     renderRecentActivity();
     renderDisciplineScore();
     renderWeeklyReview();

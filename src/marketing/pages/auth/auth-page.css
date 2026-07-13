@@ -120,6 +120,7 @@ body {
 }
 
 .auth-headline {
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   font-size: 28px;
   font-weight: 800;
   line-height: 1.26;
@@ -217,6 +218,7 @@ body {
 }
 
 .auth-form-heading {
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   font-size: 27px;
   font-weight: 800;
   color: #1E293B;

@@ -819,6 +819,22 @@
   font-weight: 600;
 }
 
+/* Combined-class overrides — app-theme.css's .calc-history-cell sets its
+   own color (var(--color-text-secondary)) for dark-mode support, and it
+   loads after this file at equal specificity, so it was silently beating
+   .calc-history-win/.calc-history-loss above on every history table that
+   uses these classes, including the Dashboard's Recent Activity table.
+   Same root cause already documented near .custom-range-month-value
+   further down this file — bumping specificity here instead of stripping
+   app-theme.css's color (which dark mode still needs for neutral cells). */
+.calc-history-cell.calc-history-win {
+  color: #16A34A;
+}
+
+.calc-history-cell.calc-history-loss {
+  color: #C53D22;
+}
+
 /* Rule status badges (used in both manual and broker-synced trade logs) */
 .rule-status-badge {
   font-size: 11.5px;

@@ -190,6 +190,69 @@
   let connectedBrokerName = null;  // 'Zerodha' | 'Angel One' | 'Upstox' | null
   let lastSyncedAt = null;         // timestamp (ms) of the last successful mock sync, or null
 
+  // ---------- Setup persistence (localStorage, prototype scope) ----------
+  // Everything else in this file (tradeHistory, journalEntries,
+  // brokerPnlData, etc.) is deliberately still in-memory-only — see the
+  // PROTOTYPE NOTE further down. This is a narrower fix for a specific
+  // complaint: refreshing the Dashboard after finishing onboarding was
+  // sending the trader all the way back through setup again, because
+  // NONE of selectedTier/startingCapital/selectedTraderTypes/broker
+  // connection survived a reload. Persisting just those few fields is
+  // enough for a refresh to land back on a working Dashboard instead of
+  // onboarding — trade history, journal entries and broker-synced P&L
+  // still reset each reload, unchanged from before.
+  const PROFILE_SETUP_STORAGE_KEY = '1crtrader_profile_setup';
+
+  function persistProfileSetup() {
+    if (!profileConfirmed) return;
+    try {
+      localStorage.setItem(PROFILE_SETUP_STORAGE_KEY, JSON.stringify({
+        selectedTier,
+        startingCapital,
+        currentBalance,
+        selectedTraderTypes: Array.from(selectedTraderTypes),
+        lastTierForBalance,
+        joinDate,
+        originalStartingCapital,
+        brokerConnected,
+        connectedBrokerName,
+        profileConfirmed,
+      }));
+    } catch (err) {
+      // Non-fatal — worst case a refresh drops back into onboarding
+      // again, same as before this fix existed.
+      console.error('Could not persist profile setup: ' + err.message);
+    }
+  }
+
+  // Called once at boot, before the DOMContentLoaded handler decides
+  // between onboarding/tab-select/dashboard. Returns true if a real
+  // saved setup was found and restored.
+  function restoreProfileSetup() {
+    let saved = null;
+    try {
+      saved = JSON.parse(localStorage.getItem(PROFILE_SETUP_STORAGE_KEY) || 'null');
+    } catch (err) {
+      return false;
+    }
+    if (!saved || !saved.selectedTier || saved.startingCapital == null) return false;
+
+    selectedTier = saved.selectedTier;
+    startingCapital = saved.startingCapital;
+    currentBalance = saved.currentBalance != null ? saved.currentBalance : saved.startingCapital;
+    selectedTraderTypes = new Set(Array.isArray(saved.selectedTraderTypes) ? saved.selectedTraderTypes : []);
+    lastTierForBalance = saved.lastTierForBalance || saved.selectedTier;
+    joinDate = saved.joinDate || todayDateString();
+    originalStartingCapital = saved.originalStartingCapital != null ? saved.originalStartingCapital : saved.startingCapital;
+    brokerConnected = !!saved.brokerConnected;
+    connectedBrokerName = saved.connectedBrokerName || null;
+    // brokerPnlData intentionally NOT restored — out of scope for this
+    // fix (see comment above); a restored broker connection just shows
+    // as connected with no synced trades until the trader re-syncs.
+    profileConfirmed = true;
+    return true;
+  }
+
   // (Lot-unlock-by-growth multiplier logic now lives directly in
   // getMaxAllowedLots()/getNextLotUnlockInfo() below, reading maxLots from
   // tierRulesMatrix per sub-tier — see the comment on tierRulesMatrix above
@@ -691,6 +754,7 @@
 
     if (profileConfirmed) {
       refreshHeaderBadge();
+      persistProfileSetup();
     }
   }
 
@@ -1224,12 +1288,17 @@
     profileConfirmed = true;
 
     // Record on the (mock) account itself that setup has been completed at
-    // least once — purely informational in this prototype, since profile
-    // data itself doesn't persist across reloads; see the auth gate comment
-    // in DOMContentLoaded for why this doesn't yet skip setup on return.
+    // least once — informational only, doesn't gate anything on its own.
     if (typeof window.Auth !== 'undefined') {
       window.Auth.markProfileComplete();
     }
+
+    // Persist just the setup fields (tier/capital/style/broker) so a
+    // Dashboard refresh restores straight into the app instead of
+    // bouncing back through onboarding — see restoreProfileSetup() in
+    // DOMContentLoaded. Trade history/journal/broker-synced P&L are
+    // still in-memory only, unchanged.
+    persistProfileSetup();
 
     // The shell has been visible since page load (see DOMContentLoaded
     // below) — confirming the profile just exits "setup mode" so the
@@ -1570,6 +1639,13 @@
       tierLabel: TIER_LABELS[selectedTier],
       maxLossRupees: rule ? rule.loss : null,
       maxLossPct: rule ? rule.pct : null,
+      // Total cumulative drawdown ceiling (doesn't reset daily, unlike
+      // maxLossRupees above) — see tierRulesMatrix's drawdown/drawdownPct
+      // comment in tier-rules.js. Added for the Dashboard's Risk Exposure
+      // card; reuses the same already-resolved sub-tier `rule` rather than
+      // a second lookup.
+      maxDrawdownRupees: rule ? rule.drawdown : null,
+      maxDrawdownPct: rule ? rule.drawdownPct : null,
       maxLots: maxLots,
       nextLotUnlock: nextUnlock, // null if no further tier defined
     };
@@ -2233,6 +2309,7 @@
       connectedBrokerName = brokerName;
       lastSyncedAt = null;
       brokerPnlData = generateMockBrokerPnlHistory();
+      persistProfileSetup(); // no-op if profile isn't confirmed yet (e.g. still mid-onboarding)
       if (typeof onConnected === 'function') onConnected();
     }, 1400);
   }
@@ -2242,6 +2319,7 @@
     connectedBrokerName = null;
     lastSyncedAt = null;
     brokerPnlData = {};
+    persistProfileSetup(); // no-op if profile isn't confirmed yet
   }
 
   function ymd(d) {
@@ -2550,6 +2628,7 @@
   // and the state/balance hooks for features/daily-limits/daily-limits.js and roadmap.js.
   window.switchTab = switchTab;
   window.setStartingCapitalDirect = setStartingCapitalDirect;
+  window.generateMockFetchedBalance = generateMockFetchedBalance; // used by onboarding.js's step 1 broker connect (now derives tier from the fetch)
   window.getSelectedTraderTypes = getSelectedTraderTypes;
   window.toggleAccountMenu = toggleAccountMenu;
   window.handleLogout = handleLogout;
@@ -2620,12 +2699,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     // ---------- Auth gate (PROTOTYPE MOCK — see auth.js) ----------
     // No logged-in session at all -> bounce to the login screen before
-    // anything else renders. NOTE: this prototype only gates ACCESS to the
-    // app behind a mock login — it does not yet persist tier/capital/
-    // instrument selections across page reloads (that state has always
-    // been in-memory only, independent of this auth layer). A returning
-    // logged-in user still goes through profile setup once per session;
-    // making the profile itself persist is a separate, larger change.
+    // anything else renders.
     if (typeof window.Auth === 'undefined') {
       console.warn('auth.js not loaded — skipping the auth gate (app will behave as if logged in).');
     } else if (!window.Auth.getSession()) {
@@ -2640,11 +2714,37 @@
     // styles/themes/app-theme.css) — nothing to apply here in JS anymore.
     applyFontSizePreference();
 
-    if (sidebar) {
-      sidebar.classList.remove('hidden');
-      sidebar.classList.add('sidebar-setup-mode');
-    }
+    if (sidebar) sidebar.classList.remove('hidden');
     if (topBar) topBar.classList.remove('hidden');
+
+    // Restore a previously-confirmed setup (tier/capital/style/broker —
+    // see restoreProfileSetup()) before deciding what to show. Without
+    // this, EVERY reload landed back on the raw tab-select "Set up your
+    // profile" screen (or, once onboarding.js's own hasOnboarded() check
+    // was fixed to require real state, back on the onboarding overlay
+    // instead) even for a trader who'd already finished setup — because
+    // selectedTier/startingCapital/etc. have always been in-memory only.
+    // Trade history/journal/broker-synced P&L still reset each reload;
+    // this only covers the fields needed to land on a working Dashboard.
+    if (restoreProfileSetup()) {
+      if (sidebar) sidebar.classList.remove('sidebar-setup-mode');
+      refreshHeaderBadge();
+
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+      const dashboardTab = document.getElementById('tab-dashboard');
+      if (dashboardTab) dashboardTab.classList.add('active');
+      const dashboardLink = document.querySelector('.sidebar-link[data-tab="tab-dashboard"]');
+      if (dashboardLink) dashboardLink.classList.add('active');
+
+      const titleEl = document.getElementById('top-bar-page-title');
+      if (titleEl) titleEl.innerText = PAGE_TITLES['tab-dashboard'];
+
+      loadComponent('tab-dashboard');
+      return;
+    }
+
+    if (sidebar) sidebar.classList.add('sidebar-setup-mode');
 
     const titleEl = document.getElementById('top-bar-page-title');
     if (titleEl) titleEl.innerText = PAGE_TITLES['tab-select'];

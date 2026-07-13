@@ -358,6 +358,175 @@
   font-weight: 700;
 }
 
+/* ── Risk Exposure — Max Drawdown + Trading Hours ─────────────
+   Two independent cards side by side, matching .dash-section-card's
+   white/bordered treatment. See dashboard-home.js's renderDrawdownCard()/
+   renderTradingHoursCard() for what drives each. */
+.dash-exposure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.dash-exposure-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.dash-exposure-clock-icon {
+  color: #8A98AD;
+}
+
+.dash-exposure-empty {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #8A98AD;
+  margin: 8px 0 0;
+}
+
+.dash-exposure-pos { color: #16A34A; }
+.dash-exposure-neg { color: #DC2626; }
+
+.dash-exposure-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #EEF2F7;
+}
+
+.dash-exposure-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.dash-exposure-row-date {
+  color: #5B6B82;
+  font-weight: 600;
+}
+
+.dash-exposure-row-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Max Drawdown card specifics */
+.dash-drawdown-value {
+  font-size: 30px;
+  font-weight: 800;
+  color: #1E293B;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.4px;
+}
+
+/* Same equal-specificity cascade issue as .calc-history-cell above:
+   .dash-exposure-neg is defined earlier in this file, so without this
+   combined-class override the base color here (later in source order)
+   silently wins and the drawdown figure never turns red even when
+   inDrawdown is true. */
+.dash-drawdown-value.dash-exposure-neg {
+  color: #DC2626;
+}
+
+.dash-drawdown-limit {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8A98AD;
+}
+
+.dash-drawdown-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: #FDECEA;
+  color: #C0362C;
+}
+
+.dash-drawdown-badge-ok {
+  background: #E3F5EC;
+  color: #15803D;
+}
+
+/* Trading Hours card specifics */
+.dash-hours-toggle {
+  display: flex;
+  background: #F1F4F8;
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.dash-hours-toggle-btn {
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8A98AD;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dash-hours-toggle-btn-active {
+  background: #ffffff;
+  color: #1E293B;
+  box-shadow: 0 1px 2px rgba(20, 35, 61, 0.08);
+}
+
+.dash-hours-headline {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.3px;
+  margin-top: 6px;
+}
+
+.dash-hours-headline-sub {
+  font-size: 13px;
+  color: #5B6B82;
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+
+.dash-hours-headline-sub strong,
+.dash-hours-headline-sub { font-variant-numeric: tabular-nums; }
+
+.dash-hours-row-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #1E293B;
+  font-weight: 600;
+}
+
+.dash-hours-clock-icon {
+  color: #8A98AD;
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+
+.dash-hours-row-count,
+.dash-hours-row-pct {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #8A98AD;
+}
+
+@media (max-width: 780px) {
+  .dash-exposure-grid { grid-template-columns: 1fr; }
+}
+
 .dash-quicklink-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

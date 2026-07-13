@@ -24,6 +24,30 @@
     </div>
   </div>
 
+  <!-- Risk Exposure — Max Drawdown (real trade history, same as every
+       other card here) + Trading Hours (needs per-trade execution time,
+       only available once a broker is connected — see the empty-state
+       copy rendered by renderTradingHoursCard() in dashboard-home.js).
+       NEW section, added alongside the drawdown limit rule introduced
+       in onboarding. -->
+  <div class="dash-section-group">
+    <div class="dash-stat-label">Risk Exposure</div>
+    <p class="section-note" style="margin:-2px 0 12px;">How much cushion you have left, and when you trade best.</p>
+    <div class="dash-exposure-grid">
+      <div id="dash-drawdown-card" class="dash-section-card dash-drawdown-card"></div>
+      <div id="dash-hours-card" class="dash-section-card dash-hours-card"></div>
+    </div>
+  </div>
+
+  <!-- Weekly / Monthly Disciplined Review — an auto-generated behavioural
+       review (not a P&L report): spots patterns in the trader's real
+       logged trades (win/loss, rule-adherence) rather than judging by
+       P&L. Per the "Discipline Features" handoff (Feature 2). -->
+  <div class="dash-section-group">
+    <div class="dash-stat-label">This week's review</div>
+    <div id="dash-review-card" class="wr-card dash-section-card"></div>
+  </div>
+
   <!-- Jump back in — Daily Limits, Trade Manager, Trading Journal, Strategies (Account intentionally not shown here) -->
   <div class="dash-section-group">
     <div class="dash-stat-label">Jump back in</div>
@@ -61,22 +85,16 @@
     </div>
   </div>
 
-  <!-- Recent activity -->
+  <!-- Recent activity — moved to the very bottom (previously sat above
+       This week's review) so the primary top-to-bottom flow matches the
+       reorganized reference: discipline -> stats -> risk rules -> risk
+       exposure -> weekly review -> jump back in, with the raw activity
+       log last since it's already summarized higher up. -->
   <div class="dash-section-group">
     <div class="dash-stat-label">Recent Activity</div>
     <div id="dash-recent-wrap" class="dash-recent-wrap dash-section-card">
       <div id="dash-recent-area"></div>
     </div>
-  </div>
-
-  <!-- Weekly / Monthly Disciplined Review — an auto-generated behavioural
-       review (not a P&L report): spots patterns in the trader's real
-       logged trades (win/loss, rule-adherence) rather than judging by
-       P&L. Lives at the bottom of the Dashboard per the "Discipline
-       Features" handoff (Feature 2). -->
-  <div class="dash-section-group">
-    <div class="dash-stat-label">This week's review</div>
-    <div id="dash-review-card" class="wr-card dash-section-card"></div>
   </div>
 </div>
 <!-- END COMPONENT: dashboard-home -->
