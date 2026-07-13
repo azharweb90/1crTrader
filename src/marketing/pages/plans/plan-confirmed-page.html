@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1Cr Traders — You're all set</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/images/logos/favicon.png">
+  <link rel="stylesheet" href="/src/marketing/pages/auth/auth-page.css?v=5">
+  <link rel="stylesheet" href="/src/marketing/pages/plans/plan-confirmed-page.css?v=1">
+</head>
+<body>
+
+  <div id="confirmed-fatal-error" class="auth-fatal-error hidden">
+    Couldn't load the login system (auth-service.js). Make sure this
+    site is served from the project root — not opened as a local file
+    — and check the browser console for the exact error.
+  </div>
+
+  <div class="auth-shell">
+
+    <!-- Same promo-panel structure/classes as the other auth pages
+         (auth-page.css), copy swapped for the post-payment context. -->
+    <aside class="auth-left">
+      <a href="/src/marketing/pages/auth/auth-page.html?view=login" class="auth-logo-row">
+        <img src="/assets/images/logos/1crtraders-icon.png" alt="" class="auth-logo-icon">
+        <div>
+          <div class="auth-logo-name">1Cr Traders</div>
+          <div class="auth-logo-tag">REWARD ABOVE RISK</div>
+        </div>
+      </a>
+
+      <div class="auth-left-mid">
+        <div class="auth-eyebrow">YOU'RE IN</div>
+        <h1 class="auth-headline">Payment confirmed. Welcome to the discipline system.</h1>
+        <p class="auth-left-sub">Your plan is active. Next, we lock in the rules that keep it that way.</p>
+        <div class="auth-checklist">
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Plan activated and billing confirmed</span>
+          </div>
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Receipt sent to your email</span>
+          </div>
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Up next: your daily loss limit and stop rule</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-left-bottom">
+        <div class="auth-avatars">
+          <img src="/assets/images/avatars/deepika-trading-femme.png" alt="" class="auth-avatar">
+          <img src="/assets/images/avatars/gautham-jha.png" alt="" class="auth-avatar">
+          <img src="/assets/images/avatars/mayank-raj-traderoom.png" alt="" class="auth-avatar">
+        </div>
+        <div class="auth-social-text">Join 12,000+ disciplined traders</div>
+      </div>
+    </aside>
+
+    <div class="auth-right">
+      <div class="auth-right-inner">
+        <div class="auth-form auth-form-center">
+          <div class="auth-success-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h2 class="auth-form-heading">You're all set — welcome aboard!</h2>
+          <p id="confirmed-sub" class="auth-form-sub">Your plan is now active. A receipt has been sent to your email.</p>
+
+          <div class="plan-confirmed-note">
+            Next: set your daily loss limit and stop rule — the guardrails that make this account work.
+          </div>
+
+          <button type="button" class="auth-submit-btn" onclick="setUpRules()">Set up my rules</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/src/marketing/services/auth-service.js"></script>
+  <script src="/src/marketing/pages/plans/plan-confirmed-page.js"></script>
+</body>
+</html>

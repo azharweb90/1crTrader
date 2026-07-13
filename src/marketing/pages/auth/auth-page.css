@@ -668,6 +668,21 @@ body {
 
 .auth-submit-btn:hover { filter: brightness(1.05); }
 
+/* Visually-disabled state — toggled alongside the real `disabled`
+   attribute (see verify-account-page.js's updateSubmitState()) so an
+   incomplete/invalid form doesn't render as a normal, clickable blue
+   button. Without this, `disabled` blocks the click but looks
+   identical to enabled, which reads as broken rather than "not ready
+   yet". */
+.auth-submit-btn-disabled,
+.auth-submit-btn-disabled:hover {
+  background: #E9EDF3;
+  color: #9AA7BA;
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: none;
+}
+
 .auth-btn-secondary {
   flex: 1;
   display: flex;

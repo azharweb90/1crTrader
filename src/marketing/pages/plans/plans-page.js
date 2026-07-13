@@ -103,7 +103,20 @@
       // continuing into the app just because it failed to save.
       console.error('Could not save plan choice: ' + err.message);
     }
-    window.location.href = '/src/app/app-shell.html';
+    // plan-confirmed-page.js needs the plan name/price to render its
+    // "Your Pro plan (₹999/mo) is now active" line — stashed here
+    // since window.Auth.getSession() doesn't expose it.
+    try {
+      sessionStorage.setItem('1crtrader_confirmed_plan', JSON.stringify({
+        plan: selectedPlan,
+        name: PLANS[selectedPlan].name,
+        monthly: PLANS[selectedPlan].monthly,
+        billingCycle,
+      }));
+    } catch (err) {
+      // Non-fatal — plan-confirmed-page.js falls back to generic text.
+    }
+    window.location.href = '/src/marketing/pages/plans/plan-confirmed-page.html';
   }
   window.continueWithPlan = continueWithPlan;
 

@@ -16,6 +16,10 @@
   justify-content: center;
   align-items: flex-start;
   padding: 48px 40px;
+  /* Extra bottom padding reserves room for the fixed CTA bar
+     (.plans-footer, now position:fixed and out of normal flow) so the
+     last table row never ends up hidden underneath it. */
+  padding-bottom: 130px;
   overflow-y: auto;
 }
 
@@ -25,7 +29,13 @@
   background: #ffffff;
   border: 1px solid #E3E9F1;
   border-radius: 18px;
-  overflow: hidden;
+  /* Was overflow:hidden (just to clip the banner's gradient corners to
+     match the card's rounding) — changed to visible so the sticky CTA
+     footer below can stick relative to .plans-right (the real
+     scrollport) instead of being trapped inside this card's own
+     clipping box, which would silently break position:sticky. The
+     banner now carries its own top corner-radius instead. */
+  overflow: visible;
   box-shadow: 0 20px 50px rgba(20, 35, 61, 0.08);
 }
 
@@ -34,6 +44,7 @@
   background: linear-gradient(115deg, #0F1F4D 0%, #2563EB 100%);
   padding: 34px 40px;
   text-align: center;
+  border-radius: 18px 18px 0 0;
 }
 
 .plans-banner-title {
@@ -115,7 +126,11 @@
 
 /* ── Table ──────────────────────────────────────────────────── */
 .plans-table-wrap {
-  padding: 20px 24px 0;
+  /* Bottom padding restored now that .plans-footer is no longer an
+     in-flow sibling providing that breathing room itself (it's fixed
+     to the viewport now) — without it the table's last row would sit
+     flush against .plans-card's rounded bottom edge. */
+  padding: 20px 24px 24px;
   overflow-x: auto;
 }
 
@@ -359,9 +374,31 @@
 }
 
 /* ── Footer / CTA ───────────────────────────────────────────── */
+/* Fixed to the viewport, not just sticky within the scrolling card —
+   position:sticky kept the bar pinned only inside .plans-right's own
+   scrollport, which let table rows visibly scroll past/behind its
+   edges as they crossed that boundary. position:fixed anchors it to
+   the actual browser window instead, so it's a solid opaque bar that
+   nothing ever shows through, matching a real checkout-bar pattern.
+   Left offset clears the 400px promo panel on wide screens (mirrors
+   the breakpoint that hides .auth-left below); full-width once that
+   panel is gone. .plans-right's extra bottom padding (above) reserves
+   room so the last table row doesn't end up hidden underneath it. */
 .plans-footer {
-  padding: 22px 24px 28px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  padding: 16px 24px 18px;
   text-align: center;
+  background: #ffffff;
+  border-top: 1px solid #E3E9F1;
+  box-shadow: 0 -8px 20px rgba(20, 35, 61, 0.07);
+}
+
+@media (min-width: 781px) {
+  .plans-footer { left: 400px; }
 }
 
 .plans-continue-btn {

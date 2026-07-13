@@ -595,6 +595,25 @@
     updateContinueButtonState();
   }
 
+  // Called by onboarding.js's own step 2 ("Continue to dashboard") — the
+  // first-run onboarding modal now derives starting capital straight from
+  // the tier the trader picked in ITS OWN step 1, and no longer hands off
+  // into this page's manual-capital input to seed it (that fragment isn't
+  // loaded during first-run onboarding anymore; see onboarding.js's header
+  // comment). Sets the same state onSetupCapitalInput() would, minus the
+  // DOM-input dependency, so confirmProfile()'s own gate
+  // (selectedTier && selectedTraderTypes.size > 0 && startingCapital !== null)
+  // is satisfied once onboarding calls it. This page/tab is still fully
+  // intact as a fallback (Skip for now, Edit Profile) — only the
+  // first-run hand-off path changed.
+  function setStartingCapitalDirect(amount) {
+    if (!amount || amount <= 0) return;
+    startingCapital = amount;
+    currentBalance = amount;
+    selectedTier = tierForBalance(amount);
+    lastTierForBalance = selectedTier;
+  }
+
   // Switches the broker section into the manual fallback path — capital
   // is typed directly, no tier cards, tier auto-derives from the amount.
   function setupGoManual() {
@@ -673,6 +692,14 @@
     if (profileConfirmed) {
       refreshHeaderBadge();
     }
+  }
+
+  // Read-only getter for onboarding.js's step 2 — lets it re-render its
+  // own trading-style cards (e.g. after a broker "connects" on a delay)
+  // without losing track of which styles are already selected, without
+  // exposing the selectedTraderTypes Set itself.
+  function getSelectedTraderTypes() {
+    return Array.from(selectedTraderTypes);
   }
 
   // ---------- Instrument multi-select (Nifty / Bank Nifty / FinNifty / Sensex) ----------
@@ -2522,6 +2549,8 @@
   // Expose handlers used by inline onclick attributes in index.html / components,
   // and the state/balance hooks for features/daily-limits/daily-limits.js and roadmap.js.
   window.switchTab = switchTab;
+  window.setStartingCapitalDirect = setStartingCapitalDirect;
+  window.getSelectedTraderTypes = getSelectedTraderTypes;
   window.toggleAccountMenu = toggleAccountMenu;
   window.handleLogout = handleLogout;
   window.selectTraderType = selectTraderType;

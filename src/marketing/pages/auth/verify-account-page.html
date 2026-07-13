@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1Cr Traders — Verify your account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/images/logos/favicon.png">
+  <link rel="stylesheet" href="/src/marketing/pages/auth/auth-page.css?v=5">
+  <link rel="stylesheet" href="/src/marketing/pages/auth/verify-account-page.css?v=2">
+</head>
+<body>
+
+  <div id="verify-fatal-error" class="auth-fatal-error hidden">
+    Couldn't load the login system (auth-service.js). Make sure this
+    site is served from the project root — not opened as a local file
+    — and check the browser console for the exact error.
+  </div>
+
+  <div class="auth-shell">
+
+    <!-- Same promo-panel structure/classes as the other auth pages
+         (auth-page.css), copy swapped for the verification context. -->
+    <aside class="auth-left">
+      <a href="/src/marketing/pages/auth/auth-page.html?view=login" class="auth-logo-row">
+        <img src="/assets/images/logos/1crtraders-icon.png" alt="" class="auth-logo-icon">
+        <div>
+          <div class="auth-logo-name">1Cr Traders</div>
+          <div class="auth-logo-tag">REWARD ABOVE RISK</div>
+        </div>
+      </a>
+
+      <div class="auth-left-mid">
+        <div class="auth-eyebrow">VERIFY IT'S YOU</div>
+        <h1 class="auth-headline">One quick check before we continue.</h1>
+        <p class="auth-left-sub">We've sent a 6-digit code to both your email and mobile — enter it to verify your account.</p>
+        <div class="auth-checklist">
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Code sent to your email</span>
+          </div>
+          <div class="auth-check-item">
+            <span class="auth-check-icon">&#10003;</span>
+            <span class="auth-check-text">Code sent to your mobile</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-left-bottom">
+        <div class="auth-avatars">
+          <img src="/assets/images/avatars/deepika-trading-femme.png" alt="" class="auth-avatar">
+          <img src="/assets/images/avatars/gautham-jha.png" alt="" class="auth-avatar">
+          <img src="/assets/images/avatars/mayank-raj-traderoom.png" alt="" class="auth-avatar">
+        </div>
+        <div class="auth-social-text">Join 12,000+ disciplined traders</div>
+      </div>
+    </aside>
+
+    <div class="auth-right">
+      <div class="auth-right-inner verify-right-inner">
+
+        <form id="verify-form" class="auth-form">
+          <h2 class="auth-form-heading">Verify your account</h2>
+          <p id="verify-sub" class="auth-form-sub">We've sent a 6-digit code to your email and mobile. Enter it below — either copy works.</p>
+
+          <div class="verify-code-row" id="verify-code-row">
+            <input type="text" inputmode="numeric" maxlength="1" class="verify-code-input" data-idx="0" autocomplete="one-time-code">
+            <input type="text" inputmode="numeric" maxlength="1" class="verify-code-input" data-idx="1">
+            <input type="text" inputmode="numeric" maxlength="1" class="verify-code-input" data-idx="2">
+            <input type="text" inputmode="numeric" maxlength="1" class="verify-code-input" data-idx="3">
+            <input type="text" inputmode="numeric" maxlength="1" class="verify-code-input" data-idx="4">
+            <input type="text" inputmode="numeric" maxlength="1" class="verify-code-input" data-idx="5">
+          </div>
+          <p id="verify-code-error" class="auth-error hidden"></p>
+
+          <button type="submit" id="verify-submit-btn" class="auth-submit-btn auth-submit-btn-disabled" disabled>Verify &amp; continue</button>
+
+          <div class="verify-resend-row">
+            <button type="button" id="verify-resend-btn" class="verify-resend-link" onclick="resendCode()">Resend code</button>
+          </div>
+
+          <p id="verify-dev-note" class="auth-inline-note"></p>
+          <div class="verify-resend-row">
+            <button type="button" id="verify-autofill-btn" class="verify-resend-link" onclick="autofillCode()">Autofill code</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/src/marketing/services/auth-service.js"></script>
+  <script src="/src/marketing/pages/auth/verify-account-page.js"></script>
+</body>
+</html>

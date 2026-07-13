@@ -1,0 +1,27 @@
+/* ===========================================================
+   YOU'RE ALL SET — plan confirmation, shown right after
+   continueWithPlan() in plans-page.js and before the trader ever
+   reaches app-shell.html. Reuses auth-page.css's shell/left-panel/
+   success-icon classes as-is (same green checkmark circle as
+   forgot-password-page.html's done step); only the info box below
+   the subtext is new.
+
+   No "Skip for now" here by design — unlike onboarding's own welcome
+   step (which still offers one), this screen requires "Set up my
+   rules" to proceed. See setUpRules() in plan-confirmed-page.js for
+   how that hands off into onboarding.js, skipping its now-redundant
+   welcome step.
+   =========================================================== */
+
+.plan-confirmed-note {
+  width: 100%;
+  border: 1px solid #E3E9F1;
+  background: #F8FAFC;
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #3E4C61;
+  text-align: left;
+  margin-bottom: 24px;
+}

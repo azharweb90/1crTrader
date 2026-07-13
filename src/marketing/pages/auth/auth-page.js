@@ -129,13 +129,20 @@
     window.location.href = '/src/app/app-shell.html';
   }
 
-  // Fresh signups go through plan selection first — plans-page.js
-  // requires the session this just created and redirects to
-  // app-shell.html once a plan is chosen. Logging in (an existing
+  // Fresh signups go through account verification, then plan
+  // selection, before ever reaching the app. Logging in (an existing
   // account) skips straight to goToApp(); they've already been
-  // through this.
-  function goToPlans() {
-    window.location.href = '/src/marketing/pages/plans/plans-page.html';
+  // through this. verify-account-page.js needs {email, phone} to mask
+  // and display them — window.Auth.getSession() only exposes
+  // {name, email} — so it's stashed here right before the redirect.
+  function goToVerify(email, phone) {
+    try {
+      sessionStorage.setItem('1crtrader_verify_contact', JSON.stringify({ email, phone }));
+    } catch (e) {
+      // sessionStorage being unavailable shouldn't block signup —
+      // verify-account-page.js falls back to a generic message.
+    }
+    window.location.href = '/src/marketing/pages/auth/verify-account-page.html';
   }
 
   // ---------- Validators ----------
@@ -608,7 +615,7 @@
             const password = registerPasswordInput.value;
             const result = window.Auth.signUp({ name, email, phone, password });
             if (result.ok) {
-              goToPlans();
+              goToVerify(email, phone);
             } else {
               showError(registerError, result.error);
               if (submitBtn) submitBtn.disabled = false;

@@ -1,0 +1,83 @@
+/* ===========================================================
+   VERIFY YOUR ACCOUNT — OTP entry, shown right after signup and
+   before plan selection (see verify-account-page.js's header comment
+   for the full flow). Reuses auth-page.css's shell/left-panel/form
+   classes as-is; only the 6-digit code row and resend link are new.
+   =========================================================== */
+
+.verify-right-inner {
+  max-width: 440px;
+}
+
+/* ── 6-digit code boxes ─────────────────────────────────────── */
+.verify-code-row {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 20px;
+}
+
+/* When a wrong-code error shows, it sits between the code row and the
+   button — give it the same 20px gap down to the button that the code
+   row itself has when there's no error, on top of .auth-error's own
+   7px margin-top down from the code row. */
+#verify-code-error.auth-error {
+  margin-bottom: 20px;
+}
+
+.verify-code-input {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  border: 1px solid #DCE3EC;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  color: #1E293B;
+  background: #ffffff;
+}
+
+.verify-code-input:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.verify-code-input.auth-field-input-invalid {
+  border-color: #DC2626;
+}
+
+.verify-code-input.auth-field-input-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+/* ── Resend link ────────────────────────────────────────────── */
+.verify-resend-row {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.verify-resend-link {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #2563EB;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.verify-resend-link:hover { color: #1D4ED8; }
+
+.verify-resend-link:disabled {
+  color: #9AA7BA;
+  text-decoration: none;
+  cursor: default;
+}
+
+#verify-dev-note {
+  margin-top: 18px;
+}
