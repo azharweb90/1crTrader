@@ -122,6 +122,41 @@
     "swing-trader": "Swing Trader",
   };
 
+  // Discipline Mode vs Risk Dashboard Mode — which rule shape a trading
+  // style needs. Discipline (Option Buyer/Scalper/Equity/Swing) keeps a
+  // max-2-trades/day + cooldown + 75%/100% soft-block/hard-stop shape;
+  // Risk Dashboard (Option Seller/Hedged Seller/Spread Trader/Futures
+  // Trader) drops the trade-count cap and tracks total loss/drawdown
+  // continuously instead, since counting order legs falsely flagged
+  // hedgers/spread traders for "overtrading" on what's really one
+  // combined position. getEnforcementMode() is the single source of
+  // truth for which applies to the current account — added now as a
+  // foundation for the Daily Limits Tool's mode-aware submission flow
+  // (not yet wired up there; onboarding's step 1 style picker is the
+  // first consumer, via the mixed-mode note on its two panels).
+  //
+  // Mixing styles from both groups is a documented open question (see
+  // README/handoff notes) — current behavior is Risk Dashboard
+  // overriding for the whole account, not a blended/parallel system.
+  const TRADER_TYPE_MODE = {
+    "option-buyer": "discipline",
+    "scalper": "discipline",
+    "equity-trader": "discipline",
+    "swing-trader": "discipline",
+    "option-seller": "risk-dashboard",
+    "hedged-seller": "risk-dashboard",
+    "spread-trader": "risk-dashboard",
+    "futures-trader": "risk-dashboard",
+  };
+
+  function getEnforcementMode() {
+    if (selectedTraderTypes.size === 0) return null;
+    for (const key of selectedTraderTypes) {
+      if (TRADER_TYPE_MODE[key] === "risk-dashboard") return "risk-dashboard";
+    }
+    return "discipline";
+  }
+
   // Lot quantity per index instrument (NSE/BSE F&O contracts). Indices
   // only for now — confirmed with the trader: stocks were genuinely
   // confusing alongside indices and are deliberately removed from this
@@ -2630,6 +2665,7 @@
   window.setStartingCapitalDirect = setStartingCapitalDirect;
   window.generateMockFetchedBalance = generateMockFetchedBalance; // used by onboarding.js's step 1 broker connect (now derives tier from the fetch)
   window.getSelectedTraderTypes = getSelectedTraderTypes;
+  window.getEnforcementMode = getEnforcementMode;
   window.toggleAccountMenu = toggleAccountMenu;
   window.handleLogout = handleLogout;
   window.selectTraderType = selectTraderType;

@@ -2,27 +2,29 @@
    FIRST-RUN ONBOARDING MODAL — "Discipline Features" handoff, Feature 4.
 
    A blocking, full-screen modal shown once, before a trader's first
-   session, that locks in: (1) Connect a broker (or enter capital
-   manually as a fallback) + trading style — step 1; (2) the tier/daily
-   loss limit/drawdown limit that fetched-or-entered capital DERIVES,
-   plus an OPTIONAL personal "stop rule" — a note from calm-you to
-   tilted-you that reappears later on the Cool-Down Lock screen
-   (Feature 3, not yet built) — step 2; (3) a summary/finish screen —
-   step 3.
+   session, that locks in, one screen at a time: (1) Connect a broker or
+   enter capital manually — step 1; (2) trading style, split into
+   Discipline Mode / Risk Dashboard Mode panels — step 2; (3) the tier/
+   daily loss limit/drawdown limit that step 1's capital DERIVES, plus an
+   OPTIONAL personal "stop rule" — a note from calm-you to tilted-you
+   that reappears later on the Cool-Down Lock screen (Feature 3, not yet
+   built) — step 3; (4) a summary/finish screen — step 4. Steps 1 and 2
+   used to be one combined screen; split apart per explicit direction to
+   cut down how much a trader has to take in on one screen — see
+   step1Html()/step2Html() below.
 
-   Re-ordered per explicit direction: connecting a broker is what
+   Re-ordered per earlier explicit direction: connecting a broker is what
    fetches the real balance, so it has to come BEFORE the tier/limits
    screen that depends on it, not after (the tier used to be a manual
    6-card pick on step 1, with broker connect + trading style on step 2
    as a purely cosmetic add-on that deliberately never touched capital —
    see git history / onbConnectBroker()'s old comment for that earlier
-   design). Manual capital entry is kept as an explicit fallback (a
-   secondary link, not a first-class picker) for someone who won't
-   connect a broker — the trade-off being every trade then has to be
-   logged by hand in the Daily Limits Tool instead of syncing
-   automatically, which manual entry's own hint copy says outright.
+   design). Manual capital entry is kept as an explicit fallback for
+   someone who won't connect a broker — the trade-off being every trade
+   then has to be logged by hand in the Daily Limits Tool instead of
+   syncing automatically, which its own hint copy says outright.
 
-   Step 2 calls straight into app-shell.js's real global functions
+   Step 1 calls straight into app-shell.js's real global functions
    instead of re-implementing them: window.connectBroker() +
    window.generateMockFetchedBalance() for the (mock) broker fetch,
    window.selectTraderType() for the trading-style multi-select (reuses
@@ -114,22 +116,45 @@
   ];
 
   // Same 8 trading styles as the tier-select page (TRADER_TYPE_LABELS in
-  // app-shell.js) with their descriptive copy — step 2's cards use the
+  // app-shell.js) with their descriptive copy — step 1's cards use the
   // real .trader-type-card class + data-trader-type attribute + the real
   // window.selectTraderType(), so clicking here updates the SAME
   // selectedTraderTypes Set the rest of the app reads, not a local copy.
+  //
+  // `mode` is new: "Discipline Mode" (Option Buyer/Scalper/Equity/Swing)
+  // keeps the old max-2-trades/day + cooldown + 75%/100% soft-block/hard-
+  // stop shape; "Risk Dashboard Mode" (Option Seller/Hedged Seller/
+  // Spread Trader/Futures Trader) drops the trade-count cap entirely —
+  // each combined multi-leg position counts as ONE entry, with a single
+  // circuit breaker on total loss/drawdown instead. Grouped into two
+  // panels below (see step1Html()) rather than 8 flat cards, since which
+  // mode a style belongs to is now load-bearing information, not
+  // decoration. Actual ENFORCEMENT of these two modes (Daily Limits
+  // Tool submission flow, circuit breaker, etc.) is a separate, much
+  // larger follow-up — this pass only covers the onboarding picker.
   const ONB_TRADER_TYPES = [
-    { key: 'option-buyer', name: 'Option Buyer', desc: 'Buys call/put options. Capital required is the option premium.' },
-    { key: 'option-seller', name: 'Option Seller', desc: 'Writes (sells) call/put options. Requires margin, similar to futures.' },
-    { key: 'futures-trader', name: 'Futures Trader', desc: 'Trades futures contracts directly. Requires the highest margin.' },
-    { key: 'hedged-seller', name: 'Hedged Seller', desc: 'Sells futures and buys an option for hedging to limit downside.' },
-    { key: 'equity-trader', name: 'Equity / Cash Trader', desc: 'Buys and sells stocks directly, no derivatives. Full share value.' },
-    { key: 'spread-trader', name: 'Spread Trader', desc: 'Combines option legs (verticals, iron condors) for defined, capped risk.' },
-    { key: 'scalper', name: 'Scalper', desc: 'Very short holding periods — seconds to minutes, small frequent gains.' },
-    { key: 'swing-trader', name: 'Swing Trader', desc: 'Holds positions for days to weeks, riding a broader move.' },
+    { key: 'option-buyer', name: 'Option Buyer', desc: 'Buys call/put options. Capital required is the option premium.', mode: 'discipline' },
+    { key: 'equity-trader', name: 'Equity / Cash Trader', desc: 'Buys and sells stocks directly, no derivatives. Full share value.', mode: 'discipline' },
+    { key: 'scalper', name: 'Scalper', desc: 'Very short holding periods — seconds to minutes, small frequent gains.', mode: 'discipline' },
+    { key: 'swing-trader', name: 'Swing Trader', desc: 'Holds positions for days to weeks, riding a broader move.', mode: 'discipline' },
+    { key: 'option-seller', name: 'Option Seller', desc: 'Writes (sells) call/put options. Requires margin, similar to futures.', mode: 'risk-dashboard' },
+    { key: 'futures-trader', name: 'Futures Trader', desc: 'Trades futures contracts directly. Requires the highest margin.', mode: 'risk-dashboard' },
+    { key: 'hedged-seller', name: 'Hedged Seller', desc: 'Sells futures and buys an option for hedging to limit downside.', mode: 'risk-dashboard' },
+    { key: 'spread-trader', name: 'Spread Trader', desc: 'Combines option legs (verticals, iron condors) for defined, capped risk.', mode: 'risk-dashboard' },
   ];
 
-  let onbStep = 0;       // 0 = welcome, 1 = broker connect (or manual) + trading style, 2 = derived tier/loss/drawdown + optional stop rule, 3 = summary/finish
+  const ONB_MODE_INFO = {
+    discipline: {
+      label: 'Discipline Mode',
+      summary: 'Max 2 trades/day, with a soft-block at 75% loss and a hard stop at 100% (Scalper skips the 75% block — only the full max-loss hit ends the day).',
+    },
+    'risk-dashboard': {
+      label: 'Risk Dashboard Mode',
+      summary: 'No trade-count cap — log each combined position (e.g. hedge or spread) as ONE entry. A single circuit breaker on total loss and drawdown ends the day instead.',
+    },
+  };
+
+  let onbStep = 0;       // 0 = welcome, 1 = broker connect (or manual), 2 = trading style, 3 = derived tier/loss/drawdown + optional stop rule, 4 = summary/finish
   let onbCapital = null; // rupees — the real fetched-or-entered amount driving onbTier; null until step 1 sets it
   let onbTier = '';      // e.g. 'medium-1' — DERIVED from onbCapital via deriveTierKeyFromCapital(), never picked directly
   let onbNote = DEFAULT_STOP_NOTE;
@@ -146,16 +171,8 @@
   // deliberately doesn't manage (instruments step was cut earlier).
   let onbBrokerConnecting = '';
   let onbConnectedBroker = '';
-  let onbManualActive = false; // has the trader expanded the "enter capital manually" fallback?
+  let onbActiveTab = 'broker'; // 'broker' | 'manual' — which of the two equal-billing tabs is showing
 
-  // Back/Continue footer visibility — same "hidden until you engage"
-  // pattern as plans-page.js's .plans-footer: starts hidden on every new
-  // step, revealed once the trader scrolls .onb-right OR makes the
-  // step's primary selection (connecting a broker or using manual entry
-  // on step 1; see onbConnectBroker()/onbUseManualCapital()). Reset to
-  // false on every step change in onbNext()/onbBack() so each step
-  // starts fresh, same as landing on a new page.
-  let onbFooterVisible = false;
 
   // Bug: onb_done persists across reloads, but app-shell.js's actual
   // profile state (tier/capital/etc.) is in-memory only and resets on
@@ -246,47 +263,31 @@
               <span class="onb-progress-seg" data-seg="1"></span>
               <span class="onb-progress-seg" data-seg="2"></span>
               <span class="onb-progress-seg" data-seg="3"></span>
+              <span class="onb-progress-seg" data-seg="4"></span>
             </div>
-            <div class="onb-step-eyebrow">STEP <span id="onb-step-num">1</span> OF 3</div>
+            <div class="onb-step-eyebrow">STEP <span id="onb-step-num">1</span> OF 4</div>
           </div>
           <div id="onb-step-body"></div>
         </div>
       </div>
     `;
     document.body.appendChild(overlay);
-
-    // Attached once to .onb-right, which persists across steps (only
-    // #onb-step-body's innerHTML is swapped by renderStep()) — mirrors
-    // plans-page.js's initFooterReveal(). One-way reveal: scrolling back
-    // up doesn't hide the footer again once shown, since re-hiding a
-    // button the trader already found is more confusing than helpful.
-    overlay.querySelector('.onb-right').addEventListener('scroll', (e) => {
-      if (e.target.scrollTop > 8) revealOnbFooter();
-    }, { passive: true });
-  }
-
-  // Shows the current step's .onb-footer (if it has one) and remembers
-  // that choice so it survives the next renderStep() re-render, which
-  // recreates the footer element fresh from the step's template string.
-  function revealOnbFooter() {
-    onbFooterVisible = true;
-    const footer = document.querySelector('#onb-overlay .onb-footer');
-    if (footer) footer.classList.add('onb-footer-visible');
   }
 
   // Syncs the left-panel checklist to what's actually been decided so
   // far. Item 1 (tier) and item 2 (daily loss cap) both track onbCapital
   // now, since connecting a broker or entering capital manually on step
   // 1 derives both at once — there's no separate "accept the limit"
-  // step. Item 3 (stop rule) lives on step 2 now, alongside the derived
-  // tier/loss/drawdown display. Step 3 (the done screen) marks
-  // everything complete.
+  // step. Step 2 (trading style) doesn't have its own checklist item, so
+  // items 1/2 just stay done there. Item 3 (stop rule) lives on step 3
+  // now, alongside the derived tier/loss/drawdown display. Step 4 (the
+  // done screen) marks everything complete.
   function updateChecklist() {
     const items = document.querySelectorAll('#onb-checklist .onb-check-item');
     items.forEach(item => {
       const n = parseInt(item.dataset.check, 10);
       item.classList.remove('onb-check-item-active', 'onb-check-item-done');
-      if (onbStep >= 3) {
+      if (onbStep >= 4) {
         item.classList.add('onb-check-item-done');
         return;
       }
@@ -296,6 +297,10 @@
         return;
       }
       if (onbStep === 2) {
+        if (n === 1 || n === 2) item.classList.add('onb-check-item-done');
+        return;
+      }
+      if (onbStep === 3) {
         if (n === 1 || n === 2) {
           item.classList.add('onb-check-item-done');
         } else if (n === 3 && onbStopOpen) {
@@ -326,8 +331,7 @@
     onbStopOpen = false;
     onbBrokerConnecting = '';
     onbConnectedBroker = '';
-    onbManualActive = false;
-    onbFooterVisible = false;
+    onbActiveTab = 'broker';
     const overlay = document.getElementById('onb-overlay');
     if (overlay) overlay.classList.remove('hidden');
     renderStep();
@@ -364,32 +368,33 @@
     // Textarea value is set via the DOM (not templated into innerHTML)
     // so the stop-note text never has to be HTML-escaped. Only present
     // at all once the optional stop-rule accordion is expanded.
-    if (onbStep === 2 && onbStopOpen) {
+    if (onbStep === 3 && onbStopOpen) {
       const noteEl = document.getElementById('onb-note-input');
       if (noteEl) noteEl.value = onbNote;
     }
 
-    // stepHtml() just rebuilt .onb-footer from scratch, so re-apply
-    // whatever reveal state was already true for this step (e.g. a tier
-    // already picked before a same-step re-render). Also force it
-    // visible if the step's content is short enough that .onb-right
-    // can't actually be scrolled — otherwise "reveal on scroll" would
-    // strand the Continue button with no scroll gesture available to
-    // find it, same safeguard as plans-page.js.
+    // Back/Continue always sit inline at the end of the card content, not
+    // as a fixed bar floating over the viewport — per explicit direction,
+    // even on a taller step like Trading style where content can exceed
+    // the viewport (a fixed bar was tried first here; rejected for
+    // covering content / sitting over the OS taskbar with dead space
+    // below it on shorter steps). See .onb-footer-inline /
+    // .onb-right-static-footer in onboarding.css — .onb-footer's own
+    // fixed/hidden-by-default rules are unused now but left in place
+    // rather than deleted, same reasoning as this file's other dead-CSS
+    // notes.
     const footer = body.querySelector('.onb-footer');
-    if (footer) {
-      const right = document.querySelector('#onb-overlay .onb-right');
-      const canScroll = right && right.scrollHeight > right.clientHeight + 4;
-      if (!canScroll) onbFooterVisible = true;
-      footer.classList.toggle('onb-footer-visible', onbFooterVisible);
-    }
+    if (footer) footer.classList.add('onb-footer-inline', 'onb-footer-visible');
+    const right = document.querySelector('#onb-overlay .onb-right');
+    if (right) right.classList.add('onb-right-static-footer');
   }
 
   function stepHtml() {
     if (onbStep === 0) return step0Html();
     if (onbStep === 1) return step1Html();
     if (onbStep === 2) return step2Html();
-    return step3Html();
+    if (onbStep === 3) return step3Html();
+    return step4Html();
   }
 
   function step0Html() {
@@ -404,92 +409,127 @@
     `;
   }
 
-  // Step 1 — Connect broker (primary; fetches balance, derives tier —
-  // see onbConnectBroker()) + Trading style (required, multi-select),
-  // with manual capital entry as a secondary fallback for anyone who
-  // won't connect a broker. Hands off to step 2, which just DISPLAYS the
-  // tier/loss/drawdown that connecting or entering capital here derived
-  // — no picker there anymore.
+  // Step 1 — Broker Sync (primary; fetches balance, derives tier — see
+  // onbConnectBroker()) or Manual Entry (equal-billing tab now, not a
+  // tucked-away link — the product decision is that manual-only trading
+  // is a first-class supported path, same as the rest of the app already
+  // treats it: Daily Limits Tool logs trades by hand, Trading Hours has
+  // its own honest empty state for manual accounts, etc.). Split out from
+  // trading style (now its own step2Html()) per explicit direction to cut
+  // how much a trader has to take in on one screen — kept as its own
+  // step rather than merging back, even though both used to share a
+  // screen. Gated on just onbCapital being set; style selection happens
+  // next.
   function step1Html() {
-    const selected = (typeof window.getSelectedTraderTypes === 'function') ? window.getSelectedTraderTypes() : [];
-
+    // Card grid only ever renders while nothing's connected yet — once a
+    // broker IS connected, the grid gives way entirely to
+    // onb-broker-connected-card below (see brokerPane), so isConnected
+    // never actually applies to a rendered card here; kept simple rather
+    // than carrying dead per-card "connected" styling for a state this
+    // grid can no longer be in.
     const brokerCards = ONB_BROKERS.map(b => {
       const isConnecting = onbBrokerConnecting === b.name;
-      const isConnected = onbConnectedBroker === b.name;
       return `
-        <button type="button" class="setup-broker-card onb-broker-card ${isConnected ? 'onb-broker-card-connected' : ''}" ${isConnecting ? 'disabled' : ''} onclick="onbConnectBroker('${b.name}')">
-          <span class="setup-broker-icon ${b.colorClass}">${isConnected ? '&#10003;' : b.initial}</span>
+        <button type="button" class="setup-broker-card onb-broker-card" ${isConnecting ? 'disabled' : ''} onclick="onbConnectBroker('${b.name}')">
+          <span class="setup-broker-icon ${b.colorClass}">${b.initial}</span>
           <span style="min-width:0;">
             <div class="setup-broker-card-name">${b.name}</div>
-            <div class="setup-broker-card-tag">${isConnecting ? 'Connecting…' : (isConnected ? 'Connected' : b.tag)}</div>
+            <div class="setup-broker-card-tag">${isConnecting ? 'Connecting…' : b.tag}</div>
           </span>
         </button>
       `;
     }).join('');
 
-    // Fetched/entered balance banner — shown once onbCapital is set,
-    // whichever path set it. Kept inside the broker card so it reads as
-    // "this is what connecting did," not a separate confirmation step.
-    const capitalBanner = onbCapital ? `
-      <div class="onb-locked-banner">
-        <span class="onb-locked-icon">&#10003;</span>
-        <span>${onbConnectedBroker
-          ? `₹${fmt(onbCapital)} balance fetched from ${onbConnectedBroker}`
-          : `₹${fmt(onbCapital)} starting capital set manually`} — ${ONB_TIER_LABELS[onbTier] || onbTier} tier</span>
-      </div>
-    ` : '';
-
-    // Secondary fallback, tucked behind a link rather than shown as an
-    // equal option — connecting a broker is what the rest of the app is
-    // built around (auto-synced P&L, Trading Hours, etc.), so manual
-    // entry stays a deliberate opt-out, not the default path. Warns
-    // upfront about the real cost: every trade then has to be logged by
-    // hand, and a later broker connect won't reconcile past manual entries.
-    const manualSection = `
-      <div class="onb-manual-toggle-row">
-        <button type="button" class="onb-manual-link" onclick="onbToggleManual()">${onbManualActive ? 'Hide manual entry' : "Can't connect a broker? Enter capital manually"}</button>
-      </div>
-      ${onbManualActive ? `
-        <div class="onb-manual-box">
-          <label class="onb-manual-label" for="onb-manual-input">Starting capital (₹)</label>
-          <div class="onb-manual-input-row">
-            <input id="onb-manual-input" type="number" min="1" step="1" class="onb-manual-input" placeholder="e.g. 100000">
-            <button type="button" class="onb-manual-use-btn" onclick="onbUseManualCapital()">Use this</button>
+    // Broker Sync pane: the pick-a-broker grid until connected, then a
+    // dedicated connected-state card instead of the grid (not alongside
+    // it) — shows the fetched balance/tier plainly instead of burying
+    // them in a one-line banner, plus "Change" (pick a different broker)
+    // and an explicit "Disconnect" action, since a trader should be able
+    // to walk this back fully, not just switch. Both currently do the
+    // same full reset (onbDisconnectBroker()) — "Change" reopens the
+    // grid to pick again, "Disconnect" is the same action framed for
+    // someone who wants Broker Sync off entirely (e.g. to switch to
+    // Manual Entry, which this also unlocks).
+    const connectedBrokerInfo = ONB_BROKERS.find(b => b.name === onbConnectedBroker);
+    const brokerPane = onbConnectedBroker ? `
+      <div class="onb-broker-connected-card">
+        <div class="onb-broker-connected-head">
+          <span class="setup-broker-icon ${connectedBrokerInfo ? connectedBrokerInfo.colorClass : ''}">${connectedBrokerInfo ? connectedBrokerInfo.initial : onbConnectedBroker.charAt(0)}</span>
+          <div class="onb-broker-connected-info">
+            <div class="onb-broker-connected-title-row">
+              <span class="onb-broker-connected-title">Connected to ${onbConnectedBroker}</span>
+              <span class="onb-broker-live-badge"><span class="onb-broker-live-dot"></span>Live</span>
+            </div>
+            <div class="onb-broker-connected-sub">Read-only · balance and positions synced</div>
           </div>
-          <p class="onb-manual-hint">Every trade you take will need to be logged by hand in the Daily Limits Tool — connecting a broker (now or later) keeps this in sync automatically instead, and won't reconcile past manual entries if you switch.</p>
+          <div class="onb-broker-connected-actions">
+            <button type="button" class="onb-broker-change-link" onclick="onbDisconnectBroker()">Change</button>
+            <button type="button" class="onb-broker-disconnect-link" onclick="onbDisconnectBroker()">Disconnect</button>
+          </div>
         </div>
-      ` : ''}
+        <div class="onb-broker-stat-row">
+          <div class="onb-broker-stat">
+            <div class="onb-broker-stat-label">Fetched balance</div>
+            <div class="onb-broker-stat-value">₹${fmt(onbCapital)}</div>
+          </div>
+          <div class="onb-broker-stat">
+            <div class="onb-broker-stat-label">Tier</div>
+            <div class="onb-broker-stat-value onb-broker-stat-value-accent">${ONB_TIER_LABELS[onbTier] || onbTier}</div>
+          </div>
+        </div>
+      </div>
+    ` : `
+      <div class="broker-grid onb-broker-grid">${brokerCards}</div>
+      <p class="onb-broker-more-note">+ 6 more brokers coming soon</p>
     `;
 
-    const styleCards = ONB_TRADER_TYPES.map(st => {
-      const isSelected = selected.indexOf(st.key) !== -1;
-      return `
-        <button type="button" class="trader-type-card ${isSelected ? 'selected' : ''}" data-trader-type="${st.key}" onclick="onbToggleStyle('${st.key}')">
-          <div class="trader-type-name">${st.name}</div>
-          <div class="trader-type-desc">${st.desc}</div>
-        </button>
-      `;
-    }).join('');
+    // Manual Entry pane: input form until confirmed, then a "selected"
+    // summary card (mirrors a connected broker card) with an edit link
+    // and an explicit reminder that Broker Sync is still one tab away —
+    // switching later (from Account) starts syncing going forward, it
+    // doesn't retroactively reconcile whatever was logged by hand.
+    const manualConfirmed = onbCapital && !onbConnectedBroker;
+    const manualPane = manualConfirmed ? `
+      <div class="onb-manual-selected-card">
+        <span class="onb-manual-selected-icon">₹</span>
+        <span>
+          <div class="onb-manual-selected-title">Manual Entry selected</div>
+          <div class="onb-manual-selected-desc">No broker needed — you'll log each trade yourself, starting from a ₹${fmt(onbCapital)} balance. <button type="button" class="onb-manual-edit-link" onclick="onbEditManualCapital()">Change amount</button></div>
+        </span>
+      </div>
+      <p class="onb-manual-switch-note">Switch to Broker Sync anytime from Account — trades already logged by hand won't be reconciled automatically.</p>
+    ` : `
+      <div class="onb-manual-box">
+        <label class="onb-manual-label" for="onb-manual-input">Starting capital (₹)</label>
+        <div class="onb-manual-input-row">
+          <input id="onb-manual-input" type="number" min="1" step="1" class="onb-manual-input" placeholder="e.g. 100000">
+          <button type="button" class="onb-manual-use-btn" onclick="onbUseManualCapital()">Use this</button>
+        </div>
+        <p class="onb-manual-hint">Every trade you take will need to be logged by hand in the Daily Limits Tool. You can switch to Broker Sync anytime from Account to start syncing automatically instead.</p>
+      </div>
+    `;
 
-    const canContinue = !!onbCapital && selected.length > 0;
+    // A connected broker always wins the pane, regardless of which tab
+    // was last clicked — Manual Entry is locked while a broker is
+    // connected (disconnect first) rather than letting both sources be
+    // "selected" at once, which is what onbSwitchTab()'s own guard
+    // enforces on the click side too.
+    const manualLocked = !!onbConnectedBroker;
+    const activeTab = manualLocked ? 'broker' : onbActiveTab;
+    const canContinue = !!onbCapital;
 
     return `
       <div class="onb-step onb-step2">
         <div class="onb-card">
           <h2 class="onb-heading onb-heading-left">Connect your broker</h2>
-          <p class="onb-sub">Read-only — we fetch your balance and derive your tier automatically. Never places trades or moves funds.</p>
-          <div class="broker-grid onb-broker-grid">${brokerCards}</div>
-          <p class="onb-broker-more-note">+ 6 more brokers coming soon</p>
-          ${capitalBanner}
-          ${manualSection}
-        </div>
+          <p class="onb-sub">Broker Sync is read-only — we fetch your balance and set your tier automatically, never place trades or move funds. No broker to connect? Use Manual Entry instead and log trades yourself.</p>
 
-        <div class="onb-card">
-          <div class="onb-style-header">
-            <h2 class="onb-heading onb-heading-left onb-style-heading">Trading style</h2>
-            <button type="button" class="onb-select-all-link" onclick="onbSelectAllStyles()">Select all</button>
+          <div class="onb-source-toggle">
+            <button type="button" class="onb-source-tab ${activeTab === 'broker' ? 'onb-source-tab-active' : ''}" onclick="onbSwitchTab('broker')">Broker Sync</button>
+            <button type="button" class="onb-source-tab ${activeTab === 'manual' ? 'onb-source-tab-active' : ''} ${manualLocked ? 'onb-source-tab-disabled' : ''}" ${manualLocked ? 'disabled title="Disconnect your broker to use Manual Entry"' : ''} onclick="onbSwitchTab('manual')">Manual Entry</button>
           </div>
-          <div class="trader-type-grid onb-style-grid">${styleCards}</div>
+
+          ${activeTab === 'broker' ? brokerPane : manualPane}
         </div>
 
         <div class="onb-footer">
@@ -502,13 +542,91 @@
     `;
   }
 
-  // Step 2 — the tier/daily loss limit/drawdown limit that step 1's
+  // Step 2 — Trading style, split out from step 1's broker/manual screen
+  // (see step1Html()'s comment) so a trader isn't asked to absorb broker
+  // connection AND style selection on one screen.
+  //
+  // Went through a couple other layouts before landing back here, per
+  // explicit direction each time: briefly rebuilt as a Broker-Sync/
+  // Manual-Entry-style tab toggle showing one mode at a time — reverted
+  // because tabs read as "pick one," but a trader can select styles from
+  // BOTH modes at once (that's what the mixed-mode note below is for),
+  // which doesn't fit a single-select tab metaphor. Landed on: two
+  // stacked panels, always both visible, header-only tint (see
+  // .onb-mode-panel / .onb-mode-panel-header in onboarding.css — the
+  // card grid below each header sits on white, not the tinted panel
+  // background). Gated on at least one style picked across EITHER panel;
+  // onbCapital was already locked in by step 1.
+  function step2Html() {
+    const selected = (typeof window.getSelectedTraderTypes === 'function') ? window.getSelectedTraderTypes() : [];
+
+    function renderModePanel(mode) {
+      const info = ONB_MODE_INFO[mode];
+      const cards = ONB_TRADER_TYPES.filter(st => st.mode === mode).map(st => {
+        const isSelected = selected.indexOf(st.key) !== -1;
+        return `
+          <button type="button" class="trader-type-card ${isSelected ? 'selected' : ''}" data-trader-type="${st.key}" onclick="onbToggleStyle('${st.key}')">
+            <div class="trader-type-name">${st.name}</div>
+            <div class="trader-type-desc">${st.desc}</div>
+          </button>
+        `;
+      }).join('');
+      return `
+        <div class="onb-mode-panel onb-mode-panel-${mode}">
+          <div class="onb-mode-panel-header">
+            <div class="onb-mode-panel-label">${info.label}</div>
+            <p class="onb-mode-panel-summary">${info.summary}</p>
+          </div>
+          <div class="trader-type-grid onb-style-grid onb-mode-panel-grid">${cards}</div>
+        </div>
+      `;
+    }
+
+    // Picking from BOTH panels makes Risk Dashboard Mode apply to the
+    // whole account, not a blended/parallel system (flagged in the spec
+    // as a possible follow-up, not final) — the note just makes that
+    // override visible instead of silent.
+    const hasDiscipline = selected.some(k => { const st = ONB_TRADER_TYPES.find(x => x.key === k); return st && st.mode === 'discipline'; });
+    const hasRiskDashboard = selected.some(k => { const st = ONB_TRADER_TYPES.find(x => x.key === k); return st && st.mode === 'risk-dashboard'; });
+    const mixedNote = (hasDiscipline && hasRiskDashboard) ? `
+      <div class="onb-mixed-note">
+        <span class="onb-mixed-note-icon">&#128161;</span>
+        <span>You've selected both Discipline-style and Risk Dashboard-style trading. Risk Dashboard Mode will apply — no trade-count cap, tracked instead on total loss and drawdown — since it's active for any seller or hedging style you pick.</span>
+      </div>
+    ` : '';
+
+    const canContinue = selected.length > 0;
+
+    return `
+      <div class="onb-step onb-step2">
+        <div class="onb-card">
+          <div class="onb-style-header">
+            <h2 class="onb-heading onb-heading-left onb-style-heading">Trading style</h2>
+            <button type="button" class="onb-select-all-link" onclick="onbSelectAllStyles()">Select all</button>
+          </div>
+          ${renderModePanel('discipline')}
+          ${renderModePanel('risk-dashboard')}
+          ${mixedNote}
+        </div>
+
+        <div class="onb-footer">
+          <div class="onb-footer-inner">
+            <button type="button" class="setup-wizard-back-btn" onclick="onbBack()">Back</button>
+            <button type="button" id="onb-step2-continue-btn" class="setup-cta-btn" style="width:auto;flex:1;" ${canContinue ? '' : 'disabled'} onclick="onbNext()">Continue</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Step 3 — the tier/daily loss limit/drawdown limit that step 1's
   // fetched-or-entered capital derived, displayed read-only (no picker
   // — "Changeable later in Account" if they want a different tier), plus
   // the optional stop rule. A recap banner up top (connection/capital +
   // trading style) makes this screen self-contained — the trader
-  // shouldn't have to remember step 1's choices to trust these numbers.
-  function step2Html() {
+  // shouldn't have to remember steps 1 & 2's choices to trust these
+  // numbers.
+  function step3Html() {
     const t = onbTier ? getTierData(onbTier) : null;
     const tierLabel = ONB_TIER_LABELS[onbTier] || 'your';
     const selected = (typeof window.getSelectedTraderTypes === 'function') ? window.getSelectedTraderTypes() : [];
@@ -516,6 +634,18 @@
       .map(k => { const st = ONB_TRADER_TYPES.find(x => x.key === k); return st ? st.name : null; })
       .filter(Boolean)
       .join(', ');
+
+    // "Up to N lots" is a BUYER sizing concept — a fixed number of
+    // contracts you hold. It doesn't describe a seller/hedge/spread
+    // position, which is margin-sized and (per the Discipline vs Risk
+    // Dashboard Mode spec) logged as ONE combined entry with no
+    // trade-count cap at all. getEnforcementMode() (app-shell.js) already
+    // resolves this the same way the mixed-mode note on step 2 does —
+    // any risk-dashboard style selected wins for the whole account — so
+    // reusing it here keeps this copy correct for a seller instead of
+    // quoting a lot ceiling that was never how their risk is measured.
+    const mode = (typeof window.getEnforcementMode === 'function') ? window.getEnforcementMode() : null;
+    const isRiskDashboard = mode === 'risk-dashboard';
 
     const recapBanner = `
       <div class="onb-locked-banner">
@@ -533,12 +663,15 @@
     // days, doesn't reset) — see drawdownPct/drawdown's comment in
     // tier-rules.js for the 3x-daily formula and what's supposed to
     // happen when it's hit.
+    const lossSub = isRiskDashboard
+      ? `${Number(t && t.pct).toFixed(2)}% of capital · no trade-count cap — each position counts as one entry · locks out on hit`
+      : `${Number(t && t.pct).toFixed(2)}% of capital · up to ${t && t.maxLots} lots · locks out on hit`;
     const lossHtml = t ? `
       <div class="onb-guardrail-grid">
         <div class="onb-loss-callout onb-loss-callout-inline">
           <div class="onb-loss-label">Max loss per day</div>
           <div class="onb-loss-value">₹${fmt(t.loss)}</div>
-          <div class="onb-loss-sub">${Number(t.pct).toFixed(2)}% of capital · up to ${t.maxLots} lots · locks out on hit</div>
+          <div class="onb-loss-sub">${lossSub}</div>
         </div>
         <div class="onb-drawdown-callout">
           <div class="onb-drawdown-label">Max drawdown limit</div>
@@ -567,7 +700,7 @@
       <div class="onb-step">
         ${recapBanner}
         <h2 class="onb-heading onb-heading-left">Your rules, set from your balance</h2>
-        <p class="onb-sub">${sourceText} — your maximum lot size and daily loss limit. Changeable later in Account.</p>
+        <p class="onb-sub">${sourceText} — your ${isRiskDashboard ? 'daily loss and drawdown limits' : 'maximum lot size and daily loss limit'}. Changeable later in Account.</p>
         <div class="onb-card">
           ${lossHtml}
           ${stopRuleHtml}
@@ -582,13 +715,13 @@
     `;
   }
 
-  // Step 3 — Summary/finish. Restates what steps 1 & 2 locked in, plus
+  // Step 4 — Summary/finish. Restates what steps 1-3 locked in, plus
   // two rows those steps didn't show on their own: the balance that
   // will be seeded (same ₹ figure setStartingCapitalDirect() actually
   // sets — see onbFinishSetup() — labeled per whether a broker was
   // connected, since that's optional) and which trading styles were
   // picked. "View dashboard" is the actual finish action.
-  function step3Html() {
+  function step4Html() {
     const key = onbTier || 'medium-1';
     const t = getTierData(key) || { loss: 0, maxLots: 0, cap: 0, drawdown: 0 };
     const selected = (typeof window.getSelectedTraderTypes === 'function') ? window.getSelectedTraderTypes() : [];
@@ -601,17 +734,31 @@
       ? `₹${fmt(onbCapital)} balance synced from ${onbConnectedBroker}`
       : `₹${fmt(onbCapital)} starting capital set manually`;
 
+    // Same mode-aware split as step3Html()'s lossSub — "up to N lots" and
+    // "max 2 trades/day" are both Discipline (buyer-side) concepts; a
+    // Risk Dashboard trader (any seller/hedge/spread/futures style) has
+    // no lot ceiling or trade-count cap at all, tracked instead on total
+    // loss/drawdown via a single circuit breaker.
+    const mode = (typeof window.getEnforcementMode === 'function') ? window.getEnforcementMode() : null;
+    const isRiskDashboard = mode === 'risk-dashboard';
+    const tierRow = isRiskDashboard
+      ? `${ONB_TIER_LABELS[key] || 'Medium - Level 1'} tier`
+      : `${ONB_TIER_LABELS[key] || 'Medium - Level 1'} tier · up to ${t.maxLots} lots`;
+    const tradeRuleRow = isRiskDashboard
+      ? 'No trade-count cap · combined positions count as one entry · single circuit breaker'
+      : 'Max 2 trades/day · 30-min cooldown';
+
     return `
       <div class="onb-step onb-step-done">
         <div class="onb-done-check">✓</div>
         <h2 class="onb-heading">You're set up to trade with discipline</h2>
         <div class="onb-summary-list">
-          <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> ${ONB_TIER_LABELS[key] || 'Medium - Level 1'} tier · up to ${t.maxLots} lots</div>
+          <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> ${tierRow}</div>
           <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> ₹${fmt(t.loss)} daily loss limit · hard lock-out</div>
           <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> ₹${fmt(t.drawdown)} max drawdown limit · total, doesn't reset daily</div>
           <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> ${balanceRow}</div>
           <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> Trading style: ${styleNames || 'None selected'}</div>
-          <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> Max 2 trades/day · 30-min cooldown</div>
+          <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> ${tradeRuleRow}</div>
           <div class="onb-summary-row"><span class="onb-summary-icon">✓</span> ${onbStopOpen ? 'Personal stop rule saved' : 'Default stop rule saved — editable in Account'}</div>
         </div>
         <button type="button" class="setup-cta-btn" onclick="onbFinishSetup()">View dashboard</button>
@@ -622,19 +769,18 @@
   // ---------- Step behavior ----------
 
   function onbNext() {
-    if (onbStep === 1) {
+    if (onbStep === 1 && !onbCapital) return;
+    if (onbStep === 2) {
       const count = (typeof window.getSelectedTraderTypes === 'function') ? window.getSelectedTraderTypes().length : 0;
-      if (!onbCapital || count === 0) return;
+      if (count === 0) return;
     }
-    if (onbStep < 3) onbStep++;
-    onbFooterVisible = false; // new step, footer starts hidden again
+    if (onbStep < 4) onbStep++;
     renderStep();
   }
 
   function onbBack() {
     if (onbStep === 0) return;
     onbStep--;
-    onbFooterVisible = false; // new step, footer starts hidden again
     renderStep();
   }
 
@@ -665,11 +811,19 @@
 
   // ---------- Step 1 behavior (broker / manual / trading style) ----------
 
+  // Full re-render (not just a button-state patch) on every toggle, since
+  // a single card flipping can also flip the mixed-mode note's
+  // visibility — a lighter button-only update (what this used to do
+  // before the mode-panel split) would leave that note stale until the
+  // next full render.
   function onbToggleStyle(key) {
     if (typeof window.selectTraderType === 'function') window.selectTraderType(key);
-    onbUpdateStep1Continue();
+    renderStep();
   }
 
+  // Selects every style across BOTH panels — both are always visible on
+  // this step (see step2Html()), so unlike a per-tab "select all" there's
+  // only one sensible scope here: everything.
   function onbSelectAllStyles() {
     ONB_TRADER_TYPES.forEach(st => {
       const card = document.querySelector('.trader-type-card[data-trader-type="' + st.key + '"]');
@@ -677,20 +831,7 @@
         window.selectTraderType(st.key);
       }
     });
-    onbUpdateStep1Continue();
-  }
-
-  // Keeps step 1's Continue button's disabled state in sync with real
-  // selection state — window.selectTraderType() only knows about the OLD
-  // page's #setup-cta-btn (which doesn't exist here, so it safely
-  // no-ops), so this step has to drive its own button directly. Gated on
-  // BOTH capital being set (broker fetch or manual entry) and at least
-  // one trading style — same check as onbNext()'s own guard.
-  function onbUpdateStep1Continue() {
-    const btn = document.getElementById('onb-step1-continue-btn');
-    if (!btn) return;
-    const count = (typeof window.getSelectedTraderTypes === 'function') ? window.getSelectedTraderTypes().length : 0;
-    btn.disabled = !onbCapital || count === 0;
+    renderStep();
   }
 
   // Mock-connects a broker and — unlike the old design — this now DOES
@@ -703,7 +844,6 @@
   function onbConnectBroker(name) {
     if (onbBrokerConnecting || onbConnectedBroker === name) return;
     onbBrokerConnecting = name;
-    onbManualActive = false; // connecting supersedes the manual fallback
     renderStep();
     const onDone = () => {
       onbBrokerConnecting = '';
@@ -711,10 +851,6 @@
       const balance = (typeof window.generateMockFetchedBalance === 'function') ? window.generateMockFetchedBalance() : 100000;
       onbCapital = balance;
       onbTier = deriveTierKeyFromCapital(balance);
-      // Fetching a balance is as clear a signal of intent as scrolling
-      // would be — show the footer right away instead of making them
-      // scroll to find a Continue button that just became reachable.
-      onbFooterVisible = true;
       renderStep();
     };
     if (typeof window.connectBroker === 'function') {
@@ -724,19 +860,43 @@
     }
   }
 
-  function onbToggleManual() {
-    onbManualActive = !onbManualActive;
+  // Full control over a broker connection — reachable from the connected
+  // card's own "tap to disconnect" tag and from the fetched-balance
+  // banner's explicit Disconnect button (step1Html()). Clears the fetched
+  // capital/tier along with the connection itself, since both were
+  // derived from it; the trader lands back on an empty Broker Sync pane
+  // (or can switch to Manual Entry, now unlocked again) rather than
+  // keeping a stale balance around with nothing backing it.
+  function onbDisconnectBroker() {
+    onbConnectedBroker = '';
+    onbBrokerConnecting = '';
+    onbCapital = null;
+    onbTier = '';
     renderStep();
-    if (onbManualActive) {
+  }
+
+  // Switches between the two equal-billing tabs. Deliberately does NOT
+  // clear onbCapital/onbConnectedBroker just from previewing the other
+  // tab — capital only changes when an action actually completes
+  // (onbConnectBroker()'s onDone, or onbUseManualCapital() below), so
+  // tapping back and forth doesn't lose what was already set. Manual
+  // Entry is locked out entirely while a broker is connected — see
+  // step1Html()'s manualLocked — so this just refuses that switch rather
+  // than trusting the (normally disabled) button not to fire.
+  function onbSwitchTab(tab) {
+    if (tab === 'manual' && onbConnectedBroker) return;
+    onbActiveTab = tab;
+    renderStep();
+    if (tab === 'manual' && !(onbCapital && !onbConnectedBroker)) {
       const el = document.getElementById('onb-manual-input');
       if (el) el.focus();
     }
   }
 
-  // Manual fallback for someone who won't connect a broker — sets
-  // onbCapital/onbTier directly from the typed amount, same derivation
-  // a broker fetch would use. Clears any prior broker connection so step
-  // 3's summary doesn't claim a sync that isn't real anymore.
+  // Manual Entry fallback — sets onbCapital/onbTier directly from the
+  // typed amount, same derivation a broker fetch would use. Clears any
+  // prior broker connection so the "selected" card and step 3's summary
+  // don't claim a sync that isn't real anymore.
   function onbUseManualCapital() {
     const el = document.getElementById('onb-manual-input');
     const amount = el ? parseFloat(el.value) : NaN;
@@ -744,8 +904,19 @@
     onbConnectedBroker = '';
     onbCapital = amount;
     onbTier = deriveTierKeyFromCapital(amount);
-    onbFooterVisible = true;
     renderStep();
+  }
+
+  // "Change amount" on the confirmed Manual Entry card — clears the
+  // manually-set capital so the input form reappears instead of the
+  // summary card. Only ever reachable when capital came from manual
+  // entry in the first place (see manualConfirmed in step1Html()).
+  function onbEditManualCapital() {
+    onbCapital = null;
+    onbTier = '';
+    renderStep();
+    const el = document.getElementById('onb-manual-input');
+    if (el) el.focus();
   }
 
   // Final "Continue to dashboard" action — sets the real fetched-or-
@@ -799,8 +970,10 @@
   window.onbToggleStyle = onbToggleStyle;
   window.onbSelectAllStyles = onbSelectAllStyles;
   window.onbConnectBroker = onbConnectBroker;
-  window.onbToggleManual = onbToggleManual;
+  window.onbDisconnectBroker = onbDisconnectBroker;
+  window.onbSwitchTab = onbSwitchTab;
   window.onbUseManualCapital = onbUseManualCapital;
+  window.onbEditManualCapital = onbEditManualCapital;
   window.onbFinishSetup = onbFinishSetup;
 
 })();

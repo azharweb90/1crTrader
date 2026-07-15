@@ -220,11 +220,17 @@
   padding: 48px 40px;
   /* Gray canvas — matches the tier-select page's own .setup-body-main —
      so the white .onb-card sections (below) read as distinct panels
-     instead of blending into the background. Extra bottom padding
-     reserves room for .onb-footer, which is position:fixed once a step
-     has one (see its own comment). */
+     instead of blending into the background. */
   background: #F7F9FC;
-  padding-bottom: 110px;
+}
+
+/* Always added by onboarding.js's renderStep() now — Back/Continue sits
+   inline at the end of each step's content (see .onb-footer-inline
+   below), never as a fixed bar, so there's no extra bottom padding to
+   reserve here. Kept as its own class/rule (rather than folded into
+   .onb-right above) in case a fixed-footer step ever comes back. */
+.onb-right.onb-right-static-footer {
+  padding-bottom: 48px;
 }
 
 .onb-right-inner {
@@ -317,15 +323,16 @@
   text-align: left;
 }
 
-/* Fixed to the browser viewport, not just the end of the scrolling
-   step content — same reasoning/pattern as plans-page.css's own
-   .plans-footer: a Back/Continue bar that requires scrolling to find
-   is exactly the dead end that was fixed there. The bar itself spans
-   the full width of the right panel edge-to-edge; .onb-footer-inner
-   caps and centers the actual buttons so they still align under the
-   560px .onb-card content above. Only steps 1 & 2 render this class —
-   step 0's welcome screen keeps its own simple centered buttons,
-   unaffected. */
+/* DEAD (base rule) — this was originally a fixed-to-viewport bar,
+   hidden until scroll (same pattern as plans-page.css's .plans-footer).
+   onboarding.js's renderStep() now ALWAYS adds .onb-footer-inline below
+   on every step, which overrides every property here back to a normal
+   in-flow row — a fixed bar left dead space under short steps and could
+   sit over the OS taskbar, and per explicit direction Back/Continue
+   should always be inside the box. Left in place rather than deleted,
+   same reasoning as this file's other dead-CSS notes; .onb-footer-inner
+   further down (max-width + auto margins) is still active, used by the
+   inline layout too. */
 .onb-footer {
   position: fixed;
   left: 0;
@@ -337,12 +344,6 @@
   border-top: 1px solid #E3E9F1;
   box-shadow: 0 -8px 20px rgba(20, 35, 61, 0.06);
   box-sizing: border-box;
-  /* Hidden until the trader scrolls .onb-right or makes the step's
-     primary selection (onbPickTier) — same pattern as plans-page.css's
-     .plans-footer, applied here per explicit follow-up request. JS
-     (onboarding.js: revealOnbFooter/renderStep) toggles
-     .onb-footer-visible and force-shows it if a step's content is too
-     short to scroll at all. */
   transform: translateY(100%);
   opacity: 0;
   pointer-events: none;
@@ -356,7 +357,26 @@
 }
 
 @media (min-width: 781px) {
-  .onb-footer { left: 400px; }
+  .onb-footer:not(.onb-footer-inline) { left: 400px; }
+}
+
+/* Always added alongside .onb-footer-visible by renderStep() — Back/
+   Continue sits inside the box at the end of the content on every step,
+   never as a fixed bar. Undoes every fixed-positioning property above;
+   .onb-footer-inner's own max-width + auto margins still center the
+   buttons under the 560px card. */
+.onb-footer-inline {
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  padding: 20px 0 0;
+  background: transparent;
+  border-top: none;
+  box-shadow: none;
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .onb-footer-inner {
@@ -648,6 +668,7 @@
   margin-bottom: 22px;
   text-align: left;
 }
+
 .onb-locked-icon {
   flex: 0 0 auto;
   width: 18px;
@@ -670,11 +691,128 @@
   margin-bottom: 8px;
 }
 
+/* DEAD as of the connected-state redesign below (.onb-broker-connected-
+   card) — the grid now only ever renders while NOTHING is connected
+   (step1Html()'s brokerPane swaps to the connected card instead of
+   highlighting a card in-place), so no rendered .onb-broker-card can
+   carry this class anymore. Left in place rather than deleted, same
+   reasoning as this file's other dead-CSS notes. */
 .onb-broker-card-connected {
   border-color: #8ED6AE !important;
   background: #F3FBF6;
 }
 .onb-broker-card-connected .setup-broker-card-tag { color: #15803D; font-weight: 600; }
+
+/* Connected-state card — replaces the broker grid entirely once
+   onbConnectedBroker is set (see step1Html()'s brokerPane). Plain white
+   card instead of a tinted banner so the fetched balance/tier read as
+   real data, not just a confirmation toast. */
+.onb-broker-connected-card {
+  border: 1px solid #E3E9F1;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 4px;
+}
+
+.onb-broker-connected-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.onb-broker-connected-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.onb-broker-connected-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.onb-broker-connected-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.onb-broker-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #DCFCE7;
+  color: #15803D;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 2px 9px 2px 7px;
+}
+
+.onb-broker-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16A34A;
+}
+
+.onb-broker-connected-sub {
+  font-size: 12.5px;
+  color: #8A98AD;
+  margin-top: 2px;
+}
+
+.onb-broker-connected-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 1px;
+}
+
+.onb-broker-change-link,
+.onb-broker-disconnect-link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.onb-broker-change-link { color: #2563EB; }
+.onb-broker-change-link:hover { text-decoration: underline; }
+
+.onb-broker-disconnect-link { color: #DC2626; }
+.onb-broker-disconnect-link:hover { text-decoration: underline; }
+
+.onb-broker-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #EEF1F6;
+}
+
+.onb-broker-stat-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #97A3B6;
+  margin-bottom: 4px;
+}
+
+.onb-broker-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.onb-broker-stat-value-accent { color: #2563EB; }
 
 .onb-broker-more-note {
   font-size: 12px;
@@ -683,9 +821,12 @@
   text-align: left;
 }
 
-/* Manual capital entry — a deliberately secondary fallback (link, not a
-   card) for someone who won't connect a broker. See onbToggleManual()/
-   onbUseManualCapital() in onboarding.js. */
+/* .onb-manual-toggle-row/.onb-manual-link below are now DEAD — manual
+   entry used to be a tucked-away link (a "secondary fallback"); it's a
+   first-class equal-billing tab now (.onb-source-toggle), per direction
+   that manual-only trading is a fully supported path, same as the rest
+   of the app already treats it. Left in place rather than deleted, same
+   reasoning as the dead .onb-tier-list rule above. */
 .onb-manual-toggle-row {
   text-align: center;
   margin-top: 14px;
@@ -702,6 +843,111 @@
   padding: 4px;
 }
 .onb-manual-link:hover { text-decoration: underline; }
+
+/* Broker Sync / Manual Entry segmented tab — same pill-toggle visual
+   language as the Dashboard's Trading Hours Best/Worst toggle
+   (dashboard-home.css's .dash-hours-toggle), applied here since it's
+   the established in-app pattern for "pick one of two equal options."
+   See onbSwitchTab() in onboarding.js. */
+.onb-source-toggle {
+  display: flex;
+  background: #F1F4F8;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  margin: 16px 0 20px;
+}
+
+.onb-source-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #8A98AD;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.onb-source-tab-active {
+  background: #ffffff;
+  color: #1E293B;
+  box-shadow: 0 1px 3px rgba(20, 35, 61, 0.1);
+}
+
+/* Locked out while a broker is connected — see step1Html()'s
+   manualLocked and onbSwitchTab()'s matching guard. Disconnect first
+   (card tap or the banner's Disconnect button) to unlock this tab
+   again. */
+.onb-source-tab-disabled {
+  color: #C3CCDA;
+  cursor: not-allowed;
+}
+.onb-source-tab-disabled:hover { background: transparent; }
+
+/* Manual Entry "selected" confirmation card — mirrors a connected
+   broker card's job (show what was chosen + let them undo it) once
+   onbUseManualCapital() has set a real amount. */
+.onb-manual-selected-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #E3E9F1;
+  border-radius: 12px;
+  background: #F7F9FC;
+  text-align: left;
+}
+
+.onb-manual-selected-icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #7C3AED;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.onb-manual-selected-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 2px;
+}
+
+.onb-manual-selected-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5B6B82;
+}
+
+.onb-manual-edit-link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2563EB;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.onb-manual-switch-note {
+  margin: 10px 2px 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #8A98AD;
+  text-align: left;
+}
 
 .onb-manual-box {
   margin-top: 14px;
@@ -791,6 +1037,88 @@
   grid-template-columns: repeat(2, 1fr);
   margin-top: 10px;
   margin-bottom: 0;
+}
+
+/* Discipline Mode / Risk Dashboard Mode panels — both stacked and always
+   visible (see step2Html()) rather than a tab toggle, since a trader can
+   select styles from both at once (.onb-mixed-note below handles that);
+   a single-select tab metaphor doesn't fit that.
+
+   Per explicit direction, only the HEADER (label + summary) carries the
+   full color fill — the card grid below sits on white. The BORDER
+   wraps the whole panel (header + grid together, one box) and is
+   themed to match — blue for Discipline, amber for Risk Dashboard —
+   same border tokens .onb-loss-callout/.onb-mixed-note already use, so
+   this reads as the same visual family rather than a generic gray box.
+   .onb-mode-panel is the neutral outer container (overflow:hidden so
+   the header's own top corners stay rounded); .onb-mode-panel-header is
+   the colored strip. */
+.onb-mode-panel {
+  border-radius: 14px;
+  margin-top: 14px;
+  background: #ffffff;
+  overflow: hidden;
+}
+.onb-mode-panel:first-of-type { margin-top: 10px; }
+
+.onb-mode-panel-discipline { border: 1px solid #CFE0FB; }
+.onb-mode-panel-risk-dashboard { border: 1px solid #F0DFA0; }
+
+.onb-mode-panel-header {
+  padding: 14px 18px;
+}
+
+.onb-mode-panel-discipline .onb-mode-panel-header {
+  background: #EAF1FE;
+  border-bottom: 1px solid #CFE0FB;
+}
+
+.onb-mode-panel-risk-dashboard .onb-mode-panel-header {
+  background: #FDF6E3;
+  border-bottom: 1px solid #F0DFA0;
+}
+
+.onb-mode-panel-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 4px;
+}
+
+.onb-mode-panel-summary {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #5B6B82;
+  margin: 0;
+}
+
+.onb-mode-panel-grid.trader-type-grid {
+  margin: 0;
+  padding: 16px 18px 18px;
+}
+
+.onb-mode-panel .trader-type-card {
+  background: #ffffff;
+}
+
+.onb-mixed-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #FEF6E0;
+  border: 1px solid #F0DFA0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #5B4A1E;
+  margin-top: 14px;
+}
+
+.onb-mixed-note-icon {
+  flex: 0 0 auto;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 /* Square checkbox + light-blue selected wash instead of the tier-select
