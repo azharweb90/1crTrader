@@ -786,9 +786,11 @@
 }
 
 /* Prominent "your limit today" callout next to the trade log */
+/* Max-loss callout — this is a risk warning, so it reads red: soft red
+   tint (low-opacity red, not a solid block) with the amount in red. */
 .your-limit-callout {
-  background: #F7F9FC;
-  border: 1px solid #E3E9F1;
+  background: rgba(197, 61, 34, 0.07);
+  border: 1px solid rgba(197, 61, 34, 0.25);
   border-radius: 10px;
   padding: 14px 18px;
   margin-bottom: 16px;
@@ -798,6 +800,14 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.your-limit-callout .your-limit-callout-label {
+  color: #A63A22;
+}
+
+.your-limit-callout .your-limit-callout-value {
+  color: #C53D22;
 }
 
 .your-limit-callout-label {

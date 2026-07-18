@@ -153,6 +153,20 @@
           <div id="tm-rr-animation-area"></div>
         </div>
         <div class="tm-active-col-right">
+          <!-- Live market read — local rule-based read on what the trader types
+               (structure + emotional cues), no external calls. Sits above the
+               position status card per the reference design. See
+               onLiveMarketReadInput()/renderLiveMarketRead() in trade-manager.js. -->
+          <div class="tm-live-card tm-lmr-card">
+            <div class="tm-lmr-header">
+              <div class="tm-lmr-title">Live market read</div>
+              <div class="tm-lmr-sub">Say what you see or feel right now — get an instant, unemotional read.</div>
+            </div>
+            <textarea id="tm-lmr-input" class="tm-lmr-textarea"
+              placeholder="e.g. Market is going to break above 23200 and form an FVG."
+              oninput="onLiveMarketReadInput()"></textarea>
+            <div id="tm-lmr-chips" class="tm-lmr-chips"></div>
+          </div>
           <div id="tm-result-area">
             <div class="tm-live-card">
               <div class="tm-live-card-label">At entry</div>

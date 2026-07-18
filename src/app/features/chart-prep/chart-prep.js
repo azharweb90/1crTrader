@@ -59,6 +59,7 @@
   let ruleSteps = ['', '', '', '', '']; // "My rules" 5-step entry checklist for today
   let ruleName = ''; // "Save these rules as a strategy" name field
   let cpSetupsTab = 'mine'; // 'mine' | 'strategy' — local only, not persisted
+  let lmrText = ''; // Pre-market read textarea — persisted like everything else here
 
   function today() {
     return (typeof window.todayDateString === 'function') ? window.todayDateString() : new Date().toISOString().slice(0, 10);
@@ -86,6 +87,7 @@
         ? parsed.ruleSteps
         : ['', '', '', '', ''];
       ruleName = parsed.ruleName || '';
+      lmrText = parsed.lmrText || '';
     } catch (e) {
       // corrupted storage — ignore and start fresh rather than throwing
     }
@@ -93,7 +95,7 @@
 
   function saveState() {
     const payload = {
-      date: today(), open: cpOpen, bias: cpBias, ruleSteps, ruleName,
+      date: today(), open: cpOpen, bias: cpBias, ruleSteps, ruleName, lmrText,
       yh: levels.yh, yl: levels.yl, sh: levels.sh, sl: levels.sl, f5h: levels.f5h, f5l: levels.f5l,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -111,6 +113,25 @@
     cpBias = bias;
     saveState();
     applyStateToDom();
+  }
+
+  // ---------- Pre-market read (shared matcher with Trade Manager) ----------
+  let lmrDebounceTimer = null;
+  function onChartPrepLiveReadInput() {
+    const el = document.getElementById('cp-lmr-input');
+    lmrText = el ? el.value : '';
+    saveState();
+    clearTimeout(lmrDebounceTimer);
+    lmrDebounceTimer = setTimeout(renderChartPrepLiveRead, 550);
+  }
+
+  function renderChartPrepLiveRead() {
+    const chipsEl = document.getElementById('cp-lmr-chips');
+    if (!chipsEl) return;
+    if (!lmrText.trim()) { chipsEl.innerHTML = ''; return; }
+    if (typeof window.analyzeLiveMarketRead !== 'function' || typeof window.renderLiveMarketReadChips !== 'function') return;
+    const matches = window.analyzeLiveMarketRead(lmrText);
+    window.renderLiveMarketReadChips(chipsEl, matches, "Add more detail — trend direction, a key level, or how you're feeling — for a sharper read.");
   }
 
   function renderOpenHint() {
@@ -463,10 +484,13 @@
     });
     const nameEl = document.getElementById('cp-rules-name');
     if (nameEl && document.activeElement !== nameEl) nameEl.value = ruleName;
+    const lmrEl = document.getElementById('cp-lmr-input');
+    if (lmrEl && document.activeElement !== lmrEl) lmrEl.value = lmrText;
 
     renderOpenHint();
     renderSideCard();
     renderSetupsCard();
+    renderChartPrepLiveRead();
   }
 
   function renderAll() {
@@ -475,6 +499,7 @@
     applyStateToDom();
   }
 
+  window.onChartPrepLiveReadInput = onChartPrepLiveReadInput;
   window.setChartPrepOpen = setChartPrepOpen;
   window.setChartPrepBias = setChartPrepBias;
   window.onChartPrepLevelInput = onChartPrepLevelInput;

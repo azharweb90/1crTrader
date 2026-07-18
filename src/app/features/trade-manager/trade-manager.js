@@ -318,10 +318,9 @@
 
     const barText = document.getElementById('tm-collapsed-setup-text');
     if (barText) {
-      const typeLabel = direction==='put'?'Put (PE)':'Call (CE)';
       const dirLabel  = direction==='put'?'Short':'Long';
       barText.innerHTML=`
-        <span class="tm-collapsed-chip tm-collapsed-chip-${direction==='put'?'short':'long'}">${dirLabel} ${typeLabel}</span>
+        <span class="tm-collapsed-chip tm-collapsed-chip-${direction==='put'?'short':'long'}">${dirLabel.toUpperCase()}</span>
         <span class="tm-collapsed-chip">${instrumentName||'—'}</span>
         <span class="tm-collapsed-chip">Entry ${fmtPts(entry)}</span>
         <span class="tm-collapsed-chip">SL ${fmtPts(slPrice)}</span>
@@ -385,6 +384,34 @@
     const th = document.getElementById('tm-target-hint'); if(th) th.innerText='';
     const emp = document.getElementById('tm-metrics-empty'); if(emp) emp.style.display='flex';
     const ps = document.getElementById('tm-position-summary'); if(ps){ps.innerHTML='';ps.classList.add('hidden');}
+
+    clearTimeout(lmrDebounceTimer);
+    const lmrInput = document.getElementById('tm-lmr-input'); if(lmrInput) lmrInput.value='';
+    const lmrChips = document.getElementById('tm-lmr-chips'); if(lmrChips) lmrChips.innerHTML='';
+  }
+
+  // ── Live market read ────────────────────────────────────────
+  // Rules + matcher now live in the shared module
+  // /src/app/shared/utils/live-market-read.js (window.analyzeLiveMarketRead
+  // / window.renderLiveMarketReadChips) so Chart Prep's pre-market version
+  // of this same feature uses the exact same rules — no second copy to
+  // drift out of sync.
+  let lmrDebounceTimer = null;
+  function onLiveMarketReadInput() {
+    clearTimeout(lmrDebounceTimer);
+    lmrDebounceTimer = setTimeout(renderLiveMarketRead, 550);
+  }
+
+  function renderLiveMarketRead() {
+    const input = document.getElementById('tm-lmr-input');
+    const chipsEl = document.getElementById('tm-lmr-chips');
+    if (!input || !chipsEl) return;
+    const text = input.value;
+    if (!text.trim()) { chipsEl.innerHTML = ''; return; }
+    if (typeof window.analyzeLiveMarketRead !== 'function' || typeof window.renderLiveMarketReadChips !== 'function') return;
+
+    const matches = window.analyzeLiveMarketRead(text);
+    window.renderLiveMarketReadChips(chipsEl, matches, "Add more detail — trend direction, a key level, or how you're feeling — for a sharper read.");
   }
 
   // ── Direction badge ────────────────────────────────────────
@@ -396,8 +423,8 @@
       <div class="tm-direction-badge tm-direction-badge-${isLong?'long':'short'}">
         <span class="tm-direction-badge-icon">${isLong?'▲':'▼'}</span>
         <div>
-          <span class="tm-direction-badge-label">${isLong?'Long':'Short'} — ${direction==='call'?'Call (CE)':'Put (PE)'}</span>
-          <span class="tm-direction-badge-note">${isLong?'You profit when price rises. Stop-loss is below entry.':'You profit when price falls. Stop-loss is above entry.'}</span>
+          <span class="tm-direction-badge-label">${isLong?'Long':'Short'} — you profit when price ${isLong?'rises':'falls'}</span>
+          <span class="tm-direction-badge-note">${isLong?'Stop-loss sits below entry and trails up as price climbs.':'Stop-loss sits above entry and trails down as price falls.'}</span>
         </div>
       </div>
     `;
@@ -499,23 +526,27 @@
       const curRs=extra.pointsInFavor*qty;
       const balPct=balance&&curRs!==0?fmtPct(Math.abs(curRs)/balance*100):null;
       const slRs = extra.trailingSlPoints*qty;
+      // Position card is tinted by state — risk-free (blue) takes priority
+      // over plain profit (green)/loss (red), matching the reference
+      // design's colored-while-open cards instead of staying neutral
+      // white until the trade actually closes.
+      const posTone = isRF ? 'blue' : (extra.pointsInFavor>0 ? 'green' : (extra.pointsInFavor<0 ? 'red' : 'neutral'));
       el.innerHTML=`
-        <div class="tm-live-card">
-          <div class="tm-live-card-label">Position</div>
+        <div class="tm-live-card tm-live-card-tint-${posTone}">
           <div class="tm-live-card-value">${fmtPts(extra.pointsInFavor)} pts in favor${isRF?' · <span class="tm-live-riskfree">Risk-free</span>':''}</div>
           <div class="tm-live-card-sub">${Math.round(pct)}% to target${isRF?' · Risk-free':''}</div>
         </div>
         <div class="tm-live-card">
           <div class="tm-live-card-row">
             <div class="tm-live-card-label">Unrealized P&amp;L</div>
-            <div class="tm-live-card-badge ${curRs>=0?'tm-live-badge-pos':'tm-live-badge-neg'}">${curRs>=0?'+':''}${fmtRs(curRs)}</div>
+            <div class="tm-live-card-badge tm-live-card-badge-pill ${curRs>=0?'tm-live-badge-pos':'tm-live-badge-neg'}">${curRs>=0?'+':''}${fmtRs(curRs)}</div>
           </div>
           ${balPct?`<div class="tm-live-card-sub">${balPct} of balance</div>`:''}
         </div>
         <div class="tm-live-card">
           <div class="tm-live-card-row">
             <div class="tm-live-card-label">Trailing stop</div>
-            <div class="tm-live-card-badge ${slRs>=0?'tm-live-badge-pos':'tm-live-badge-neg'}">${slRs>=0?'+':''}${fmtRs(slRs)}</div>
+            <div class="tm-live-card-badge tm-live-card-badge-pill ${slRs>=0?'tm-live-badge-pos':'tm-live-badge-neg'}">${slRs>=0?'+':''}${fmtRs(slRs)}</div>
           </div>
           <div class="tm-live-card-value" style="font-size:16px;">${fmtPts(priceFromPIF(extra.trailingSlPoints))}</div>
           <div class="tm-live-card-sub">${extra.trailingSlPoints>=0?'+':''}${fmtPts(extra.trailingSlPoints)} pts from entry</div>
@@ -622,7 +653,12 @@
           <div style="font-size:13px;font-weight:700;color:#1f3a5f;">Trade closed</div>
         </div>`:''}
       </div>
-      <p class="foot-note" style="margin-top:6px;"><span style="color:#2e75b6;">━</span> blue = trailing stop · <span style="color:#1f3a5f;">╌</span> dashed = current price</p>
+      <p class="foot-note tm-chart-legend" style="margin-top:6px;">
+        <span><span style="color:#2e75b6;">━</span> trailing stop</span>
+        <span><span style="color:#1f3a5f;">╌</span> current price</span>
+        <span><span class="tm-chart-legend-swatch" style="background:#1d9e75;"></span> reward</span>
+        <span><span class="tm-chart-legend-swatch" style="background:#d9381e;"></span> risk</span>
+      </p>
     `;
   }
 
@@ -643,5 +679,6 @@
   window.closeTmImportPanel           = closeTmImportPanel;
   window.closeTmImportPanelIfOutside  = closeTmImportPanelIfOutside;
   window.applyBrokerImport            = applyBrokerImport;
+  window.onLiveMarketReadInput        = onLiveMarketReadInput;
 
 })();

@@ -318,9 +318,9 @@
     const wrap = document.getElementById(`t${tradeNum}-amount-wrap`);
     const label = document.getElementById(`t${tradeNum}-amount-label`);
     if (outcome === 'profit') {
-      // Profit amount isn't needed for rule evaluation, but we still let the
-      // user log it for their own record (label adjusts accordingly).
-      label.innerText = 'Enter profit amount (₹) — optional';
+      // Profit amount isn't used for rule evaluation, but it IS required —
+      // the P&L history, balance and journal are meaningless without it.
+      label.innerText = 'Enter profit amount (₹)';
       wrap.classList.remove('hidden');
     } else {
       label.innerText = 'Enter loss amount (₹)';
@@ -487,9 +487,9 @@
         } else if (trade1Status === null) {
           t1Btn.disabled = true;
           t1Status.innerText = 'Pick an outcome to continue.';
-        } else if (trade1Status === 'loss' && trade1Amount <= 0) {
+        } else if (trade1Amount <= 0) {
           t1Btn.disabled = true;
-          t1Status.innerText = 'Enter the loss amount to continue.';
+          t1Status.innerText = `Enter the ${trade1Status === 'profit' ? 'profit' : 'loss'} amount to continue.`;
         } else if (!dateOk) {
           t1Btn.disabled = true;
           t1Status.innerText = 'Fix the date above before submitting.';
@@ -515,9 +515,9 @@
         } else if (trade2Status === null) {
           t2Btn.disabled = true;
           t2Status.innerText = 'Pick an outcome for this final trade.';
-        } else if (trade2Status === 'loss' && trade2Amount <= 0) {
+        } else if (trade2Amount <= 0) {
           t2Btn.disabled = true;
-          t2Status.innerText = 'Enter the loss amount to continue.';
+          t2Status.innerText = `Enter the ${trade2Status === 'profit' ? 'profit' : 'loss'} amount to continue.`;
         } else if (!dateOk) {
           t2Btn.disabled = true;
           t2Status.innerText = 'Fix the date above before submitting.';
@@ -533,7 +533,7 @@
   function submitTrade1() {
     if (trade1Submitted || trade1Status === null || !isLogDateValid()) return;
     if (!trade1Instrument) return; // instrument is required
-    if (trade1Status === 'loss' && trade1Amount <= 0) return;
+    if (trade1Amount <= 0) return; // amount is required for both outcomes
 
     const rule = currentRule();
     if (!rule) return;
@@ -677,7 +677,7 @@
   function submitTrade2() {
     if (!trade2Unlocked || trade2Submitted || trade2Status === null || !isLogDateValid()) return;
     if (!trade2Instrument) return; // instrument is required
-    if (trade2Status === 'loss' && trade2Amount <= 0) return;
+    if (trade2Amount <= 0) return; // amount is required for both outcomes
 
     trade2Submitted = true;
     setStoredCooldownDeadline(null); // day is over either way; nothing left to count down to

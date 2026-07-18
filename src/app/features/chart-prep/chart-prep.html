@@ -13,6 +13,18 @@
   <div class="cp-grid">
     <div class="cp-col-left">
 
+      <!-- Pre-market read — same local rule-based matcher as Trade
+           Manager's during-trade "Live market read" (shared via
+           /src/app/shared/utils/live-market-read.js), just captured
+           before the trade instead of during it. Persists per calendar
+           day alongside the rest of Chart Prep's homework. -->
+      <div class="cp-card">
+        <div class="cp-card-label">PRE-MARKET READ</div>
+        <p class="cp-note" style="margin:0 0 10px;">Say what you see or feel before you take a trade — get an instant, unemotional read.</p>
+        <textarea id="cp-lmr-input" class="cp-input tm-lmr-textarea" placeholder="e.g. Feeling FOMO after missing yesterday's move — market is also forming higher highs." oninput="onChartPrepLiveReadInput()"></textarea>
+        <div id="cp-lmr-chips" class="tm-lmr-chips" style="margin-top:12px;"></div>
+      </div>
+
       <div class="cp-card">
         <div class="cp-card-label">THE OPEN</div>
         <div class="cp-field">

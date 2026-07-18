@@ -1028,11 +1028,9 @@
 }
 
 .tm-live-card-label {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10.5px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
   color: #8a98ad;
   margin-bottom: 6px;
 }
@@ -1070,6 +1068,151 @@
   color: #15803d;
   font-weight: 700;
 }
+
+/* Position card tint — while the trade is still open, not just after it
+   closes. Priority: risk-free (blue) > profit (green) > loss (red) >
+   flat (neutral white), matching the reference design. */
+.tm-live-card-tint-green {
+  background: #eaf8f2;
+  border-color: #b9e6d4;
+}
+.tm-live-card-tint-green .tm-live-card-value { color: #15803d; }
+
+.tm-live-card-tint-red {
+  background: #fbe7e2;
+  border-color: #f6c8c2;
+}
+.tm-live-card-tint-red .tm-live-card-value { color: #c53d22; }
+
+.tm-live-card-tint-blue {
+  background: #eaf2fa;
+  border-color: #cfe1f2;
+}
+.tm-live-card-tint-blue .tm-live-card-value { color: #1f4e7a; }
+
+.tm-live-card-tint-neutral {
+  background: #f7f9fc;
+}
+
+/* Unrealized P&L / Trailing stop deltas as filled pills, not plain
+   colored text — matches the reference design. */
+.tm-live-card-badge-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.tm-live-card-badge-pill.tm-live-badge-pos {
+  background: #e7f6ec;
+}
+.tm-live-card-badge-pill.tm-live-badge-neg {
+  background: #fceee9;
+}
+
+/* Chart legend — trailing stop / current price lines plus reward/risk
+   zone color swatches, laid out as a wrapping row instead of one long
+   dot-separated string. */
+.tm-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+.tm-chart-legend-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  margin-right: 2px;
+}
+
+/* Live market read — local rule-based read card (right column, above the
+   position status card). Base rule reuses .tm-live-card's white/bordered
+   look; only the header/textarea/chip pieces are new. */
+.tm-lmr-card {
+  margin-bottom: 14px;
+}
+
+.tm-lmr-header {
+  margin-bottom: 10px;
+}
+
+.tm-lmr-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 3px;
+}
+
+.tm-lmr-sub {
+  font-size: 12.5px;
+  color: #8a98ad;
+  line-height: 1.4;
+}
+
+.tm-lmr-textarea {
+  width: 100%;
+  min-height: 64px;
+  resize: vertical;
+  border: 1px solid #e3e9f1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: #1e293b;
+  background: #f7f9fc;
+  box-sizing: border-box;
+}
+.tm-lmr-textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+}
+
+.tm-lmr-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.tm-lmr-chip {
+  border-left: 3px solid #cbd5e3;
+  background: #f7f9fc;
+  border-radius: 0 10px 10px 0;
+  padding: 9px 12px;
+}
+
+.tm-lmr-chip-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  color: #5b6b82;
+}
+
+.tm-lmr-chip-text {
+  font-size: 12.5px;
+  color: #3e4c63;
+  line-height: 1.45;
+}
+
+.tm-lmr-chip-green { border-left-color: #15803d; }
+.tm-lmr-chip-green .tm-lmr-chip-label { color: #15803d; }
+
+.tm-lmr-chip-red { border-left-color: #c53d22; }
+.tm-lmr-chip-red .tm-lmr-chip-label { color: #c53d22; }
+
+.tm-lmr-chip-purple { border-left-color: #7c3aed; }
+.tm-lmr-chip-purple .tm-lmr-chip-label { color: #7c3aed; }
+
+.tm-lmr-chip-blue { border-left-color: #2563eb; }
+.tm-lmr-chip-blue .tm-lmr-chip-label { color: #2563eb; }
+
+.tm-lmr-chip-amber { border-left-color: #c2620e; }
+.tm-lmr-chip-amber .tm-lmr-chip-label { color: #c2620e; }
+
+.tm-lmr-chip-neutral { border-left-color: #8a98ad; }
+.tm-lmr-chip-neutral .tm-lmr-chip-label { color: #8a98ad; }
 
 .tm-live-rr-footer {
   background: #f7f9fc;
