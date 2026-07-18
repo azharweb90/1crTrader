@@ -261,9 +261,11 @@
   </div>
 
   <div id="manual-entry-panel" class="tool-layout">
-    <!-- Input Panel -->
+    <!-- Input column — split into separate cards: tier & risk, logging
+         date, then the trade log. -->
     <div class="input-panel">
-      <div class="form-group">
+      <div class="dl-card">
+      <div class="form-group" style="margin-bottom:14px;">
         <label for="calc-tier">Operational Tier Level</label>
         <select id="calc-tier" class="select-input" onchange="onTierChange()">
           <option value="small-1">Small - Level 1 (₹25,000 Cap)</option>
@@ -281,12 +283,14 @@
         </select>
       </div>
 
-      <!-- Trade 1 -->
-      <div class="form-group">
-        <div id="your-limit-callout" class="your-limit-callout">
+        <div id="your-limit-callout" class="your-limit-callout" style="margin-bottom:0;">
           <span class="your-limit-callout-label">Your Max Loss Today</span>
           <span id="your-limit-value" class="your-limit-callout-value">&mdash;</span>
         </div>
+      </div>
+
+      <!-- Trade 1 -->
+      <div class="form-group">
 
         <!-- Date selector, always visible, defaulting to today. Editable
              anytime so a missed earlier day can be backfilled before logging. -->
@@ -464,9 +468,9 @@
   <div id="quick-journal-modal-overlay" class="quick-journal-overlay hidden"
     onclick="onQuickJournalOverlayClick(event)">
     <div class="quick-journal-modal">
-      <div class="journal-form-header">
+      <div class="quick-journal-header">
         <div class="journal-form-title">Quick Journal Note</div>
-        <button type="button" class="journal-close-btn" onclick="closeQuickJournalModal()">&times;</button>
+        <button type="button" class="quick-journal-close" onclick="closeQuickJournalModal()" aria-label="Close">&times;</button>
       </div>
       <label class="amount-label">Strategy / Reason</label>
       <textarea id="qj-strategy" class="journal-textarea" placeholder="Why did you take this trade?"></textarea>
@@ -474,10 +478,19 @@
       <textarea id="qj-emotion" class="journal-textarea"
         placeholder="How were you feeling during this trade?"></textarea>
       <p class="foot-note" style="margin-top:8px;">This is a quick note. For the full write-up (entry/exit price,
-        screenshot, review checklist), open this trade later from the Trading Journal tab — your notes here will already
-        be there.</p>
-      <button type="button" class="trade-submit-btn outcome-btn" style="margin-top:12px;"
-        onclick="saveQuickJournalNote()">Save Note</button>
+        screenshot, review checklist), use the button below — or save the note and finish it later from the Trading
+        Journal tab; whatever you write here will already be there.</p>
+      <div class="qj-actions-row">
+        <button type="button" class="trade-submit-btn outcome-btn"
+          onclick="saveQuickJournalNote()">Save Note</button>
+        <!-- Always visible, but disabled until the trade is submitted — the
+             full journal form opens against a real trade id, which doesn't
+             exist yet for a pre-submit draft. When enabled, it saves the
+             quick fields first, then jumps straight into the full entry on
+             the Trading Journal tab. -->
+        <button type="button" id="qj-full-entry-btn" class="qj-full-entry-btn"
+          onclick="goToFullJournalEntry()">Fill Full Journal Entry &rarr;</button>
+      </div>
       <p id="qj-save-status" class="foot-note" style="margin-top:6px;"></p>
     </div>
   </div>

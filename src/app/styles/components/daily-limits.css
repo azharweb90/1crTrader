@@ -20,6 +20,40 @@
   padding: 20px;
 }
 
+/* The input column used to be one giant white box holding everything —
+   visually confusing. It's now a transparent stack, and each logical
+   group below (tier & risk, logging date, each trade slot) is its own
+   separate card. */
+.input-panel {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.dl-card {
+  background: #ffffff;
+  border: 1px solid #DCE3EC;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+
+/* Promote the previously-inset boxes to standalone white cards. */
+.input-panel .log-date-wrap {
+  background: #ffffff;
+  border: 1px solid #DCE3EC;
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.input-panel .trade-log-container {
+  background: #ffffff;
+  border: 1px solid #DCE3EC;
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
 .output-panel {
   position: sticky;
   top: 20px;
@@ -85,17 +119,60 @@
   vertical-align: middle;
 }
 
+/* Primary CTA. Doubled-up selector on purpose: the markup is
+   class="outcome-btn trade-submit-btn", and .outcome-btn (white bg) is
+   declared LATER in this file — at equal specificity it silently won the
+   cascade, rendering every submit button white like the outcome toggles.
+   .outcome-btn.trade-submit-btn outranks it regardless of order. */
+.outcome-btn.trade-submit-btn,
 .trade-submit-btn {
   width: 100%;
-  background: #1E293B;
+  background: #2563EB;
   color: #ffffff;
-  border-color: #1E293B;
+  border-color: #2563EB;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
 }
 
+.outcome-btn.trade-submit-btn:hover:not(:disabled),
+.trade-submit-btn:hover:not(:disabled) {
+  background: #1D4ED8;
+  border-color: #1D4ED8;
+}
+
+.outcome-btn.trade-submit-btn:disabled,
 .trade-submit-btn:disabled {
   background: #DCE3EC;
   color: #8A98AD;
   border-color: #DCE3EC;
+  box-shadow: none;
+  opacity: 1;
+}
+
+/* "+ Add Journal Note" — an inviting, clearly-clickable secondary action.
+   The generic .journal-list-btn gets recolored to flat canvas-gray by
+   app-theme.css (loaded last), which made this button look permanently
+   disabled. The scoped selector below outranks that override. */
+.trade-log-container .journal-list-btn {
+  background: #fff;
+  border: 1px dashed #A8C4F5;
+  color: #2563EB;
+  font-weight: 700;
+}
+
+.trade-log-container .journal-list-btn:hover:not(:disabled) {
+  background: #EAF1FE;
+  border-style: solid;
+  border-color: #2563EB;
+  color: #2563EB;
+}
+
+.trade-log-container .journal-list-btn:disabled {
+  background: #F7F9FC;
+  border: 1px dashed #DCE3EC;
+  color: #8A98AD;
+  opacity: 1;
+  cursor: not-allowed;
 }
 
 .trade-log-container.locked {
@@ -1303,6 +1380,79 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* Modal header: title left, circular close button right — previously the
+   markup used .journal-form-header/.journal-close-btn which had no styles
+   anywhere, leaving a raw unstyled × sitting under the title. */
+.quick-journal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.quick-journal-close {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 1px solid #E3E9F1;
+  border-radius: 50%;
+  background: #fff;
+  color: #5B6B82;
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.quick-journal-close:hover {
+  background: #F7F9FC;
+  color: #1E293B;
+  border-color: #CFD9E6;
+}
+
+/* Save Note + Fill Full Journal Entry, side by side. */
+.qj-actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.qj-actions-row > button {
+  flex: 1;
+  margin-top: 0;
+}
+
+/* Secondary CTA next to Save Note — jumps into the full journal entry form. */
+.qj-full-entry-btn {
+  padding: 11px 14px;
+  border: 1px solid #CFE0FB;
+  border-radius: 10px;
+  background: #EAF1FE;
+  color: #2563EB;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.qj-full-entry-btn:hover:not(:disabled) {
+  background: #DDE9FD;
+  border-color: #2563EB;
+}
+
+.qj-full-entry-btn:disabled {
+  background: #F7F9FC;
+  border-color: #E3E9F1;
+  color: #8A98AD;
+  cursor: not-allowed;
 }
 
 /* Broker-synced trade feed (prototype mock) */

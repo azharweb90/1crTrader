@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="/assets/images/logos/favicon.png">
   <link rel="stylesheet" href="/src/app/styles/tokens.css">
-  <link rel="stylesheet" href="/src/app/styles/main.css?v=3">
+  <link rel="stylesheet" href="/src/app/styles/main.css?v=13">
   <link rel="stylesheet" href="/src/app/styles/themes/app-theme.css">
   <link rel="stylesheet" href="/src/app/product-tour/product-tour.css">
   <link rel="stylesheet" href="/src/app/onboarding/onboarding.css?v=22">
@@ -67,6 +67,9 @@
   <div class="main-column">
     <header id="top-bar" class="top-bar hidden">
       <div class="top-bar-title">
+        <button type="button" id="top-bar-back-btn" class="top-bar-back-btn hidden" onclick="goBackTab()" aria-label="Go back" title="Go back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
         <h1 id="top-bar-page-title" class="top-bar-page-title">Dashboard</h1>
       </div>
       <div class="top-bar-right">
@@ -106,6 +109,10 @@
     </header>
 
     <main class="content-area">
+      <!-- Breadcrumb trail — lives in the canvas, directly under the top bar.
+           Populated by updateTopBarNav() in app-shell.js on every tab switch;
+           hidden via :empty when there's nothing to show (setup screen). -->
+      <nav id="page-breadcrumb" class="page-breadcrumb" aria-label="Breadcrumb"></nav>
       <!-- Each tab-content is an empty slot; app-shell.js fetches the matching
            components/*.html fragment into it the first time the tab is opened. -->
       <div id="tab-select" class="tab-content active"></div>
@@ -127,7 +134,7 @@
 <script src="/src/marketing/services/auth-service.js"></script>
 <script src="/src/app/shared/utils/formatters.js"></script>
 <script src="/src/app/shared/risk-engine/tier-rules.js?v=3"></script>
-<script src="/src/app/app-shell.js?v=5"></script>
+<script src="/src/app/app-shell.js?v=7"></script>
 <script src="/src/app/product-tour/product-tour.js"></script>
 <script src="/src/app/product-tour/tour-content.js"></script>
 <script src="/src/app/onboarding/onboarding.js?v=23"></script>

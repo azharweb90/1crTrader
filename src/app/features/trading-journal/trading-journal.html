@@ -7,6 +7,67 @@
   <div id="journal-mode-list">
     <p class="section-note" style="margin:0 0 22px; max-width:720px;">Turn every trade into a lesson. Log your reasoning, emotion and execution — each entry is scored like a report card, so your discipline becomes something you can actually see and improve.</p>
 
+    <!-- Overview — its own Day/Week/Month range (separate from the Rule
+         Adherence Analysis section's own Week/Month/All Time toggle
+         below), 7 stat tiles (Best/Worst Strategy intentionally excluded
+         — no structured strategy-name field exists on a trade or journal
+         entry yet), and a single dynamic insight banner. Every tile opens
+         the details drawer (#journal-ov-drawer near the end of this file)
+         via openOverviewDrawer() — see trading-journal.js. -->
+    <div class="journal-ov-section">
+      <div class="journal-ov-header">
+        <div class="journal-ov-header-left">
+          <div class="journal-hero-eyebrow">Overview</div>
+          <span id="journal-ov-badge" class="journal-ov-badge hidden"></span>
+        </div>
+        <div class="journal-hero-toggle">
+          <button type="button" id="journal-ov-day-btn" class="broker-range-pill" onclick="setOverviewRange('day')">Day</button>
+          <button type="button" id="journal-ov-week-btn" class="broker-range-pill broker-range-pill-active" onclick="setOverviewRange('week')">Week</button>
+          <button type="button" id="journal-ov-month-btn" class="broker-range-pill" onclick="setOverviewRange('month')">Month</button>
+        </div>
+      </div>
+
+      <div class="journal-ov-grid">
+        <div class="journal-ov-tile" onclick="openOverviewDrawer('wins')">
+          <div class="journal-ov-label">Wins</div>
+          <div id="journal-ov-wins-value" class="journal-ov-value journal-ov-value-green">0</div>
+          <div id="journal-ov-wins-sub" class="journal-ov-sub">&mdash;</div>
+        </div>
+        <div class="journal-ov-tile" onclick="openOverviewDrawer('losses')">
+          <div class="journal-ov-label">Losses</div>
+          <div id="journal-ov-losses-value" class="journal-ov-value journal-ov-value-red">0</div>
+          <div id="journal-ov-losses-sub" class="journal-ov-sub">&mdash;</div>
+        </div>
+        <div class="journal-ov-tile" onclick="openOverviewDrawer('clean')">
+          <div class="journal-ov-label">Clean Days</div>
+          <div id="journal-ov-clean-value" class="journal-ov-value journal-ov-value-green">0</div>
+          <div id="journal-ov-clean-sub" class="journal-ov-sub">0 of 0 days</div>
+        </div>
+        <div class="journal-ov-tile" onclick="openRuleBreaksPage()">
+          <div class="journal-ov-label">Rule-broken Days</div>
+          <div id="journal-ov-rulebroken-value" class="journal-ov-value">0</div>
+          <div id="journal-ov-rulebroken-sub" class="journal-ov-sub">0 of 0 days</div>
+        </div>
+        <div class="journal-ov-tile" onclick="openOverviewDrawer('largest-win')">
+          <div class="journal-ov-label">Largest Win</div>
+          <div id="journal-ov-largestwin-value" class="journal-ov-value journal-ov-value-green">&mdash;</div>
+          <div id="journal-ov-largestwin-sub" class="journal-ov-sub">&mdash;</div>
+        </div>
+        <div class="journal-ov-tile" onclick="openOverviewDrawer('largest-loss')">
+          <div class="journal-ov-label">Largest Loss</div>
+          <div id="journal-ov-largestloss-value" class="journal-ov-value journal-ov-value-red">&mdash;</div>
+          <div id="journal-ov-largestloss-sub" class="journal-ov-sub">&mdash;</div>
+        </div>
+        <div class="journal-ov-tile" onclick="openOverviewDrawer('graded')">
+          <div class="journal-ov-label">Avg Grade</div>
+          <div id="journal-ov-avggrade-value" class="journal-ov-value"><span class="journal-grade-pill-empty">&mdash;</span></div>
+          <div id="journal-ov-avggrade-sub" class="journal-ov-sub">0 trades scored</div>
+        </div>
+      </div>
+
+      <div id="journal-ov-banner" class="journal-ov-banner hidden" onclick="handleOverviewBannerClick()"></div>
+    </div>
+
     <!-- Adherence hero -->
     <div class="journal-hero">
       <div class="journal-hero-header">
@@ -33,10 +94,6 @@
           <div class="journal-hero-stat-label">Avg review score</div>
           <div id="journal-hero-avg-score" class="journal-hero-stat-value">&mdash;</div>
         </div>
-        <div class="journal-hero-stat">
-          <div class="journal-hero-stat-label">Avg grade</div>
-          <div id="journal-hero-avg-grade"><span class="journal-grade-pill-empty">&mdash;</span></div>
-        </div>
       </div>
     </div>
 
@@ -48,6 +105,9 @@
 
     <!-- Needs-journaling tab -->
     <div id="journal-tab-todo">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+        <button type="button" class="journal-filter-clear-btn" onclick="openMissedEntriesPage()">View by day / week / month &rarr;</button>
+      </div>
       <div class="journal-todo-wrap">
         <div class="journal-todo-grid">
           <div class="journal-todo-row" style="display:contents;">
@@ -64,6 +124,9 @@
 
     <!-- Journaled-entries tab -->
     <div id="journal-tab-saved" class="hidden">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+        <button type="button" class="journal-filter-clear-btn" onclick="openEntriesPage()">Open in full page &rarr;</button>
+      </div>
       <div class="journal-filter-row">
         <div class="journal-filter-field">
           <label for="journal-instrument-filter">Instrument</label>
@@ -115,8 +178,22 @@
       <div id="journal-form-meta" class="journal-form-meta"></div>
     </div>
 
-    <div class="journal-section">
-      <div class="journal-section-header"><div class="journal-section-num">1</div><span class="journal-section-title">Trade details</span></div>
+    <!-- Wizard stepper — one section shown at a time (setJournalStep() in
+         trading-journal.js). Completed/visited steps are clickable. -->
+    <div id="journal-stepper" class="journal-stepper">
+      <button type="button" class="jstep-node" data-step="1" onclick="goToJournalStep(1)"><span class="jstep-circle">1</span><span class="jstep-label">Trade details</span></button>
+      <span class="jstep-line" data-line="1"></span>
+      <button type="button" class="jstep-node" data-step="2" onclick="goToJournalStep(2)"><span class="jstep-circle">2</span><span class="jstep-label">Execution</span></button>
+      <span class="jstep-line" data-line="2"></span>
+      <button type="button" class="jstep-node" data-step="3" onclick="goToJournalStep(3)"><span class="jstep-circle">3</span><span class="jstep-label">Logic</span></button>
+      <span class="jstep-line" data-line="3"></span>
+      <button type="button" class="jstep-node" data-step="4" onclick="goToJournalStep(4)"><span class="jstep-circle">4</span><span class="jstep-label">Psychology</span></button>
+      <span class="jstep-line" data-line="4"></span>
+      <button type="button" class="jstep-node" data-step="5" onclick="goToJournalStep(5)"><span class="jstep-circle">5</span><span class="jstep-label">Review score</span></button>
+    </div>
+
+    <div class="journal-section" id="jstep-sec-1">
+      <div class="journal-section-header"><span class="journal-section-title">Trade details</span></div>
       <div class="journal-field-grid">
         <div>
           <div class="journal-field-label">Instrument</div>
@@ -132,8 +209,8 @@
       </div>
     </div>
 
-    <div class="journal-section">
-      <div class="journal-section-header"><div class="journal-section-num">2</div><span class="journal-section-title">Execution &amp; management</span></div>
+    <div class="journal-section hidden" id="jstep-sec-2">
+      <div class="journal-section-header"><span class="journal-section-title">Execution &amp; management</span></div>
       <div class="journal-field-grid journal-field-grid-5">
         <div><div class="journal-field-label">Entry price</div><input type="number" id="jf-entry-price" class="journal-input mono" placeholder="22150"></div>
         <div><div class="journal-field-label">Exit price</div><input type="number" id="jf-exit-price" class="journal-input mono" placeholder="22220"></div>
@@ -143,8 +220,8 @@
       </div>
     </div>
 
-    <div class="journal-section">
-      <div class="journal-section-header"><div class="journal-section-num">3</div><span class="journal-section-title">Logic</span></div>
+    <div class="journal-section hidden" id="jstep-sec-3">
+      <div class="journal-section-header"><span class="journal-section-title">Logic</span></div>
       <div class="journal-field-label">Setup / entry reason</div>
       <textarea id="jf-setup-reason" class="journal-textarea" placeholder="Why did you take this trade? What setup or signal triggered the entry?"></textarea>
       <div class="journal-field-label">Market conditions</div>
@@ -165,17 +242,22 @@
       <p id="jf-screenshot-error" class="capital-amount-error hidden"></p>
     </div>
 
-    <div class="journal-section">
-      <div class="journal-section-header"><div class="journal-section-num">4</div><span class="journal-section-title">Psychology &amp; reflection</span></div>
+    <div class="journal-section hidden" id="jstep-sec-4">
+      <div class="journal-section-header"><span class="journal-section-title">Psychology &amp; reflection</span></div>
       <div class="journal-field-label">Emotion during the trade</div>
       <textarea id="jf-emotion" class="journal-textarea" placeholder="How were you feeling — confident, anxious, FOMO, calm? Be honest."></textarea>
+      <div class="journal-field-label">Trade behavior flags</div>
+      <!-- Chips are rendered by renderBehaviorFlags() in trading-journal.js
+           from the BEHAVIOR_FLAGS list — multi-select, except "No mistakes"
+           which is exclusive and clears the rest. -->
+      <div id="jf-behavior-flags" class="journal-flag-row"></div>
       <div class="journal-field-label">Mistakes / what you'd do differently</div>
       <textarea id="jf-mistakes" class="journal-textarea" placeholder="Anything you'd change next time? Rule broken? Good discipline shown?" style="margin-bottom:0;"></textarea>
     </div>
 
-    <div class="journal-section">
-      <div class="journal-section-header"><div class="journal-section-num">5</div><span class="journal-section-title">Trade review score</span></div>
-      <p class="section-note" style="margin:0 0 10px;">Check what applied to this trade. Each item is weighted — the total maps to a letter grade, like a report card for your discipline.</p>
+    <div class="journal-section hidden" id="jstep-sec-5">
+      <div class="journal-section-header"><span class="journal-section-title">Trade review score</span></div>
+      <p class="section-note" style="margin:0 0 10px;">Check what applied to this trade. Each item is weighted — the total maps to a letter grade, like a report card for your discipline. Behavior flags from section 4 count against you: each mistake flagged deducts 2 points, so a trade full of mistakes can't grade like a clean one.</p>
       <div class="journal-grade-legend">
         <span class="journal-grade-legend-item"><b class="journal-grade-legend-pill grade-a">A</b>90%+</span>
         <span class="journal-grade-legend-item"><b class="journal-grade-legend-pill grade-b">B</b>80–89%</span>
@@ -194,77 +276,155 @@
     </div>
 
     <div class="journal-form-actions">
-      <button type="button" id="journal-save-btn" class="journal-save-btn" onclick="saveCurrentJournalEntry()">Save journal entry</button>
-      <button type="button" class="journal-cancel-btn" onclick="jBackToList()">Cancel</button>
+      <button type="button" id="journal-wizard-back-btn" class="journal-cancel-btn" onclick="journalWizardBack()">Cancel</button>
+      <button type="button" id="journal-wizard-next-btn" class="journal-save-btn" onclick="journalWizardNext()">Continue</button>
       <button type="button" id="journal-delete-btn" class="journal-delete-btn hidden" onclick="confirmDeleteJournalEntry()">Delete</button>
     </div>
     <p id="journal-save-status" class="foot-note" style="margin-top:-12px;"></p>
   </div>
 
   <!-- ===== VIEW MODE (read-only) ===== -->
+  <!-- journal-view-content is filled by entryDetailHtml() in trading-journal.js
+       (openJournalView()) — the same template function also fills the
+       Entries page's right-hand detail pane, so the two never drift out
+       of sync with each other. -->
   <div id="journal-mode-view" class="journal-form-wrap hidden">
     <button type="button" class="journal-back-btn" onclick="jBackToList()">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back to journal
     </button>
+    <div id="journal-view-content"></div>
+  </div>
 
-    <div class="journal-view-header">
-      <div id="journal-view-grade" class="journal-view-grade">&mdash;</div>
-      <div class="journal-view-main">
-        <div class="journal-view-title-row">
-          <span id="journal-view-instrument" class="journal-view-instrument"></span>
-          <span id="journal-view-dir" class="journal-view-dir"></span>
+  <!-- ===== JOURNAL ENTRIES (master-detail full page) =====
+       Left pane: filterable (instrument/grade/date), groupable
+       (Day/Week/Month/All) list of every journaled entry. Right pane:
+       the selected entry's full detail via entryDetailHtml() — clicking
+       another row just re-renders the right pane (selectJedEntry), no
+       navigation. Reached from the Journaled-entries tab (row clicks and
+       the "Open in full page" link) and from any place that used to open
+       the standalone view mode for a saved entry. See openEntriesPage()/
+       renderEntriesPage() in trading-journal.js. -->
+  <div id="journal-mode-entries" class="journal-form-wrap hidden" style="max-width:1200px;">
+    <button type="button" class="journal-back-btn" onclick="jBackToList()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back to journal
+    </button>
+    <div class="jed-header">
+      <div>
+        <h2 class="journal-form-title">All journal entries</h2>
+        <div id="jed-count" class="journal-form-meta">0 entries</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <button type="button" class="journal-filter-clear-btn" onclick="openMissedEntriesPage()">Missed entries &rarr;</button>
+        <div class="journal-group-toggle">
+          <button type="button" id="jed-group-day-btn" class="broker-range-pill" onclick="setJedGroup('day')">Day</button>
+          <button type="button" id="jed-group-week-btn" class="broker-range-pill broker-range-pill-active" onclick="setJedGroup('week')">Week</button>
+          <button type="button" id="jed-group-month-btn" class="broker-range-pill" onclick="setJedGroup('month')">Month</button>
+          <button type="button" id="jed-group-all-btn" class="broker-range-pill" onclick="setJedGroup('all')">All</button>
         </div>
-        <div id="journal-view-date" class="journal-view-date"></div>
-        <div class="journal-view-bar-track"><div id="journal-view-bar" class="journal-view-bar-fill" style="width:0%;"></div></div>
-        <div id="journal-view-pts" class="journal-view-pts"></div>
-      </div>
-      <div class="journal-view-result-col">
-        <div class="journal-view-result-label">Result</div>
-        <div id="journal-view-result" class="journal-view-result"></div>
       </div>
     </div>
 
-    <div class="journal-section">
-      <div class="journal-hero-eyebrow" style="margin-bottom:14px;">Execution</div>
-      <div class="journal-view-execution-grid">
-        <div class="journal-view-stat"><div class="journal-view-stat-label">Entry</div><div id="journal-view-entry" class="journal-view-stat-value"></div></div>
-        <div class="journal-view-stat"><div class="journal-view-stat-label">Exit</div><div id="journal-view-exit" class="journal-view-stat-value"></div></div>
-        <div class="journal-view-stat"><div class="journal-view-stat-label">Stop loss</div><div id="journal-view-sl" class="journal-view-stat-value"></div></div>
-        <div class="journal-view-stat"><div class="journal-view-stat-label">Target</div><div id="journal-view-target" class="journal-view-stat-value"></div></div>
-        <div class="journal-view-stat"><div class="journal-view-stat-label">Risk : reward</div><div id="journal-view-rr" class="journal-view-stat-value"></div></div>
+    <div class="journal-filter-row">
+      <div class="journal-filter-field">
+        <label for="jed-instrument-filter">Instrument</label>
+        <select id="jed-instrument-filter" class="select-input journal-filter-select" onchange="onJedInstrumentFilterChange()">
+          <option value="">All instruments</option>
+        </select>
+      </div>
+      <div class="journal-filter-field">
+        <label for="jed-grade-filter">Grade</label>
+        <select id="jed-grade-filter" class="select-input journal-filter-select" onchange="onJedGradeFilterChange()">
+          <option value="">All grades</option>
+          <option value="A">A grades</option>
+          <option value="B">B grades</option>
+          <option value="C">C grades</option>
+          <option value="D">D grades</option>
+          <option value="F">F grades</option>
+        </select>
+      </div>
+      <div class="journal-filter-field">
+        <label for="jed-date-from">From</label>
+        <input type="date" id="jed-date-from" class="select-input journal-filter-select" onchange="onJedDateFilterChange()">
+      </div>
+      <div class="journal-filter-field">
+        <label for="jed-date-to">To</label>
+        <input type="date" id="jed-date-to" class="select-input journal-filter-select" onchange="onJedDateFilterChange()">
+      </div>
+      <button type="button" class="journal-filter-clear-btn" onclick="clearJedFilters()">Clear filters</button>
+    </div>
+
+    <div class="jed-layout">
+      <div class="jed-list-pane">
+        <div id="jed-list-body"></div>
+      </div>
+      <div class="jed-detail-pane">
+        <div id="jed-detail-body"></div>
       </div>
     </div>
+  </div>
 
-    <div class="journal-view-two-col">
-      <div class="journal-section" style="margin-bottom:0;">
-        <div class="journal-hero-eyebrow" style="margin-bottom:14px;">Logic</div>
-        <div class="journal-view-card-label">Setup / entry reason</div>
-        <p id="journal-view-setup" class="journal-view-card-text"></p>
-        <div class="journal-view-card-label">Market conditions</div>
-        <p id="journal-view-market" class="journal-view-card-text"></p>
+  <!-- ===== MISSED ENTRIES (full page) =====
+       Trades with no journal entry yet, grouped by date, with its own
+       Day/Week/Month range (jMissedRange) — answers "when did he not
+       journal". Visually reuses the Rule-broken Days page's card styles.
+       See openMissedEntriesPage()/renderMissedPage() in trading-journal.js. -->
+  <div id="journal-mode-missed" class="journal-form-wrap hidden">
+    <button type="button" class="journal-back-btn" onclick="jBackToList()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back to journal
+    </button>
+    <div class="jrb-header">
+      <div>
+        <h2 class="journal-form-title">Missed entries</h2>
+        <div id="jmi-period-label" class="journal-form-meta">This Week</div>
       </div>
-      <div class="journal-section" style="margin-bottom:0;">
-        <div class="journal-hero-eyebrow" style="margin-bottom:14px;">Psychology &amp; reflection</div>
-        <div class="journal-view-card-label">Emotion during the trade</div>
-        <p id="journal-view-emotion" class="journal-view-card-text"></p>
-        <div class="journal-view-card-label">Mistakes / what you'd do differently</div>
-        <p id="journal-view-mistakes" class="journal-view-card-text"></p>
+      <div class="journal-hero-toggle">
+        <button type="button" id="jmi-day-btn" class="broker-range-pill" onclick="setMissedRange('day')">Day</button>
+        <button type="button" id="jmi-week-btn" class="broker-range-pill broker-range-pill-active" onclick="setMissedRange('week')">Week</button>
+        <button type="button" id="jmi-month-btn" class="broker-range-pill" onclick="setMissedRange('month')">Month</button>
       </div>
     </div>
+    <div id="jmi-body"></div>
+  </div>
 
-    <div id="journal-view-screenshot-wrap" class="journal-section hidden">
-      <div class="journal-hero-eyebrow" style="margin-bottom:10px;">Setup screenshot</div>
-      <img id="journal-view-screenshot" class="journal-view-screenshot" alt="Setup screenshot">
+  <!-- ===== RULE-BROKEN DAYS (full page) =====
+       A 4th top-level mode, not the drawer — the Rule-broken Days tile and
+       the Overview warning banner both open this instead of
+       openOverviewDrawer('rule-broken'), since a single-line "Rule broken"
+       badge wasn't enough detail; this page shows the actual rule message
+       plus the journaled Mistakes/Emotion/checklist breakdown per trade.
+       Has its own Day/Week/Month range (jRbRange, defaults Month) that is
+       independent of jRange and jOverviewRange. See openRuleBreaksPage() /
+       renderRuleBreaksPage() in trading-journal.js. -->
+  <div id="journal-mode-rulebreaks" class="journal-form-wrap hidden">
+    <button type="button" class="journal-back-btn" onclick="jBackToList()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back to journal
+    </button>
+    <div class="jrb-header">
+      <div>
+        <h2 class="journal-form-title">Rule-broken days</h2>
+        <div id="jrb-period-label" class="journal-form-meta">This Month</div>
+      </div>
+      <div class="journal-hero-toggle">
+        <button type="button" id="jrb-day-btn" class="broker-range-pill" onclick="setRbRange('day')">Day</button>
+        <button type="button" id="jrb-week-btn" class="broker-range-pill" onclick="setRbRange('week')">Week</button>
+        <button type="button" id="jrb-month-btn" class="broker-range-pill broker-range-pill-active" onclick="setRbRange('month')">Month</button>
+      </div>
     </div>
+    <div id="jrb-body"></div>
+  </div>
 
-    <div class="journal-section">
-      <div class="journal-hero-eyebrow" style="margin-bottom:16px;">Trade review breakdown</div>
-      <div id="journal-view-breakdown"></div>
+  <!-- Overview drawer — a sibling of the three mode wrappers above (not
+       nested inside journal-mode-list) so it isn't yanked out of the DOM
+       by setMode() if a row click navigates into view/entry mode before
+       its own closeOverviewDrawer() call finishes. See openOverviewDrawer()
+       / closeOverviewDrawer() in trading-journal.js. -->
+  <div id="journal-ov-drawer-backdrop" class="journal-ov-drawer-backdrop hidden" onclick="closeOverviewDrawer()"></div>
+  <div id="journal-ov-drawer" class="journal-ov-drawer hidden">
+    <div class="journal-ov-drawer-header">
+      <span id="journal-ov-drawer-title" class="journal-ov-drawer-title"></span>
+      <button type="button" class="journal-ov-drawer-close" onclick="closeOverviewDrawer()" aria-label="Close">&times;</button>
     </div>
-
-    <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
-      <button type="button" class="journal-cancel-btn" onclick="editCurrentJournalEntry()">Edit this entry</button>
-    </div>
+    <div id="journal-ov-drawer-body" class="journal-ov-drawer-body"></div>
   </div>
 
 </div>

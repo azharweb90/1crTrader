@@ -81,6 +81,60 @@
     "tab-settings": "Account",
   };
 
+  // ---------- Top-bar navigation: breadcrumb + back button ----------
+  // The tab structure is flat (every feature hangs off Dashboard), so the
+  // breadcrumb is "Dashboard › <Page>" on feature tabs and just "Dashboard"
+  // on the dashboard itself. tabHistory records the trail of visited tabs
+  // so the back button retraces the user's actual steps (not browser
+  // history — the shell never changes the URL).
+  const HOME_TAB = 'tab-dashboard';
+  let tabHistory = [];
+
+  function activeTabId() {
+    const el = document.querySelector('.tab-content.active');
+    return el ? el.id : null;
+  }
+
+  function updateTopBarNav(tabId) {
+    const crumbEl = document.getElementById('page-breadcrumb');
+    const backBtn = document.getElementById('top-bar-back-btn');
+    if (crumbEl) {
+      if (tabId === 'tab-select' || !PAGE_TITLES[tabId]) {
+        crumbEl.innerHTML = '';
+      } else if (tabId === HOME_TAB) {
+        crumbEl.innerHTML = '<span class="breadcrumb-current">Dashboard</span>';
+      } else {
+        crumbEl.innerHTML =
+          '<a href="#" class="breadcrumb-link" onclick="switchTab(null, \'' + HOME_TAB + '\'); return false;">Dashboard</a>' +
+          '<span class="breadcrumb-sep" aria-hidden="true">&rsaquo;</span>' +
+          '<span class="breadcrumb-current">' + PAGE_TITLES[tabId] + '</span>';
+      }
+    }
+    if (backBtn) {
+      backBtn.classList.toggle('hidden', tabHistory.length === 0 || tabId === 'tab-select');
+    }
+  }
+
+  function goBackTab() {
+    if (!tabHistory.length) return;
+    const prev = tabHistory.pop();
+    switchTab(null, prev, { fromBack: true });
+  }
+
+  // ---------- Journal attention badge ----------
+  // A pulsing dot on the Trading Journal sidebar link, lit whenever a quick
+  // note leaves a PARTIAL journal entry behind (see daily-limits.js). Cleared
+  // the moment the trader visits the journal tab.
+  function flagJournalAttention() {
+    const link = document.querySelector('.sidebar-link[data-tab="tab-journal"]');
+    if (link) link.classList.add('has-attention');
+  }
+
+  function clearJournalAttention() {
+    const link = document.querySelector('.sidebar-link[data-tab="tab-journal"]');
+    if (link) link.classList.remove('has-attention');
+  }
+
   // First sub-level key used to pre-select the calculator dropdown per tier.
   const TIER_FIRST_SUBLEVEL = {
     small: "small-1",
@@ -246,6 +300,8 @@
         startingCapital,
         currentBalance,
         selectedTraderTypes: Array.from(selectedTraderTypes),
+        selectedInstruments,
+        customStocks,
         lastTierForBalance,
         joinDate,
         originalStartingCapital,
@@ -276,6 +332,17 @@
     startingCapital = saved.startingCapital;
     currentBalance = saved.currentBalance != null ? saved.currentBalance : saved.startingCapital;
     selectedTraderTypes = new Set(Array.isArray(saved.selectedTraderTypes) ? saved.selectedTraderTypes : []);
+    // Instruments were not part of older saves — without this restore the
+    // Daily Limits "Select instrument" dropdowns came back empty after every
+    // reload. For saves from before this fix (no selectedInstruments key),
+    // fall back to all four index instruments so the tool stays usable.
+    if (saved.selectedInstruments && typeof saved.selectedInstruments === 'object' && Object.keys(saved.selectedInstruments).length) {
+      selectedInstruments = saved.selectedInstruments;
+    } else {
+      selectedInstruments = {};
+      Object.keys(INSTRUMENT_INFO).forEach(key => { selectedInstruments[key] = { lots: 1 }; });
+    }
+    customStocks = Array.isArray(saved.customStocks) ? saved.customStocks : [];
     lastTierForBalance = saved.lastTierForBalance || saved.selectedTier;
     joinDate = saved.joinDate || todayDateString();
     originalStartingCapital = saved.originalStartingCapital != null ? saved.originalStartingCapital : saved.startingCapital;
@@ -568,7 +635,7 @@
   }
 
   // ---------- Tab switching ----------
-  function switchTab(event, tabId) {
+  function switchTab(event, tabId, opts) {
     // While still on the very first profile setup (sidebar nav is visually
     // inert, see .sidebar-setup-mode), block navigation away from it via
     // sidebar clicks — there's no profile/balance yet for other tabs to
@@ -578,6 +645,16 @@
     const sidebar = document.getElementById('sidebar');
     if (sidebar && sidebar.classList.contains('sidebar-setup-mode') && tabId !== 'tab-select') {
       return;
+    }
+
+    // Record where we're coming FROM so the back button can retrace it.
+    // Skipped when this switch IS a back navigation (fromBack), when the
+    // user re-clicks the tab they're already on, and when leaving the
+    // one-time setup screen (no point navigating back into setup).
+    const comingFrom = activeTabId();
+    if (comingFrom && comingFrom !== tabId && comingFrom !== 'tab-select' && !(opts && opts.fromBack)) {
+      tabHistory.push(comingFrom);
+      if (tabHistory.length > 50) tabHistory.shift();
     }
 
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -596,6 +673,10 @@
     if (titleEl && PAGE_TITLES[tabId]) {
       titleEl.innerText = PAGE_TITLES[tabId];
     }
+
+    updateTopBarNav(tabId);
+
+    if (tabId === 'tab-journal') clearJournalAttention();
 
     loadComponent(tabId).then(() => {
       if (tabId === 'tab-roadmap') {
@@ -1353,6 +1434,10 @@
     const titleEl = document.getElementById('top-bar-page-title');
     if (titleEl) titleEl.innerText = PAGE_TITLES['tab-dashboard'];
 
+    // Fresh landing on Dashboard right after setup — no history to go back to.
+    tabHistory = [];
+    updateTopBarNav('tab-dashboard');
+
     loadComponent('tab-dashboard');
 
     Object.keys(COMPONENTS).forEach(applyTierHighlight);
@@ -1363,6 +1448,7 @@
     document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
     const selectTab = document.getElementById('tab-select');
     if (selectTab) selectTab.classList.add('active');
+    updateTopBarNav('tab-select');
     loadComponent('tab-select');
   }
 
@@ -2662,6 +2748,8 @@
   // Expose handlers used by inline onclick attributes in index.html / components,
   // and the state/balance hooks for features/daily-limits/daily-limits.js and roadmap.js.
   window.switchTab = switchTab;
+  window.goBackTab = goBackTab;
+  window.flagJournalAttention = flagJournalAttention;
   window.setStartingCapitalDirect = setStartingCapitalDirect;
   window.generateMockFetchedBalance = generateMockFetchedBalance; // used by onboarding.js's step 1 broker connect (now derives tier from the fetch)
   window.getSelectedTraderTypes = getSelectedTraderTypes;
@@ -2775,6 +2863,10 @@
 
       const titleEl = document.getElementById('top-bar-page-title');
       if (titleEl) titleEl.innerText = PAGE_TITLES['tab-dashboard'];
+
+      // Fresh session landing on Dashboard — start with an empty trail.
+      tabHistory = [];
+      updateTopBarNav('tab-dashboard');
 
       loadComponent('tab-dashboard');
       return;

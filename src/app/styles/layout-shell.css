@@ -121,6 +121,25 @@ body {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+/* Attention badge — pulsing dot on a sidebar link (currently used by the
+   Trading Journal link when a quick note leaves a partial entry behind).
+   Cleared by switchTab() when the tab is visited. */
+.sidebar-link.has-attention::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  margin-left: auto;
+  flex-shrink: 0;
+  animation: sidebar-attention-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes sidebar-attention-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.8); }
+}
+
 /* During initial profile setup, the sidebar is visible (for visual
    continuity with the rest of the app) but nav links are inert — there's
    no profile/balance yet for those screens to render meaningfully. */
@@ -197,6 +216,76 @@ body {
   letter-spacing: -0.4px;
   color: var(--color-text-primary);
   margin: 0;
+}
+
+/* ---------- Top-bar navigation: back button + breadcrumb ---------- */
+
+.top-bar-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.top-bar-back-btn {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.top-bar-back-btn:hover {
+  background: var(--color-surface-inset);
+  color: var(--color-text-primary);
+  border-color: var(--color-accent-border);
+}
+
+.top-bar-back-btn.hidden {
+  display: none;
+}
+
+/* Breadcrumb trail — sits in the canvas area, directly below the top bar,
+   above whichever tab-content is active. */
+.page-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 1;
+  margin: 0 0 18px;
+  white-space: nowrap;
+}
+
+.page-breadcrumb:empty {
+  display: none;
+}
+
+.breadcrumb-link {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.breadcrumb-current {
+  color: var(--color-text-secondary);
+  font-weight: 600;
 }
 
 .top-bar-right {

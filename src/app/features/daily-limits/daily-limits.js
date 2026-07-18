@@ -99,6 +99,8 @@
     } else {
       trade2Instrument = select && select.value ? label : '';
     }
+    // Instrument is part of submit validation — re-evaluate button state.
+    updateTradeSubmitButtons();
   }
 
   // ---------- Always-visible log date ----------
@@ -479,7 +481,10 @@
         t1Status.innerText = 'Locked in and added to your balance and history below.';
       } else {
         t1Btn.innerText = 'Submit Trade 1';
-        if (trade1Status === null) {
+        if (!trade1Instrument) {
+          t1Btn.disabled = true;
+          t1Status.innerText = 'Select an instrument to continue.';
+        } else if (trade1Status === null) {
           t1Btn.disabled = true;
           t1Status.innerText = 'Pick an outcome to continue.';
         } else if (trade1Status === 'loss' && trade1Amount <= 0) {
@@ -504,7 +509,10 @@
         t2Btn.innerText = 'Trade 2 Submitted ✓';
       } else {
         t2Btn.innerText = 'Submit Trade 2';
-        if (trade2Status === null) {
+        if (!trade2Instrument) {
+          t2Btn.disabled = true;
+          t2Status.innerText = 'Select an instrument to continue.';
+        } else if (trade2Status === null) {
           t2Btn.disabled = true;
           t2Status.innerText = 'Pick an outcome for this final trade.';
         } else if (trade2Status === 'loss' && trade2Amount <= 0) {
@@ -524,6 +532,7 @@
   // ---------- Submit Trade 1 ----------
   function submitTrade1() {
     if (trade1Submitted || trade1Status === null || !isLogDateValid()) return;
+    if (!trade1Instrument) return; // instrument is required
     if (trade1Status === 'loss' && trade1Amount <= 0) return;
 
     const rule = currentRule();
@@ -667,6 +676,7 @@
   // ---------- Submit Trade 2 ----------
   function submitTrade2() {
     if (!trade2Unlocked || trade2Submitted || trade2Status === null || !isLogDateValid()) return;
+    if (!trade2Instrument) return; // instrument is required
     if (trade2Status === 'loss' && trade2Amount <= 0) return;
 
     trade2Submitted = true;
@@ -829,7 +839,15 @@
       const draft = journalDrafts[tradeNum];
       strategyEl.value = draft ? draft.strategy : '';
       emotionEl.value = draft ? draft.emotion : '';
-      if (statusEl) statusEl.innerText = 'Draft note \u2014 saved automatically with this trade once you submit it.';
+      if (statusEl) statusEl.innerText = 'Draft note \u2014 saved automatically with this trade once you submit it. The full journal entry unlocks once the trade is submitted.';
+    }
+
+    // "Fill Full Journal Entry" needs a real trade id (the full form opens
+    // against a submitted trade) \u2014 visible always, enabled only post-submit.
+    const fullBtn = document.getElementById('qj-full-entry-btn');
+    if (fullBtn) {
+      fullBtn.disabled = !tradeId;
+      fullBtn.title = tradeId ? '' : 'Submit the trade first \u2014 then you can write the full entry.';
     }
 
     const overlay = document.getElementById('quick-journal-modal-overlay');
@@ -872,7 +890,42 @@
       return;
     }
 
+    // A saved quick note on a real trade is a PARTIAL journal entry \u2014 light
+    // up the Trading Journal link in the sidebar so the trader remembers to
+    // finish the full write-up. (Drafts flag later, when the trade submits \u2014
+    // see commitJournalDraft.)
+    if (quickJournalTradeId && typeof window.flagJournalAttention === 'function') {
+      window.flagJournalAttention();
+    }
+
     setTimeout(closeQuickJournalModal, 700);
+  }
+
+  // "Fill Full Journal Entry" \u2014 saves whatever is typed in the quick fields,
+  // closes this modal, switches to the Trading Journal tab, and opens the
+  // full entry form for this trade. openJournalForm lives in the journal
+  // component's script, which is lazy-loaded on first tab visit \u2014 hence the
+  // short retry loop instead of a direct call.
+  function goToFullJournalEntry() {
+    const tradeId = quickJournalTradeId;
+    if (!tradeId) return;
+
+    const strategy = document.getElementById('qj-strategy').value.trim();
+    const emotion = document.getElementById('qj-emotion').value.trim();
+    if (typeof window.saveJournalEntry === 'function') {
+      window.saveJournalEntry(tradeId, { setupReason: strategy, emotion: emotion });
+    }
+
+    closeQuickJournalModal();
+    if (typeof window.switchTab === 'function') window.switchTab(null, 'tab-journal');
+
+    (function tryOpen(attemptsLeft) {
+      if (typeof window.openJournalForm === 'function') {
+        window.openJournalForm(tradeId);
+      } else if (attemptsLeft > 0) {
+        setTimeout(() => tryOpen(attemptsLeft - 1), 150);
+      }
+    })(20);
   }
 
   // Called right after a trade is submitted, to transfer any pre-submit
@@ -884,6 +937,10 @@
       window.saveJournalEntry(tradeId, { setupReason: draft.strategy, emotion: draft.emotion });
       if (typeof window.renderJournalList === 'function') {
         window.renderJournalList();
+      }
+      // The drafted note just became a real (partial) journal entry.
+      if (typeof window.flagJournalAttention === 'function') {
+        window.flagJournalAttention();
       }
     }
     journalDrafts[tradeNum] = null;
@@ -1469,6 +1526,11 @@
     brokerImportPendingDate = null;
     const confirmWrap = document.getElementById('broker-import-confirm');
     if (confirmWrap) confirmWrap.classList.add('hidden');
+    // Reset the footer back to its default button pair and close the modal —
+    // the import is done, so the trader should land back on the Trade Log
+    // (with the sync status line below reporting what was imported).
+    setBrokerImportFooterMode('default');
+    closeBrokerImportPanel();
 
     const statusEl = document.getElementById('broker-sync-status');
     if (statusEl) {
@@ -1500,6 +1562,7 @@
   window.onTradeInstrumentChange = onTradeInstrumentChange;
   window.openQuickJournalModal = openQuickJournalModal;
   window.closeQuickJournalModal = closeQuickJournalModal;
+  window.goToFullJournalEntry = goToFullJournalEntry;
   window.onQuickJournalOverlayClick = onQuickJournalOverlayClick;
   window.saveQuickJournalNote = saveQuickJournalNote;
   window.renderCalculatorBrokerMode = renderCalculatorBrokerMode;

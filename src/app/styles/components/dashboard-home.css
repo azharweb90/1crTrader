@@ -271,11 +271,12 @@
 .dash-risk-card-tier .dash-risk-value { color: #1D4ED8; }
 
 .dash-risk-card-loss {
-  background: #E3F8F0;
-  border-color: #C3EEDA;
+  background: #FDECEA;
+  border-color: #F6C6C0;
 }
-.dash-risk-card-loss::before { background: #0D9488; }
-.dash-risk-card-loss .dash-risk-label { color: #0D9488; }
+.dash-risk-card-loss::before { background: #DC2626; }
+.dash-risk-card-loss .dash-risk-label { color: #C0362C; }
+.dash-risk-card-loss .dash-risk-value { color: #B3261E; }
 
 .dash-risk-card-lots {
   background: #F1ECFE;
